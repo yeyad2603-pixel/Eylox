@@ -1,0 +1,1892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>∞ Eylox — Admin Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#a78bfa;--green:#4ade80;--pink:#f472b6;--yellow:#fde68a;
+  --blue:#60a5fa;--teal:#2dd4bf;--red:#f87171;--orange:#fb923c;
+  --bg:#07011a;--surface:#0f0428;--card:#130530;--border:#1e0a48;
+  --border2:#2a1560;--text:#f0e8ff;--muted:#9d8ec7;
+  --font-h:'Fredoka One',cursive;--font-b:'Nunito',sans-serif;--font-mono:'JetBrains Mono',monospace;
+}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--font-b);overflow-x:hidden}
+
+/* ── Top bar ── */
+.admin-topbar{
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;gap:12px;
+  padding:0 20px;height:56px;
+  background:rgba(7,1,26,.97);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border2);
+}
+.at-logo{font-family:var(--font-h);font-size:1.3rem;color:var(--yellow);text-decoration:none;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.at-badge{background:linear-gradient(135deg,#f59e0b,#fde68a);color:#1a0800;font-size:.65rem;font-weight:900;padding:2px 8px;border-radius:99px;letter-spacing:.5px}
+.at-spacer{flex:1}
+.at-player{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.82rem;font-weight:700}
+.at-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#ec4899);display:flex;align-items:center;justify-content:center;font-size:1rem;border:2px solid var(--yellow)}
+.at-back{background:rgba(167,139,250,.1);border:1px solid var(--border2);color:var(--purple);font-size:.78rem;font-weight:800;padding:6px 14px;border-radius:99px;cursor:pointer;text-decoration:none;transition:background .15s}
+.at-back:hover{background:rgba(167,139,250,.22)}
+
+/* ── Layout ── */
+.admin-body{display:flex;gap:0;min-height:calc(100vh - 56px)}
+
+/* ── Sidebar ── */
+.admin-sidebar{
+  width:220px;flex-shrink:0;
+  background:var(--surface);border-right:1px solid var(--border);
+  padding:16px 0;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;
+}
+.as-section{padding:8px 16px 4px;font-size:.65rem;font-weight:900;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
+.as-link{
+  display:flex;align-items:center;gap:10px;padding:9px 18px;
+  color:var(--muted);font-size:.82rem;font-weight:800;cursor:pointer;
+  transition:background .15s,color .15s;border-left:3px solid transparent;
+  text-decoration:none;
+}
+.as-link:hover,.as-link.active{background:rgba(167,139,250,.1);color:var(--text);border-left-color:var(--purple)}
+.as-link .icon{font-size:1rem;flex-shrink:0;width:20px;text-align:center}
+.as-count{margin-left:auto;background:rgba(167,139,250,.18);color:var(--purple);font-size:.65rem;font-weight:900;padding:2px 7px;border-radius:99px}
+
+/* ── Main content ── */
+.admin-main{flex:1;padding:20px 24px;min-width:0}
+
+/* ── Command input ── */
+.cmd-input-wrap{
+  background:var(--card);border:1px solid var(--border2);border-radius:16px;
+  padding:16px 20px;margin-bottom:20px;
+}
+.cmd-label{font-size:.72rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.cmd-row{display:flex;gap:10px;align-items:center}
+.cmd-input{
+  flex:1;background:rgba(167,139,250,.07);border:1px solid var(--border2);
+  border-radius:12px;padding:12px 16px;color:var(--text);
+  font-family:var(--font-mono);font-size:.95rem;font-weight:700;outline:none;
+  transition:border-color .18s,background .18s;
+}
+.cmd-input:focus{border-color:var(--purple);background:rgba(167,139,250,.12)}
+.cmd-input::placeholder{color:var(--muted);opacity:.5}
+.cmd-run{
+  background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;
+  border:none;border-radius:12px;padding:12px 22px;font-family:var(--font-b);
+  font-weight:800;font-size:.9rem;cursor:pointer;transition:transform .15s,filter .15s;
+  white-space:nowrap;
+}
+.cmd-run:hover{transform:translateY(-2px);filter:brightness(1.1)}
+.cmd-run:active{transform:scale(.96)}
+.cmd-suggestions{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.cmd-sug{
+  background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);
+  color:var(--muted);font-family:var(--font-mono);font-size:.72rem;font-weight:700;
+  padding:3px 10px;border-radius:99px;cursor:pointer;transition:all .15s;
+}
+.cmd-sug:hover{background:rgba(167,139,250,.22);color:var(--purple);border-color:var(--purple)}
+
+/* ── Category sections ── */
+.cat-section{margin-bottom:28px}
+.cat-header{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 16px;border-radius:12px;
+  background:var(--card);border:1px solid var(--border);
+  margin-bottom:12px;cursor:pointer;user-select:none;
+}
+.cat-header:hover{border-color:var(--border2)}
+.cat-emoji{font-size:1.4rem}
+.cat-title{font-family:var(--font-h);font-size:1rem;flex:1}
+.cat-count{font-size:.72rem;color:var(--muted);font-weight:700}
+.cat-arrow{color:var(--muted);transition:transform .2s;font-size:.8rem}
+.cat-section.collapsed .cat-arrow{transform:rotate(-90deg)}
+.cat-section.collapsed .cmd-grid{display:none}
+.cmd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
+
+/* ── Command card ── */
+.cmd-card{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:10px 14px;cursor:pointer;transition:border-color .15s,background .15s,transform .12s;
+  display:flex;align-items:center;gap:10px;
+}
+.cmd-card:hover{border-color:var(--border2);background:rgba(167,139,250,.07);transform:translateY(-1px)}
+.cmd-card:active{transform:scale(.97)}
+.cc-icon{font-size:1.2rem;flex-shrink:0;width:26px;text-align:center}
+.cc-text{flex:1;min-width:0}
+.cc-cmd{font-family:var(--font-mono);font-size:.75rem;color:var(--purple);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cc-desc{font-size:.7rem;color:var(--muted);font-weight:700;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cc-run{
+  background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.2);
+  color:var(--green);font-size:.65rem;font-weight:900;padding:3px 8px;
+  border-radius:99px;flex-shrink:0;transition:background .15s;
+}
+.cmd-card:hover .cc-run{background:rgba(74,222,128,.25)}
+
+/* ── Console log ── */
+.console-wrap{
+  background:var(--card);border:1px solid var(--border2);border-radius:16px;
+  padding:16px 20px;margin-bottom:20px;
+}
+.console-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.console-title{font-size:.72rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.console-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:blink 1.4s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.console-clear{background:none;border:1px solid var(--border);color:var(--muted);font-family:var(--font-b);font-size:.72rem;font-weight:800;padding:4px 12px;border-radius:99px;cursor:pointer;transition:all .15s}
+.console-clear:hover{color:var(--pink);border-color:var(--pink)}
+.console-log{
+  background:rgba(0,0,0,.4);border-radius:10px;padding:12px;
+  font-family:var(--font-mono);font-size:.78rem;
+  max-height:220px;overflow-y:auto;
+  display:flex;flex-direction:column;gap:3px;
+}
+.log-line{display:flex;gap:8px;align-items:flex-start;animation:logIn .18s ease}
+@keyframes logIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+.log-time{color:rgba(157,142,199,.4);flex-shrink:0;font-size:.7rem;padding-top:1px}
+.log-icon{flex-shrink:0}
+.log-text{color:var(--text);word-break:break-word}
+.log-text.ok  {color:var(--green)}
+.log-text.warn{color:var(--yellow)}
+.log-text.err {color:var(--red)}
+.log-text.info{color:var(--blue)}
+.log-text.fun {color:var(--pink)}
+.log-empty{color:var(--muted);font-size:.75rem;text-align:center;padding:12px 0}
+
+/* ── Players online ── */
+.players-wrap{
+  background:var(--card);border:1px solid var(--border2);border-radius:16px;
+  padding:16px 20px;margin-bottom:20px;
+}
+.players-title{font-size:.72rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+.players-list{display:flex;flex-direction:column;gap:6px}
+.player-row{
+  display:flex;align-items:center;gap:10px;padding:8px 12px;
+  background:rgba(167,139,250,.05);border:1px solid var(--border);border-radius:10px;
+  transition:background .15s;cursor:pointer;
+}
+.player-row:hover{background:rgba(167,139,250,.12);border-color:var(--border2)}
+.pr-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#ec4899);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.pr-name{font-size:.82rem;font-weight:800;flex:1}
+.pr-badge{font-size:.62rem;font-weight:900;padding:2px 7px;border-radius:99px}
+.badge-owner{background:linear-gradient(135deg,#f59e0b,#fde68a);color:#1a0800}
+.badge-mod{background:rgba(167,139,250,.22);color:var(--purple)}
+.badge-player{background:rgba(74,222,128,.12);color:var(--green)}
+.badge-guest{background:rgba(157,142,199,.12);color:var(--muted)}
+.pr-actions{display:flex;gap:5px}
+.pr-act{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.18);color:var(--muted);font-size:.65rem;font-weight:800;padding:3px 8px;border-radius:99px;cursor:pointer;transition:all .15s}
+.pr-act:hover{background:rgba(244,114,182,.18);color:var(--pink);border-color:var(--pink)}
+.pr-act.green:hover{background:rgba(74,222,128,.18);color:var(--green);border-color:var(--green)}
+
+/* ── Stats cards ── */
+.stat-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:20px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;text-align:center}
+.stat-val{font-family:var(--font-h);font-size:1.6rem;line-height:1.1}
+.stat-lbl{font-size:.7rem;color:var(--muted);font-weight:800;margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
+
+/* ── Notification toast ── */
+#adminToast{
+  position:fixed;top:68px;right:20px;z-index:9999;
+  display:flex;flex-direction:column;gap:8px;pointer-events:none;
+}
+.a-toast{
+  background:var(--card);border:1px solid var(--border2);border-radius:12px;
+  padding:10px 16px;font-size:.82rem;font-weight:800;color:var(--text);
+  display:flex;align-items:center;gap:8px;
+  animation:toastIn .3s cubic-bezier(.34,1.56,.64,1) both;
+  pointer-events:none;min-width:220px;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.4);
+}
+@keyframes toastIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+.a-toast.out{animation:toastOut .3s ease forwards}
+@keyframes toastOut{to{opacity:0;transform:translateX(30px)}}
+.a-toast-icon{font-size:1.1rem;flex-shrink:0}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+
+/* ── Mobile ── */
+@media(max-width:700px){
+  .admin-sidebar{display:none}
+  .admin-main{padding:14px 14px 80px}
+  .cmd-grid{grid-template-columns:1fr 1fr}
+  .stat-row{grid-template-columns:1fr 1fr 1fr}
+}
+@media(max-width:400px){
+  .cmd-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="admin-topbar">
+  <a href="index.html" class="at-logo">🎮 Eylox <span class="at-badge">👑 ADMIN</span></a>
+  <div class="at-spacer"></div>
+  <div class="at-player">
+    <div class="at-av" id="atAv">👑</div>
+    <span id="atName">Owner</span>
+  </div>
+  <a href="index.html" class="at-back">← Back to Home</a>
+</div>
+
+<div class="admin-body">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <a class="as-link" onclick="showPlayerRegistry()"><span class="icon">🏅</span> Player Registry</a>
+    <a class="as-link" onclick="showAccountHistory()"><span class="icon">📋</span> Login History</a>
+    <div class="as-section" style="margin-top:16px">Quick Tools</div>
+    <a class="as-link" onclick="cmdQuick(':clearchat')"><span class="icon">🧹</span> Clear Chat</a>
+    <a class="as-link" onclick="cmdQuick(':day')">       <span class="icon">☀️</span> Set Day</a>
+    <a class="as-link" onclick="cmdQuick(':night')">     <span class="icon">🌙</span> Set Night</a>
+    <a class="as-link" onclick="cmdQuick(':clearweather')"><span class="icon">🌤️</span> Clear Weather</a>
+    <a class="as-link" onclick="cmdQuick(':deleteall')"> <span class="icon">🧹</span> Delete All</a>
+    <a class="as-link" onclick="cmdQuick(':logs')">      <span class="icon">📜</span> View Logs</a>
+  </aside>
+
+  <!-- Main -->
+  <main class="admin-main">
+
+    <!-- Stats row -->
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-val" style="color:var(--green)" id="st-online">5</div><div class="stat-lbl">🟢 Online</div></div>
+      <div class="stat-card"><div class="stat-val" style="color:var(--yellow)" id="st-cmds">0</div><div class="stat-lbl">⚡ Commands</div></div>
+      <div class="stat-card"><div class="stat-val" style="color:var(--pink)" id="st-bans">0</div><div class="stat-lbl">🚫 Banned</div></div>
+      <div class="stat-card"><div class="stat-val" style="color:var(--teal)" id="st-coins">—</div><div class="stat-lbl">🪙 My Coins</div></div>
+      <div class="stat-card"><div class="stat-val" style="color:var(--purple)" id="st-uptime">0m</div><div class="stat-lbl">⏱️ Uptime</div></div>
+    </div>
+
+    <!-- Players online -->
+    <div class="players-wrap">
+      <div class="players-title">🎮 Players Online</div>
+      <div class="players-list" id="playersList">
+        <!-- filled by JS -->
+      </div>
+    </div>
+
+    <!-- Command input -->
+    <div class="cmd-input-wrap">
+      <div class="cmd-label">⚡ Command Input</div>
+      <div class="cmd-row">
+        <input class="cmd-input" id="cmdInput" placeholder=":command player [args]" autocomplete="off" spellcheck="false"/>
+        <button class="cmd-run" onclick="runCmd()">▶ Run</button>
+      </div>
+      <div class="cmd-suggestions" id="cmdSugs"></div>
+    </div>
+
+    <!-- Console -->
+    <div class="console-wrap">
+      <div class="console-header">
+        <div class="console-title"><div class="console-dot"></div> Command Log</div>
+        <button class="console-clear" onclick="clearLog()">🧹 Clear</button>
+      </div>
+      <div class="console-log" id="consoleLog">
+        <div class="log-empty">No commands run yet. Type a command above or click any card below.</div>
+      </div>
+    </div>
+
+    <!-- ════════ CATEGORIES (injected by restoreCommandView / init) ════════ -->
+
+  </main>
+</div>
+
+<!-- Toast container -->
+<div id="adminToast"></div>
+
+<script>
+'use strict';
+/* ══════════════════════════════════════════════════
+   OWNER GUARD
+══════════════════════════════════════════════════ */
+const OWNER_NAMES = ['owner','player123','admin'];
+let _adminUser = null;
+try {
+  const u = JSON.parse(localStorage.getItem('eylox_user') || 'null');
+  const isGuest = localStorage.getItem('eylox_guest');
+  const hasSession = localStorage.getItem('eylox_token') || isGuest || u;
+  if (!hasSession) {
+    document.body.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:20px;text-align:center;padding:24px">
+        <div style="font-size:5rem">🔒</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:2rem;color:#a78bfa">Not Logged In</div>
+        <p style="color:#9d8ec7;font-family:Nunito,sans-serif;font-weight:700">Please log in to access the admin panel.</p>
+        <a href="login.html" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;padding:12px 28px;border-radius:99px;text-decoration:none;font-family:Nunito,sans-serif;font-weight:800">← Login</a>
+      </div>`;
+    throw new Error('not logged in');
+  }
+  if (localStorage.getItem('eylox_is_owner') !== 'true') {
+    document.body.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:20px;text-align:center;padding:24px">
+        <div style="font-size:5rem">🔒</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:2rem;color:#a78bfa">Access Denied</div>
+        <p style="color:#9d8ec7;font-family:Nunito,sans-serif;font-weight:700">This panel is for Owner accounts only.</p>
+        <a href="index.html" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;padding:12px 28px;border-radius:99px;text-decoration:none;font-family:Nunito,sans-serif;font-weight:800">← Back to Home</a>
+      </div>`;
+    throw new Error('access denied');
+  }
+  _adminUser = u;
+  /* Fill topbar */
+  document.getElementById('atName').textContent = u.username || 'Owner';
+  document.getElementById('atAv').textContent   = u.avatar || '👑';
+} catch(e) {
+  if(e.message !== 'access denied' && e.message !== 'not logged in') {
+    console.error('Admin auth error:', e);
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   COMMAND DATABASE — 500 COMMANDS
+══════════════════════════════════════════════════ */
+const COMMANDS = {
+  movement: [
+    /* 1–100 🎮💯 PLAYER & MOVEMENT */
+    { cmd:':kill player',         icon:'☠️',  desc:'Eliminate a player',                type:'danger' },
+    { cmd:':heal player',         icon:'❤️',  desc:'Fully heal a player',               type:'ok' },
+    { cmd:':respawn player',      icon:'🔄',  desc:'Respawn a player',                  type:'ok' },
+    { cmd:':god player',          icon:'🛡️',  desc:'Make player invincible',            type:'ok' },
+    { cmd:':ungod player',        icon:'🛡️',  desc:'Remove god mode',                   type:'warn' },
+    { cmd:':invisible player',    icon:'👻',  desc:'Make player invisible',             type:'fun' },
+    { cmd:':visible player',      icon:'👁️',  desc:'Make player visible again',         type:'ok' },
+    { cmd:':freeze player',       icon:'❄️',  desc:'Freeze a player in place',          type:'warn' },
+    { cmd:':unfreeze player',     icon:'🌡️',  desc:'Unfreeze a player',                 type:'ok' },
+    { cmd:':sit player',          icon:'🪑',  desc:'Force a player to sit',             type:'fun' },
+    { cmd:':jump player',         icon:'🦘',  desc:'Force a player to jump',            type:'fun' },
+    { cmd:':trip player',         icon:'😂',  desc:'Trip a player',                     type:'fun' },
+    { cmd:':ragdoll player',      icon:'🪆',  desc:'Ragdoll a player',                  type:'fun' },
+    { cmd:':unragdoll player',    icon:'🧍',  desc:'Unragdoll a player',                type:'ok' },
+    { cmd:':stun player',         icon:'⚡',  desc:'Stun a player briefly',             type:'warn' },
+    { cmd:':blind player',        icon:'🙈',  desc:'Blind a player temporarily',        type:'warn' },
+    { cmd:':unblind player',      icon:'👀',  desc:'Remove blindness from player',      type:'ok' },
+    { cmd:':sleep player',        icon:'😴',  desc:'Put player to sleep',               type:'fun' },
+    { cmd:':wake player',         icon:'⏰',  desc:'Wake a sleeping player',            type:'ok' },
+    { cmd:':energize player',     icon:'⚡',  desc:'Energize & speed boost player',     type:'ok' },
+    { cmd:':fly player',          icon:'🕊️',  desc:'Give player fly ability',           type:'ok' },
+    { cmd:':unfly player',        icon:'🪂',  desc:'Remove fly ability',                type:'warn' },
+    { cmd:':speed10 player',      icon:'🏃',  desc:'Set player speed to 10',            type:'ok' },
+    { cmd:':speed20 player',      icon:'🏃',  desc:'Set player speed to 20',            type:'ok' },
+    { cmd:':speed50 player',      icon:'⚡',  desc:'Set player speed to 50',            type:'ok' },
+    { cmd:':speed100 player',     icon:'🚀',  desc:'Set player speed to 100',           type:'warn' },
+    { cmd:':jump50 player',       icon:'🦘',  desc:'Set jump power to 50',              type:'ok' },
+    { cmd:':jump100 player',      icon:'🦘',  desc:'Set jump power to 100',             type:'fun' },
+    { cmd:':lowgravity player',   icon:'🌙',  desc:'Low gravity for player',            type:'fun' },
+    { cmd:':highgravity player',  icon:'🌍',  desc:'High gravity for player',           type:'warn' },
+    { cmd:':launch player',       icon:'🚀',  desc:'Launch player into the air',        type:'fun' },
+    { cmd:':spin player',         icon:'🌀',  desc:'Spin a player around',              type:'fun' },
+    { cmd:':unspin player',       icon:'⏹️',  desc:'Stop spinning player',              type:'ok' },
+    { cmd:':fling player',        icon:'🤯',  desc:'Fling player with force',           type:'danger' },
+    { cmd:':float player',        icon:'☁️',  desc:'Make player float gently',          type:'fun' },
+    { cmd:':sink player',         icon:'⬇️',  desc:'Make player sink down',             type:'warn' },
+    { cmd:':orbit player',        icon:'🪐',  desc:'Make player orbit you',             type:'fun' },
+    { cmd:':dash player',         icon:'💨',  desc:'Dash player forward fast',          type:'fun' },
+    { cmd:':teleport player me',  icon:'✨',  desc:'Teleport player to you',            type:'ok' },
+    { cmd:':bring player',        icon:'📍',  desc:'Bring player to your location',     type:'ok' },
+    { cmd:':goto player',         icon:'🗺️',  desc:'Go to player location',            type:'ok' },
+    { cmd:':warp player',         icon:'🌀',  desc:'Warp player to a spot',            type:'ok' },
+    { cmd:':bounce player',       icon:'🏀',  desc:'Make player bounce',               type:'fun' },
+    { cmd:':slide player',        icon:'🛷',  desc:'Make player slide on surfaces',    type:'fun' },
+    { cmd:':climb player',        icon:'🧗',  desc:'Enable wall climbing for player',  type:'ok' },
+    { cmd:':noclip player',       icon:'👁️',  desc:'Enable noclip / fly through walls',type:'warn' },
+    { cmd:':clip player',         icon:'🧱',  desc:'Disable noclip for player',        type:'ok' },
+    { cmd:':hover player',        icon:'🛸',  desc:'Make player hover in place',       type:'fun' },
+    { cmd:':roll player',         icon:'🎳',  desc:'Make player roll around',          type:'fun' },
+    { cmd:':flip player',         icon:'🤸',  desc:'Flip player upside-down',          type:'fun' },
+    { cmd:':teleportall',         icon:'✨',  desc:'Teleport all players to you',      type:'warn' },
+    { cmd:':summonall',           icon:'📣',  desc:'Summon all players to you',        type:'warn' },
+    { cmd:':scatter',             icon:'💨',  desc:'Scatter all players randomly',     type:'fun' },
+    { cmd:':follow player',       icon:'🐾',  desc:'Make player follow you',           type:'fun' },
+    { cmd:':unfollow player',     icon:'🛑',  desc:'Stop player following you',        type:'ok' },
+    { cmd:':attach player',       icon:'🔗',  desc:'Attach player to your character',  type:'fun' },
+    { cmd:':detach player',       icon:'🔓',  desc:'Detach player from your character',type:'ok' },
+    { cmd:':push player',         icon:'👋',  desc:'Push player away from you',        type:'fun' },
+    { cmd:':pull player',         icon:'🧲',  desc:'Pull player towards you',          type:'fun' },
+    { cmd:':swap player',         icon:'🔄',  desc:'Swap positions with player',       type:'fun' },
+    { cmd:':mirror player',       icon:'🪞',  desc:'Mirror player movements',          type:'fun' },
+    { cmd:':lock player',         icon:'🔒',  desc:'Lock player in place',             type:'warn' },
+    { cmd:':unlock player',       icon:'🔓',  desc:'Unlock player from place',         type:'ok' },
+    { cmd:':mark player',         icon:'📌',  desc:'Mark player with a tag',           type:'info' },
+    { cmd:':unmark player',       icon:'📌',  desc:'Remove player marker',             type:'info' },
+    { cmd:':tag player',          icon:'🏷️',  desc:'Tag player for tracking',          type:'info' },
+    { cmd:':untag player',        icon:'🏷️',  desc:'Remove player tag',               type:'info' },
+    { cmd:':ghostwalk player',    icon:'👻',  desc:'Enable ghost walk mode',           type:'fun' },
+    { cmd:':solid player',        icon:'🧱',  desc:'Make player solid again',          type:'ok' },
+    { cmd:':boost player',        icon:'🚀',  desc:'Apply all speed boosts to player', type:'ok' },
+    { cmd:':nerf player',         icon:'📉',  desc:'Nerf player speed & power',        type:'warn' },
+    { cmd:':clone player',        icon:'👥',  desc:'Create clone of player',           type:'fun' },
+    { cmd:':removeclone player',  icon:'❌',  desc:'Remove player clone',              type:'ok' },
+    { cmd:':teleportup player',   icon:'⬆️',  desc:'Teleport player upward',           type:'fun' },
+    { cmd:':teleportdown player', icon:'⬇️',  desc:'Teleport player downward',         type:'fun' },
+    { cmd:':teleportrandom player',icon:'🎲', desc:'Teleport player to random spot',   type:'fun' },
+    { cmd:':freezeall',           icon:'❄️',  desc:'Freeze all players',               type:'danger' },
+    { cmd:':unfreezeall',         icon:'🌡️',  desc:'Unfreeze all players',             type:'ok' },
+    { cmd:':speedall',            icon:'⚡',  desc:'Apply speed to all players',       type:'warn' },
+    { cmd:':jumpall',             icon:'🦘',  desc:'Force all players to jump',        type:'fun' },
+    { cmd:':flyall',              icon:'🕊️',  desc:'Give all players fly',             type:'warn' },
+    { cmd:':unflyall',            icon:'🪂',  desc:'Remove fly from all players',      type:'ok' },
+    { cmd:':launchall',           icon:'🚀',  desc:'Launch all players',               type:'fun' },
+    { cmd:':spinall',             icon:'🌀',  desc:'Spin all players',                 type:'fun' },
+    { cmd:':flingall',            icon:'🤯',  desc:'Fling all players',                type:'fun' },
+    { cmd:':orbitall',            icon:'🪐',  desc:'Orbit all players around you',     type:'fun' },
+    { cmd:':dashall',             icon:'💨',  desc:'Dash all players forward',         type:'fun' },
+    { cmd:':hoverall',            icon:'🛸',  desc:'Hover all players',                type:'fun' },
+    { cmd:':bounceall',           icon:'🏀',  desc:'Bounce all players',               type:'fun' },
+    { cmd:':rollall',             icon:'🎳',  desc:'Roll all players',                 type:'fun' },
+    { cmd:':flipall',             icon:'🤸',  desc:'Flip all players',                 type:'fun' },
+    { cmd:':noclipall',           icon:'👁️',  desc:'Noclip all players',               type:'warn' },
+    { cmd:':clipall',             icon:'🧱',  desc:'Restore clip for all players',     type:'ok' },
+    { cmd:':followall',           icon:'🐾',  desc:'All players follow you',           type:'fun' },
+    { cmd:':detachall',           icon:'🔓',  desc:'Detach all players',               type:'ok' },
+    { cmd:':pushall',             icon:'👋',  desc:'Push all players away',            type:'fun' },
+    { cmd:':pullall',             icon:'🧲',  desc:'Pull all players to you',          type:'fun' },
+    { cmd:':swapall',             icon:'🔄',  desc:'Swap all players positions',       type:'fun' },
+    { cmd:':mirrorall',           icon:'🪞',  desc:'Mirror all players movements',     type:'fun' },
+    { cmd:':lockall',             icon:'🔒',  desc:'Lock all players in place',        type:'danger' },
+  ],
+  effects: [
+    /* 101–200 🎭💥 EFFECTS & FUN */
+    { cmd:':bighead player',      icon:'😂',  desc:'Enlarge player head',              type:'fun' },
+    { cmd:':smallhead player',    icon:'🔬',  desc:'Shrink player head',               type:'fun' },
+    { cmd:':giant player',        icon:'🗿',  desc:'Make player giant',                type:'fun' },
+    { cmd:':tiny player',         icon:'🐜',  desc:'Make player tiny',                 type:'fun' },
+    { cmd:':rainbow player',      icon:'🌈',  desc:'Rainbow colour effect',            type:'fun' },
+    { cmd:':fire player',         icon:'🔥',  desc:'Surround player with fire',        type:'fun' },
+    { cmd:':smoke player',        icon:'💨',  desc:'Add smoke effect',                 type:'fun' },
+    { cmd:':sparkles player',     icon:'✨',  desc:'Add sparkle particles',            type:'fun' },
+    { cmd:':glow player',         icon:'💡',  desc:'Make player glow',                 type:'fun' },
+    { cmd:':ghost player',        icon:'👻',  desc:'Semi-transparent ghost look',      type:'fun' },
+    { cmd:':trail player',        icon:'🌠',  desc:'Add movement trail',               type:'fun' },
+    { cmd:':confetti player',     icon:'🎉',  desc:'Confetti explosion on player',     type:'fun' },
+    { cmd:':disco player',        icon:'🕺',  desc:'Disco lights & dance',             type:'fun' },
+    { cmd:':freezeeffect player', icon:'🧊',  desc:'Ice freeze visual effect',         type:'fun' },
+    { cmd:':shock player',        icon:'⚡',  desc:'Electric shock visual',            type:'fun' },
+    { cmd:':explode player',      icon:'💥',  desc:'Explosion effect (no damage)',     type:'fun' },
+    { cmd:':ice player',          icon:'🧊',  desc:'Freeze player in ice block',       type:'fun' },
+    { cmd:':paintred player',     icon:'🔴',  desc:'Paint player red',                 type:'fun' },
+    { cmd:':paintblue player',    icon:'🔵',  desc:'Paint player blue',                type:'fun' },
+    { cmd:':paintgreen player',   icon:'🟢',  desc:'Paint player green',               type:'fun' },
+    { cmd:':dance player',        icon:'💃',  desc:'Force player to dance',            type:'fun' },
+    { cmd:':laugh player',        icon:'😂',  desc:'Make player emote laugh',          type:'fun' },
+    { cmd:':cry player',          icon:'😢',  desc:'Make player emote cry',            type:'fun' },
+    { cmd:':scream player',       icon:'😱',  desc:'Make player scream',               type:'fun' },
+    { cmd:':glitch player',       icon:'📺',  desc:'Apply glitch effect',              type:'fun' },
+    { cmd:':pixel player',        icon:'🎮',  desc:'Pixelate player appearance',       type:'fun' },
+    { cmd:':neon player',         icon:'💜',  desc:'Apply neon glow effect',           type:'fun' },
+    { cmd:':shadow player',       icon:'🌑',  desc:'Make player shadowy',              type:'fun' },
+    { cmd:':light player',        icon:'💛',  desc:'Surround player with light',       type:'fun' },
+    { cmd:':dark player',         icon:'⬛',  desc:'Darken player appearance',         type:'fun' },
+    { cmd:':rain',                icon:'🌧️',  desc:'Start rain weather',              type:'fun' },
+    { cmd:':snow',                icon:'❄️',  desc:'Start snow weather',              type:'fun' },
+    { cmd:':storm',               icon:'⛈️',  desc:'Start storm weather',             type:'fun' },
+    { cmd:':fog',                 icon:'🌫️',  desc:'Add fog to the world',            type:'fun' },
+    { cmd:':wind',                icon:'🌬️',  desc:'Add wind effect',                 type:'fun' },
+    { cmd:':earthquake',          icon:'🌋',  desc:'Trigger earthquake effect',        type:'fun' },
+    { cmd:':lava',                icon:'🌋',  desc:'Lava floor effect',               type:'danger' },
+    { cmd:':meteor',              icon:'☄️',  desc:'Meteor shower effect',            type:'fun' },
+    { cmd:':fireall',             icon:'🔥',  desc:'Fire effect on all players',       type:'fun' },
+    { cmd:':sparklesall',         icon:'✨',  desc:'Sparkles on all players',          type:'fun' },
+    { cmd:':glowall',             icon:'💡',  desc:'Glow all players',                 type:'fun' },
+    { cmd:':trailall',            icon:'🌠',  desc:'Trail on all players',             type:'fun' },
+    { cmd:':discoall',            icon:'🕺',  desc:'Disco mode all players',           type:'fun' },
+    { cmd:':explodeall',          icon:'💥',  desc:'Explode all players (visual)',     type:'fun' },
+    { cmd:':rainbowall',          icon:'🌈',  desc:'Rainbow all players',              type:'fun' },
+    { cmd:':iceall',              icon:'🧊',  desc:'Ice block all players',            type:'fun' },
+    { cmd:':paintallred',         icon:'🔴',  desc:'Paint all players red',            type:'fun' },
+    { cmd:':paintallblue',        icon:'🔵',  desc:'Paint all players blue',           type:'fun' },
+    { cmd:':paintallgreen',       icon:'🟢',  desc:'Paint all players green',          type:'fun' },
+    { cmd:':danceall',            icon:'💃',  desc:'Force all players to dance',       type:'fun' },
+    { cmd:':laughall',            icon:'😂',  desc:'All players laugh',                type:'fun' },
+    { cmd:':cryall',              icon:'😢',  desc:'All players cry emote',            type:'fun' },
+    { cmd:':glitchall',           icon:'📺',  desc:'Glitch all players',               type:'fun' },
+    { cmd:':pixelall',            icon:'🎮',  desc:'Pixelate all players',             type:'fun' },
+    { cmd:':neonall',             icon:'💜',  desc:'Neon glow all players',            type:'fun' },
+    { cmd:':shadowall',           icon:'🌑',  desc:'Shadow all players',               type:'fun' },
+    { cmd:':lightall',            icon:'💛',  desc:'Light all players',                type:'fun' },
+    { cmd:':darkall',             icon:'⬛',  desc:'Darken all players',               type:'fun' },
+    { cmd:':rainall',             icon:'🌧️',  desc:'Rain on all players',             type:'fun' },
+    { cmd:':snowall',             icon:'❄️',  desc:'Snow on all players',             type:'fun' },
+    { cmd:':stormall',            icon:'⛈️',  desc:'Storm on all players',            type:'fun' },
+    { cmd:':fogall',              icon:'🌫️',  desc:'Fog on all players',              type:'fun' },
+    { cmd:':windall',             icon:'🌬️',  desc:'Wind on all players',             type:'fun' },
+    { cmd:':lavaall',             icon:'🌋',  desc:'Lava effect on all players',       type:'danger' },
+    { cmd:':meteorall',           icon:'☄️',  desc:'Meteor shower on all',            type:'fun' },
+    { cmd:':confettiall',         icon:'🎉',  desc:'Confetti on all players',          type:'fun' },
+    { cmd:':freezeeffectall',     icon:'🧊',  desc:'Ice freeze all players',           type:'fun' },
+    { cmd:':shockall',            icon:'⚡',  desc:'Shock all players',                type:'fun' },
+    { cmd:':bigheadall',          icon:'😂',  desc:'Big head on all players',          type:'fun' },
+    { cmd:':tinyall',             icon:'🐜',  desc:'Tiny all players',                 type:'fun' },
+    { cmd:':giantall',            icon:'🗿',  desc:'Giant all players',                type:'fun' },
+    { cmd:':smallheadall',        icon:'🔬',  desc:'Small head on all players',        type:'fun' },
+    { cmd:':ghostall',            icon:'👻',  desc:'Ghost all players',                type:'fun' },
+    { cmd:':visibleall',          icon:'👁️',  desc:'Make all players visible',         type:'ok' },
+    { cmd:':invisibleall',        icon:'👻',  desc:'Make all players invisible',       type:'warn' },
+    { cmd:':flash player',        icon:'⚡',  desc:'Flash screen for player',          type:'fun' },
+    { cmd:':zoom player',         icon:'🔭',  desc:'Zoom player camera',               type:'fun' },
+    { cmd:':blur player',         icon:'🌀',  desc:'Blur player screen',               type:'fun' },
+    { cmd:':invert player',       icon:'🔄',  desc:'Invert player colours',            type:'fun' },
+    { cmd:':shake player',        icon:'📳',  desc:'Shake player screen',              type:'fun' },
+    { cmd:':flashall',            icon:'⚡',  desc:'Flash screen for all players',     type:'fun' },
+    { cmd:':zoomall',             icon:'🔭',  desc:'Zoom camera for all players',      type:'fun' },
+    { cmd:':blurall',             icon:'🌀',  desc:'Blur screen for all players',      type:'fun' },
+    { cmd:':invertall',           icon:'🔄',  desc:'Invert colours for all players',   type:'fun' },
+    { cmd:':shakeall',            icon:'📳',  desc:'Shake screen for all players',     type:'fun' },
+    { cmd:':screenred player',    icon:'🔴',  desc:'Red screen overlay for player',    type:'fun' },
+    { cmd:':screenblue player',   icon:'🔵',  desc:'Blue screen overlay for player',   type:'fun' },
+    { cmd:':screenblack player',  icon:'⬛',  desc:'Black screen overlay for player',  type:'fun' },
+    { cmd:':screenwhite player',  icon:'⬜',  desc:'White screen overlay for player',  type:'fun' },
+    { cmd:':screenallred',        icon:'🔴',  desc:'Red screen for all players',       type:'fun' },
+    { cmd:':screenallblue',       icon:'🔵',  desc:'Blue screen for all players',      type:'fun' },
+    { cmd:':screenallblack',      icon:'⬛',  desc:'Black screen for all players',     type:'fun' },
+    { cmd:':screenallwhite',      icon:'⬜',  desc:'White screen for all players',     type:'fun' },
+    { cmd:':screenrainbow player',icon:'🌈',  desc:'Rainbow screen for player',        type:'fun' },
+    { cmd:':screenallrainbow',    icon:'🌈',  desc:'Rainbow screen for all players',   type:'fun' },
+    { cmd:':firetrail player',    icon:'🔥',  desc:'Fire trail effect on player',      type:'fun' },
+    { cmd:':smoketrail player',   icon:'💨',  desc:'Smoke trail effect on player',     type:'fun' },
+    { cmd:':rainbowtrail player', icon:'🌈',  desc:'Rainbow trail effect on player',   type:'fun' },
+    { cmd:':sparkletrail player', icon:'✨',  desc:'Sparkle trail effect on player',   type:'fun' },
+    { cmd:':glowtrail player',    icon:'💡',  desc:'Glow trail effect on player',      type:'fun' },
+  ],
+  mod: [
+    /* 201–300 ⚖️🛡️ MODERATION & SERVER */
+    { cmd:':kick player',         icon:'🚪',  desc:'Kick player from server',          type:'danger' },
+    { cmd:':ban player',          icon:'❌',  desc:'Permanently ban player',           type:'danger' },
+    { cmd:':unban player',        icon:'✅',  desc:'Unban a player',                   type:'ok' },
+    { cmd:':mute player',         icon:'🔇',  desc:'Mute player in chat',             type:'warn' },
+    { cmd:':unmute player',       icon:'🔊',  desc:'Unmute a player',                 type:'ok' },
+    { cmd:':warn player',         icon:'⚠️',  desc:'Send warning to player',           type:'warn' },
+    { cmd:':jail player',         icon:'⛓️',  desc:'Jail a player',                    type:'danger' },
+    { cmd:':unjail player',       icon:'🔓',  desc:'Release player from jail',         type:'ok' },
+    { cmd:':freezechat',          icon:'❄️',  desc:'Freeze all chat',                 type:'warn' },
+    { cmd:':unfreezechat',        icon:'💬',  desc:'Unfreeze chat',                   type:'ok' },
+    { cmd:':slowchat',            icon:'🐢',  desc:'Enable slow chat mode',           type:'warn' },
+    { cmd:':clearchat',           icon:'🧹',  desc:'Clear all chat messages',         type:'warn' },
+    { cmd:':announce Hello!',     icon:'📢',  desc:'Broadcast server message',         type:'info' },
+    { cmd:':logs',                icon:'📜',  desc:'View server logs',                type:'info' },
+    { cmd:':check player',        icon:'🔍',  desc:'View player info & history',       type:'info' },
+    { cmd:':report player',       icon:'🚨',  desc:'Report a player',                 type:'warn' },
+    { cmd:':flag player',         icon:'🚩',  desc:'Flag player for review',          type:'warn' },
+    { cmd:':unflag player',       icon:'✅',  desc:'Remove player flag',              type:'ok' },
+    { cmd:':timeout player 60',   icon:'⏱️',  desc:'Timeout player for 60 seconds',   type:'warn' },
+    { cmd:':untimeout player',    icon:'▶️',  desc:'Remove player timeout',           type:'ok' },
+    { cmd:':blacklist player',    icon:'⛔',  desc:'Add player to blacklist',          type:'danger' },
+    { cmd:':whitelist player',    icon:'✅',  desc:'Add player to whitelist',          type:'ok' },
+    { cmd:':serverlock',          icon:'🔒',  desc:'Lock server to new players',      type:'danger' },
+    { cmd:':serverunlock',        icon:'🔓',  desc:'Unlock server to new players',    type:'ok' },
+    { cmd:':shutdown',            icon:'🛑',  desc:'Shut down the server',            type:'danger' },
+    { cmd:':restart',             icon:'🔄',  desc:'Restart the server',              type:'danger' },
+    { cmd:':rejoin player',       icon:'🔁',  desc:'Force player to rejoin',          type:'warn' },
+    { cmd:':softshutdown',        icon:'⏸️',  desc:'Graceful shutdown (wait for round)',type:'warn' },
+    { cmd:':hardshutdown',        icon:'🛑',  desc:'Immediate hard shutdown',         type:'danger' },
+    { cmd:':serverinfo',          icon:'ℹ️',  desc:'Show server information',         type:'info' },
+    { cmd:':playercount',         icon:'👥',  desc:'Show current player count',       type:'info' },
+    { cmd:':uptime',              icon:'⏰',  desc:'Show server uptime',              type:'info' },
+    { cmd:':ping',                icon:'📡',  desc:'Ping the server',                 type:'info' },
+    { cmd:':fps',                 icon:'🎯',  desc:'Show server FPS',                 type:'info' },
+    { cmd:':latency player',      icon:'📶',  desc:'Check player latency',            type:'info' },
+    { cmd:':memory',              icon:'💾',  desc:'Show memory usage',               type:'info' },
+    { cmd:':cpu',                 icon:'🖥️',  desc:'Show CPU usage',                  type:'info' },
+    { cmd:':stats',               icon:'📊',  desc:'Show server stats',               type:'info' },
+    { cmd:':debug',               icon:'🐛',  desc:'Enable debug mode',               type:'info' },
+    { cmd:':nodebug',             icon:'✅',  desc:'Disable debug mode',              type:'ok' },
+    { cmd:':backup',              icon:'💾',  desc:'Backup server data',              type:'ok' },
+    { cmd:':restore',             icon:'📂',  desc:'Restore from backup',             type:'warn' },
+    { cmd:':save',                icon:'💾',  desc:'Save server state',               type:'ok' },
+    { cmd:':load',                icon:'📂',  desc:'Load saved server state',         type:'warn' },
+    { cmd:':resetserver',         icon:'🔄',  desc:'Reset server to defaults',        type:'danger' },
+    { cmd:':lockchat',            icon:'🔒',  desc:'Lock chat (owner only)',           type:'warn' },
+    { cmd:':unlockchat',          icon:'🔓',  desc:'Unlock chat for all',             type:'ok' },
+    { cmd:':modmode',             icon:'🔰',  desc:'Enable moderator mode',           type:'warn' },
+    { cmd:':adminmode',           icon:'👑',  desc:'Enable admin mode',               type:'warn' },
+    { cmd:':ownermode',           icon:'🌟',  desc:'Enable owner mode',               type:'danger' },
+    { cmd:':anticheat',           icon:'🛡️',  desc:'Enable anti-cheat system',        type:'ok' },
+    { cmd:':disableanticheat',    icon:'❌',  desc:'Disable anti-cheat system',       type:'danger' },
+    { cmd:':kickall',             icon:'🚪',  desc:'Kick all players',                type:'danger' },
+    { cmd:':banall',              icon:'❌',  desc:'Ban all players',                  type:'danger' },
+    { cmd:':muteall',             icon:'🔇',  desc:'Mute all players',                type:'warn' },
+    { cmd:':warnall',             icon:'⚠️',  desc:'Warn all players',                type:'warn' },
+    { cmd:':jailall',             icon:'⛓️',  desc:'Jail all players',                type:'danger' },
+    { cmd:':unjailall',           icon:'🔓',  desc:'Unjail all players',              type:'ok' },
+    { cmd:':timeoutall 60',       icon:'⏱️',  desc:'Timeout all players 60s',         type:'warn' },
+    { cmd:':untimeoutall',        icon:'▶️',  desc:'Remove timeout from all players', type:'ok' },
+    { cmd:':clearwarnings player',icon:'🧹',  desc:'Clear all warnings for player',  type:'ok' },
+    { cmd:':clearlogs',           icon:'🧹',  desc:'Clear server logs',               type:'warn' },
+    { cmd:':broadcast message',   icon:'📡',  desc:'Broadcast message to all',        type:'info' },
+    { cmd:':systemmessage text',  icon:'🖥️',  desc:'Send system message',             type:'info' },
+    { cmd:':alert message',       icon:'🚨',  desc:'Send urgent alert to all',        type:'warn' },
+    { cmd:':lockall',             icon:'🔒',  desc:'Lock all players in place',       type:'danger' },
+    { cmd:':unlockall',           icon:'🔓',  desc:'Unlock all players',              type:'ok' },
+    { cmd:':spectate player',     icon:'👁️',  desc:'Spectate a player',               type:'info' },
+    { cmd:':unspectate',          icon:'🎮',  desc:'Stop spectating',                 type:'ok' },
+    { cmd:':spectateall',         icon:'👁️',  desc:'Spectate all players at once',    type:'info' },
+    { cmd:':ghostmode player',    icon:'👻',  desc:'Enable ghost mode for player',    type:'warn' },
+    { cmd:':normalmode player',   icon:'🧍',  desc:'Set player to normal mode',       type:'ok' },
+    { cmd:':adminchat message',   icon:'💬',  desc:'Send message in admin chat',      type:'info' },
+    { cmd:':modchat message',     icon:'💬',  desc:'Send message in mod chat',        type:'info' },
+    { cmd:':ownerchat message',   icon:'💬',  desc:'Send message in owner chat',      type:'info' },
+    { cmd:':globalmute',          icon:'🔇',  desc:'Mute everyone globally',          type:'danger' },
+    { cmd:':unglobalmute',        icon:'🔊',  desc:'Unmute everyone globally',        type:'ok' },
+    { cmd:':serverfreeze',        icon:'❄️',  desc:'Freeze entire server',            type:'danger' },
+    { cmd:':serverunfreeze',      icon:'🌡️',  desc:'Unfreeze the server',             type:'ok' },
+    { cmd:':forcefieldall',       icon:'🛡️',  desc:'Give forcefield to all players',  type:'ok' },
+    { cmd:':removeforcefieldall', icon:'❌',  desc:'Remove forcefield from all',      type:'warn' },
+    { cmd:':shieldall',           icon:'🛡️',  desc:'Shield all players',              type:'ok' },
+    { cmd:':unshieldall',         icon:'❌',  desc:'Remove shields from all',         type:'warn' },
+    { cmd:':respawnall',          icon:'🔄',  desc:'Respawn all players',             type:'ok' },
+    { cmd:':healall',             icon:'❤️',  desc:'Heal all players',                type:'ok' },
+    { cmd:':killall',             icon:'☠️',  desc:'Kill all players',                type:'danger' },
+    { cmd:':bringall',            icon:'📍',  desc:'Bring all players to you',        type:'warn' },
+    { cmd:':gotoall player',      icon:'🗺️',  desc:'Send all players to player',     type:'warn' },
+    { cmd:':teleporteveryone',    icon:'✨',  desc:'Teleport everyone to center',     type:'warn' },
+    { cmd:':summoneveryone',      icon:'📣',  desc:'Summon everyone to you',          type:'warn' },
+    { cmd:':scattereveryone',     icon:'💨',  desc:'Scatter everyone randomly',       type:'fun' },
+    { cmd:':lockserverchat',      icon:'🔒',  desc:'Lock server chat',                type:'warn' },
+    { cmd:':unlockserverchat',    icon:'🔓',  desc:'Unlock server chat',              type:'ok' },
+    { cmd:':enablelogs',          icon:'📜',  desc:'Enable server logging',           type:'ok' },
+    { cmd:':disablelogs',         icon:'❌',  desc:'Disable server logging',          type:'warn' },
+    { cmd:':devmode',             icon:'🛠️',  desc:'Enable developer mode',           type:'warn' },
+    { cmd:':livemode',            icon:'🔴',  desc:'Enable live server mode',         type:'ok' },
+    { cmd:':maintenance',         icon:'🔧',  desc:'Put server in maintenance mode',  type:'warn' },
+    { cmd:':unmaintenance',       icon:'✅',  desc:'Exit maintenance mode',           type:'ok' },
+    { cmd:':serverrestartnow',    icon:'🔄',  desc:'Restart server immediately',      type:'danger' },
+  ],
+  economy: [
+    /* 301–400 💰🎁 ECONOMY & ITEMS */
+    { cmd:':coins player 1000',   icon:'💰',  desc:'Give coins to player',            type:'ok' },
+    { cmd:':wins player 10',      icon:'🏆',  desc:'Give wins to player',             type:'ok' },
+    { cmd:':removecoins player 500',icon:'💸',desc:'Remove coins from player',        type:'warn' },
+    { cmd:':givecash player 200', icon:'💵',  desc:'Give cash to player',             type:'ok' },
+    { cmd:':takecash player 100', icon:'📤',  desc:'Take cash from player',           type:'warn' },
+    { cmd:':rich player',         icon:'🤑',  desc:'Max out player coins',            type:'ok' },
+    { cmd:':poor player',         icon:'📉',  desc:'Set player coins to 0',           type:'danger' },
+    { cmd:':dailybonus player',   icon:'🎁',  desc:'Give daily bonus reward',         type:'ok' },
+    { cmd:':resetstats player',   icon:'🔄',  desc:'Reset player stats',              type:'danger' },
+    { cmd:':levelup player',      icon:'⬆️',  desc:'Level up a player',               type:'ok' },
+    { cmd:':maxlevel player',     icon:'🏆',  desc:'Set player to max level',         type:'ok' },
+    { cmd:':xp player 1000',      icon:'⭐',  desc:'Give XP to player',               type:'ok' },
+    { cmd:':removexp player 500', icon:'📉',  desc:'Remove XP from player',           type:'warn' },
+    { cmd:':giveitem player item',icon:'🎁',  desc:'Give item to player',             type:'ok' },
+    { cmd:':removeitem player item',icon:'❌',desc:'Remove item from player',         type:'warn' },
+    { cmd:':inventory player',    icon:'🎒',  desc:'View player inventory',           type:'info' },
+    { cmd:':shopopen',            icon:'🛒',  desc:'Open the item shop',              type:'ok' },
+    { cmd:':shopclose',           icon:'🔒',  desc:'Close the item shop',             type:'warn' },
+    { cmd:':discount 50',         icon:'🏷️',  desc:'Set shop discount percentage',    type:'ok' },
+    { cmd:':doublecoins',         icon:'💰',  desc:'Enable double coins mode',        type:'ok' },
+    { cmd:':triplexp',            icon:'⭐',  desc:'Enable triple XP mode',           type:'ok' },
+    { cmd:':boostcoins player',   icon:'💸',  desc:'Boost player coin gain',          type:'ok' },
+    { cmd:':boostxp player',      icon:'⭐',  desc:'Boost player XP gain',            type:'ok' },
+    { cmd:':givepet player pet',  icon:'🐾',  desc:'Give pet to player',              type:'ok' },
+    { cmd:':removepet player',    icon:'❌',  desc:'Remove pet from player',          type:'warn' },
+    { cmd:':petboost player',     icon:'🐾',  desc:'Boost player pet stats',          type:'ok' },
+    { cmd:':petmax player',       icon:'🏆',  desc:'Max out player pet stats',        type:'ok' },
+    { cmd:':givecrate player',    icon:'📦',  desc:'Give loot crate to player',       type:'ok' },
+    { cmd:':opencrate player',    icon:'🎁',  desc:'Open a loot crate for player',    type:'ok' },
+    { cmd:':rareitem player',     icon:'💜',  desc:'Give rare item to player',        type:'ok' },
+    { cmd:':legendaryitem player',icon:'🌟',  desc:'Give legendary item to player',   type:'ok' },
+    { cmd:':epicitem player',     icon:'🟣',  desc:'Give epic item to player',        type:'ok' },
+    { cmd:':commonitem player',   icon:'⬜',  desc:'Give common item to player',      type:'ok' },
+    { cmd:':unlockallitems player',icon:'🔓', desc:'Unlock all items for player',     type:'warn' },
+    { cmd:':lockallitems player', icon:'🔒',  desc:'Lock all items for player',       type:'warn' },
+    { cmd:':gift player item',    icon:'🎁',  desc:'Gift item to player',             type:'ok' },
+    { cmd:':giftall item',        icon:'🎁',  desc:'Gift item to all players',        type:'ok' },
+    { cmd:':trade player',        icon:'🔄',  desc:'Initiate trade with player',      type:'info' },
+    { cmd:':canceltrade',         icon:'❌',  desc:'Cancel active trade',             type:'warn' },
+    { cmd:':accepttrade',         icon:'✅',  desc:'Accept incoming trade',           type:'ok' },
+    { cmd:':auction item',        icon:'🔨',  desc:'Start auction for item',          type:'info' },
+    { cmd:':bid amount',          icon:'💸',  desc:'Place bid in auction',            type:'info' },
+    { cmd:':sell item',           icon:'💰',  desc:'Sell item to shop',               type:'ok' },
+    { cmd:':buy item',            icon:'🛒',  desc:'Buy item from shop',              type:'ok' },
+    { cmd:':marketopen',          icon:'🏪',  desc:'Open player market',              type:'ok' },
+    { cmd:':marketclose',         icon:'🔒',  desc:'Close player market',             type:'warn' },
+    { cmd:':tax 10',              icon:'📜',  desc:'Set transaction tax rate',        type:'warn' },
+    { cmd:':notax',               icon:'✅',  desc:'Remove all transaction tax',      type:'ok' },
+    { cmd:':bonus player',        icon:'🎁',  desc:'Give small bonus to player',      type:'ok' },
+    { cmd:':superbonus player',   icon:'🎉',  desc:'Give super bonus to player',      type:'ok' },
+    { cmd:':megabonus player',    icon:'🌟',  desc:'Give mega bonus to player',       type:'ok' },
+    { cmd:':coinsall 500',        icon:'💰',  desc:'Give coins to all players',       type:'ok' },
+    { cmd:':cashall 100',         icon:'💵',  desc:'Give cash to all players',        type:'ok' },
+    { cmd:':xpall 1000',          icon:'⭐',  desc:'Give XP to all players',          type:'ok' },
+    { cmd:':giveallitems player', icon:'🎁',  desc:'Give all items to player',        type:'warn' },
+    { cmd:':removeallitems player',icon:'❌', desc:'Remove all items from player',    type:'danger' },
+    { cmd:':petall',              icon:'🐾',  desc:'Give pets to all players',        type:'ok' },
+    { cmd:':crateall',            icon:'📦',  desc:'Give crates to all players',      type:'ok' },
+    { cmd:':giftallplayers item', icon:'🎁',  desc:'Gift item to all players',        type:'ok' },
+    { cmd:':rewardall',           icon:'🏆',  desc:'Reward all players',              type:'ok' },
+    { cmd:':penaltyall',          icon:'⚠️',  desc:'Penalise all players',            type:'danger' },
+    { cmd:':coinrain',            icon:'💰',  desc:'Make coins rain from the sky',    type:'fun' },
+    { cmd:':cashrain',            icon:'💵',  desc:'Make cash rain from the sky',     type:'fun' },
+    { cmd:':itemrain',            icon:'🎁',  desc:'Make items rain from the sky',    type:'fun' },
+    { cmd:':rewarddrop',          icon:'🏆',  desc:'Drop reward for first to grab',   type:'ok' },
+    { cmd:':lootdrop',            icon:'📦',  desc:'Drop loot crate in world',        type:'ok' },
+    { cmd:':jackpot player',      icon:'🎰',  desc:'Give jackpot to player',          type:'ok' },
+    { cmd:':minijackpot player',  icon:'🎰',  desc:'Give mini jackpot to player',     type:'ok' },
+    { cmd:':megajackpot player',  icon:'🎰',  desc:'Give mega jackpot to player',     type:'ok' },
+    { cmd:':spinwheel player',    icon:'🎡',  desc:'Spin reward wheel for player',    type:'fun' },
+    { cmd:':freespin player',     icon:'🎡',  desc:'Give player a free spin',         type:'ok' },
+    { cmd:':doublespin player',   icon:'🎡',  desc:'Give player 2 spins',             type:'ok' },
+    { cmd:':triplespin player',   icon:'🎡',  desc:'Give player 3 spins',             type:'ok' },
+    { cmd:':unlockvip player',    icon:'💎',  desc:'Give VIP status to player',       type:'ok' },
+    { cmd:':removevip player',    icon:'❌',  desc:'Remove VIP from player',          type:'warn' },
+    { cmd:':vipall',              icon:'💎',  desc:'Give VIP to all players',         type:'warn' },
+    { cmd:':premium player',      icon:'⭐',  desc:'Give premium to player',           type:'ok' },
+    { cmd:':removepremium player',icon:'❌',  desc:'Remove premium from player',      type:'warn' },
+    { cmd:':premiumall',          icon:'⭐',  desc:'Give premium to all players',      type:'warn' },
+    { cmd:':grantpass player',    icon:'🎫',  desc:'Grant game pass to player',       type:'ok' },
+    { cmd:':removepass player',   icon:'❌',  desc:'Remove game pass from player',    type:'warn' },
+    { cmd:':passall',             icon:'🎫',  desc:'Give pass to all players',        type:'warn' },
+    { cmd:':grantbadge player',   icon:'🏅',  desc:'Grant badge to player',           type:'ok' },
+    { cmd:':removebadge player',  icon:'❌',  desc:'Remove badge from player',        type:'warn' },
+    { cmd:':badgeall',            icon:'🏅',  desc:'Give badge to all players',       type:'ok' },
+    { cmd:':unlockachievement player',icon:'🏆',desc:'Unlock achievement for player', type:'ok' },
+    { cmd:':achievementall',      icon:'🏆',  desc:'Unlock achievement for all',      type:'ok' },
+    { cmd:':resetinventory player',icon:'🔄', desc:'Reset player inventory',          type:'danger' },
+    { cmd:':clearinventory player',icon:'🧹', desc:'Clear player inventory',          type:'danger' },
+    { cmd:':fullinventory player',icon:'📦',  desc:'Fill player inventory',           type:'ok' },
+    { cmd:':maxinventory player', icon:'📦',  desc:'Max out player inventory space',  type:'ok' },
+    { cmd:':addslot player',      icon:'➕',  desc:'Add inventory slot to player',    type:'ok' },
+    { cmd:':removeslot player',   icon:'➖',  desc:'Remove inventory slot',           type:'warn' },
+    { cmd:':expandinventory player',icon:'📦',desc:'Expand player inventory',         type:'ok' },
+    { cmd:':shrinkinventory player',icon:'📦',desc:'Shrink player inventory',         type:'warn' },
+    { cmd:':autocollect player',  icon:'🤖',  desc:'Auto-collect items for player',   type:'ok' },
+    { cmd:':stopcollect player',  icon:'🛑',  desc:'Stop auto-collect for player',    type:'warn' },
+    { cmd:':multiplier 2',        icon:'✖️',  desc:'Set global coin multiplier',      type:'ok' },
+    { cmd:':setmultiplier player 3',icon:'✖️',desc:'Set coin multiplier for player',  type:'ok' },
+    { cmd:':boostall',            icon:'🚀',  desc:'Boost all players stats',         type:'ok' },
+    { cmd:':resetallstats',       icon:'🔄',  desc:'Reset all players stats',         type:'danger' },
+  ],
+  gamemodes: [
+    /* 401–500 🎮👑 GAME MODES & SPECIAL */
+    { cmd:':obbymode',            icon:'🧗',  desc:'Enable obstacle course mode',     type:'ok' },
+    { cmd:':survivalmode',        icon:'🌲',  desc:'Enable survival mode',            type:'ok' },
+    { cmd:':sandbox',             icon:'🏖️',  desc:'Enable free-build sandbox',       type:'ok' },
+    { cmd:':pvp on',              icon:'⚔️',  desc:'Enable PvP combat',               type:'warn' },
+    { cmd:':pvp off',             icon:'🕊️',  desc:'Disable PvP combat',              type:'ok' },
+    { cmd:':minigame start',      icon:'🎯',  desc:'Start the current minigame',      type:'ok' },
+    { cmd:':minigame stop',       icon:'⏹️',  desc:'Stop the current minigame',       type:'warn' },
+    { cmd:':roundstart',          icon:'▶️',  desc:'Start a new round',               type:'ok' },
+    { cmd:':roundend',            icon:'⏸️',  desc:'End the current round',           type:'warn' },
+    { cmd:':autoplay on',         icon:'🔁',  desc:'Enable auto-rotate modes',        type:'ok' },
+    { cmd:':autoplay off',        icon:'⏹️',  desc:'Disable auto-rotate modes',       type:'warn' },
+    { cmd:':chaosmode',           icon:'🌪️',  desc:'Enable chaos mode',               type:'danger' },
+    { cmd:':peacefulmode',        icon:'🕊️',  desc:'Enable peaceful mode',            type:'ok' },
+    { cmd:':hardmode',            icon:'💀',  desc:'Enable hard difficulty',          type:'warn' },
+    { cmd:':easymode',            icon:'🌟',  desc:'Enable easy difficulty',          type:'ok' },
+    { cmd:':nightmode',           icon:'🌙',  desc:'Set world to night mode',         type:'fun' },
+    { cmd:':daymode',             icon:'☀️',  desc:'Set world to day mode',           type:'ok' },
+    { cmd:':speedmode',           icon:'⚡',  desc:'Enable speed mode for all',       type:'warn' },
+    { cmd:':slowmode',            icon:'🐢',  desc:'Enable slow motion mode',         type:'warn' },
+    { cmd:':gravitymode',         icon:'🌍',  desc:'Custom gravity game mode',        type:'warn' },
+    { cmd:':lowgravitymode',      icon:'🌙',  desc:'Low gravity game mode',           type:'fun' },
+    { cmd:':highgravitymode',     icon:'⬇️',  desc:'High gravity game mode',          type:'warn' },
+    { cmd:':eventstart',          icon:'🎉',  desc:'Start a game event',              type:'ok' },
+    { cmd:':eventstop',           icon:'⏹️',  desc:'Stop the game event',             type:'warn' },
+    { cmd:':bossspawn',           icon:'👹',  desc:'Spawn the boss enemy',            type:'fun' },
+    { cmd:':bosskill',            icon:'☠️',  desc:'Kill the boss instantly',         type:'warn' },
+    { cmd:':bossrage',            icon:'😡',  desc:'Trigger boss rage mode',          type:'danger' },
+    { cmd:':spawnnpc name',       icon:'🤖',  desc:'Spawn an NPC',                    type:'ok' },
+    { cmd:':removenpc name',      icon:'❌',  desc:'Remove an NPC',                   type:'warn' },
+    { cmd:':npcattack player',    icon:'⚔️',  desc:'Make NPC attack player',          type:'fun' },
+    { cmd:':npcfollow player',    icon:'🐾',  desc:'Make NPC follow player',          type:'fun' },
+    { cmd:':npcstop',             icon:'🛑',  desc:'Stop all NPC actions',            type:'ok' },
+    { cmd:':npcall',              icon:'🤖',  desc:'Spawn NPC for all players',       type:'fun' },
+    { cmd:':weathercycle',        icon:'🌤️',  desc:'Enable weather cycle mode',       type:'fun' },
+    { cmd:':timecycle',           icon:'⏰',  desc:'Enable day/night time cycle',     type:'fun' },
+    { cmd:':musicplay track',     icon:'🎵',  desc:'Play background music track',     type:'fun' },
+    { cmd:':musicstop',           icon:'⏹️',  desc:'Stop background music',           type:'ok' },
+    { cmd:':musicall track',      icon:'🎵',  desc:'Play music for all players',      type:'fun' },
+    { cmd:':soundeffect name',    icon:'🔊',  desc:'Play a sound effect',             type:'fun' },
+    { cmd:':soundall name',       icon:'🔊',  desc:'Sound effect for all players',    type:'fun' },
+    { cmd:':cutscene name',       icon:'🎬',  desc:'Play a cutscene',                 type:'fun' },
+    { cmd:':skipcutscene',        icon:'⏭️',  desc:'Skip the current cutscene',       type:'ok' },
+    { cmd:':camerazoom 5',        icon:'🔭',  desc:'Set camera zoom level',           type:'fun' },
+    { cmd:':camerashake player',  icon:'📳',  desc:'Shake camera for player',         type:'fun' },
+    { cmd:':cinematic',           icon:'🎥',  desc:'Enable cinematic camera mode',    type:'fun' },
+    { cmd:':recordmode',          icon:'⏺️',  desc:'Start recording mode',            type:'info' },
+    { cmd:':stoprecord',          icon:'⏹️',  desc:'Stop recording',                  type:'ok' },
+    { cmd:':screenshot',          icon:'📷',  desc:'Take a server screenshot',        type:'info' },
+    { cmd:':highlight player',    icon:'⭐',  desc:'Highlight a player',              type:'info' },
+    { cmd:':highlightall',        icon:'⭐',  desc:'Highlight all players',           type:'info' },
+    { cmd:':tagyoutuber player',  icon:'📹',  desc:'Tag player as YouTuber',          type:'ok' },
+    { cmd:':untagyoutuber player',icon:'❌',  desc:'Remove YouTuber tag',             type:'warn' },
+    { cmd:':creatorbadge player', icon:'🎨',  desc:'Give creator badge to player',    type:'ok' },
+    { cmd:':removecreatorbadge player',icon:'❌',desc:'Remove creator badge',         type:'warn' },
+    { cmd:':viptag player',       icon:'💎',  desc:'Give VIP tag to player',          type:'ok' },
+    { cmd:':removetag player',    icon:'❌',  desc:'Remove all tags from player',     type:'warn' },
+    { cmd:':namestyle player',    icon:'✍️',  desc:'Change player name style',        type:'fun' },
+    { cmd:':resetname player',    icon:'🔄',  desc:'Reset player name to default',    type:'ok' },
+    { cmd:':colorname player red',icon:'🎨',  desc:'Colour player name',              type:'fun' },
+    { cmd:':rainbowname player',  icon:'🌈',  desc:'Rainbow animated player name',    type:'fun' },
+    { cmd:':glowname player',     icon:'💡',  desc:'Glowing name effect',             type:'fun' },
+    { cmd:':effectname player',   icon:'✨',  desc:'Special effect on player name',   type:'fun' },
+    { cmd:':resetallnames',       icon:'🔄',  desc:'Reset all player names',          type:'warn' },
+    { cmd:':unlockallmodes',      icon:'🔓',  desc:'Unlock all game modes',           type:'warn' },
+    { cmd:':lockallmodes',        icon:'🔒',  desc:'Lock all game modes',             type:'warn' },
+    { cmd:':grantallpowers player',icon:'⚡', desc:'Grant all powers to player',      type:'warn' },
+    { cmd:':removepowers player', icon:'❌',  desc:'Remove all powers from player',   type:'warn' },
+    { cmd:':powerup player',      icon:'⬆️',  desc:'Power up player abilities',       type:'ok' },
+    { cmd:':powerdown player',    icon:'⬇️',  desc:'Power down player abilities',     type:'warn' },
+    { cmd:':ultimate player',     icon:'💥',  desc:'Activate ultimate ability',       type:'danger' },
+    { cmd:':superpower player',   icon:'🦸',  desc:'Give superpower to player',       type:'ok' },
+    { cmd:':disablepowers player',icon:'❌',  desc:'Disable all powers for player',   type:'warn' },
+    { cmd:':enablepowers player', icon:'✅',  desc:'Enable all powers for player',    type:'ok' },
+    { cmd:':spawnvehicle car',    icon:'🚗',  desc:'Spawn a vehicle for player',      type:'ok' },
+    { cmd:':removevehicle',       icon:'❌',  desc:'Remove player vehicle',           type:'warn' },
+    { cmd:':vehicleboost player', icon:'🏎️',  desc:'Boost player vehicle speed',      type:'fun' },
+    { cmd:':vehicleall car',      icon:'🚗',  desc:'Give vehicles to all players',    type:'ok' },
+    { cmd:':spawnpet player pet', icon:'🐾',  desc:'Spawn pet for player',            type:'ok' },
+    { cmd:':petfollow player',    icon:'🐾',  desc:'Set pet to follow player',        type:'ok' },
+    { cmd:':petstay player',      icon:'🐾',  desc:'Set pet to stay in place',        type:'ok' },
+    { cmd:':petattack player',    icon:'🐾',  desc:'Set pet to attack mode',          type:'warn' },
+    { cmd:':petallfollow',        icon:'🐾',  desc:'All pets follow their owners',    type:'ok' },
+    { cmd:':petallstay',          icon:'🐾',  desc:'All pets stay in place',          type:'ok' },
+    { cmd:':petallattack',        icon:'🐾',  desc:'All pets attack mode',            type:'warn' },
+    { cmd:':unlockworld',         icon:'🔓',  desc:'Unlock all world areas',          type:'ok' },
+    { cmd:':lockworld',           icon:'🔒',  desc:'Lock world areas',                type:'warn' },
+    { cmd:':teleportworld name',  icon:'🌍',  desc:'Teleport all to a world',         type:'warn' },
+    { cmd:':nextworld',           icon:'▶️',  desc:'Switch to next world',             type:'ok' },
+    { cmd:':previousworld',       icon:'◀️',  desc:'Switch to previous world',         type:'ok' },
+    { cmd:':resetworld',          icon:'🔄',  desc:'Reset current world to default',  type:'danger' },
+    { cmd:':worldevent name',     icon:'🌍',  desc:'Trigger a world event',           type:'fun' },
+    { cmd:':globalevent name',    icon:'🌐',  desc:'Trigger a global event',          type:'warn' },
+    { cmd:':universemode',        icon:'🌌',  desc:'Enable universe mode',            type:'fun' },
+    { cmd:':multiverse',          icon:'🌌',  desc:'Enable multiverse mode',          type:'fun' },
+    { cmd:':dimension name',      icon:'🌀',  desc:'Switch to a dimension',           type:'fun' },
+    { cmd:':portalopen name',     icon:'🔵',  desc:'Open a portal in world',          type:'fun' },
+    { cmd:':portalclose',         icon:'❌',  desc:'Close the active portal',         type:'ok' },
+    { cmd:':portalall name',      icon:'🔵',  desc:'Open portals for all players',    type:'fun' },
+    { cmd:':finalmode',           icon:'💀',  desc:'Enable final challenge mode',     type:'danger' },
+    { cmd:':godserver',           icon:'👑',  desc:'Enable god-tier server mode',     type:'danger' },
+  ],
+};
+
+/* ══════════════════════════════════════════════════
+   PLAYERS LIST (simulated)
+══════════════════════════════════════════════════ */
+const PLAYERS = [
+  { name:'Owner',    avatar:'👑', badge:'owner',  coins:9999, level:100 },
+  { name:'Player123',avatar:'🎮', badge:'mod',    coins:500,  level:12 },
+  { name:'Alex',     avatar:'🚀', badge:'player', coins:320,  level:7 },
+  { name:'Riley',    avatar:'🌟', badge:'player', coins:780,  level:24 },
+  { name:'Guest_01', avatar:'👤', badge:'guest',  coins:0,    level:1 },
+];
+
+function renderPlayers() {
+  const list = document.getElementById('playersList');
+  list.innerHTML = PLAYERS.map(p => `
+    <div class="player-row" onclick="fillPlayer('${p.name}')">
+      <div class="pr-av">${p.avatar}</div>
+      <div class="pr-name">${p.name}</div>
+      <span class="pr-badge badge-${p.badge}">${p.badge === 'owner' ? '👑 Owner' : p.badge === 'mod' ? '🔰 Mod' : p.badge === 'guest' ? '👤 Guest' : '🎮 Player'}</span>
+      <span style="font-size:.72rem;color:var(--muted);font-weight:700">Lv.${p.level}</span>
+      <div class="pr-actions">
+        <button class="pr-act" onclick="event.stopPropagation();quickAction('kick','${p.name}')">Kick</button>
+        <button class="pr-act green" onclick="event.stopPropagation();quickAction('heal','${p.name}')">Heal</button>
+        <button class="pr-act" onclick="event.stopPropagation();quickAction('teleport','${p.name}')">TP</button>
+      </div>
+    </div>`).join('');
+}
+
+function fillPlayer(name) {
+  const inp = document.getElementById('cmdInput');
+  inp.value = inp.value.replace(/player/g, name).trim() || (':heal ' + name);
+  inp.focus();
+  toast('👆 Filled: ' + name, 'var(--purple)');
+}
+
+function quickAction(action, name) {
+  const map = { kick:':kick', heal:':heal', teleport:':teleport' };
+  const suffix = action === 'teleport' ? ' me' : '';
+  runCmdStr(`${map[action]} ${name}${suffix}`);
+}
+
+/* ══════════════════════════════════════════════════
+   RENDER COMMAND CARDS
+══════════════════════════════════════════════════ */
+function renderCards() {
+  const TYPE_COLORS = {
+    ok:     'rgba(74,222,128,.15)',
+    warn:   'rgba(253,230,138,.1)',
+    danger: 'rgba(248,113,113,.12)',
+    fun:    'rgba(244,114,182,.1)',
+    info:   'rgba(96,165,250,.12)',
+  };
+  for (const [cat, cmds] of Object.entries(COMMANDS)) {
+    const grid = document.getElementById('grid-' + cat);
+    if (!grid) continue;
+    grid.innerHTML = cmds.map(c => `
+      <div class="cmd-card" onclick="fillCmd('${c.cmd.replace(/'/g,"&#39;")}')" style="border-color:${TYPE_COLORS[c.type]||''}">
+        <div class="cc-icon">${c.icon}</div>
+        <div class="cc-text">
+          <div class="cc-cmd">${c.cmd}</div>
+          <div class="cc-desc">${c.desc}</div>
+        </div>
+        <span class="cc-run">▶ Run</span>
+      </div>`).join('');
+    /* Make Run button actually run */
+    grid.querySelectorAll('.cmd-card').forEach((card, i) => {
+      card.querySelector('.cc-run').addEventListener('click', e => {
+        e.stopPropagation();
+        runCmdStr(cmds[i].cmd);
+      });
+    });
+  }
+}
+
+function fillCmd(cmd) {
+  document.getElementById('cmdInput').value = cmd;
+  document.getElementById('cmdInput').focus();
+}
+
+/* ══════════════════════════════════════════════════
+   COMMAND EXECUTION
+══════════════════════════════════════════════════ */
+let cmdCount = 0, banCount = 0;
+
+const CMD_RESPONSES = {
+  /* ── 1–100 PLAYER & MOVEMENT ── */
+  ':kill':              (p)=>({ msg:`☠️ ${p} was eliminated.`,                    type:'err',    toast:'☠️ Player killed' }),
+  ':heal':              (p)=>({ msg:`❤️ ${p} is fully healed.`,                   type:'ok',     toast:'❤️ Healed!' }),
+  ':respawn':           (p)=>({ msg:`🔄 ${p} respawned.`,                         type:'ok',     toast:'🔄 Respawned' }),
+  ':god':               (p)=>({ msg:`🛡️ ${p} is now invincible.`,                 type:'ok',     toast:'🛡️ God mode ON' }),
+  ':ungod':             (p)=>({ msg:`🛡️ God mode removed from ${p}.`,             type:'warn',   toast:'🛡️ God mode OFF' }),
+  ':invisible':         (p)=>({ msg:`👻 ${p} vanished.`,                          type:'fun',    toast:'👻 Now invisible' }),
+  ':visible':           (p)=>({ msg:`👁️ ${p} is visible again.`,                  type:'ok',     toast:'👁️ Visible again' }),
+  ':freeze':            (p)=>({ msg:`❄️ ${p} frozen solid.`,                      type:'warn',   toast:'❄️ Frozen!' }),
+  ':unfreeze':          (p)=>({ msg:`🌡️ ${p} thawed out.`,                        type:'ok',     toast:'🌡️ Thawed' }),
+  ':sit':               (p)=>({ msg:`🪑 ${p} is now sitting.`,                    type:'fun',    toast:'🪑 Sit!' }),
+  ':jump':              (p)=>({ msg:`🦘 ${p} launched upward!`,                   type:'fun',    toast:'🦘 Boing!' }),
+  ':trip':              (p)=>({ msg:`😂 ${p} tripped!`,                           type:'fun',    toast:'😂 Tripped!' }),
+  ':ragdoll':           (p)=>({ msg:`🪆 ${p} is a ragdoll now.`,                  type:'fun',    toast:'🪆 Ragdoll!' }),
+  ':unragdoll':         (p)=>({ msg:`🧍 ${p} standing up.`,                       type:'ok',     toast:'🧍 Unragdolled' }),
+  ':stun':              (p)=>({ msg:`⚡ ${p} is stunned!`,                        type:'warn',   toast:'⚡ Stunned' }),
+  ':blind':             (p)=>({ msg:`🙈 ${p} has been blinded.`,                  type:'warn',   toast:'🙈 Blinded' }),
+  ':unblind':           (p)=>({ msg:`👀 ${p} can see again.`,                     type:'ok',     toast:'👀 Unblinded' }),
+  ':sleep':             (p)=>({ msg:`😴 ${p} fell asleep.`,                       type:'fun',    toast:'😴 Sleeping' }),
+  ':wake':              (p)=>({ msg:`⏰ ${p} woke up.`,                           type:'ok',     toast:'⏰ Awake!' }),
+  ':energize':          (p)=>({ msg:`⚡ ${p} is energized!`,                      type:'ok',     toast:'⚡ Energized!' }),
+  ':fly':               (p)=>({ msg:`🕊️ ${p} can now fly.`,                       type:'ok',     toast:'🕊️ Flying!' }),
+  ':unfly':             (p)=>({ msg:`🪂 Fly removed from ${p}.`,                  type:'warn',   toast:'🪂 No more flying' }),
+  ':speed10':           (p)=>({ msg:`🏃 ${p} speed set to 10.`,                   type:'ok',     toast:'🏃 Speed 10' }),
+  ':speed20':           (p)=>({ msg:`🏃 ${p} speed set to 20.`,                   type:'ok',     toast:'🏃 Speed 20' }),
+  ':speed50':           (p)=>({ msg:`⚡ ${p} speed set to 50.`,                   type:'ok',     toast:'⚡ Speed 50' }),
+  ':speed100':          (p)=>({ msg:`🚀 ${p} SPEED 100! Hold on!`,                type:'warn',   toast:'🚀 Speed 100' }),
+  ':jump50':            (p)=>({ msg:`🦘 ${p} jump power set to 50.`,              type:'ok',     toast:'🦘 Jump 50' }),
+  ':jump100':           (p)=>({ msg:`🦘 ${p} jump power set to 100!`,             type:'fun',    toast:'🦘 Jump 100!' }),
+  ':lowgravity':        (p)=>({ msg:`🌙 ${p} low gravity enabled.`,               type:'fun',    toast:'🌙 Low gravity' }),
+  ':highgravity':       (p)=>({ msg:`🌍 ${p} high gravity enabled.`,              type:'warn',   toast:'🌍 High gravity' }),
+  ':launch':            (p)=>({ msg:`🚀 ${p} LAUNCHED!`,                          type:'fun',    toast:'🚀 Launched!' }),
+  ':spin':              (p)=>({ msg:`🌀 ${p} is spinning…`,                       type:'fun',    toast:'🌀 Spinning!' }),
+  ':unspin':            (p)=>({ msg:`⏹️ ${p} stopped spinning.`,                  type:'ok',     toast:'⏹️ Stopped' }),
+  ':fling':             (p)=>({ msg:`🤯 ${p} got FLUNG!`,                         type:'danger', toast:'🤯 Flinged!' }),
+  ':float':             (p)=>({ msg:`☁️ ${p} is floating.`,                       type:'fun',    toast:'☁️ Floating' }),
+  ':sink':              (p)=>({ msg:`⬇️ ${p} sinking…`,                           type:'warn',   toast:'⬇️ Sinking' }),
+  ':orbit':             (p)=>({ msg:`🪐 ${p} is now orbiting you.`,               type:'fun',    toast:'🪐 Orbiting' }),
+  ':dash':              (p)=>({ msg:`💨 ${p} dashed forward!`,                    type:'fun',    toast:'💨 Dash!' }),
+  ':teleport':          (p)=>({ msg:`✨ ${p} teleported to you.`,                  type:'ok',     toast:'✨ Teleported!' }),
+  ':bring':             (p)=>({ msg:`📍 ${p} brought to your location.`,           type:'ok',     toast:'📍 Brought!' }),
+  ':goto':              (p)=>({ msg:`🗺️ Warped to ${p}'s location.`,              type:'ok',     toast:'🗺️ Going to player' }),
+  ':warp':              (p)=>({ msg:`🌀 ${p} warped to new spot.`,                type:'ok',     toast:'🌀 Warped!' }),
+  ':bounce':            (p)=>({ msg:`🏀 ${p} is bouncing!`,                       type:'fun',    toast:'🏀 Boing boing!' }),
+  ':slide':             (p)=>({ msg:`🛷 ${p} is sliding on surfaces.`,            type:'fun',    toast:'🛷 Sliding!' }),
+  ':climb':             (p)=>({ msg:`🧗 ${p} can now climb walls.`,               type:'ok',     toast:'🧗 Climb enabled' }),
+  ':noclip':            (p)=>({ msg:`👁️ ${p} can now walk through walls.`,        type:'warn',   toast:'👁️ Noclip ON' }),
+  ':clip':              (p)=>({ msg:`🧱 ${p} collisions restored.`,               type:'ok',     toast:'🧱 Clip ON' }),
+  ':hover':             (p)=>({ msg:`🛸 ${p} is hovering.`,                       type:'fun',    toast:'🛸 Hovering' }),
+  ':roll':              (p)=>({ msg:`🎳 ${p} is rolling.`,                        type:'fun',    toast:'🎳 Rolling!' }),
+  ':flip':              (p)=>({ msg:`🤸 ${p} flipped upside-down!`,               type:'fun',    toast:'🤸 Flipped!' }),
+  ':teleportall':       ()=> ({ msg:`✨ All players teleported to you.`,           type:'warn',   toast:'✨ All teleported' }),
+  ':summonall':         ()=> ({ msg:`📣 All players summoned.`,                    type:'warn',   toast:'📣 All summoned' }),
+  ':scatter':           ()=> ({ msg:`💨 All players scattered randomly.`,          type:'fun',    toast:'💨 Scattered!' }),
+  ':follow':            (p)=>({ msg:`🐾 ${p} is now following you.`,              type:'fun',    toast:'🐾 Following' }),
+  ':unfollow':          (p)=>({ msg:`🛑 ${p} stopped following you.`,             type:'ok',     toast:'🛑 Unfollowed' }),
+  ':attach':            (p)=>({ msg:`🔗 ${p} attached to you.`,                   type:'fun',    toast:'🔗 Attached' }),
+  ':detach':            (p)=>({ msg:`🔓 ${p} detached.`,                          type:'ok',     toast:'🔓 Detached' }),
+  ':push':              (p)=>({ msg:`👋 ${p} pushed away!`,                       type:'fun',    toast:'👋 Pushed!' }),
+  ':pull':              (p)=>({ msg:`🧲 ${p} pulled towards you.`,                type:'fun',    toast:'🧲 Pulled!' }),
+  ':swap':              (p)=>({ msg:`🔄 Swapped positions with ${p}.`,            type:'fun',    toast:'🔄 Swapped!' }),
+  ':mirror':            (p)=>({ msg:`🪞 ${p} movements mirrored.`,               type:'fun',    toast:'🪞 Mirrored' }),
+  ':lock':              (p)=>({ msg:`🔒 ${p} locked in place.`,                   type:'warn',   toast:'🔒 Locked' }),
+  ':unlock':            (p)=>({ msg:`🔓 ${p} unlocked.`,                          type:'ok',     toast:'🔓 Unlocked' }),
+  ':mark':              (p)=>({ msg:`📌 ${p} has been marked.`,                   type:'info',   toast:'📌 Marked' }),
+  ':unmark':            (p)=>({ msg:`📌 ${p} marker removed.`,                    type:'info',   toast:'📌 Unmarked' }),
+  ':tag':               (p)=>({ msg:`🏷️ ${p} tagged for tracking.`,               type:'info',   toast:'🏷️ Tagged' }),
+  ':untag':             (p)=>({ msg:`🏷️ ${p} tag removed.`,                       type:'info',   toast:'🏷️ Untagged' }),
+  ':ghostwalk':         (p)=>({ msg:`👻 ${p} ghost walk mode ON.`,                type:'fun',    toast:'👻 Ghost walk' }),
+  ':solid':             (p)=>({ msg:`🧱 ${p} is solid again.`,                    type:'ok',     toast:'🧱 Solid' }),
+  ':boost':             (p)=>({ msg:`🚀 All boosts applied to ${p}.`,             type:'ok',     toast:'🚀 Boosted!' }),
+  ':nerf':              (p)=>({ msg:`📉 ${p} has been nerfed.`,                   type:'warn',   toast:'📉 Nerfed' }),
+  ':clone':             (p)=>({ msg:`👥 Clone of ${p} created.`,                  type:'fun',    toast:'👥 Cloned!' }),
+  ':removeclone':       (p)=>({ msg:`❌ ${p}'s clone removed.`,                   type:'ok',     toast:'❌ Clone removed' }),
+  ':teleportup':        (p)=>({ msg:`⬆️ ${p} teleported upward!`,                 type:'fun',    toast:'⬆️ Up!' }),
+  ':teleportdown':      (p)=>({ msg:`⬇️ ${p} teleported downward!`,               type:'fun',    toast:'⬇️ Down!' }),
+  ':teleportrandom':    (p)=>({ msg:`🎲 ${p} teleported to random spot.`,         type:'fun',    toast:'🎲 Teleport random' }),
+  ':freezeall':         ()=> ({ msg:`❄️ All players frozen.`,                     type:'danger', toast:'❄️ All frozen' }),
+  ':unfreezeall':       ()=> ({ msg:`🌡️ All players thawed.`,                     type:'ok',     toast:'🌡️ All thawed' }),
+  ':speedall':          ()=> ({ msg:`⚡ Speed applied to all players.`,            type:'warn',   toast:'⚡ Speed all' }),
+  ':jumpall':           ()=> ({ msg:`🦘 All players jumped!`,                     type:'fun',    toast:'🦘 Jump all!' }),
+  ':flyall':            ()=> ({ msg:`🕊️ All players can fly.`,                    type:'warn',   toast:'🕊️ Fly all' }),
+  ':unflyall':          ()=> ({ msg:`🪂 Fly removed from all players.`,           type:'ok',     toast:'🪂 Unfly all' }),
+  ':launchall':         ()=> ({ msg:`🚀 All players LAUNCHED!`,                   type:'fun',    toast:'🚀 Launch all!' }),
+  ':spinall':           ()=> ({ msg:`🌀 All players spinning.`,                   type:'fun',    toast:'🌀 Spin all' }),
+  ':flingall':          ()=> ({ msg:`🤯 All players FLUNG!`,                      type:'fun',    toast:'🤯 Fling all!' }),
+  ':orbitall':          ()=> ({ msg:`🪐 All players orbiting you.`,               type:'fun',    toast:'🪐 Orbit all' }),
+  ':dashall':           ()=> ({ msg:`💨 All players dashed forward!`,             type:'fun',    toast:'💨 Dash all' }),
+  ':hoverall':          ()=> ({ msg:`🛸 All players hovering.`,                   type:'fun',    toast:'🛸 Hover all' }),
+  ':bounceall':         ()=> ({ msg:`🏀 All players bouncing!`,                   type:'fun',    toast:'🏀 Bounce all' }),
+  ':rollall':           ()=> ({ msg:`🎳 All players rolling.`,                    type:'fun',    toast:'🎳 Roll all' }),
+  ':flipall':           ()=> ({ msg:`🤸 All players flipped!`,                    type:'fun',    toast:'🤸 Flip all' }),
+  ':noclipall':         ()=> ({ msg:`👁️ Noclip enabled for all players.`,         type:'warn',   toast:'👁️ Noclip all' }),
+  ':clipall':           ()=> ({ msg:`🧱 Clip restored for all players.`,          type:'ok',     toast:'🧱 Clip all' }),
+  ':followall':         ()=> ({ msg:`🐾 All players are following you.`,          type:'fun',    toast:'🐾 Follow all' }),
+  ':detachall':         ()=> ({ msg:`🔓 All players detached.`,                   type:'ok',     toast:'🔓 Detach all' }),
+  ':pushall':           ()=> ({ msg:`👋 All players pushed away!`,                type:'fun',    toast:'👋 Push all' }),
+  ':pullall':           ()=> ({ msg:`🧲 All players pulled to you.`,              type:'fun',    toast:'🧲 Pull all' }),
+  ':swapall':           ()=> ({ msg:`🔄 All player positions swapped.`,           type:'fun',    toast:'🔄 Swap all' }),
+  ':mirrorall':         ()=> ({ msg:`🪞 All player movements mirrored.`,          type:'fun',    toast:'🪞 Mirror all' }),
+  ':lockall':           ()=> ({ msg:`🔒 All players locked in place.`,            type:'danger', toast:'🔒 Lock all' }),
+  /* ── 101–200 EFFECTS & FUN ── */
+  ':bighead':           (p)=>({ msg:`😂 ${p}'s head is HUGE.`,                   type:'fun',    toast:'😂 Big head!' }),
+  ':smallhead':         (p)=>({ msg:`🔬 ${p}'s head is tiny.`,                   type:'fun',    toast:'🔬 Small head' }),
+  ':giant':             (p)=>({ msg:`🗿 ${p} is now GIANT.`,                     type:'fun',    toast:'🗿 GIANT!' }),
+  ':tiny':              (p)=>({ msg:`🐜 ${p} is now tiny.`,                      type:'fun',    toast:'🐜 Tiny!' }),
+  ':rainbow':           (p)=>({ msg:`🌈 ${p} is rainbow coloured.`,              type:'fun',    toast:'🌈 Rainbow!' }),
+  ':fire':              (p)=>({ msg:`🔥 ${p} is on fire!`,                       type:'fun',    toast:'🔥 On fire!' }),
+  ':smoke':             (p)=>({ msg:`💨 ${p} is smoky.`,                         type:'fun',    toast:'💨 Smoky' }),
+  ':sparkles':          (p)=>({ msg:`✨ ${p} sparkles everywhere.`,              type:'fun',    toast:'✨ Sparkles!' }),
+  ':glow':              (p)=>({ msg:`💡 ${p} is glowing.`,                       type:'fun',    toast:'💡 Glowing' }),
+  ':ghost':             (p)=>({ msg:`👻 ${p} looks ghostly.`,                    type:'fun',    toast:'👻 Ghost!' }),
+  ':trail':             (p)=>({ msg:`🌠 ${p} has a trail.`,                      type:'fun',    toast:'🌠 Trail added' }),
+  ':confetti':          (p)=>{ spawnParticleRain('🎉',40); return { msg:`🎉 Confetti for ${p}!`, type:'fun', toast:'🎉 Confetti!' }; },
+  ':disco':             (p)=>({ msg:`🕺 ${p} is in disco mode.`,                 type:'fun',    toast:'🕺 Disco!' }),
+  ':freezeeffect':      (p)=>({ msg:`🧊 ${p} frozen in ice.`,                   type:'fun',    toast:'🧊 Ice effect' }),
+  ':shock':             (p)=>({ msg:`⚡ ${p} got shocked!`,                      type:'fun',    toast:'⚡ Shocked!' }),
+  ':explode':           (p)=>({ msg:`💥 ${p} exploded! (visual only)`,           type:'fun',    toast:'💥 Boom!' }),
+  ':ice':               (p)=>({ msg:`🧊 ${p} encased in ice block.`,             type:'fun',    toast:'🧊 Iced!' }),
+  ':paintred':          (p)=>({ msg:`🔴 ${p} painted red.`,                      type:'fun',    toast:'🔴 Red paint!' }),
+  ':paintblue':         (p)=>({ msg:`🔵 ${p} painted blue.`,                     type:'fun',    toast:'🔵 Blue paint!' }),
+  ':paintgreen':        (p)=>({ msg:`🟢 ${p} painted green.`,                    type:'fun',    toast:'🟢 Green paint!' }),
+  ':dance':             (p)=>({ msg:`💃 ${p} is dancing!`,                       type:'fun',    toast:'💃 Dancing!' }),
+  ':laugh':             (p)=>({ msg:`😂 ${p} laughing!`,                         type:'fun',    toast:'😂 Ha ha ha!' }),
+  ':cry':               (p)=>({ msg:`😢 ${p} is crying.`,                        type:'fun',    toast:'😢 Crying' }),
+  ':scream':            (p)=>({ msg:`😱 ${p} screamed!`,                         type:'fun',    toast:'😱 Scream!' }),
+  ':glitch':            (p)=>({ msg:`📺 ${p} is glitching!`,                     type:'fun',    toast:'📺 Glitch!' }),
+  ':pixel':             (p)=>({ msg:`🎮 ${p} has been pixelated.`,               type:'fun',    toast:'🎮 Pixelated' }),
+  ':neon':              (p)=>({ msg:`💜 ${p} is neon glowing.`,                  type:'fun',    toast:'💜 Neon!' }),
+  ':shadow':            (p)=>({ msg:`🌑 ${p} shadowed.`,                         type:'fun',    toast:'🌑 Shadowed' }),
+  ':light':             (p)=>({ msg:`💛 ${p} surrounded by light.`,              type:'fun',    toast:'💛 Lit up!' }),
+  ':dark':              (p)=>({ msg:`⬛ ${p} appearance darkened.`,              type:'fun',    toast:'⬛ Darkened' }),
+  ':rain':              ()=> ({ msg:`🌧️ Rain started.`,                           type:'fun',    toast:'🌧️ Raining' }),
+  ':snow':              ()=> ({ msg:`❄️ Snow is falling.`,                        type:'fun',    toast:'❄️ Snowing' }),
+  ':storm':             ()=> ({ msg:`⛈️ Storm incoming!`,                         type:'fun',    toast:'⛈️ Storm!' }),
+  ':fog':               ()=> ({ msg:`🌫️ Fog rolled in.`,                          type:'fun',    toast:'🌫️ Foggy' }),
+  ':wind':              ()=> ({ msg:`🌬️ Wind howling.`,                           type:'fun',    toast:'🌬️ Windy' }),
+  ':earthquake':        ()=> ({ msg:`🌋 Earthquake shaking the world!`,           type:'fun',    toast:'🌋 Earthquake!' }),
+  ':lava':              ()=> ({ msg:`🌋 The floor is LAVA!`,                      type:'danger', toast:'🌋 Lava floor!' }),
+  ':meteor':            ()=> ({ msg:`☄️ Meteor shower incoming!`,                 type:'fun',    toast:'☄️ Meteor!' }),
+  ':fireall':           ()=> ({ msg:`🔥 Fire on all players.`,                    type:'fun',    toast:'🔥 Fire all!' }),
+  ':sparklesall':       ()=> ({ msg:`✨ Sparkles on all players.`,               type:'fun',    toast:'✨ Sparkles all' }),
+  ':glowall':           ()=> ({ msg:`💡 All players glowing.`,                   type:'fun',    toast:'💡 Glow all' }),
+  ':trailall':          ()=> ({ msg:`🌠 Trails on all players.`,                 type:'fun',    toast:'🌠 Trail all' }),
+  ':discoall':          ()=> ({ msg:`🕺 Disco mode for everyone!`,               type:'fun',    toast:'🕺 Disco all!' }),
+  ':explodeall':        ()=> ({ msg:`💥 Visual explosions on all players!`,       type:'fun',    toast:'💥 Explode all!' }),
+  ':rainbowall':        ()=> ({ msg:`🌈 Rainbow all players.`,                   type:'fun',    toast:'🌈 Rainbow all' }),
+  ':iceall':            ()=> ({ msg:`🧊 All players in ice blocks.`,              type:'fun',    toast:'🧊 Ice all' }),
+  ':paintallred':       ()=> ({ msg:`🔴 All players painted red.`,               type:'fun',    toast:'🔴 All red' }),
+  ':paintallblue':      ()=> ({ msg:`🔵 All players painted blue.`,              type:'fun',    toast:'🔵 All blue' }),
+  ':paintallgreen':     ()=> ({ msg:`🟢 All players painted green.`,             type:'fun',    toast:'🟢 All green' }),
+  ':danceall':          ()=> ({ msg:`💃 Everyone is dancing!`,                   type:'fun',    toast:'💃 Dance all!' }),
+  ':laughall':          ()=> ({ msg:`😂 Everyone is laughing!`,                  type:'fun',    toast:'😂 Laugh all!' }),
+  ':cryall':            ()=> ({ msg:`😢 Everyone crying.`,                       type:'fun',    toast:'😢 Cry all' }),
+  ':glitchall':         ()=> ({ msg:`📺 Glitch effect on all players.`,          type:'fun',    toast:'📺 Glitch all' }),
+  ':pixelall':          ()=> ({ msg:`🎮 All players pixelated.`,                 type:'fun',    toast:'🎮 Pixel all' }),
+  ':neonall':           ()=> ({ msg:`💜 Neon glow on all players.`,              type:'fun',    toast:'💜 Neon all' }),
+  ':shadowall':         ()=> ({ msg:`🌑 Shadow effect on all players.`,          type:'fun',    toast:'🌑 Shadow all' }),
+  ':lightall':          ()=> ({ msg:`💛 Light effect on all players.`,           type:'fun',    toast:'💛 Light all' }),
+  ':darkall':           ()=> ({ msg:`⬛ All players darkened.`,                  type:'fun',    toast:'⬛ Dark all' }),
+  ':rainall':           ()=> ({ msg:`🌧️ Rain on all players.`,                   type:'fun',    toast:'🌧️ Rain all' }),
+  ':snowall':           ()=> ({ msg:`❄️ Snow on all players.`,                   type:'fun',    toast:'❄️ Snow all' }),
+  ':stormall':          ()=> ({ msg:`⛈️ Storm on all players.`,                  type:'fun',    toast:'⛈️ Storm all' }),
+  ':fogall':            ()=> ({ msg:`🌫️ Fog on all players.`,                    type:'fun',    toast:'🌫️ Fog all' }),
+  ':windall':           ()=> ({ msg:`🌬️ Wind on all players.`,                   type:'fun',    toast:'🌬️ Wind all' }),
+  ':lavaall':           ()=> ({ msg:`🌋 Lava under all players.`,                type:'danger', toast:'🌋 Lava all!' }),
+  ':meteorall':         ()=> ({ msg:`☄️ Meteor shower on all players.`,           type:'fun',    toast:'☄️ Meteor all' }),
+  ':confettiall':       ()=> ({ msg:`🎉 Confetti for all players!`,              type:'fun',    toast:'🎉 Confetti all!' }),
+  ':freezeeffectall':   ()=> ({ msg:`🧊 All players ice-frozen.`,                type:'fun',    toast:'🧊 Ice all' }),
+  ':shockall':          ()=> ({ msg:`⚡ All players shocked!`,                   type:'fun',    toast:'⚡ Shock all' }),
+  ':bigheadall':        ()=> ({ msg:`😂 Big heads on everyone.`,                 type:'fun',    toast:'😂 Bighead all' }),
+  ':tinyall':           ()=> ({ msg:`🐜 All players are tiny!`,                  type:'fun',    toast:'🐜 Tiny all' }),
+  ':giantall':          ()=> ({ msg:`🗿 All players are GIANT!`,                 type:'fun',    toast:'🗿 Giant all' }),
+  ':smallheadall':      ()=> ({ msg:`🔬 All players have tiny heads.`,           type:'fun',    toast:'🔬 Small head all' }),
+  ':ghostall':          ()=> ({ msg:`👻 All players ghosted.`,                   type:'fun',    toast:'👻 Ghost all' }),
+  ':visibleall':        ()=> ({ msg:`👁️ All players visible.`,                   type:'ok',     toast:'👁️ All visible' }),
+  ':invisibleall':      ()=> ({ msg:`👻 All players invisible.`,                 type:'warn',   toast:'👻 All invisible' }),
+  ':flash':             (p)=>({ msg:`⚡ Screen flashed for ${p}.`,               type:'fun',    toast:'⚡ Flash!' }),
+  ':zoom':              (p)=>({ msg:`🔭 Camera zoomed for ${p}.`,               type:'fun',    toast:'🔭 Zoom!' }),
+  ':blur':              (p)=>({ msg:`🌀 Screen blurred for ${p}.`,              type:'fun',    toast:'🌀 Blur' }),
+  ':invert':            (p)=>({ msg:`🔄 Colours inverted for ${p}.`,            type:'fun',    toast:'🔄 Inverted' }),
+  ':shake':             (p)=>({ msg:`📳 Screen shaking for ${p}.`,              type:'fun',    toast:'📳 Shake!' }),
+  ':flashall':          ()=> ({ msg:`⚡ Screen flashed for all players.`,        type:'fun',    toast:'⚡ Flash all!' }),
+  ':zoomall':           ()=> ({ msg:`🔭 Camera zoomed for all players.`,         type:'fun',    toast:'🔭 Zoom all' }),
+  ':blurall':           ()=> ({ msg:`🌀 Screen blurred for all players.`,        type:'fun',    toast:'🌀 Blur all' }),
+  ':invertall':         ()=> ({ msg:`🔄 Colours inverted for all players.`,      type:'fun',    toast:'🔄 Invert all' }),
+  ':shakeall':          ()=> ({ msg:`📳 Screen shaking for all players.`,        type:'fun',    toast:'📳 Shake all' }),
+  ':screenred':         (p)=>({ msg:`🔴 Red screen overlay applied to ${p}.`,   type:'fun',    toast:'🔴 Screen red' }),
+  ':screenblue':        (p)=>({ msg:`🔵 Blue screen overlay applied to ${p}.`,  type:'fun',    toast:'🔵 Screen blue' }),
+  ':screenblack':       (p)=>({ msg:`⬛ Black screen overlay on ${p}.`,         type:'fun',    toast:'⬛ Screen black' }),
+  ':screenwhite':       (p)=>({ msg:`⬜ White screen overlay on ${p}.`,         type:'fun',    toast:'⬜ Screen white' }),
+  ':screenallred':      ()=> ({ msg:`🔴 Red screen for all players.`,            type:'fun',    toast:'🔴 Screen all red' }),
+  ':screenallblue':     ()=> ({ msg:`🔵 Blue screen for all players.`,           type:'fun',    toast:'🔵 Screen all blue' }),
+  ':screenallblack':    ()=> ({ msg:`⬛ Black screen for all players.`,          type:'fun',    toast:'⬛ Screen all black' }),
+  ':screenallwhite':    ()=> ({ msg:`⬜ White screen for all players.`,          type:'fun',    toast:'⬜ Screen all white' }),
+  ':screenrainbow':     (p)=>({ msg:`🌈 Rainbow screen for ${p}.`,              type:'fun',    toast:'🌈 Rainbow screen' }),
+  ':screenallrainbow':  ()=> ({ msg:`🌈 Rainbow screen for all players.`,        type:'fun',    toast:'🌈 Rainbow all' }),
+  ':firetrail':         (p)=>({ msg:`🔥 Fire trail added to ${p}.`,             type:'fun',    toast:'🔥 Fire trail' }),
+  ':smoketrail':        (p)=>({ msg:`💨 Smoke trail added to ${p}.`,            type:'fun',    toast:'💨 Smoke trail' }),
+  ':rainbowtrail':      (p)=>({ msg:`🌈 Rainbow trail added to ${p}.`,          type:'fun',    toast:'🌈 Rainbow trail' }),
+  ':sparkletrail':      (p)=>({ msg:`✨ Sparkle trail added to ${p}.`,          type:'fun',    toast:'✨ Sparkle trail' }),
+  ':glowtrail':         (p)=>({ msg:`💡 Glow trail added to ${p}.`,             type:'fun',    toast:'💡 Glow trail' }),
+  /* ── 201–300 MODERATION & SERVER ── */
+  ':kick':              (p)=>{ banCount++; upd(); return { msg:`🚪 ${p} was kicked from the server.`,       type:'err',    toast:'🚪 Player kicked' }; },
+  ':ban':               (p)=>{ banCount++; upd(); try{ const bl=JSON.parse(localStorage.getItem('eylox_banned')||'[]'); if(!bl.includes(p))bl.push(p); localStorage.setItem('eylox_banned',JSON.stringify(bl)); }catch{} return { msg:`❌ ${p} is now BANNED.`,type:'err',toast:'🚫 Banned' }; },
+  ':unban':             (p)=>{ try{ let bl=JSON.parse(localStorage.getItem('eylox_banned')||'[]'); bl=bl.filter(n=>n!==p); localStorage.setItem('eylox_banned',JSON.stringify(bl)); }catch{} return { msg:`✅ ${p} has been unbanned.`,type:'ok',toast:'✅ Unbanned' }; },
+  ':mute':              (p)=>({ msg:`🔇 ${p} has been muted.`,                  type:'warn',   toast:'🔇 Muted' }),
+  ':unmute':            (p)=>({ msg:`🔊 ${p} has been unmuted.`,                type:'ok',     toast:'🔊 Unmuted' }),
+  ':warn':              (p)=>({ msg:`⚠️ Warning sent to ${p}.`,                  type:'warn',   toast:'⚠️ Warned' }),
+  ':jail':              (p)=>({ msg:`⛓️ ${p} jailed.`,                           type:'warn',   toast:'⛓️ Jailed' }),
+  ':unjail':            (p)=>({ msg:`🔓 ${p} released from jail.`,               type:'ok',     toast:'🔓 Unjailed' }),
+  ':freezechat':        ()=> ({ msg:`❄️ Chat is frozen.`,                        type:'warn',   toast:'❄️ Chat frozen' }),
+  ':unfreezechat':      ()=> ({ msg:`💬 Chat unfrozen.`,                         type:'ok',     toast:'💬 Chat active' }),
+  ':slowchat':          ()=> ({ msg:`🐢 Slow mode: 30s between messages.`,       type:'warn',   toast:'🐢 Slow chat' }),
+  ':clearchat':         ()=>{ clearLog(); try{localStorage.removeItem('eylox_chat_log');}catch{} return { msg:`🧹 Chat cleared. Console reset.`, type:'ok', toast:'🧹 Chat cleared' }; },
+  ':announce':          (_,m)=>{ showAnnounce(m||'Hello!'); return { msg:`📢 Server: "${m||'Hello!'}"`,type:'info',toast:'📢 Announced!' }; },
+  ':logs':              ()=>{ setTimeout(()=>{ try{ showAccountHistory(); }catch{} },120); return { msg:`📜 Opening Login History…`, type:'info', toast:'📜 Logs opened' }; },
+  ':check':             (p)=>({ msg:`🔍 ${p}: Lv.${Math.floor(Math.random()*50)+1} | ${Math.floor(Math.random()*1000)} coins | ${Math.floor(Math.random()*20)} warnings`,type:'info',toast:'🔍 Checked' }),
+  ':report':            (p)=>({ msg:`🚨 Report filed for ${p}.`,                 type:'warn',   toast:'🚨 Reported' }),
+  ':flag':              (p)=>({ msg:`🚩 ${p} flagged for review.`,               type:'warn',   toast:'🚩 Flagged' }),
+  ':unflag':            (p)=>({ msg:`✅ ${p} flag removed.`,                     type:'ok',     toast:'✅ Unflagged' }),
+  ':timeout':           (p,a)=>({ msg:`⏱️ ${p} timed out for ${a||'60'}s.`,     type:'warn',   toast:'⏱️ Timeout' }),
+  ':untimeout':         (p)=>({ msg:`▶️ ${p} timeout removed.`,                  type:'ok',     toast:'▶️ Timeout cleared' }),
+  ':blacklist':         (p)=>({ msg:`⛔ ${p} added to blacklist.`,               type:'danger', toast:'⛔ Blacklisted' }),
+  ':whitelist':         (p)=>({ msg:`✅ ${p} added to whitelist.`,               type:'ok',     toast:'✅ Whitelisted' }),
+  ':serverlock':        ()=> ({ msg:`🔒 Server locked. No new joins.`,           type:'danger', toast:'🔒 Server locked' }),
+  ':serverunlock':      ()=> ({ msg:`🔓 Server unlocked. New players can join.`, type:'ok',     toast:'🔓 Server unlocked' }),
+  ':shutdown':          ()=> ({ msg:`🛑 Server shutting down in 30s…`,           type:'danger', toast:'🛑 Shutdown!' }),
+  ':restart':           ()=> ({ msg:`🔄 Server restarting…`,                     type:'danger', toast:'🔄 Restarting' }),
+  ':rejoin':            (p)=>({ msg:`🔁 ${p} forced to rejoin.`,                 type:'warn',   toast:'🔁 Forced rejoin' }),
+  ':softshutdown':      ()=> ({ msg:`⏸️ Graceful shutdown queued.`,              type:'warn',   toast:'⏸️ Soft shutdown' }),
+  ':hardshutdown':      ()=> ({ msg:`🛑 Hard shutdown NOW.`,                     type:'danger', toast:'🛑 Hard shutdown' }),
+  ':serverinfo':        ()=> ({ msg:`ℹ️ Server: v2.1.0 | Uptime: ${Math.floor(Math.random()*100)+1}h | Players: ${Math.floor(Math.random()*50)+1}`,type:'info',toast:'ℹ️ Server info' }),
+  ':playercount':       ()=> ({ msg:`👥 Current players: ${Math.floor(Math.random()*50)+1}/100`,type:'info',toast:'👥 Player count' }),
+  ':uptime':            ()=> ({ msg:`⏰ Server uptime: ${Math.floor(Math.random()*100)+1}h ${Math.floor(Math.random()*60)}m`,type:'info',toast:'⏰ Uptime' }),
+  ':ping':              ()=> ({ msg:`📡 Ping: ${Math.floor(Math.random()*50)+5}ms`,type:'info', toast:'📡 Pong!' }),
+  ':fps':               ()=> ({ msg:`🎯 Server FPS: ${Math.floor(Math.random()*20)+50}`,type:'info',toast:'🎯 FPS checked' }),
+  ':latency':           (p)=>({ msg:`📶 ${p} latency: ${Math.floor(Math.random()*100)+10}ms`,type:'info',toast:'📶 Latency checked' }),
+  ':memory':            ()=> ({ msg:`💾 Memory: ${Math.floor(Math.random()*40)+30}% used`,type:'info',toast:'💾 Memory checked' }),
+  ':cpu':               ()=> ({ msg:`🖥️ CPU: ${Math.floor(Math.random()*50)+20}% load`,type:'info',toast:'🖥️ CPU checked' }),
+  ':stats':             ()=> ({ msg:`📊 Server stats loaded. Check console.`,     type:'info',   toast:'📊 Stats loaded' }),
+  ':debug':             ()=> ({ msg:`🐛 Debug mode ON.`,                          type:'info',   toast:'🐛 Debug ON' }),
+  ':nodebug':           ()=> ({ msg:`✅ Debug mode OFF.`,                         type:'ok',     toast:'✅ Debug OFF' }),
+  ':backup':            ()=> ({ msg:`💾 Server data backed up.`,                  type:'ok',     toast:'💾 Backed up' }),
+  ':restore':           ()=> ({ msg:`📂 Server restored from backup.`,            type:'warn',   toast:'📂 Restored' }),
+  ':save':              ()=> ({ msg:`💾 Server state saved.`,                     type:'ok',     toast:'💾 Saved' }),
+  ':load':              ()=> ({ msg:`📂 Server state loaded.`,                    type:'warn',   toast:'📂 Loaded' }),
+  ':resetserver':       ()=> ({ msg:`🔄 Server reset to defaults.`,               type:'danger', toast:'🔄 Server reset' }),
+  ':lockchat':          ()=> ({ msg:`🔒 Chat locked to owners only.`,             type:'warn',   toast:'🔒 Chat locked' }),
+  ':unlockchat':        ()=> ({ msg:`🔓 Chat unlocked for all.`,                  type:'ok',     toast:'🔓 Chat unlocked' }),
+  ':modmode':           ()=> ({ msg:`🔰 Moderator mode activated.`,               type:'warn',   toast:'🔰 Mod mode' }),
+  ':adminmode':         ()=> ({ msg:`👑 Admin mode activated.`,                   type:'warn',   toast:'👑 Admin mode' }),
+  ':ownermode':         ()=> ({ msg:`🌟 Owner mode activated.`,                   type:'danger', toast:'🌟 Owner mode' }),
+  ':anticheat':         ()=> ({ msg:`🛡️ Anti-cheat system enabled.`,              type:'ok',     toast:'🛡️ Anti-cheat ON' }),
+  ':disableanticheat':  ()=> ({ msg:`❌ Anti-cheat disabled.`,                    type:'danger', toast:'❌ Anti-cheat OFF' }),
+  ':kickall':           ()=> ({ msg:`🚪 All players kicked from server.`,         type:'danger', toast:'🚪 All kicked' }),
+  ':banall':            ()=> ({ msg:`❌ All players banned.`,                      type:'danger', toast:'❌ All banned' }),
+  ':muteall':           ()=> ({ msg:`🔇 All players muted.`,                      type:'warn',   toast:'🔇 All muted' }),
+  ':warnall':           ()=> ({ msg:`⚠️ Warning sent to all players.`,            type:'warn',   toast:'⚠️ All warned' }),
+  ':jailall':           ()=> ({ msg:`⛓️ All players jailed.`,                     type:'danger', toast:'⛓️ All jailed' }),
+  ':unjailall':         ()=> ({ msg:`🔓 All players unjailed.`,                   type:'ok',     toast:'🔓 All unjailed' }),
+  ':timeoutall':        ()=> ({ msg:`⏱️ Timeout applied to all players.`,         type:'warn',   toast:'⏱️ All timed out' }),
+  ':untimeoutall':      ()=> ({ msg:`▶️ Timeout removed from all players.`,       type:'ok',     toast:'▶️ All untimed' }),
+  ':clearwarnings':     (p)=>({ msg:`🧹 Warnings cleared for ${p}.`,             type:'ok',     toast:'🧹 Warnings cleared' }),
+  ':clearlogs':         ()=> ({ msg:`🧹 Server logs cleared.`,                    type:'warn',   toast:'🧹 Logs cleared' }),
+  ':broadcast':         (_,m)=>{ showAnnounce(m||'Attention!'); return { msg:`📡 Broadcast: "${m||'Attention!'}"`,type:'info',toast:'📡 Broadcast sent' }; },
+  ':systemmessage':     (_,m)=>({ msg:`🖥️ System: "${m||'System message'}"`,     type:'info',   toast:'🖥️ System message' }),
+  ':alert':             (_,m)=>{ showAnnounce(m||'ALERT!'); return { msg:`🚨 ALERT: "${m||'Alert!'}"`,type:'warn',toast:'🚨 Alert sent' }; },
+  ':spectate':          (p)=>({ msg:`👁️ Now spectating ${p}.`,                   type:'info',   toast:'👁️ Spectating' }),
+  ':unspectate':        ()=> ({ msg:`🎮 Spectating stopped.`,                     type:'ok',     toast:'🎮 Back to game' }),
+  ':spectateall':       ()=> ({ msg:`👁️ Spectating all players.`,                 type:'info',   toast:'👁️ Spectate all' }),
+  ':ghostmode':         (p)=>({ msg:`👻 ${p} in ghost mode.`,                     type:'warn',   toast:'👻 Ghost mode' }),
+  ':normalmode':        (p)=>({ msg:`🧍 ${p} back to normal mode.`,              type:'ok',     toast:'🧍 Normal mode' }),
+  ':adminchat':         (_,m)=>({ msg:`💬 [ADMIN] ${m||'Hello!'}`,               type:'info',   toast:'💬 Admin chat' }),
+  ':modchat':           (_,m)=>({ msg:`💬 [MOD] ${m||'Hello!'}`,                 type:'info',   toast:'💬 Mod chat' }),
+  ':ownerchat':         (_,m)=>({ msg:`💬 [OWNER] ${m||'Hello!'}`,               type:'info',   toast:'💬 Owner chat' }),
+  ':globalmute':        ()=> ({ msg:`🔇 Global mute activated.`,                  type:'danger', toast:'🔇 Global mute' }),
+  ':unglobalmute':      ()=> ({ msg:`🔊 Global mute removed.`,                    type:'ok',     toast:'🔊 Global unmute' }),
+  ':serverfreeze':      ()=> ({ msg:`❄️ Server frozen. All players paused.`,      type:'danger', toast:'❄️ Server frozen' }),
+  ':serverunfreeze':    ()=> ({ msg:`🌡️ Server unfrozen.`,                        type:'ok',     toast:'🌡️ Server unfrozen' }),
+  ':forcefieldall':     ()=> ({ msg:`🛡️ Forcefield applied to all players.`,      type:'ok',     toast:'🛡️ Forcefield all' }),
+  ':removeforcefieldall':()=>({ msg:`❌ Forcefield removed from all players.`,    type:'warn',   toast:'❌ Forcefield gone' }),
+  ':shieldall':         ()=> ({ msg:`🛡️ Shields on all players.`,                 type:'ok',     toast:'🛡️ Shield all' }),
+  ':unshieldall':       ()=> ({ msg:`❌ Shields removed from all players.`,        type:'warn',   toast:'❌ Unshield all' }),
+  ':respawnall':        ()=> ({ msg:`🔄 All players respawned.`,                  type:'ok',     toast:'🔄 Respawn all' }),
+  ':healall':           ()=> ({ msg:`❤️ All players fully healed.`,               type:'ok',     toast:'❤️ Heal all' }),
+  ':killall':           ()=> ({ msg:`☠️ All players eliminated.`,                 type:'danger', toast:'☠️ Kill all' }),
+  ':bringall':          ()=> ({ msg:`📍 All players brought to you.`,             type:'warn',   toast:'📍 Bring all' }),
+  ':gotoall':           (p)=>({ msg:`🗺️ All players sent to ${p}.`,              type:'warn',   toast:'🗺️ Goto all' }),
+  ':teleporteveryone':  ()=> ({ msg:`✨ Everyone teleported to center.`,           type:'warn',   toast:'✨ Teleport all' }),
+  ':summoneveryone':    ()=> ({ msg:`📣 Everyone summoned to you.`,               type:'warn',   toast:'📣 Summon all' }),
+  ':scattereveryone':   ()=> ({ msg:`💨 Everyone scattered randomly.`,            type:'fun',    toast:'💨 Scatter all' }),
+  ':lockserverchat':    ()=> ({ msg:`🔒 Server chat locked.`,                     type:'warn',   toast:'🔒 Chat locked' }),
+  ':unlockserverchat':  ()=> ({ msg:`🔓 Server chat unlocked.`,                   type:'ok',     toast:'🔓 Chat unlocked' }),
+  ':enablelogs':        ()=> ({ msg:`📜 Logging enabled.`,                        type:'ok',     toast:'📜 Logs ON' }),
+  ':disablelogs':       ()=> ({ msg:`❌ Logging disabled.`,                        type:'warn',   toast:'❌ Logs OFF' }),
+  ':devmode':           ()=> ({ msg:`🛠️ Developer mode enabled.`,                 type:'warn',   toast:'🛠️ Dev mode' }),
+  ':livemode':          ()=> ({ msg:`🔴 LIVE mode activated.`,                    type:'ok',     toast:'🔴 Live mode' }),
+  ':maintenance':       ()=> ({ msg:`🔧 Server in maintenance mode.`,             type:'warn',   toast:'🔧 Maintenance' }),
+  ':unmaintenance':     ()=> ({ msg:`✅ Maintenance mode off.`,                   type:'ok',     toast:'✅ Live again' }),
+  ':serverrestartnow':  ()=> ({ msg:`🔄 Restarting server immediately…`,          type:'danger', toast:'🔄 Restart now!' }),
+  /* ── 301–400 ECONOMY & ITEMS ── */
+  ':coins':             (p,a)=>{ try{ const u=JSON.parse(localStorage.getItem('eylox_user')||'null'); if(u){ u.coins=(u.coins||0)+parseInt(a||1000); localStorage.setItem('eylox_user',JSON.stringify(u)); } }catch{} return { msg:`💰 Gave ${a||'1000'} coins to ${p}.`,type:'ok',toast:'💰 Coins given' }; },
+  ':removecoins':       (p,a)=>{ try{ const u=JSON.parse(localStorage.getItem('eylox_user')||'null'); if(u){ u.coins=Math.max(0,(u.coins||0)-parseInt(a||500)); localStorage.setItem('eylox_user',JSON.stringify(u)); } }catch{} return { msg:`💸 Removed ${a||'500'} coins from ${p}.`,type:'warn',toast:'💸 Coins removed' }; },
+  ':givecash':          (p,a)=>({ msg:`💵 Gave $${a||'200'} cash to ${p}.`,      type:'ok',     toast:'💵 Cash given' }),
+  ':takecash':          (p,a)=>({ msg:`📤 Took $${a||'100'} cash from ${p}.`,    type:'warn',   toast:'📤 Cash taken' }),
+  ':rich':              (p)=>{ try{ const u=JSON.parse(localStorage.getItem('eylox_user')||'null'); if(u){ u.coins=99999; localStorage.setItem('eylox_user',JSON.stringify(u)); } }catch{} return { msg:`🤑 ${p} is now RICH! (99,999 coins)`,type:'ok',toast:'🤑 Rich!' }; },
+  ':poor':              (p)=>{ try{ const u=JSON.parse(localStorage.getItem('eylox_user')||'null'); if(u){ u.coins=0; localStorage.setItem('eylox_user',JSON.stringify(u)); } }catch{} return { msg:`📉 ${p} lost all coins.`,type:'danger',toast:'📉 Broke' }; },
+  ':wins':              (p,a)=>{ try{ const u=JSON.parse(localStorage.getItem('eylox_user')||'null'); if(u){ u.wins=(u.wins||0)+parseInt(a||10); localStorage.setItem('eylox_user',JSON.stringify(u)); } }catch{} return { msg:`🏆 Gave ${a||'10'} wins to ${p}.`,type:'ok',toast:'🏆 Wins given' }; },
+  ':dailybonus':        (p)=>({ msg:`🎁 Daily bonus sent to ${p}.`,              type:'ok',     toast:'🎁 Bonus sent' }),
+  ':resetstats':        (p)=>({ msg:`🔄 ${p}'s stats reset.`,                    type:'danger', toast:'🔄 Stats reset' }),
+  ':levelup':           (p)=>({ msg:`⬆️ ${p} leveled up!`,                       type:'ok',     toast:'⬆️ Level up!' }),
+  ':maxlevel':          (p)=>({ msg:`🏆 ${p} set to max level!`,                 type:'ok',     toast:'🏆 Max level!' }),
+  ':xp':                (p,a)=>({ msg:`⭐ Gave ${a||'1000'} XP to ${p}.`,       type:'ok',     toast:'⭐ XP given' }),
+  ':removexp':          (p,a)=>({ msg:`📉 Removed ${a||'500'} XP from ${p}.`,   type:'warn',   toast:'📉 XP removed' }),
+  ':giveitem':          (p,it)=>({ msg:`🎁 Gave item "${it||'item'}" to ${p}.`,  type:'ok',     toast:'🎁 Item given' }),
+  ':removeitem':        (p,it)=>({ msg:`❌ Removed "${it||'item'}" from ${p}.`,  type:'warn',   toast:'❌ Item removed' }),
+  ':inventory':         (p)=>({ msg:`🎒 ${p} inventory: 12 items.`,              type:'info',   toast:'🎒 Inventory viewed' }),
+  ':shopopen':          ()=> ({ msg:`🛒 Shop is now open.`,                       type:'ok',     toast:'🛒 Shop open' }),
+  ':shopclose':         ()=> ({ msg:`🔒 Shop is now closed.`,                     type:'warn',   toast:'🔒 Shop closed' }),
+  ':discount':          (_,v)=>({ msg:`🏷️ Shop discount set to ${v||'50'}%.`,    type:'ok',     toast:'🏷️ Discount set' }),
+  ':doublecoins':       ()=> ({ msg:`💰 Double coins mode ON!`,                   type:'ok',     toast:'💰 Double coins!' }),
+  ':triplexp':          ()=> ({ msg:`⭐ Triple XP mode ON!`,                      type:'ok',     toast:'⭐ Triple XP!' }),
+  ':boostcoins':        (p)=>({ msg:`💸 ${p}'s coin gain boosted.`,              type:'ok',     toast:'💸 Coins boosted' }),
+  ':boostxp':           (p)=>({ msg:`⭐ ${p}'s XP gain boosted.`,                type:'ok',     toast:'⭐ XP boosted' }),
+  ':givepet':           (p,pet)=>({ msg:`🐾 Pet "${pet||'cat'}" given to ${p}.`, type:'ok',     toast:'🐾 Pet given' }),
+  ':removepet':         (p)=>({ msg:`❌ Pet removed from ${p}.`,                  type:'warn',   toast:'❌ Pet removed' }),
+  ':petboost':          (p)=>({ msg:`🐾 ${p}'s pet stats boosted.`,              type:'ok',     toast:'🐾 Pet boosted' }),
+  ':petmax':            (p)=>({ msg:`🏆 ${p}'s pet maxed out!`,                  type:'ok',     toast:'🏆 Pet maxed' }),
+  ':givecrate':         (p)=>({ msg:`📦 Crate sent to ${p}.`,                    type:'ok',     toast:'📦 Crate given' }),
+  ':opencrate':         (p)=>({ msg:`🎁 ${p}'s crate opened!`,                   type:'ok',     toast:'🎁 Crate opened' }),
+  ':rareitem':          (p)=>({ msg:`💜 Rare item given to ${p}.`,               type:'ok',     toast:'💜 Rare item!' }),
+  ':legendaryitem':     (p)=>({ msg:`🌟 LEGENDARY item given to ${p}!`,          type:'ok',     toast:'🌟 Legendary!' }),
+  ':epicitem':          (p)=>({ msg:`🟣 Epic item given to ${p}.`,               type:'ok',     toast:'🟣 Epic item!' }),
+  ':commonitem':        (p)=>({ msg:`⬜ Common item given to ${p}.`,             type:'ok',     toast:'⬜ Common item' }),
+  ':unlockallitems':    (p)=>({ msg:`🔓 All items unlocked for ${p}.`,           type:'warn',   toast:'🔓 All items' }),
+  ':lockallitems':      (p)=>({ msg:`🔒 All items locked for ${p}.`,             type:'warn',   toast:'🔒 Items locked' }),
+  ':gift':              (p,it)=>({ msg:`🎁 Gifted "${it||'item'}" to ${p}.`,     type:'ok',     toast:'🎁 Gift sent' }),
+  ':giftall':           (_,it)=>({ msg:`🎁 "${it||'item'}" gifted to all.`,      type:'ok',     toast:'🎁 Gift all' }),
+  ':trade':             (p)=>({ msg:`🔄 Trade initiated with ${p}.`,             type:'info',   toast:'🔄 Trade started' }),
+  ':canceltrade':       ()=> ({ msg:`❌ Trade cancelled.`,                         type:'warn',   toast:'❌ Trade cancelled' }),
+  ':accepttrade':       ()=> ({ msg:`✅ Trade accepted!`,                          type:'ok',     toast:'✅ Trade done!' }),
+  ':auction':           (_,it)=>({ msg:`🔨 Auction started for "${it||'item'}".`,type:'info',   toast:'🔨 Auction live' }),
+  ':bid':               (_,a)=>({ msg:`💸 Bid placed: ${a||'100'} coins.`,       type:'info',   toast:'💸 Bid placed' }),
+  ':sell':              (_,it)=>({ msg:`💰 Sold "${it||'item'}".`,               type:'ok',     toast:'💰 Sold!' }),
+  ':buy':               (_,it)=>({ msg:`🛒 Bought "${it||'item'}".`,             type:'ok',     toast:'🛒 Bought!' }),
+  ':marketopen':        ()=> ({ msg:`🏪 Player market opened.`,                   type:'ok',     toast:'🏪 Market open' }),
+  ':marketclose':       ()=> ({ msg:`🔒 Player market closed.`,                   type:'warn',   toast:'🔒 Market closed' }),
+  ':tax':               (_,v)=>({ msg:`📜 Tax rate set to ${v||'10'}%.`,         type:'warn',   toast:'📜 Tax set' }),
+  ':notax':             ()=> ({ msg:`✅ Tax removed.`,                             type:'ok',     toast:'✅ No tax' }),
+  ':bonus':             (p)=>({ msg:`🎁 Bonus sent to ${p}.`,                    type:'ok',     toast:'🎁 Bonus!' }),
+  ':superbonus':        (p)=>({ msg:`🎉 Super bonus sent to ${p}!`,              type:'ok',     toast:'🎉 Super bonus!' }),
+  ':megabonus':         (p)=>({ msg:`🌟 MEGA bonus sent to ${p}!`,               type:'ok',     toast:'🌟 MEGA bonus!' }),
+  ':coinsall':          (_,a)=>({ msg:`💰 ${a||'500'} coins given to all.`,      type:'ok',     toast:'💰 Coins to all' }),
+  ':cashall':           (_,a)=>({ msg:`💵 $${a||'100'} cash given to all.`,      type:'ok',     toast:'💵 Cash to all' }),
+  ':xpall':             (_,a)=>({ msg:`⭐ ${a||'1000'} XP given to all.`,        type:'ok',     toast:'⭐ XP to all' }),
+  ':giveallitems':      (p)=>({ msg:`🎁 All items given to ${p}.`,               type:'warn',   toast:'🎁 All items given' }),
+  ':removeallitems':    (p)=>({ msg:`❌ All items removed from ${p}.`,            type:'danger', toast:'❌ All items gone' }),
+  ':petall':            ()=> ({ msg:`🐾 Pets given to all players.`,              type:'ok',     toast:'🐾 Pets to all' }),
+  ':crateall':          ()=> ({ msg:`📦 Crates given to all players.`,            type:'ok',     toast:'📦 Crates to all' }),
+  ':giftallplayers':    (_,it)=>({ msg:`🎁 "${it||'gift'}" gifted to all.`,      type:'ok',     toast:'🎁 Gift everyone' }),
+  ':rewardall':         ()=> ({ msg:`🏆 All players rewarded.`,                   type:'ok',     toast:'🏆 Reward all' }),
+  ':penaltyall':        ()=> ({ msg:`⚠️ All players penalised.`,                  type:'danger', toast:'⚠️ Penalise all' }),
+  ':coinrain':          ()=>{ spawnParticleRain('💰',60); return { msg:`💰 Coins raining from the sky!`, type:'fun', toast:'💰 Coin rain!' }; },
+  ':cashrain':          ()=>{ spawnParticleRain('💵',60); return { msg:`💵 Cash raining from the sky!`, type:'fun', toast:'💵 Cash rain!' }; },
+  ':itemrain':          ()=> ({ msg:`🎁 Items raining from the sky!`,             type:'fun',    toast:'🎁 Item rain!' }),
+  ':rewarddrop':        ()=> ({ msg:`🏆 Reward dropped. First to grab wins!`,     type:'ok',     toast:'🏆 Reward drop' }),
+  ':lootdrop':          ()=> ({ msg:`📦 Loot crate dropped in world.`,            type:'ok',     toast:'📦 Loot drop' }),
+  ':jackpot':           (p)=>({ msg:`🎰 JACKPOT for ${p}!`,                      type:'ok',     toast:'🎰 Jackpot!' }),
+  ':minijackpot':       (p)=>({ msg:`🎰 Mini jackpot for ${p}!`,                 type:'ok',     toast:'🎰 Mini jackpot' }),
+  ':megajackpot':       (p)=>({ msg:`🎰 MEGA JACKPOT for ${p}!!!`,               type:'ok',     toast:'🎰 MEGA jackpot!' }),
+  ':spinwheel':         (p)=>({ msg:`🎡 Reward wheel spinning for ${p}…`,        type:'fun',    toast:'🎡 Spinning!' }),
+  ':freespin':          (p)=>({ msg:`🎡 Free spin given to ${p}.`,               type:'ok',     toast:'🎡 Free spin' }),
+  ':doublespin':        (p)=>({ msg:`🎡 2 spins given to ${p}.`,                 type:'ok',     toast:'🎡 2 spins' }),
+  ':triplespin':        (p)=>({ msg:`🎡 3 spins given to ${p}.`,                 type:'ok',     toast:'🎡 3 spins' }),
+  ':unlockvip':         (p)=>({ msg:`💎 ${p} is now VIP.`,                       type:'ok',     toast:'💎 VIP granted' }),
+  ':removevip':         (p)=>({ msg:`❌ VIP removed from ${p}.`,                  type:'warn',   toast:'❌ VIP removed' }),
+  ':vipall':            ()=> ({ msg:`💎 All players are now VIP!`,                type:'warn',   toast:'💎 VIP all' }),
+  ':premium':           (p)=>({ msg:`⭐ ${p} has premium.`,                       type:'ok',     toast:'⭐ Premium given' }),
+  ':removepremium':     (p)=>({ msg:`❌ Premium removed from ${p}.`,              type:'warn',   toast:'❌ Premium removed' }),
+  ':premiumall':        ()=> ({ msg:`⭐ All players have premium!`,               type:'warn',   toast:'⭐ Premium all' }),
+  ':grantpass':         (p)=>({ msg:`🎫 Pass granted to ${p}.`,                  type:'ok',     toast:'🎫 Pass granted' }),
+  ':removepass':        (p)=>({ msg:`❌ Pass removed from ${p}.`,                 type:'warn',   toast:'❌ Pass removed' }),
+  ':passall':           ()=> ({ msg:`🎫 Pass given to all players.`,              type:'warn',   toast:'🎫 Pass all' }),
+  ':grantbadge':        (p)=>({ msg:`🏅 Badge granted to ${p}.`,                 type:'ok',     toast:'🏅 Badge granted' }),
+  ':removebadge':       (p)=>({ msg:`❌ Badge removed from ${p}.`,                type:'warn',   toast:'❌ Badge removed' }),
+  ':badgeall':          ()=> ({ msg:`🏅 Badge given to all players.`,             type:'ok',     toast:'🏅 Badge all' }),
+  ':unlockachievement': (p)=>({ msg:`🏆 Achievement unlocked for ${p}.`,         type:'ok',     toast:'🏆 Achievement!' }),
+  ':achievementall':    ()=> ({ msg:`🏆 Achievement unlocked for all players.`,   type:'ok',     toast:'🏆 Achieve all' }),
+  ':resetinventory':    (p)=>({ msg:`🔄 ${p}'s inventory reset.`,                type:'danger', toast:'🔄 Inventory reset' }),
+  ':clearinventory':    (p)=>({ msg:`🧹 ${p}'s inventory cleared.`,              type:'danger', toast:'🧹 Inventory cleared' }),
+  ':fullinventory':     (p)=>({ msg:`📦 ${p}'s inventory filled.`,               type:'ok',     toast:'📦 Inventory full' }),
+  ':maxinventory':      (p)=>({ msg:`📦 ${p}'s inventory space maxed.`,          type:'ok',     toast:'📦 Max inventory' }),
+  ':addslot':           (p)=>({ msg:`➕ Inventory slot added to ${p}.`,           type:'ok',     toast:'➕ Slot added' }),
+  ':removeslot':        (p)=>({ msg:`➖ Inventory slot removed from ${p}.`,       type:'warn',   toast:'➖ Slot removed' }),
+  ':expandinventory':   (p)=>({ msg:`📦 ${p}'s inventory expanded.`,             type:'ok',     toast:'📦 Inventory expanded' }),
+  ':shrinkinventory':   (p)=>({ msg:`📦 ${p}'s inventory shrunk.`,               type:'warn',   toast:'📦 Inventory shrunk' }),
+  ':autocollect':       (p)=>({ msg:`🤖 Auto-collect ON for ${p}.`,              type:'ok',     toast:'🤖 Auto-collect ON' }),
+  ':stopcollect':       (p)=>({ msg:`🛑 Auto-collect OFF for ${p}.`,             type:'warn',   toast:'🛑 Auto-collect OFF' }),
+  ':multiplier':        (_,v)=>({ msg:`✖️ Coin multiplier set to ${v||'2'}x.`,   type:'ok',     toast:'✖️ Multiplier set' }),
+  ':setmultiplier':     (p,v)=>({ msg:`✖️ ${p}'s multiplier set to ${v||'3'}x.`,type:'ok',     toast:'✖️ Multiplier set' }),
+  ':boostall':          ()=> ({ msg:`🚀 All players boosted!`,                    type:'ok',     toast:'🚀 Boost all!' }),
+  ':resetallstats':     ()=> ({ msg:`🔄 All players stats reset.`,                type:'danger', toast:'🔄 All stats reset' }),
+  /* ── 401–500 GAME MODES & SPECIAL ── */
+  ':obbymode':          ()=> ({ msg:`🧗 Obby mode activated.`,                    type:'ok',     toast:'🧗 Obby mode' }),
+  ':survivalmode':      ()=> ({ msg:`🌲 Survival mode activated.`,                type:'ok',     toast:'🌲 Survival mode' }),
+  ':sandbox':           ()=> ({ msg:`🏖️ Sandbox mode activated.`,                 type:'ok',     toast:'🏖️ Sandbox!' }),
+  ':pvp':               (_,s)=>({ msg:`⚔️ PvP turned ${s||'on'}.`,               type:'warn',   toast:'⚔️ PvP ' + (s||'on') }),
+  ':minigame':          (_,s)=>({ msg:`🎯 Minigame ${s||'start'}ed.`,            type:'ok',     toast:'🎯 Minigame!' }),
+  ':roundstart':        ()=> ({ msg:`▶️ Round started!`,                          type:'ok',     toast:'▶️ Round start' }),
+  ':roundend':          ()=> ({ msg:`⏸️ Round ended.`,                            type:'warn',   toast:'⏸️ Round end' }),
+  ':autoplay':          (_,s)=>({ msg:`🔁 Autoplay ${s||'on'}.`,                 type:'ok',     toast:'🔁 Autoplay' }),
+  ':chaosmode':         ()=> ({ msg:`🌪️ CHAOS MODE activated! Good luck!`,        type:'danger', toast:'🌪️ Chaos!' }),
+  ':peacefulmode':      ()=> ({ msg:`🕊️ Peaceful mode activated.`,               type:'ok',     toast:'🕊️ Peaceful' }),
+  ':hardmode':          ()=> ({ msg:`💀 Hard difficulty enabled.`,                type:'warn',   toast:'💀 Hard mode' }),
+  ':easymode':          ()=> ({ msg:`🌟 Easy difficulty enabled.`,                type:'ok',     toast:'🌟 Easy mode' }),
+  ':nightmode':         ()=> ({ msg:`🌙 Night mode activated.`,                   type:'fun',    toast:'🌙 Night mode' }),
+  ':daymode':           ()=> ({ msg:`☀️ Day mode activated.`,                     type:'ok',     toast:'☀️ Day mode' }),
+  ':speedmode':         ()=> ({ msg:`⚡ Speed mode enabled for all.`,             type:'warn',   toast:'⚡ Speed mode' }),
+  ':slowmode':          ()=> ({ msg:`🐢 Slow motion mode enabled.`,               type:'warn',   toast:'🐢 Slow motion' }),
+  ':gravitymode':       ()=> ({ msg:`🌍 Custom gravity mode enabled.`,            type:'warn',   toast:'🌍 Gravity mode' }),
+  ':lowgravitymode':    ()=> ({ msg:`🌙 Low gravity mode for all.`,              type:'fun',    toast:'🌙 Low gravity mode' }),
+  ':highgravitymode':   ()=> ({ msg:`⬇️ High gravity mode for all.`,             type:'warn',   toast:'⬇️ High gravity mode' }),
+  ':eventstart':        ()=> ({ msg:`🎉 Game event started!`,                     type:'ok',     toast:'🎉 Event start!' }),
+  ':eventstop':         ()=> ({ msg:`⏹️ Game event stopped.`,                     type:'warn',   toast:'⏹️ Event stopped' }),
+  ':bossspawn':         ()=> ({ msg:`👹 BOSS spawned! Defeat it!`,               type:'fun',    toast:'👹 Boss spawned!' }),
+  ':bosskill':          ()=> ({ msg:`☠️ Boss instantly defeated.`,               type:'warn',   toast:'☠️ Boss killed' }),
+  ':bossrage':          ()=> ({ msg:`😡 Boss RAGE MODE activated!`,               type:'danger', toast:'😡 Boss rage!' }),
+  ':spawnnpc':          (_,n)=>({ msg:`🤖 NPC "${n||'NPC'}" spawned.`,           type:'ok',     toast:'🤖 NPC spawned' }),
+  ':removenpc':         (_,n)=>({ msg:`❌ NPC "${n||'NPC'}" removed.`,           type:'warn',   toast:'❌ NPC removed' }),
+  ':npcattack':         (p)=>({ msg:`⚔️ NPC attacking ${p}!`,                    type:'fun',    toast:'⚔️ NPC attack' }),
+  ':npcfollow':         (p)=>({ msg:`🐾 NPC following ${p}.`,                    type:'fun',    toast:'🐾 NPC follow' }),
+  ':npcstop':           ()=> ({ msg:`🛑 All NPC actions stopped.`,               type:'ok',     toast:'🛑 NPC stop' }),
+  ':npcall':            ()=> ({ msg:`🤖 NPC given to all players.`,               type:'fun',    toast:'🤖 NPC all' }),
+  ':weathercycle':      ()=> ({ msg:`🌤️ Weather cycle mode enabled.`,             type:'fun',    toast:'🌤️ Weather cycle' }),
+  ':timecycle':         ()=> ({ msg:`⏰ Day/night cycle enabled.`,                type:'fun',    toast:'⏰ Time cycle' }),
+  ':musicplay':         (_,t)=>({ msg:`🎵 Playing track "${t||'default'}".`,     type:'fun',    toast:'🎵 Music playing' }),
+  ':musicstop':         ()=> ({ msg:`⏹️ Music stopped.`,                          type:'ok',     toast:'⏹️ Music stopped' }),
+  ':musicall':          (_,t)=>({ msg:`🎵 Playing "${t||'default'}" for all.`,   type:'fun',    toast:'🎵 Music all' }),
+  ':soundeffect':       (_,n)=>({ msg:`🔊 Sound effect "${n||'boom'}" played.`,  type:'fun',    toast:'🔊 Sound played' }),
+  ':soundall':          (_,n)=>({ msg:`🔊 Sound "${n||'boom'}" for all players.`,type:'fun',    toast:'🔊 Sound all' }),
+  ':cutscene':          (_,n)=>({ msg:`🎬 Cutscene "${n||'intro'}" playing.`,    type:'fun',    toast:'🎬 Cutscene!' }),
+  ':skipcutscene':      ()=> ({ msg:`⏭️ Cutscene skipped.`,                       type:'ok',     toast:'⏭️ Skipped' }),
+  ':camerazoom':        (_,v)=>({ msg:`🔭 Camera zoom set to ${v||'5'}.`,        type:'fun',    toast:'🔭 Zoom set' }),
+  ':camerashake':       (p)=>({ msg:`📳 Camera shaking for ${p}.`,              type:'fun',    toast:'📳 Camera shake' }),
+  ':cinematic':         ()=> ({ msg:`🎥 Cinematic camera mode ON.`,               type:'fun',    toast:'🎥 Cinematic!' }),
+  ':recordmode':        ()=> ({ msg:`⏺️ Recording started.`,                      type:'info',   toast:'⏺️ Recording' }),
+  ':stoprecord':        ()=> ({ msg:`⏹️ Recording stopped.`,                      type:'ok',     toast:'⏹️ Stop record' }),
+  ':screenshot':        ()=> ({ msg:`📷 Screenshot taken.`,                       type:'info',   toast:'📷 Screenshot!' }),
+  ':highlight':         (p)=>({ msg:`⭐ ${p} highlighted.`,                      type:'info',   toast:'⭐ Highlighted' }),
+  ':highlightall':      ()=> ({ msg:`⭐ All players highlighted.`,                type:'info',   toast:'⭐ Highlight all' }),
+  ':tagyoutuber':       (p)=>({ msg:`📹 ${p} tagged as YouTuber.`,               type:'ok',     toast:'📹 YouTuber tag' }),
+  ':untagyoutuber':     (p)=>({ msg:`❌ YouTuber tag removed from ${p}.`,         type:'warn',   toast:'❌ Tag removed' }),
+  ':creatorbadge':      (p)=>({ msg:`🎨 Creator badge given to ${p}.`,           type:'ok',     toast:'🎨 Creator badge' }),
+  ':removecreatorbadge':(p)=>({ msg:`❌ Creator badge removed from ${p}.`,        type:'warn',   toast:'❌ Badge removed' }),
+  ':viptag':            (p)=>({ msg:`💎 VIP tag given to ${p}.`,                 type:'ok',     toast:'💎 VIP tag' }),
+  ':removetag':         (p)=>({ msg:`❌ All tags removed from ${p}.`,             type:'warn',   toast:'❌ Tags removed' }),
+  ':namestyle':         (p)=>({ msg:`✍️ Name style changed for ${p}.`,           type:'fun',    toast:'✍️ Name styled' }),
+  ':resetname':         (p)=>({ msg:`🔄 ${p}'s name reset to default.`,          type:'ok',     toast:'🔄 Name reset' }),
+  ':colorname':         (p,c)=>({ msg:`🎨 ${p}'s name coloured ${c||'red'}.`,   type:'fun',    toast:'🎨 Name coloured' }),
+  ':rainbowname':       (p)=>({ msg:`🌈 ${p}'s name is rainbow!`,               type:'fun',    toast:'🌈 Rainbow name!' }),
+  ':glowname':          (p)=>({ msg:`💡 ${p}'s name is glowing.`,               type:'fun',    toast:'💡 Glow name' }),
+  ':effectname':        (p)=>({ msg:`✨ Special effect on ${p}'s name.`,         type:'fun',    toast:'✨ Name effect' }),
+  ':resetallnames':     ()=> ({ msg:`🔄 All player names reset.`,                type:'warn',   toast:'🔄 Names reset' }),
+  ':unlockallmodes':    ()=> ({ msg:`🔓 All game modes unlocked.`,               type:'warn',   toast:'🔓 All modes' }),
+  ':lockallmodes':      ()=> ({ msg:`🔒 All game modes locked.`,                  type:'warn',   toast:'🔒 Modes locked' }),
+  ':grantallpowers':    (p)=>({ msg:`⚡ All powers granted to ${p}.`,             type:'warn',   toast:'⚡ All powers' }),
+  ':removepowers':      (p)=>({ msg:`❌ All powers removed from ${p}.`,           type:'warn',   toast:'❌ Powers gone' }),
+  ':powerup':           (p)=>({ msg:`⬆️ ${p}'s abilities powered up.`,           type:'ok',     toast:'⬆️ Power up!' }),
+  ':powerdown':         (p)=>({ msg:`⬇️ ${p}'s abilities powered down.`,         type:'warn',   toast:'⬇️ Power down' }),
+  ':ultimate':          (p)=>({ msg:`💥 ${p}'s ULTIMATE activated!`,             type:'danger', toast:'💥 Ultimate!' }),
+  ':superpower':        (p)=>({ msg:`🦸 ${p} now has SUPERPOWERS!`,              type:'ok',     toast:'🦸 Superpower!' }),
+  ':disablepowers':     (p)=>({ msg:`❌ All powers disabled for ${p}.`,           type:'warn',   toast:'❌ Powers OFF' }),
+  ':enablepowers':      (p)=>({ msg:`✅ All powers enabled for ${p}.`,            type:'ok',     toast:'✅ Powers ON' }),
+  ':spawnvehicle':      (_,v)=>({ msg:`🚗 Vehicle "${v||'car'}" spawned.`,       type:'ok',     toast:'🚗 Vehicle spawned' }),
+  ':removevehicle':     ()=> ({ msg:`❌ Player vehicle removed.`,                  type:'warn',   toast:'❌ Vehicle gone' }),
+  ':vehicleboost':      (p)=>({ msg:`🏎️ ${p}'s vehicle speed boosted.`,          type:'fun',    toast:'🏎️ Vehicle boost' }),
+  ':vehicleall':        (_,v)=>({ msg:`🚗 "${v||'car'}" given to all players.`,  type:'ok',     toast:'🚗 Vehicles all' }),
+  ':spawnpet':          (p,pet)=>({ msg:`🐾 Pet "${pet||'dog'}" spawned for ${p}.`,type:'ok',  toast:'🐾 Pet spawned' }),
+  ':petfollow':         (p)=>({ msg:`🐾 ${p}'s pet is following.`,              type:'ok',     toast:'🐾 Pet follow' }),
+  ':petstay':           (p)=>({ msg:`🐾 ${p}'s pet will stay.`,                 type:'ok',     toast:'🐾 Pet stay' }),
+  ':petattack':         (p)=>({ msg:`🐾 ${p}'s pet is attacking!`,              type:'warn',   toast:'🐾 Pet attack' }),
+  ':petallfollow':      ()=> ({ msg:`🐾 All pets following their owners.`,        type:'ok',     toast:'🐾 Pets follow' }),
+  ':petallstay':        ()=> ({ msg:`🐾 All pets staying in place.`,             type:'ok',     toast:'🐾 Pets stay' }),
+  ':petallattack':      ()=> ({ msg:`🐾 All pets in attack mode!`,               type:'warn',   toast:'🐾 Pets attack' }),
+  ':unlockworld':       ()=> ({ msg:`🔓 All world areas unlocked.`,              type:'ok',     toast:'🔓 World unlocked' }),
+  ':lockworld':         ()=> ({ msg:`🔒 World areas locked.`,                     type:'warn',   toast:'🔒 World locked' }),
+  ':teleportworld':     (_,n)=>({ msg:`🌍 All teleported to "${n||'world'}".`,   type:'warn',   toast:'🌍 World teleport' }),
+  ':nextworld':         ()=> ({ msg:`▶️ Switched to next world.`,                 type:'ok',     toast:'▶️ Next world' }),
+  ':previousworld':     ()=> ({ msg:`◀️ Switched to previous world.`,             type:'ok',     toast:'◀️ Prev world' }),
+  ':resetworld':        ()=> ({ msg:`🔄 Current world reset to default.`,         type:'danger', toast:'🔄 World reset' }),
+  ':worldevent':        (_,n)=>({ msg:`🌍 World event "${n||'chaos'}" started.`, type:'fun',    toast:'🌍 World event' }),
+  ':globalevent':       (_,n)=>({ msg:`🌐 Global event "${n||'epic'}" started.`, type:'warn',   toast:'🌐 Global event' }),
+  ':universemode':      ()=> ({ msg:`🌌 Universe mode activated!`,               type:'fun',    toast:'🌌 Universe!' }),
+  ':multiverse':        ()=> ({ msg:`🌌 Multiverse mode activated!`,             type:'fun',    toast:'🌌 Multiverse!' }),
+  ':dimension':         (_,n)=>({ msg:`🌀 Switched to dimension "${n||'1'}".`,   type:'fun',    toast:'🌀 Dimension!' }),
+  ':portalopen':        (_,n)=>({ msg:`🔵 Portal "${n||'A'}" opened!`,           type:'fun',    toast:'🔵 Portal open!' }),
+  ':portalclose':       ()=> ({ msg:`❌ Active portal closed.`,                   type:'ok',     toast:'❌ Portal closed' }),
+  ':portalall':         (_,n)=>({ msg:`🔵 Portals opened for all players.`,      type:'fun',    toast:'🔵 Portals all' }),
+  ':finalmode':         ()=> ({ msg:`💀 FINAL CHALLENGE MODE ACTIVATED!`,         type:'danger', toast:'💀 Final mode!' }),
+  ':godserver':         ()=> ({ msg:`👑 GOD SERVER MODE. All limits removed!`,   type:'danger', toast:'👑 God server!' }),
+
+  /* ── QUICK TOOLS (sidebar shortcuts) ── */
+  ':day':             ()=>{ document.body.style.transition='filter .6s'; document.body.style.filter='brightness(1.35) saturate(.75)'; document.documentElement.style.setProperty('--bg','#0d0732'); setTimeout(()=>{ document.body.style.filter=''; },8000); return { msg:`☀️ Day mode activated! Bright skies for 8 seconds.`, type:'ok', toast:'☀️ Day mode!' }; },
+  ':night':           ()=>{ document.body.style.transition='filter .6s'; document.body.style.filter='brightness(.6) saturate(1.3) hue-rotate(220deg)'; document.documentElement.style.removeProperty('--bg'); setTimeout(()=>{ document.body.style.filter=''; },8000); return { msg:`🌙 Night mode activated! Dark skies for 8 seconds.`, type:'fun', toast:'🌙 Night mode' }; },
+  ':clearweather':    ()=>{ document.body.style.filter=''; document.body.style.transition=''; const ol=document.getElementById('weatherOverlay'); if(ol) ol.remove(); return { msg:`🌤️ Weather cleared. Skies are perfectly clear!`, type:'ok', toast:'🌤️ Clear skies!' }; },
+  ':deleteall':       ()=>{ const keys=['eylox_login_history','eylox_banned','eylox_chat_log','eylox_game_logs','eylox_recently_played']; let n=0; keys.forEach(k=>{ if(localStorage.getItem(k)!==null){ localStorage.removeItem(k); n++; } }); clearLog(); return { msg:`🗑️ Deleted ${n} data entries. Login history, bans, chat & game logs cleared.`, type:'danger', toast:`🗑️ ${n} items deleted` }; },
+};
+
+function parseCmd(raw) {
+  const parts = raw.trim().split(/\s+/);
+  const cmd   = parts[0].toLowerCase();
+  const arg1  = parts[1] || '';
+  const arg2  = parts.slice(2).join(' ') || '';
+  return { cmd, arg1, arg2 };
+}
+
+function runCmdStr(raw) {
+  /* If cmdInput isn't in DOM yet, rebuild the view first */
+  if (!document.getElementById('cmdInput')) restoreCommandView(null);
+  const inp = document.getElementById('cmdInput');
+  if (inp) inp.value = raw;
+  runCmd();
+}
+
+function cmdQuick(raw) {
+  runCmdStr(raw);
+}
+
+function runCmd() {
+  const raw = document.getElementById('cmdInput').value.trim();
+  if (!raw) return;
+  if (window.EyloxRateLimit && !window.EyloxRateLimit()) {
+    addLog('⚠️ Slow down! Too many commands at once.', 'warn');
+    return;
+  }
+  const { cmd, arg1, arg2 } = parseCmd(raw);
+
+  let result = null;
+  /* Exact match first, then prefix match */
+  if (CMD_RESPONSES[cmd]) {
+    result = CMD_RESPONSES[cmd](arg1 || 'player', arg2 || arg1);
+  } else {
+    for (const [key, fn] of Object.entries(CMD_RESPONSES)) {
+      if (cmd.startsWith(key)) {
+        result = fn(arg1 || 'player', arg2 || arg1);
+        break;
+      }
+    }
+  }
+  if (!result) {
+    result = { msg: `❓ Unknown command: ${cmd}`, type: 'warn', toast: '❓ Unknown cmd' };
+  }
+
+  cmdCount++;
+  upd();
+  addLog(result.msg, result.type, cmd.startsWith(':') ? cmd[1].toUpperCase() + cmd.slice(2) : cmd);
+  toast(result.toast, result.type === 'ok' ? 'var(--green)' : result.type === 'err' || result.type === 'danger' ? 'var(--red)' : result.type === 'fun' ? 'var(--pink)' : 'var(--purple)');
+  document.getElementById('cmdInput').value = '';
+  document.getElementById('cmdInput').focus();
+}
+
+/* ══════════════════════════════════════════════════
+   LOG
+══════════════════════════════════════════════════ */
+function addLog(msg, type, cmd) {
+  const log  = document.getElementById('consoleLog');
+  const empty = log.querySelector('.log-empty');
+  if (empty) empty.remove();
+  const now  = new Date();
+  const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0') + ':' + now.getSeconds().toString().padStart(2,'0');
+  const line = document.createElement('div');
+  line.className = 'log-line';
+  line.innerHTML = `<span class="log-time">${time}</span><span class="log-text ${type||''}">${msg}</span>`;
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+  /* keep max 80 lines */
+  while (log.children.length > 80) log.removeChild(log.firstChild);
+}
+
+function clearLog() {
+  const log = document.getElementById('consoleLog');
+  log.innerHTML = '<div class="log-empty">Log cleared.</div>';
+}
+
+/* ══════════════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════════════ */
+function toast(msg, color) {
+  const wrap = document.getElementById('adminToast');
+  const el   = document.createElement('div');
+  el.className = 'a-toast';
+  el.style.borderLeftColor = color || 'var(--purple)';
+  el.style.borderLeftWidth = '3px';
+  el.innerHTML = `<span class="a-toast-icon">${msg.split(' ')[0]}</span><span>${msg.split(' ').slice(1).join(' ') || msg}</span>`;
+  wrap.appendChild(el);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 320); }, 2200);
+}
+
+/* ══════════════════════════════════════════════════
+   STATS UPDATER
+══════════════════════════════════════════════════ */
+let startTime = Date.now();
+function upd() {
+  document.getElementById('st-cmds').textContent = cmdCount;
+  document.getElementById('st-bans').textContent = (() => { try { return JSON.parse(localStorage.getItem('eylox_banned')||'[]').length; } catch { return banCount; } })();
+  const mins = Math.floor((Date.now() - startTime) / 60000);
+  document.getElementById('st-uptime').textContent = mins < 60 ? mins + 'm' : Math.floor(mins/60) + 'h ' + (mins%60) + 'm';
+  // Update coins in circulation from user
+  try {
+    const u = JSON.parse(localStorage.getItem('eylox_user')||'null');
+    const coinEl = document.getElementById('st-coins');
+    if (coinEl && u) coinEl.textContent = (u.coins||0).toLocaleString();
+  } catch {}
+}
+setInterval(upd, 10000);
+
+/* ══════════════════════════════════════════════════
+   ANNOUNCE OVERLAY
+══════════════════════════════════════════════════ */
+function showAnnounce(text) {
+  const old = document.getElementById('announceOverlay');
+  if (old) old.remove();
+  const el = document.createElement('div');
+  el.id = 'announceOverlay';
+  el.style.cssText = 'position:fixed;inset:0;z-index:9990;display:flex;align-items:center;justify-content:center;background:rgba(7,1,26,.85);backdrop-filter:blur(14px);cursor:pointer;animation:toastIn .35s cubic-bezier(.34,1.56,.64,1) both';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#1e0a48,#2a1560);border:2px solid var(--yellow);border-radius:24px;padding:40px 52px;text-align:center;max-width:560px;box-shadow:0 0 80px rgba(245,158,11,.25)">
+      <div style="font-size:3rem;margin-bottom:12px">📢</div>
+      <div style="font-family:var(--font-h);font-size:clamp(1.3rem,4vw,2rem);color:var(--yellow);margin-bottom:10px">Server Announcement</div>
+      <div style="font-size:clamp(.95rem,2.5vw,1.2rem);font-weight:800;color:var(--text);line-height:1.5">${text}</div>
+      <div style="margin-top:20px;font-size:.75rem;color:var(--muted);font-weight:700">Click anywhere to dismiss</div>
+    </div>`;
+  el.addEventListener('click', () => el.remove());
+  document.body.appendChild(el);
+  setTimeout(() => { if (el.parentNode) el.remove(); }, 6000);
+}
+
+/* ══════════════════════════════════════════════════
+   PARTICLE RAIN (visual effect for coin/confetti cmds)
+══════════════════════════════════════════════════ */
+function spawnParticleRain(emoji, count) {
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.textContent = emoji;
+    const size = 1.2 + Math.random() * 1.4;
+    const left = Math.random() * 100;
+    const delay = Math.random() * 1.5;
+    const dur = 2 + Math.random() * 2;
+    el.style.cssText = `position:fixed;top:-50px;left:${left}vw;font-size:${size}rem;z-index:9998;pointer-events:none;animation:particleFall ${dur}s ${delay}s linear forwards;opacity:0.9`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), (delay + dur + .2) * 1000);
+  }
+}
+if (!document.getElementById('particleFallStyle')) {
+  const s = document.createElement('style');
+  s.id = 'particleFallStyle';
+  s.textContent = '@keyframes particleFall{0%{transform:translateY(0) rotate(0deg);opacity:.9}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}';
+  document.head.appendChild(s);
+}
+
+/* ══════════════════════════════════════════════════
+   MAIN COMMAND VIEW HTML
+══════════════════════════════════════════════════ */
+function getCommandViewHTML() {
+  return `
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-val" style="color:var(--green)" id="st-online">5</div><div class="stat-lbl">🟢 Online</div></div>
+      <div class="stat-card"><div class="stat-val" style="color:var(--yellow)" id="st-cmds">0</div><div class="stat-lbl">⚡ Commands</div></div>
+      <div class="stat-card"><div class="stat-val" style="color:var(--pink)" id="st-bans">0</div><div class="stat-lbl">🚫 Banned</div></div>
+      <div class="stat-card"><div class="stat-val" style="color:var(--teal)" id="st-coins">—</div><div class="stat-lbl">🪙 My Coins</div></div>
+      <div class="stat-card"><div class="stat-val" style="color:var(--purple)" id="st-uptime">0m</div><div class="stat-lbl">⏱️ Uptime</div></div>
+    </div>
+    <div class="players-wrap">
+      <div class="players-title">🎮 Players Online</div>
+      <div class="players-list" id="playersList"></div>
+    </div>
+    <div class="cmd-input-wrap">
+      <div class="cmd-label">⚡ Command Input</div>
+      <div class="cmd-row">
+        <input class="cmd-input" id="cmdInput" placeholder=":command player [args]" autocomplete="off" spellcheck="false"/>
+        <button class="cmd-run" onclick="runCmd()">▶ Run</button>
+      </div>
+      <div class="cmd-suggestions" id="cmdSugs"></div>
+    </div>
+    <div class="console-wrap">
+      <div class="console-header">
+        <div class="console-title"><div class="console-dot"></div> Command Log</div>
+        <button class="console-clear" onclick="clearLog()">🧹 Clear</button>
+      </div>
+      <div class="console-log" id="consoleLog">
+        <div class="log-empty">No commands run yet.</div>
+      </div>
+    </div>
+    <div class="cat-section collapsed" id="sec-movement">
+      <div class="cat-header" onclick="toggleCat(this)">
+        <span class="cat-emoji">🎮</span><span class="cat-title">💯 Player &amp; Movement</span>
+        <span class="cat-count">100 commands</span><span class="cat-arrow">▾</span>
+      </div>
+      <div class="cmd-grid" id="grid-movement"></div>
+    </div>
+    <div class="cat-section collapsed" id="sec-effects">
+      <div class="cat-header" onclick="toggleCat(this)">
+        <span class="cat-emoji">💥</span><span class="cat-title">🎭 Effects &amp; Fun</span>
+        <span class="cat-count">100 commands</span><span class="cat-arrow">▾</span>
+      </div>
+      <div class="cmd-grid" id="grid-effects"></div>
+    </div>
+    <div class="cat-section collapsed" id="sec-mod">
+      <div class="cat-header" onclick="toggleCat(this)">
+        <span class="cat-emoji">🛡️</span><span class="cat-title">⚖️ Moderation &amp; Server</span>
+        <span class="cat-count">100 commands</span><span class="cat-arrow">▾</span>
+      </div>
+      <div class="cmd-grid" id="grid-mod"></div>
+    </div>
+    <div class="cat-section collapsed" id="sec-economy">
+      <div class="cat-header" onclick="toggleCat(this)">
+        <span class="cat-emoji">🎁</span><span class="cat-title">💰 Economy &amp; Items</span>
+        <span class="cat-count">100 commands</span><span class="cat-arrow">▾</span>
+      </div>
+      <div class="cmd-grid" id="grid-economy"></div>
+    </div>
+    <div class="cat-section collapsed" id="sec-gamemodes">
+      <div class="cat-header" onclick="toggleCat(this)">
+        <span class="cat-emoji">👑</span><span class="cat-title">🎮 Game Modes &amp; Special</span>
+        <span class="cat-count">100 commands</span><span class="cat-arrow">▾</span>
+      </div>
+      <div class="cmd-grid" id="grid-gamemodes"></div>
+    </div>`;
+}
+
+function restoreCommandView(openCat) {
+  const main = document.querySelector('.admin-main');
+  main.innerHTML = getCommandViewHTML();
+  renderCards();
+  renderPlayers();
+  upd();
+  /* Re-wire command input */
+  const inp = document.getElementById('cmdInput');
+  if (inp) {
+    inp.addEventListener('input', function() {
+      const val = this.value.toLowerCase();
+      const sug = document.getElementById('cmdSugs');
+      if (!val || val.length < 2) { sug.innerHTML = ''; return; }
+      const matches = ALL_CMDS.filter(c => c.startsWith(val)).slice(0, 8);
+      sug.innerHTML = matches.map(c => `<span class="cmd-sug" onclick="fillCmd('${c} player')">${c}</span>`).join('');
+    });
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') runCmd(); });
+  }
+  if (openCat) {
+    const sec = document.getElementById('sec-' + openCat);
+    if (sec) { sec.classList.remove('collapsed'); setTimeout(() => sec.scrollIntoView({ behavior:'smooth', block:'start' }), 60); }
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   SIDEBAR SCROLL
+══════════════════════════════════════════════════ */
+function scrollTo(cat) {
+  document.querySelectorAll('.as-link').forEach(l => l.classList.remove('active'));
+  try { event.currentTarget.classList.add('active'); } catch {}
+  const sec = document.getElementById('sec-' + cat);
+  if (!sec) {
+    /* Main view was replaced by registry/history — rebuild it */
+    restoreCommandView(cat);
+    return;
+  }
+  /* Section exists — expand it and scroll */
+  sec.classList.remove('collapsed');
+  sec.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+/* ══════════════════════════════════════════════════
+   PLAYER REGISTRY — accounts in join order
+══════════════════════════════════════════════════ */
+async function showPlayerRegistry() {
+  document.querySelectorAll('.as-link').forEach(l => l.classList.remove('active'));
+  try { event.currentTarget.classList.add('active'); } catch {}
+
+  const main = document.querySelector('.admin-main');
+  main.innerHTML = `<div style="text-align:center;padding:60px;color:var(--muted);font-size:.9rem;font-weight:700">⏳ Loading player registry…</div>`;
+
+  const MEDAL = ['🥇','🥈','🥉'];
+  function fmtDate(d) {
+    const dt = new Date(d);
+    return dt.toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'}) + ' ' + dt.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  }
+
+  let users = [];
+  try {
+    const data = await fetch('http://localhost:3001/api/users/registry').then(r => r.json()).catch(() => null);
+    if (data?.users) users = data.users;
+  } catch {}
+
+  const rows = users.length ? users.map((u, i) => {
+    const rank = i < 3 ? `<span style="font-size:1.2rem">${MEDAL[i]}</span>` : `<span style="color:var(--muted);font-size:.8rem;font-weight:800">#${i+1}</span>`;
+    const isOwner = u.username?.toLowerCase() === 'eylox';
+    return `
+    <tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:12px 16px;text-align:center;width:52px">${rank}</td>
+      <td style="padding:12px 16px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#ec4899);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">${u.avatar||'🎮'}</div>
+          <div>
+            <div style="font-family:'Fredoka One',cursive;font-size:.95rem;color:var(--text)">
+              ${u.username}
+              ${isOwner ? '<span style="margin-left:6px;background:linear-gradient(135deg,#f59e0b,#fde68a);color:#1a0800;font-size:.6rem;font-weight:900;padding:2px 7px;border-radius:99px;font-family:\'Nunito\',sans-serif;letter-spacing:.3px">👑 OWNER</span>' : ''}
+            </div>
+            <div style="font-size:.7rem;color:var(--muted)">Joined ${fmtDate(u.createdAt)}</div>
+          </div>
+        </div>
+      </td>
+      <td style="padding:12px 16px;font-size:.8rem;color:var(--yellow);font-weight:800">🪙 ${(u.coins||0).toLocaleString()}</td>
+      <td style="padding:12px 16px;font-size:.8rem;color:var(--green);font-weight:800">🏆 ${u.wins||0}</td>
+      <td style="padding:12px 16px;font-size:.8rem;color:var(--muted)">${(u.badges||[]).join(', ') || '—'}</td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--muted);font-weight:700">No registered accounts yet (server may be offline)</td></tr>`;
+
+  main.innerHTML = `
+    <div style="margin-bottom:20px">
+      <h2 style="font-family:'Fredoka One',cursive;font-size:1.6rem;color:var(--text);margin-bottom:6px">🏅 Player Registry</h2>
+      <p style="color:var(--muted);font-size:.85rem;font-weight:700">All accounts in join order — ${users.length} registered</p>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border2);border-radius:16px;overflow:hidden">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="background:rgba(167,139,250,.06);border-bottom:1px solid var(--border)">
+            <th style="padding:10px 16px;text-align:center;font-size:.65rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Rank</th>
+            <th style="padding:10px 16px;text-align:left;font-size:.65rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Account</th>
+            <th style="padding:10px 16px;text-align:left;font-size:.65rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Coins</th>
+            <th style="padding:10px 16px;text-align:left;font-size:.65rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Wins</th>
+            <th style="padding:10px 16px;text-align:left;font-size:.65rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Badges</th>
+          </tr>
+        </thead>
+        <tbody style="color:var(--text)">${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+/* ══════════════════════════════════════════════════
+   ACCOUNT HISTORY (LOGIN LOG)
+══════════════════════════════════════════════════ */
+function showAccountHistory() {
+  document.querySelectorAll('.as-link').forEach(l => l.classList.remove('active'));
+  try { event.currentTarget.classList.add('active'); } catch {}
+
+  const main = document.querySelector('.admin-main');
+  const history = (() => { try { return JSON.parse(localStorage.getItem('eylox_login_history') || '[]'); } catch { return []; } })();
+
+  function fmtTime(ts) {
+    const d = new Date(ts);
+    return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  }
+
+  const rows = history.length ? history.map((h, i) => `
+    <tr>
+      <td style="color:var(--muted);padding:10px 14px;font-size:.78rem">${i+1}</td>
+      <td style="padding:10px 14px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#ec4899);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0">
+            ${h.username?.[0]?.toUpperCase()||'?'}
+          </div>
+          <div>
+            <div style="font-family:'Fredoka One',cursive;font-size:.9rem;color:var(--text)">${h.username}</div>
+            <div style="font-size:.7rem;color:var(--muted)">@${h.username.toLowerCase()}_eylox</div>
+          </div>
+        </div>
+      </td>
+      <td style="padding:10px 14px;font-size:.78rem;color:var(--muted)">${fmtTime(h.time)}</td>
+      <td style="padding:10px 14px;font-size:.78rem;color:var(--muted)">${h.device||'💻 Desktop'}</td>
+      <td style="padding:10px 14px">
+        <span style="padding:2px 10px;border-radius:99px;font-size:.68rem;font-weight:900;background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.3)">✓ Logged In</span>
+      </td>
+    </tr>`).join('') : `<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--muted);font-size:.88rem;font-weight:700">No login history yet. Accounts will appear here once players log in.</td></tr>`;
+
+  main.innerHTML = `
+    <div style="margin-bottom:20px">
+      <h2 style="font-family:'Fredoka One',cursive;font-size:1.6rem;color:var(--text);margin-bottom:6px">📋 Login History</h2>
+      <p style="color:var(--muted);font-size:.85rem;font-weight:700">All accounts that have logged in to Eylox — ${history.length} sessions</p>
+    </div>
+
+    <!-- Search + clear -->
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+      <input id="ahSearch" placeholder="🔍 Search username…" style="flex:1;min-width:180px;background:rgba(167,139,250,.07);border:1px solid var(--border2);border-radius:10px;padding:10px 14px;color:var(--text);font-family:'Nunito',sans-serif;font-weight:700;font-size:.85rem;outline:none"/>
+      <button onclick="if(confirm('Clear all login history?')){localStorage.removeItem('eylox_login_history');showAccountHistory()}" style="background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.3);color:var(--red);padding:10px 18px;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.82rem;cursor:pointer">🗑️ Clear History</button>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border2);border-radius:16px;overflow:hidden">
+      <table id="ahTable" style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="background:rgba(167,139,250,.06);border-bottom:1px solid var(--border)">
+            <th style="padding:10px 14px;text-align:left;font-size:.68rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase">#</th>
+            <th style="padding:10px 14px;text-align:left;font-size:.68rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Account</th>
+            <th style="padding:10px 14px;text-align:left;font-size:.68rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Last Login</th>
+            <th style="padding:10px 14px;text-align:left;font-size:.68rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Device</th>
+            <th style="padding:10px 14px;text-align:left;font-size:.68rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Status</th>
+          </tr>
+        </thead>
+        <tbody id="ahBody" style="color:var(--text)">${rows}</tbody>
+      </table>
+    </div>
+  `;
+  /* Wire search after HTML is in the DOM */
+  const searchEl = document.getElementById('ahSearch');
+  if (searchEl) {
+    searchEl.addEventListener('input', function() {
+      const q = this.value.toLowerCase().trim();
+      document.querySelectorAll('#ahBody tr').forEach(row => {
+        row.style.display = (!q || row.textContent.toLowerCase().includes(q)) ? 'table-row' : 'none';
+      });
+    });
+    searchEl.focus();
+  }
+}
+
+function filterHistory() {
+  const el = document.getElementById('ahSearch');
+  if (!el) return;
+  const q = el.value.toLowerCase().trim();
+  document.querySelectorAll('#ahBody tr').forEach(row => {
+    row.style.display = (!q || row.textContent.toLowerCase().includes(q)) ? 'table-row' : 'none';
+  });
+}
+
+/* ══════════════════════════════════════════════════
+   CATEGORY COLLAPSE
+══════════════════════════════════════════════════ */
+function toggleCat(header) {
+  header.closest('.cat-section').classList.toggle('collapsed');
+}
+
+/* ══════════════════════════════════════════════════
+   CMD INPUT — AUTOCOMPLETE SUGGESTIONS
+   (wired in restoreCommandView after DOM injection)
+══════════════════════════════════════════════════ */
+const ALL_CMDS = Object.keys(CMD_RESPONSES);
+
+/* ══════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════ */
+restoreCommandView(null);
+addLog('🟢 Admin panel loaded. Welcome, ' + (document.getElementById('atName').textContent || 'Owner') + '!', 'ok');
+addLog('ℹ️ Click a category in the sidebar to expand it, or type a command above.', 'info');
+
+
+</script>
+<script src="security.js"></script>
+</body>
+</html>

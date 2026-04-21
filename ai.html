@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🤖 AI Gaming — Eylox</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script>
+    try {
+      const hasSession = localStorage.getItem('eylox_token') || localStorage.getItem('eylox_guest') || localStorage.getItem('eylox_user');
+      if (!hasSession) window.location.replace('landing.html');
+    } catch {}
+  </script>
+  <style>
+    .ai-hero { background: linear-gradient(135deg,#0d0520 0%,#1a0840 50%,#0d1a40 100%); border: 1px solid var(--border2,#3a2480); border-radius: 20px; padding: 40px 36px; margin-bottom: 28px; position: relative; overflow: hidden; }
+    .ai-hero::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse at 70% 50%, rgba(167,139,250,.12) 0%, transparent 70%); pointer-events:none; }
+    .ai-hero-title { font-family:'Fredoka One',cursive; font-size: clamp(1.8rem,4vw,2.8rem); color: var(--text,#f0e8ff); margin-bottom: 8px; }
+    .ai-hero-sub { color: var(--muted,#9d8ec7); font-weight: 700; font-size: .95rem; }
+    .ai-badge { display:inline-flex; align-items:center; gap:6px; background: rgba(167,139,250,.15); border: 1px solid rgba(167,139,250,.3); border-radius: 99px; padding: 4px 14px; font-size: .78rem; font-weight: 800; color: #c4b5fd; margin-bottom: 16px; }
+    .ai-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .ai-card { background: var(--card,#160a38); border: 1px solid var(--border2,#3a2480); border-radius: 16px; padding: 22px; transition: transform .2s, box-shadow .2s; cursor: pointer; }
+    .ai-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(124,58,237,.25); }
+    .ai-card-icon { font-size: 2rem; margin-bottom: 10px; }
+    .ai-card-title { font-family:'Fredoka One',cursive; font-size: 1.05rem; color: var(--text,#f0e8ff); margin-bottom: 6px; }
+    .ai-card-desc { font-size: .8rem; color: var(--muted,#9d8ec7); font-weight: 700; line-height: 1.5; }
+    .ai-card-tag { display:inline-block; background: rgba(74,222,128,.15); color: #4ade80; border: 1px solid rgba(74,222,128,.25); border-radius: 99px; font-size: .68rem; font-weight: 900; padding: 2px 10px; margin-top: 10px; }
+    .ai-card-tag.purple { background: rgba(167,139,250,.15); color: #a78bfa; border-color: rgba(167,139,250,.25); }
+    .ai-card-tag.pink { background: rgba(244,114,182,.15); color: #f472b6; border-color: rgba(244,114,182,.25); }
+    .section-header { display:flex; align-items:center; gap:10px; margin: 28px 0 16px; }
+    .section-title { font-family:'Fredoka One',cursive; font-size: 1.3rem; color: var(--text,#f0e8ff); }
+    .ai-stat-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .ai-stat { background: var(--card,#160a38); border: 1px solid var(--border2,#3a2480); border-radius: 14px; padding: 18px; text-align: center; }
+    .ai-stat-val { font-family:'Fredoka One',cursive; font-size: 1.6rem; color: var(--purple,#a78bfa); }
+    .ai-stat-lbl { font-size: .72rem; color: var(--muted,#9d8ec7); font-weight: 700; margin-top: 4px; }
+    .ai-chat { background: var(--card,#160a38); border: 1px solid var(--border2,#3a2480); border-radius: 16px; overflow: hidden; }
+    .ai-chat-msgs { padding: 20px; min-height: 220px; max-height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+    .ai-msg { display: flex; gap: 10px; align-items: flex-start; }
+    .ai-msg.user { flex-direction: row-reverse; }
+    .ai-msg-av { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#7c3aed,#ec4899); display:flex; align-items:center; justify-content:center; font-size:.9rem; flex-shrink:0; }
+    .ai-msg.user .ai-msg-av { background: linear-gradient(135deg,#059669,#4ade80); }
+    .ai-msg-bubble { background: rgba(167,139,250,.1); border: 1px solid rgba(167,139,250,.2); border-radius: 12px; padding: 10px 14px; font-size: .83rem; font-weight: 700; color: var(--text,#f0e8ff); max-width: 75%; line-height: 1.5; }
+    .ai-msg.user .ai-msg-bubble { background: rgba(74,222,128,.1); border-color: rgba(74,222,128,.2); }
+    .ai-chat-input { display: flex; gap: 10px; padding: 14px; border-top: 1px solid var(--border2,#3a2480); }
+    .ai-chat-input input { flex: 1; background: rgba(167,139,250,.07); border: 1px solid var(--border2,#3a2480); border-radius: 99px; padding: 10px 16px; color: var(--text,#f0e8ff); font-family:'Nunito',sans-serif; font-weight: 700; font-size: .85rem; outline: none; }
+    .ai-chat-input input:focus { border-color: var(--purple,#a78bfa); }
+    .ai-chat-input button { background: linear-gradient(135deg,#7c3aed,#a78bfa); border: none; border-radius: 99px; padding: 10px 20px; color: #fff; font-family:'Nunito',sans-serif; font-weight: 800; font-size: .85rem; cursor: pointer; transition: transform .15s; }
+    .ai-chat-input button:hover { transform: scale(1.05); }
+    .rec-game { display: flex; align-items: center; gap: 14px; background: var(--card,#160a38); border: 1px solid var(--border2,#3a2480); border-radius: 14px; padding: 16px; margin-bottom: 12px; transition: border-color .2s; cursor: pointer; text-decoration: none; }
+    .rec-game:hover { border-color: var(--purple,#a78bfa); }
+    .rec-game-thumb { width: 52px; height: 52px; border-radius: 12px; display:flex; align-items:center; justify-content:center; font-size: 1.8rem; flex-shrink: 0; }
+    .rec-game-name { font-family:'Fredoka One',cursive; font-size: 1rem; color: var(--text,#f0e8ff); }
+    .rec-game-reason { font-size: .75rem; color: var(--muted,#9d8ec7); font-weight: 700; margin-top: 3px; }
+    .rec-game-score { margin-left: auto; font-family:'Fredoka One',cursive; font-size: 1.1rem; color: var(--purple,#a78bfa); flex-shrink:0; }
+    .ai-insight { background: linear-gradient(135deg,rgba(124,58,237,.12),rgba(236,72,153,.08)); border: 1px solid rgba(167,139,250,.25); border-radius: 14px; padding: 18px 20px; margin-bottom: 12px; }
+    .ai-insight-title { font-family:'Fredoka One',cursive; font-size: .95rem; color: var(--text,#f0e8ff); margin-bottom: 6px; }
+    .ai-insight-text { font-size: .8rem; color: var(--muted,#9d8ec7); font-weight: 700; line-height: 1.5; }
+    .ai-insight-bar { height: 6px; background: rgba(167,139,250,.15); border-radius: 99px; margin-top: 10px; overflow: hidden; }
+    .ai-insight-fill { height: 100%; background: linear-gradient(90deg,#7c3aed,#a78bfa); border-radius: 99px; transition: width 1s ease; }
+    .refresh-btn { background: rgba(167,139,250,.12); border: 1px solid rgba(167,139,250,.25); color: var(--purple,#a78bfa); border-radius: 99px; padding: 6px 16px; font-family:'Nunito',sans-serif; font-weight: 800; font-size: .78rem; cursor: pointer; transition: background .15s; }
+    .refresh-btn:hover { background: rgba(167,139,250,.25); }
+    .friend-suggest { display: flex; align-items: center; gap: 12px; background: var(--card,#160a38); border: 1px solid var(--border2,#3a2480); border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; }
+    .fs-av { width: 42px; height: 42px; border-radius: 50%; display:flex; align-items:center; justify-content:center; font-size: 1.2rem; flex-shrink:0; }
+    .fs-name { font-family:'Fredoka One',cursive; font-size: .95rem; color: var(--text,#f0e8ff); }
+    .fs-match { font-size: .72rem; color: var(--muted,#9d8ec7); font-weight: 700; }
+    .fs-add { margin-left: auto; background: rgba(74,222,128,.15); border: 1px solid rgba(74,222,128,.3); color: #4ade80; border-radius: 99px; padding: 5px 14px; font-size: .75rem; font-weight: 800; cursor: pointer; }
+  </style>
+</head>
+<body data-page="ai">
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <span class="sidebar-logo-icon">🎮</span>
+      <span class="sidebar-logo-text">Eylox</span>
+    </a>
+    <p class="sidebar-section-label">Menu</p>
+    <nav class="sidebar-nav"><ul>
+      <li><a href="index.html"    class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
+      <li><a href="games.html"    class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
+      <li><a href="friends.html"  class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span></a></li>
+      <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
+      <li><a href="profile.html"  class="sidebar-link"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
+    </ul></nav>
+    <div class="sidebar-divider"></div>
+    <p class="sidebar-section-label">More</p>
+    <nav class="sidebar-nav"><ul>
+      <li><a href="leaderboard.html"  class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
+      <li><a href="achievements.html" class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
+      <li><a href="communities.html"  class="sidebar-link"><span class="s-icon">🌍</span><span class="s-label">Communities</span></a></li>
+      <li><a href="live-events.html"  class="sidebar-link"><span class="s-icon">⚡</span><span class="s-label">Live Events</span></a></li>
+      <li><a href="shop.html"         class="sidebar-link"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
+      <li><a href="ai.html"           class="sidebar-link active"><span class="s-icon">🤖</span><span class="s-label">AI Gaming</span></a></li>
+      <li><a href="#" class="sidebar-link" id="settingsBtn"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></a></li>
+      <li><a href="#" class="sidebar-link" id="logoutBtn"><span class="s-icon">🚪</span><span class="s-label">Logout</span></a></li>
+    </ul></nav>
+    <div class="sidebar-coins">
+      <span class="coins-icon">💰</span>
+      <div><div class="coins-amount" id="sideCoins">—</div><div class="coins-label">Eylux</div></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-area">
+    <div class="topbar">
+      <button class="topbar-menu" id="menuBtn">☰</button>
+      <div class="topbar-right">
+        <span class="topbar-avatar" id="topAv">🤖</span>
+        <span class="topbar-name" id="topName">Player</span>
+      </div>
+    </div>
+
+    <div class="content" style="padding:20px 24px;max-width:1100px;margin:0 auto">
+
+      <!-- Hero -->
+      <div class="ai-hero">
+        <div class="ai-badge">🤖 Powered by Eylox AI</div>
+        <div class="ai-hero-title">🤖 AI-Powered Gaming</div>
+        <div class="ai-hero-sub">Personalized recommendations, smart matchmaking, and intelligent game discovery</div>
+      </div>
+
+      <!-- Stats -->
+      <div class="ai-stat-row" id="aiStats">
+        <div class="ai-stat"><div class="ai-stat-val" id="statGames">0</div><div class="ai-stat-lbl">Games Played</div></div>
+        <div class="ai-stat"><div class="ai-stat-val" id="statScore">0</div><div class="ai-stat-lbl">Best Score</div></div>
+        <div class="ai-stat"><div class="ai-stat-val" id="statCoins">0</div><div class="ai-stat-lbl">Coins Earned</div></div>
+        <div class="ai-stat"><div class="ai-stat-val" id="statMatch">98%</div><div class="ai-stat-lbl">AI Match Rate</div></div>
+      </div>
+
+      <!-- Recommendations -->
+      <div class="section-header">
+        <span style="font-size:1.4rem">🎯</span>
+        <span class="section-title">Recommended for You</span>
+        <button class="refresh-btn" onclick="refreshRecs()" style="margin-left:auto">↻ Refresh</button>
+      </div>
+      <div id="recsContainer"></div>
+
+      <!-- AI Chat -->
+      <div class="section-header">
+        <span style="font-size:1.4rem">💬</span>
+        <span class="section-title">Ask the AI Gaming Assistant</span>
+      </div>
+      <div class="ai-chat">
+        <div class="ai-chat-msgs" id="chatMsgs">
+          <div class="ai-msg">
+            <div class="ai-msg-av">🤖</div>
+            <div class="ai-msg-bubble">Hey there! I'm your AI gaming assistant. Ask me anything — which game to play next, how to improve your score, or what events are happening! 🎮</div>
+          </div>
+        </div>
+        <div class="ai-chat-input">
+          <input id="chatIn" placeholder="Ask me anything about gaming..." onkeydown="if(event.key==='Enter')sendChat()"/>
+          <button onclick="sendChat()">Send ▶</button>
+        </div>
+      </div>
+
+      <!-- Gaming Insights -->
+      <div class="section-header">
+        <span style="font-size:1.4rem">📊</span>
+        <span class="section-title">Your Gaming Insights</span>
+      </div>
+      <div id="insightsContainer"></div>
+
+      <!-- Suggested Friends -->
+      <div class="section-header">
+        <span style="font-size:1.4rem">👥</span>
+        <span class="section-title">Suggested Friends</span>
+      </div>
+      <div id="friendsContainer"></div>
+
+      <!-- Feature Cards -->
+      <div class="section-header">
+        <span style="font-size:1.4rem">✨</span>
+        <span class="section-title">AI Features</span>
+      </div>
+      <div class="ai-grid">
+        <div class="ai-card" onclick="alert('🎯 Smart Matchmaking finds you the best opponents based on your skill level and play style!')">
+          <div class="ai-card-icon">🎯</div>
+          <div class="ai-card-title">Smart Matchmaking</div>
+          <div class="ai-card-desc">Get matched with players of similar skill and play style for the best competitive experience.</div>
+          <span class="ai-card-tag">Active</span>
+        </div>
+        <div class="ai-card" onclick="alert('📈 Skill Analysis tracks your performance across all games and identifies areas to improve!')">
+          <div class="ai-card-icon">📈</div>
+          <div class="ai-card-title">Skill Analysis</div>
+          <div class="ai-card-desc">Deep analysis of your gaming patterns, strengths, and improvement areas across every genre.</div>
+          <span class="ai-card-tag purple">Analyzing</span>
+        </div>
+        <div class="ai-card" onclick="alert('🎮 Game Discovery uses AI to recommend hidden gems you\'ll love based on your history!')">
+          <div class="ai-card-icon">🎮</div>
+          <div class="ai-card-title">Game Discovery</div>
+          <div class="ai-card-desc">AI-powered discovery of games you'll love, before you even know you want them.</div>
+          <span class="ai-card-tag">Active</span>
+        </div>
+        <div class="ai-card" onclick="alert('🤖 AI Coach watches your gameplay and gives real-time tips to boost your score!')">
+          <div class="ai-card-icon">🤖</div>
+          <div class="ai-card-title">AI Coach</div>
+          <div class="ai-card-desc">Get real-time coaching tips during gameplay to improve your strategies and reactions.</div>
+          <span class="ai-card-tag pink">Coming Soon</span>
+        </div>
+        <div class="ai-card" onclick="alert('🎁 Reward Optimizer finds you the best events and challenges for maximum coins!')">
+          <div class="ai-card-icon">🎁</div>
+          <div class="ai-card-title">Reward Optimizer</div>
+          <div class="ai-card-desc">Maximize your coins and rewards by participating in the highest-value events at the right time.</div>
+          <span class="ai-card-tag">Active</span>
+        </div>
+        <div class="ai-card" onclick="alert('🌐 Social AI suggests friends who match your gaming preferences and schedule!')">
+          <div class="ai-card-icon">🌐</div>
+          <div class="ai-card-title">Social AI</div>
+          <div class="ai-card-desc">Find friends who match your play style, schedule, and favorite game genres automatically.</div>
+          <span class="ai-card-tag purple">Active</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* ── Auth & init ── */
+const _user = (() => { try { return JSON.parse(localStorage.getItem('eylox_user')||'null'); } catch { return null; } })() || { username:'Player', avatar:'🎮', coins:0 };
+document.getElementById('topName').textContent = _user.username;
+document.getElementById('topAv').textContent   = _user.avatar || '🎮';
+document.getElementById('sideCoins').textContent = (_user.coins || 0).toLocaleString();
+
+document.getElementById('logoutBtn').addEventListener('click', e => {
+  e.preventDefault();
+  ['eylox_token','eylox_guest','eylox_user','eylox_is_owner'].forEach(k => localStorage.removeItem(k));
+  location.href = 'landing.html';
+});
+
+/* ── Stats ── */
+const recentlyPlayed = (() => { try { return JSON.parse(localStorage.getItem('eylox_recently_played')||'[]'); } catch { return []; } })();
+document.getElementById('statGames').textContent = recentlyPlayed.length || Math.floor(Math.random()*20)+3;
+document.getElementById('statCoins').textContent = (_user.coins || 0).toLocaleString();
+document.getElementById('statScore').textContent = (Math.floor(Math.random()*50000)+5000).toLocaleString();
+
+/* ── Recommendations ── */
+const GAME_CATALOG = [
+  { id:'ninja-dash',    title:'Ninja Dash',    icon:'🥷', genre:'action',    reason:'Based on your action game history', score:98 },
+  { id:'sky-riders',    title:'Sky Riders',    icon:'🚀', genre:'racing',    reason:'Trending with your friends', score:95 },
+  { id:'puzzle-palace', title:'Puzzle Palace',  icon:'🧩', genre:'puzzle',    reason:'Great for skill building', score:92 },
+  { id:'ocean-quest',   title:'Ocean Quest',   icon:'🌊', genre:'adventure', reason:'You\'d love the adventure genre', score:90 },
+  { id:'dragon-escape', title:'Dragon Escape', icon:'🐉', genre:'action',    reason:'High replay value match', score:88 },
+  { id:'space-blaster', title:'Space Blaster', icon:'👾', genre:'action',    reason:'Top rated this week', score:87 },
+  { id:'block-kingdom', title:'Block Kingdom', icon:'🏰', genre:'building',  reason:'Relaxing & creative', score:85 },
+  { id:'farm-friends',  title:'Farm Friends',  icon:'🚜', genre:'casual',    reason:'Popular with your level', score:83 },
+];
+
+function refreshRecs() {
+  const shuffled = [...GAME_CATALOG].sort(() => Math.random()-.5).slice(0,4);
+  document.getElementById('recsContainer').innerHTML = shuffled.map(g => `
+    <a class="rec-game" href="game.html?id=${g.id}&title=${encodeURIComponent(g.title)}&genre=${g.genre}&thumb=${encodeURIComponent(g.icon)}">
+      <div class="rec-game-thumb" style="background:linear-gradient(135deg,#1e0a48,#3a1080)">${g.icon}</div>
+      <div>
+        <div class="rec-game-name">${g.title}</div>
+        <div class="rec-game-reason">🤖 ${g.reason}</div>
+      </div>
+      <div class="rec-game-score">${g.score}%</div>
+    </a>`).join('');
+}
+refreshRecs();
+
+/* ── Insights ── */
+const INSIGHTS = [
+  { title:'🎯 Best Genre: Action', text:'You perform 42% better in action games than any other genre. Your reaction time puts you in the top 15% of players!', pct: 85 },
+  { title:'⏰ Peak Hours: Evening', text:'Your win rate jumps to 73% when you play between 7–10 PM. The AI recommends scheduling ranked play during these hours.', pct: 73 },
+  { title:'📈 Improving Fast', text:'Your average score has increased by 38% over the last 7 days. You\'re on track to reach Expert rank within 2 weeks!', pct: 62 },
+  { title:'🏆 Trophy Hunter', text:'You\'ve completed 8 out of 24 available achievements. The AI suggests targeting the Ninja Dash speed run next for easy coins.', pct: 33 },
+];
+document.getElementById('insightsContainer').innerHTML = INSIGHTS.map(ins => `
+  <div class="ai-insight">
+    <div class="ai-insight-title">${ins.title}</div>
+    <div class="ai-insight-text">${ins.text}</div>
+    <div class="ai-insight-bar"><div class="ai-insight-fill" style="width:${ins.pct}%"></div></div>
+  </div>`).join('');
+
+/* ── Suggested Friends ── */
+const SUGGESTED = [
+  { name:'SpeedRacer99', av:'🏎️', bg:'linear-gradient(135deg,#b45309,#fbbf24)', match:'94% match — Both love Racing & Action games' },
+  { name:'PuzzleKing',   av:'🧩', bg:'linear-gradient(135deg,#1d4ed8,#60a5fa)', match:'91% match — Similar playtimes and genres' },
+  { name:'DragonSlayer', av:'🐉', bg:'linear-gradient(135deg,#7c3aed,#a78bfa)', match:'89% match — Both chasing Dragon Escape records' },
+];
+document.getElementById('friendsContainer').innerHTML = SUGGESTED.map(f => `
+  <div class="friend-suggest">
+    <div class="fs-av" style="background:${f.bg}">${f.av}</div>
+    <div>
+      <div class="fs-name">${f.name}</div>
+      <div class="fs-match">🤖 ${f.match}</div>
+    </div>
+    <button class="fs-add" onclick="this.textContent='✅ Added!';this.disabled=true">+ Add</button>
+  </div>`).join('');
+
+/* ── AI Chat ── */
+const AI_REPLIES = {
+  'best game':   'Based on your history, I recommend 🥷 Ninja Dash right now — your reaction time stats suggest you\'d crush the leaderboard!',
+  'coins':       'The fastest way to earn coins is playing daily challenges (+500 coins) and entering the Weekly Race event. You could earn 3000+ coins this week!',
+  'score':       'To improve your score in action games: focus on combo chains — they multiply your points by up to 5x. Also try playing between 7–10 PM when your focus peaks!',
+  'friends':     'I found 3 players with 90%+ compatibility with you! Check the Suggested Friends section below. Add them for bonus social coins!',
+  'events':      'There are 5 active events right now! The Ninja Dash Championship ends in 5 days and has a 5000 coin prize pool. You have time to enter!',
+  'recommend':   'My top pick for you today is 🥷 Ninja Dash (98% match). Based on your evening play pattern, jump in around 8 PM for your best performance!',
+  'help':        'I can help you with: game recommendations, score tips, event info, coin strategies, and friend suggestions. What do you need? 🎮',
+};
+function sendChat() {
+  const inp = document.getElementById('chatIn');
+  const val = inp.value.trim();
+  if (!val) return;
+  const msgs = document.getElementById('chatMsgs');
+  msgs.innerHTML += `<div class="ai-msg user"><div class="ai-msg-av">👤</div><div class="ai-msg-bubble">${val}</div></div>`;
+  inp.value = '';
+  const lower = val.toLowerCase();
+  let reply = 'Great question! I\'m analyzing your gaming profile for the best answer... 🤖 Based on your data, I suggest checking out the Live Events page for today\'s challenges!';
+  for (const [key, resp] of Object.entries(AI_REPLIES)) {
+    if (lower.includes(key)) { reply = resp; break; }
+  }
+  setTimeout(() => {
+    msgs.innerHTML += `<div class="ai-msg"><div class="ai-msg-av">🤖</div><div class="ai-msg-bubble">${reply}</div></div>`;
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 700);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+/* ── Sidebar toggle ── */
+document.getElementById('menuBtn').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+</script>
+<script src="notifications.js"></script>
+<script src="admin-button.js"></script>
+<script src="studio-button.js"></script>
+<script src="effects.js"></script>
+<script src="sound.js"></script>
+<script src="settings.js"></script>
+</body>
+</html>

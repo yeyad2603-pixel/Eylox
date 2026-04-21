@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>∞ Eylox — Achievements</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap"/>
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    try {
+      const hasSession = localStorage.getItem('eylox_token') ||
+                         localStorage.getItem('eylox_guest') ||
+                         localStorage.getItem('eylox_user');
+      if (!hasSession) window.location.replace('landing.html');
+    } catch {}
+  </script>
+</head>
+<body data-page="achievements">
+<div class="app-shell">
+
+  <!-- ══════════ SIDEBAR ══════════ -->
+  <aside class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <span class="sidebar-logo-icon">🎮</span>
+      <span class="sidebar-logo-text">Eylox</span>
+    </a>
+    <p class="sidebar-section-label">Menu</p>
+    <nav class="sidebar-nav"><ul>
+      <li><a href="index.html"    class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
+      <li><a href="games.html"    class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
+      <li><a href="friends.html"  class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span><span class="s-badge" style="display:none">0</span></a></li>
+      <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
+      <li><a href="profile.html"  class="sidebar-link"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
+    </ul></nav>
+    <div class="sidebar-divider"></div>
+    <p class="sidebar-section-label">More</p>
+    <nav class="sidebar-nav"><ul>
+      <li><a href="leaderboard.html"   class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
+      <li><a href="achievements.html"  class="sidebar-link active"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
+      <li><a href="communities.html"   class="sidebar-link"><span class="s-icon">🌍</span><span class="s-label">Communities</span></a></li>
+      <li><a href="live-events.html"   class="sidebar-link"><span class="s-icon">⚡</span><span class="s-label">Live Events</span></a></li>
+      <li><a href="shop.html"          class="sidebar-link"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
+      <li><a href="#" class="sidebar-link" id="settingsBtn"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></a></li>
+      <li><a href="#" class="sidebar-link" id="logoutBtn"><span class="s-icon">🚪</span><span class="s-label">Logout</span></a></li>
+    </ul></nav>
+    <div class="sidebar-coins">
+      <img src="eylux-coin.png" class="coins-icon-img" alt="Eylux" />
+      <div><div class="coins-amount">—</div><div class="coins-label">Eylux</div></div>
+    </div>
+    <div class="sidebar-coins sidebar-trophies">
+      <span class="coins-icon">🏆</span>
+      <div><div class="trophies-amount">—</div><div class="coins-label">Trophies</div></div>
+    </div>
+  </aside>
+
+  <!-- ══════════ MAIN ══════════ -->
+  <div class="main-area">
+
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="search" class="search-input" placeholder="Search achievements…" aria-label="Search achievements" id="achSearch" />
+      </div>
+      <div class="topbar-right">
+        <button class="tb-btn" id="notifBellBtn" aria-label="Notifications">🔔<span class="notif-dot"></span></button>
+        <div class="tb-coins"><img src="eylux-coin.png" class="tb-coin-img" alt="EC"> <span id="topbarCoins">—</span></div>
+        <div class="tb-trophies"><span class="tb-trophy-icon">🏆</span> <span id="topbarTrophies">—</span></div>
+        <a href="profile.html" class="tb-avatar" aria-label="My Profile">🎮<span class="online-dot"></span></a>
+      </div>
+    </header>
+
+    <main class="page-content">
+
+      <!-- Page Header -->
+      <div class="page-heading">
+        <h1>🎖️ Achievements</h1>
+        <p>Unlock badges by playing, creating, and connecting</p>
+      </div>
+
+      <!-- Progress Summary -->
+      <div class="ach-summary-bar" id="achSummary">
+        <div class="ach-stat">
+          <div class="ach-stat-value" id="achUnlockedCount">0</div>
+          <div class="ach-stat-label">Unlocked</div>
+        </div>
+        <div class="ach-stat-divider"></div>
+        <div class="ach-stat">
+          <div class="ach-stat-value" id="achTotalCount">0</div>
+          <div class="ach-stat-label">Total</div>
+        </div>
+        <div class="ach-stat-divider"></div>
+        <div class="ach-stat">
+          <div class="ach-stat-value" id="achPoints">0</div>
+          <div class="ach-stat-label">Points</div>
+        </div>
+        <div class="ach-stat-divider"></div>
+        <div class="ach-progress-wrap">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+            <span style="font-size:.78rem;font-weight:800;color:var(--muted)">Overall Progress</span>
+            <span style="font-size:.78rem;font-weight:900;color:var(--purple)" id="achPct">0%</span>
+          </div>
+          <div class="ach-progress-bar">
+            <div class="ach-progress-fill" id="achProgressFill" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="ach-filter-row">
+        <button class="ach-filter-btn active" data-filter="all">All</button>
+        <button class="ach-filter-btn" data-filter="unlocked">✅ Unlocked</button>
+        <button class="ach-filter-btn" data-filter="locked">🔒 Locked</button>
+        <button class="ach-filter-btn" data-filter="common">⚪ Common</button>
+        <button class="ach-filter-btn" data-filter="uncommon">🟢 Uncommon</button>
+        <button class="ach-filter-btn" data-filter="rare">🔵 Rare</button>
+        <button class="ach-filter-btn" data-filter="epic">🟣 Epic</button>
+        <button class="ach-filter-btn" data-filter="legendary">🟡 Legendary</button>
+      </div>
+
+      <!-- Achievements Grid -->
+      <div class="section">
+        <div class="ach-grid" id="achGrid">
+          <div class="ach-loading">Loading achievements…</div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Achievement Detail Modal -->
+<div class="modal-overlay hidden" id="achModal">
+  <div class="modal-box" style="max-width:460px">
+    <div class="modal-head">
+      <span class="modal-title" id="achModalTitle">Achievement</span>
+      <button class="modal-close" id="closeAchModal">✕</button>
+    </div>
+    <div class="modal-body" id="achModalBody"></div>
+  </div>
+</div>
+
+<style>
+/* ── Page Heading ── */
+.page-heading { margin-bottom: 24px; }
+.page-heading h1 {
+  font-family: var(--font-head); font-size: clamp(1.6rem,4vw,2.2rem);
+  background: linear-gradient(135deg, var(--purple), var(--blue));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.page-heading p { color: var(--muted); font-weight: 700; font-size: .9rem; margin-top: 4px; }
+
+/* ── Summary Bar ── */
+.ach-summary-bar {
+  display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+  background: var(--card); border: 1px solid rgba(167,139,250,.15);
+  border-radius: var(--r-lg); padding: 20px 24px;
+  margin-bottom: 20px;
+}
+.ach-stat { text-align: center; }
+.ach-stat-value { font-family: var(--font-head); font-size: 1.8rem; color: var(--purple); line-height: 1; }
+.ach-stat-label { font-size: .72rem; font-weight: 800; color: var(--muted); margin-top: 2px; letter-spacing: .5px; text-transform: uppercase; }
+.ach-stat-divider { width: 1px; height: 40px; background: rgba(167,139,250,.12); flex-shrink: 0; }
+.ach-progress-wrap { flex: 1; min-width: 140px; }
+.ach-progress-bar {
+  height: 10px; background: rgba(167,139,250,.1); border-radius: 99px; overflow: hidden;
+}
+.ach-progress-fill {
+  height: 100%; border-radius: 99px;
+  background: linear-gradient(90deg, var(--purple), var(--blue));
+  transition: width .8s cubic-bezier(.34,1.56,.64,1);
+}
+
+/* ── Filter Tabs ── */
+.ach-filter-row {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
+}
+.ach-filter-btn {
+  background: rgba(167,139,250,.08); border: 1px solid rgba(167,139,250,.15);
+  color: var(--muted); border-radius: 99px; padding: 7px 16px;
+  font-family: var(--font-body); font-size: .8rem; font-weight: 800;
+  cursor: pointer; transition: all .18s;
+}
+.ach-filter-btn:hover { background: rgba(167,139,250,.16); color: var(--text); }
+.ach-filter-btn.active { background: rgba(167,139,250,.22); border-color: var(--purple); color: var(--purple); }
+
+/* ── Achievements Grid ── */
+.ach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.ach-card {
+  background: var(--card); border: 1px solid rgba(167,139,250,.12);
+  border-radius: var(--r-md); padding: 20px 16px;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  gap: 10px; cursor: pointer; transition: all .22s; position: relative; overflow: hidden;
+}
+.ach-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(0,0,0,.3), 0 0 0 1px rgba(167,139,250,.25);
+}
+.ach-card.unlocked { border-color: rgba(167,139,250,.35); }
+.ach-card.locked { opacity: .65; filter: grayscale(.4); }
+.ach-card.locked:hover { opacity: .85; filter: grayscale(.15); }
+
+/* Rarity glow */
+.ach-card.common.unlocked    { box-shadow: 0 0 0 1px rgba(157,157,157,.2); }
+.ach-card.uncommon.unlocked  { border-color: rgba(74,222,128,.4); box-shadow: 0 0 16px rgba(74,222,128,.12); }
+.ach-card.rare.unlocked      { border-color: rgba(96,165,250,.4); box-shadow: 0 0 16px rgba(96,165,250,.15); }
+.ach-card.epic.unlocked      { border-color: rgba(167,139,250,.5); box-shadow: 0 0 20px rgba(167,139,250,.22); }
+.ach-card.legendary.unlocked { border-color: rgba(253,230,138,.5); box-shadow: 0 0 24px rgba(253,230,138,.2); }
+
+.ach-rarity-tag {
+  position: absolute; top: 10px; right: 10px;
+  font-size: .68rem; font-weight: 900; letter-spacing: .5px; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 99px;
+}
+.rarity-common    { background: rgba(157,157,157,.15); color: #aaa; }
+.rarity-uncommon  { background: rgba(74,222,128,.15);  color: var(--green); }
+.rarity-rare      { background: rgba(96,165,250,.15);  color: var(--blue); }
+.rarity-epic      { background: rgba(167,139,250,.18); color: var(--purple); }
+.rarity-legendary { background: rgba(253,230,138,.15); color: var(--yellow); }
+
+.ach-icon-wrap {
+  position: relative; width: 68px; height: 68px;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 2.2rem;
+}
+.ach-card.common.unlocked    .ach-icon-wrap { background: rgba(157,157,157,.12); }
+.ach-card.uncommon.unlocked  .ach-icon-wrap { background: rgba(74,222,128,.1); box-shadow: 0 0 20px rgba(74,222,128,.2); }
+.ach-card.rare.unlocked      .ach-icon-wrap { background: rgba(96,165,250,.1); box-shadow: 0 0 20px rgba(96,165,250,.2); }
+.ach-card.epic.unlocked      .ach-icon-wrap { background: rgba(167,139,250,.12); box-shadow: 0 0 24px rgba(167,139,250,.3); }
+.ach-card.legendary.unlocked .ach-icon-wrap { background: rgba(253,230,138,.1); box-shadow: 0 0 28px rgba(253,230,138,.35); animation: legendaryPulse 2.5s ease-in-out infinite; }
+@keyframes legendaryPulse {
+  0%,100% { box-shadow: 0 0 20px rgba(253,230,138,.2); }
+  50%      { box-shadow: 0 0 40px rgba(253,230,138,.5); }
+}
+.ach-card.locked .ach-icon-wrap { background: rgba(157,142,199,.06); filter: grayscale(1); }
+.ach-lock-icon {
+  position: absolute; bottom: 0; right: 0;
+  font-size: .9rem; background: var(--card); border-radius: 50%; padding: 2px;
+}
+
+.ach-name {
+  font-family: var(--font-head); font-size: .98rem; color: var(--text); line-height: 1.2;
+}
+.ach-card.locked .ach-name { color: var(--muted); }
+
+.ach-desc {
+  font-size: .77rem; font-weight: 700; color: var(--muted); line-height: 1.5;
+}
+
+.ach-reward {
+  display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap;
+}
+.ach-reward-chip {
+  background: rgba(253,230,138,.1); border: 1px solid rgba(253,230,138,.2);
+  border-radius: 99px; padding: 3px 10px; font-size: .75rem; font-weight: 800; color: var(--yellow);
+}
+
+.ach-progress-mini {
+  width: 100%; height: 6px; background: rgba(167,139,250,.1); border-radius: 99px; overflow: hidden;
+}
+.ach-progress-mini-fill {
+  height: 100%; border-radius: 99px;
+  background: linear-gradient(90deg, var(--purple), var(--blue));
+  transition: width .6s ease;
+}
+.ach-progress-label {
+  font-size: .73rem; font-weight: 800; color: rgba(157,142,199,.6); margin-top: 2px;
+}
+
+.ach-unlocked-stamp {
+  background: rgba(74,222,128,.1); border: 1px solid rgba(74,222,128,.25);
+  border-radius: 99px; padding: 3px 10px;
+  font-size: .72rem; font-weight: 900; color: var(--green); letter-spacing: .3px;
+}
+
+.ach-loading {
+  grid-column: 1/-1; text-align: center; padding: 60px;
+  color: var(--muted); font-size: .9rem; font-weight: 700;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+
+/* ── Modal ── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 999;
+  background: rgba(8,4,22,.82); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.modal-box {
+  background: var(--card); border: 1px solid rgba(167,139,250,.2);
+  border-radius: var(--r-lg); width: 100%; box-shadow: 0 16px 64px rgba(0,0,0,.5);
+  overflow: hidden;
+}
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 1px solid rgba(167,139,250,.1);
+}
+.modal-title { font-family: var(--font-head); font-size: 1.1rem; color: var(--text); }
+.modal-close {
+  background: rgba(167,139,250,.1); border: 1px solid rgba(167,139,250,.2);
+  color: var(--muted); border-radius: 50%; width: 30px; height: 30px;
+  font-size: .85rem; cursor: pointer; transition: all .15s;
+}
+.modal-close:hover { background: rgba(244,114,182,.15); color: var(--pink); }
+.modal-body { padding: 24px; }
+.hidden { display: none !important; }
+</style>
+
+<script src="security.js"></script>
+<script src="api.js"></script>
+<script src="script.js"></script>
+<script src="features.js"></script>
+<script src="notifications.js"></script>
+<script src="polish.js"></script>
+<script src="admin-button.js"></script>
+<script src="studio-button.js"></script>
+<script src="extras.js"></script>
+<script src="friends-local.js"></script>
+
+<script>
+/* ============================================================
+   EYLOX — Achievements Page
+   ============================================================ */
+
+const API_BASE = 'http://localhost:3001/api';
+
+/* ── Default achievements (offline fallback) ── */
+const DEFAULT_ACHIEVEMENTS = [
+  /* Common */
+  { code:'first_game',   name:'First Steps',      icon:'👟', rarity:'common',    desc:'Play your first game on Eylox',                   criteria:{type:'playtime',value:1},  reward:{coins:50},   unlockedCount:9821 },
+  { code:'win_5',        name:'Winner',            icon:'🏆', rarity:'common',    desc:'Win 5 games',                                      criteria:{type:'wins',value:5},      reward:{coins:100},  unlockedCount:5430 },
+  { code:'social_1',     name:'Social Butterfly',  icon:'🦋', rarity:'common',    desc:'Add your first friend',                            criteria:{type:'friends_count',value:1}, reward:{coins:75}, unlockedCount:7200 },
+  { code:'play_10',      name:'Gamer',             icon:'🎮', rarity:'common',    desc:'Play 10 different games',                          criteria:{type:'playtime',value:10}, reward:{coins:150},  unlockedCount:4100 },
+
+  /* Uncommon */
+  { code:'win_25',       name:'Champion',          icon:'🥇', rarity:'uncommon',  desc:'Win 25 games',                                     criteria:{type:'wins',value:25},     reward:{coins:300},  unlockedCount:2100 },
+  { code:'friends_5',   name:'Crew Leader',        icon:'🤝', rarity:'uncommon',  desc:'Have 5 friends',                                   criteria:{type:'friends_count',value:5}, reward:{coins:200}, unlockedCount:1800 },
+  { code:'coins_1000',  name:'Coin Collector',     icon:'💰', rarity:'uncommon',  desc:'Accumulate 1,000 Eylux coins',                     criteria:{type:'playtime',value:20}, reward:{coins:250},  unlockedCount:3400 },
+  { code:'shop_1',      name:'Shopaholic',         icon:'🛒', rarity:'uncommon',  desc:'Make your first purchase in the shop',             criteria:{type:'marketplace_purchases',value:1}, reward:{coins:150}, unlockedCount:900 },
+
+  /* Rare */
+  { code:'win_100',      name:'Legend',            icon:'🌟', rarity:'rare',      desc:'Win 100 games',                                    criteria:{type:'wins',value:100},    reward:{coins:1000}, unlockedCount:410 },
+  { code:'creator_1',   name:'Born Creator',       icon:'🎨', rarity:'rare',      desc:'Create and publish your first game',               criteria:{type:'games_created',value:1}, reward:{coins:500}, unlockedCount:310 },
+  { code:'friends_20',  name:'Social King',        icon:'👑', rarity:'rare',      desc:'Have 20 friends on Eylox',                         criteria:{type:'friends_count',value:20}, reward:{coins:400}, unlockedCount:280 },
+  { code:'marathon',    name:'Marathon Gamer',      icon:'⏱️', rarity:'rare',      desc:'Accumulate 50 hours of playtime',                  criteria:{type:'playtime',value:50}, reward:{coins:600},  unlockedCount:195 },
+
+  /* Epic */
+  { code:'win_500',      name:'Warlord',           icon:'⚔️', rarity:'epic',      desc:'Win 500 games — you are unstoppable',              criteria:{type:'wins',value:500},    reward:{coins:3000}, unlockedCount:87 },
+  { code:'creator_10',  name:'Studio Boss',        icon:'🎬', rarity:'epic',      desc:'Create 10 published games',                        criteria:{type:'games_created',value:10}, reward:{coins:2000}, unlockedCount:43 },
+  { code:'marketplace', name:'Tycoon',             icon:'💎', rarity:'epic',      desc:'Make 50 purchases in the marketplace',             criteria:{type:'marketplace_purchases',value:50}, reward:{coins:1500}, unlockedCount:62 },
+  { code:'friends_50',  name:'Influencer',         icon:'📡', rarity:'epic',      desc:'Have 50 friends — you know everyone',              criteria:{type:'friends_count',value:50}, reward:{coins:1200}, unlockedCount:29 },
+
+  /* Legendary */
+  { code:'win_2000',     name:'Eylox God',         icon:'🔱', rarity:'legendary', desc:'Win 2,000 games. You are the definition of Eylox', criteria:{type:'wins',value:2000},   reward:{coins:10000},unlockedCount:8 },
+  { code:'creator_50',  name:'Game Maestro',       icon:'🎼', rarity:'legendary', desc:'Create 50 games — a true platform legend',         criteria:{type:'games_created',value:50}, reward:{coins:8000}, unlockedCount:3 },
+  { code:'coins_1m',    name:'Millionaire',        icon:'🤑', rarity:'legendary', desc:'Accumulate 1,000,000 Eylux coins',                 criteria:{type:'playtime',value:500}, reward:{coins:5000}, unlockedCount:5 },
+];
+
+let allAchievements = [];
+let userUnlocked    = new Set();
+let currentFilter   = 'all';
+let searchQuery     = '';
+
+/* ── Init ── */
+document.addEventListener('DOMContentLoaded', async () => {
+  loadUserProgress();
+  await fetchAchievements();
+  bindFilters();
+  document.getElementById('achSearch').addEventListener('input', e => {
+    searchQuery = e.target.value.toLowerCase();
+    renderGrid();
+  });
+  document.getElementById('closeAchModal').addEventListener('click', () => {
+    document.getElementById('achModal').classList.add('hidden');
+  });
+  document.getElementById('achModal').addEventListener('click', e => {
+    if (e.target.id === 'achModal') document.getElementById('achModal').classList.add('hidden');
+  });
+});
+
+/* ── Load user progress from localStorage ── */
+function loadUserProgress() {
+  try {
+    const u = JSON.parse(localStorage.getItem('eylox_user') || 'null');
+    if (!u) return;
+
+    const wins    = u.wins    || 0;
+    const friends = 0; /* from friends data */
+    const playtime = 0;
+
+    /* Simulate what's been unlocked based on stats */
+    userUnlocked.clear();
+    DEFAULT_ACHIEVEMENTS.forEach(a => {
+      let progress = 0;
+      if (a.criteria.type === 'wins')     progress = wins;
+      if (a.criteria.type === 'playtime') progress = playtime;
+      if (a.code === 'first_game' && wins > 0) progress = 1;
+      if (progress >= a.criteria.value)   userUnlocked.add(a.code);
+    });
+
+    /* Also check explicit badges stored on user */
+    if (Array.isArray(u.badges)) {
+      u.badges.forEach(b => userUnlocked.add(b));
+    }
+  } catch {}
+}
+
+/* ── Fetch achievements ── */
+async function fetchAchievements() {
+  let data = DEFAULT_ACHIEVEMENTS;
+
+  if (localStorage.getItem('eylox_token')) {
+    try {
+      const res = await fetch(`${API_BASE}/achievements`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('eylox_token')}` }
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.achievements?.length) {
+          data = json.achievements;
+        }
+      }
+    } catch { /* offline */ }
+  }
+
+  allAchievements = data;
+  updateSummary();
+  renderGrid();
+}
+
+/* ── Update summary bar ── */
+function updateSummary() {
+  const total    = allAchievements.length;
+  const unlocked = allAchievements.filter(a => userUnlocked.has(a.code)).length;
+  const pct      = total > 0 ? Math.round((unlocked / total) * 100) : 0;
+  const points   = allAchievements
+    .filter(a => userUnlocked.has(a.code))
+    .reduce((sum, a) => sum + (a.reward?.coins || 0), 0);
+
+  document.getElementById('achUnlockedCount').textContent = unlocked;
+  document.getElementById('achTotalCount').textContent    = total;
+  document.getElementById('achPoints').textContent        = points.toLocaleString();
+  document.getElementById('achPct').textContent           = pct + '%';
+  document.getElementById('achProgressFill').style.width  = pct + '%';
+}
+
+/* ── Bind filter buttons ── */
+function bindFilters() {
+  document.querySelectorAll('.ach-filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.ach-filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      renderGrid();
+    });
+  });
+}
+
+/* ── Render grid ── */
+function renderGrid() {
+  const grid = document.getElementById('achGrid');
+
+  let list = allAchievements;
+
+  /* Filter */
+  if (currentFilter === 'unlocked') list = list.filter(a => userUnlocked.has(a.code));
+  else if (currentFilter === 'locked') list = list.filter(a => !userUnlocked.has(a.code));
+  else if (['common','uncommon','rare','epic','legendary'].includes(currentFilter)) list = list.filter(a => a.rarity === currentFilter);
+
+  /* Search */
+  if (searchQuery) list = list.filter(a => a.name.toLowerCase().includes(searchQuery) || a.desc?.toLowerCase().includes(searchQuery));
+
+  if (list.length === 0) {
+    grid.innerHTML = `<div class="ach-loading" style="animation:none;opacity:.6">No achievements found.</div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(a => achCard(a)).join('');
+
+  /* Animate progress bars */
+  grid.querySelectorAll('.ach-progress-mini-fill').forEach(bar => {
+    const w = bar.dataset.width;
+    requestAnimationFrame(() => { bar.style.width = w + '%'; });
+  });
+
+  /* Click handlers */
+  grid.querySelectorAll('.ach-card').forEach(card => {
+    card.addEventListener('click', () => openModal(card.dataset.code));
+  });
+}
+
+/* ── Build a single achievement card ── */
+function achCard(a) {
+  const unlocked = userUnlocked.has(a.code);
+  const rarity   = a.rarity || 'common';
+
+  /* Progress estimation */
+  const u = (() => { try { return JSON.parse(localStorage.getItem('eylox_user') || 'null'); } catch { return null; } })();
+  let current = 0;
+  if (u) {
+    if (a.criteria?.type === 'wins')     current = u.wins || 0;
+    if (a.criteria?.type === 'playtime') current = 0;
+  }
+  const target  = a.criteria?.value || 1;
+  const pct     = unlocked ? 100 : Math.min(100, Math.round((current / target) * 100));
+
+  return `
+  <div class="ach-card ${rarity} ${unlocked ? 'unlocked' : 'locked'}" data-code="${escHtml(a.code)}">
+    <div class="ach-rarity-tag rarity-${rarity}">${rarity}</div>
+
+    <div class="ach-icon-wrap">
+      ${a.icon || '🎖️'}
+      ${!unlocked ? '<div class="ach-lock-icon">🔒</div>' : ''}
+    </div>
+
+    <div class="ach-name">${escHtml(a.name)}</div>
+    <div class="ach-desc">${escHtml(a.desc || '')}</div>
+
+    ${a.reward?.coins ? `
+      <div class="ach-reward">
+        <div class="ach-reward-chip">+${a.reward.coins.toLocaleString()} coins</div>
+      </div>` : ''}
+
+    ${!unlocked ? `
+      <div style="width:100%">
+        <div class="ach-progress-mini">
+          <div class="ach-progress-mini-fill" data-width="${pct}" style="width:0%"></div>
+        </div>
+        <div class="ach-progress-label">${current.toLocaleString()} / ${target.toLocaleString()}</div>
+      </div>` : `
+      <div class="ach-unlocked-stamp">✅ Unlocked</div>`}
+  </div>`;
+}
+
+/* ── Open detail modal ── */
+function openModal(code) {
+  const a = allAchievements.find(x => x.code === code);
+  if (!a) return;
+
+  const unlocked = userUnlocked.has(a.code);
+  const rarity   = a.rarity || 'common';
+
+  const rarityColors = {
+    common: '#aaa', uncommon: '#4ade80', rare: '#60a5fa', epic: '#a78bfa', legendary: '#fde68a'
+  };
+  const col = rarityColors[rarity] || '#aaa';
+
+  document.getElementById('achModalTitle').textContent = a.name;
+  document.getElementById('achModalBody').innerHTML = `
+    <div style="text-align:center;padding:20px 0 10px">
+      <div style="font-size:3.5rem;margin-bottom:12px;${unlocked ? '' : 'filter:grayscale(1);opacity:.5'}">${a.icon || '🎖️'}</div>
+      <div style="display:inline-block;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);border-radius:99px;padding:4px 14px;font-size:.75rem;font-weight:900;color:${col};letter-spacing:.5px;text-transform:uppercase;margin-bottom:14px">${rarity}</div>
+      <p style="font-size:.88rem;font-weight:700;color:var(--muted);line-height:1.6;margin-bottom:20px">${escHtml(a.desc || '')}</p>
+      ${unlocked
+        ? `<div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);border-radius:var(--r-md);padding:12px 20px;font-size:.85rem;font-weight:800;color:var(--green)">✅ You have unlocked this achievement!</div>`
+        : `<div style="background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.15);border-radius:var(--r-md);padding:12px 20px;font-size:.85rem;font-weight:800;color:var(--muted)">🔒 Not yet unlocked</div>`
+      }
+    </div>
+    ${a.criteria ? `
+    <div style="margin-top:20px;background:var(--surface);border-radius:var(--r-sm);padding:14px 16px">
+      <div style="font-size:.75rem;font-weight:900;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">HOW TO UNLOCK</div>
+      <div style="font-size:.88rem;font-weight:800;color:var(--text)">${criteriaText(a.criteria)}</div>
+    </div>` : ''}
+    ${a.reward?.coins ? `
+    <div style="margin-top:12px;display:flex;gap:10px">
+      <div style="flex:1;background:rgba(253,230,138,.08);border:1px solid rgba(253,230,138,.2);border-radius:var(--r-sm);padding:10px 14px;text-align:center">
+        <div style="font-size:.72rem;font-weight:900;color:var(--muted);letter-spacing:.5px;text-transform:uppercase">REWARD</div>
+        <div style="font-family:var(--font-head);font-size:1.2rem;color:var(--yellow);margin-top:2px">+${a.reward.coins.toLocaleString()} coins</div>
+      </div>
+      <div style="flex:1;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.15);border-radius:var(--r-sm);padding:10px 14px;text-align:center">
+        <div style="font-size:.72rem;font-weight:900;color:var(--muted);letter-spacing:.5px;text-transform:uppercase">EARNERS</div>
+        <div style="font-family:var(--font-head);font-size:1.2rem;color:var(--purple);margin-top:2px">${(a.unlockedCount || 0).toLocaleString()}</div>
+      </div>
+    </div>` : ''}
+  `;
+  document.getElementById('achModal').classList.remove('hidden');
+}
+
+function criteriaText(c) {
+  if (!c) return 'Play and explore Eylox!';
+  const labels = {
+    wins:                   `Win ${(c.value||0).toLocaleString()} games`,
+    playtime:               `Play ${(c.value||0)} sessions`,
+    friends_count:          `Have ${(c.value||0)} friends`,
+    marketplace_purchases:  `Make ${(c.value||0)} shop purchases`,
+    games_created:          `Create and publish ${(c.value||0)} games`,
+  };
+  return labels[c.type] || 'Complete the challenge';
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+<script src="effects.js"></script>
+<script src="sound.js"></script>
+<script src="settings.js"></script>
+</body>
+</html>

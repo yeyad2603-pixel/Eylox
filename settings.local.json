@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell.exe -Command \"Select-String -Path ''C:\\\\Users\\\\ip\\\\Desktop\\\\EYLOX\\\\Eylox Web html\\\\index.html'' -Pattern ''eylox_token|landing'' | Select-Object -First 3\")",
+      "Bash(powershell.exe -Command \"Select-String -Path ''C:\\\\Users\\\\ip\\\\Desktop\\\\EYLOX\\\\Eylox Web html\\\\index.html'' -Pattern ''<title>|style.css|api.js|script.js'' | Select-Object Line\")",
+      "Bash(__NEW_LINE_dedfb5d4eb00b0e4__ cp:*)",
+      "Bash(__NEW_LINE_dedfb5d4eb00b0e4__ echo:*)"
+    ]
+  }
+}
