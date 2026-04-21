@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>∞ Eylox — Messages</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap"/>
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    try {
+      const hasSession = localStorage.getItem('eylox_token') ||
+                         localStorage.getItem('eylox_guest') ||
+                         localStorage.getItem('eylox_user');
+      if (!hasSession) window.location.replace('landing.html');
+    } catch {}
+  </script>
+</head>
+<body data-page="messages">
+<div class="app-shell">
+
+  <!-- ══════════ SIDEBAR ══════════ -->
+  <aside class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <span class="sidebar-logo-icon">🎮</span>
+      <span class="sidebar-logo-text">Eylox</span>
+    </a>
+    <p class="sidebar-section-label">Menu</p>
+    <nav class="sidebar-nav"><ul>
+      <li><a href="index.html"    class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
+      <li><a href="games.html"    class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
+      <li><a href="friends.html"  class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span><span class="s-badge" style="display:none">0</span></a></li>
+      <li><a href="messages.html" class="sidebar-link active"><span class="s-icon">💬</span><span class="s-label">Messages</span><span class="s-badge msg-badge" style="display:none">0</span></a></li>
+      <li><a href="profile.html"  class="sidebar-link"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
+    </ul></nav>
+    <div class="sidebar-divider"></div>
+    <p class="sidebar-section-label">More</p>
+    <nav class="sidebar-nav"><ul>
+      <li><a href="leaderboard.html"   class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
+      <li><a href="achievements.html"  class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
+      <li><a href="communities.html"   class="sidebar-link"><span class="s-icon">🌍</span><span class="s-label">Communities</span></a></li>
+      <li><a href="live-events.html"   class="sidebar-link"><span class="s-icon">⚡</span><span class="s-label">Live Events</span></a></li>
+      <li><a href="shop.html"          class="sidebar-link"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
+      <li><a href="#" class="sidebar-link" id="settingsBtn"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></a></li>
+      <li><a href="#" class="sidebar-link" id="logoutBtn"><span class="s-icon">🚪</span><span class="s-label">Logout</span></a></li>
+    </ul></nav>
+    <div class="sidebar-coins">
+      <img src="eylux-coin.png" class="coins-icon-img" alt="Eylux" />
+      <div><div class="coins-amount">—</div><div class="coins-label">Eylux</div></div>
+    </div>
+    <div class="sidebar-coins sidebar-trophies">
+      <span class="coins-icon">🏆</span>
+      <div><div class="trophies-amount">—</div><div class="coins-label">Trophies</div></div>
+    </div>
+  </aside>
+
+  <!-- ══════════ MAIN ══════════ -->
+  <div class="main-area" style="overflow:hidden;display:flex;flex-direction:column;height:100vh">
+
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="search" class="search-input" id="contactSearch" placeholder="Search conversations…" aria-label="Search conversations" />
+      </div>
+      <div class="topbar-right">
+        <button class="tb-btn" id="notifBellBtn" aria-label="Notifications">🔔<span class="notif-dot"></span></button>
+        <div class="tb-coins"><img src="eylux-coin.png" class="tb-coin-img" alt="EC"> <span id="topbarCoins">—</span></div>
+        <div class="tb-trophies"><span class="tb-trophy-icon">🏆</span> <span id="topbarTrophies">—</span></div>
+        <a href="profile.html" class="tb-avatar" aria-label="My Profile">🎮<span class="online-dot"></span></a>
+      </div>
+    </header>
+
+    <!-- ── Messages Layout ── -->
+    <div class="msg-layout">
+
+      <!-- Left: Conversation List -->
+      <div class="msg-sidebar" id="msgSidebar">
+        <div class="msg-sidebar-head">
+          <h2>💬 Messages</h2>
+          <button class="new-msg-btn" id="newMsgBtn" title="New message">✏️</button>
+        </div>
+        <div class="conv-search-wrap">
+          <input type="search" class="conv-search" id="convSearch" placeholder="🔍 Search messages…" autocomplete="off" />
+        </div>
+        <div class="conv-list" id="convList">
+          <p class="msg-empty-state">Loading conversations…</p>
+        </div>
+      </div>
+
+      <!-- Right: Chat Window -->
+      <div class="msg-chat" id="msgChat">
+
+        <!-- Empty state (no conversation selected) -->
+        <div class="chat-empty" id="chatEmpty">
+          <div class="chat-empty-icon">💬</div>
+          <h3>Your Messages</h3>
+          <p>Select a conversation or start a new one</p>
+          <button class="btn-play" id="startChatBtn" style="padding:10px 26px;font-size:.9rem">✏️ New Message</button>
+        </div>
+
+        <!-- Active chat (hidden until selected) -->
+        <div class="chat-active hidden" id="chatActive">
+          <!-- Chat header -->
+          <div class="chat-head">
+            <button class="chat-back-btn" id="chatBackBtn">←</button>
+            <div class="chat-head-avatar" id="chatHeadAvatar">🎮</div>
+            <div class="chat-head-info">
+              <div class="chat-head-name" id="chatHeadName">—</div>
+              <div class="chat-head-status" id="chatHeadStatus">Online</div>
+            </div>
+            <div class="chat-head-actions">
+              <button class="tb-btn" title="View profile" id="chatProfileBtn">👤</button>
+            </div>
+          </div>
+
+          <!-- Messages area -->
+          <div class="chat-messages" id="chatMessages">
+            <!-- Messages are injected here -->
+          </div>
+
+          <!-- Input area -->
+          <div class="chat-input-wrap">
+            <div class="chat-input-row">
+              <button class="chat-emoji-btn" id="chatEmojiBtn" title="Add emoji">😊</button>
+              <input type="text" class="chat-input" id="chatInput" placeholder="Type a message…" maxlength="1000" autocomplete="off" />
+              <button class="chat-send-btn" id="chatSendBtn" title="Send">➤</button>
+            </div>
+            <div class="emoji-picker hidden" id="emojiPicker">
+              <span>😀</span><span>😂</span><span>😍</span><span>🔥</span><span>💯</span>
+              <span>🎮</span><span>🏆</span><span>💎</span><span>⚡</span><span>🌟</span>
+              <span>😎</span><span>🤝</span><span>👑</span><span>🚀</span><span>💪</span>
+              <span>❤️</span><span>🎉</span><span>😱</span><span>🤣</span><span>👀</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- New Message Modal -->
+<div class="modal-overlay hidden" id="newMsgModal">
+  <div class="modal-box" style="max-width:420px">
+    <div class="modal-head">
+      <span class="modal-title">✏️ New Message</span>
+      <button class="modal-close" id="closeNewMsgModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <label class="form-label">👤 Send to (username)</label>
+      <input type="text" class="form-input" id="newMsgTarget" placeholder="Enter username…" autocomplete="off" />
+      <div id="newMsgSuggestions" style="display:none;margin-top:6px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden"></div>
+      <div style="margin-top:14px">
+        <label class="form-label">💬 Message</label>
+        <textarea class="form-input" id="newMsgText" rows="3" placeholder="Type your first message…" maxlength="1000" style="resize:vertical;min-height:80px"></textarea>
+      </div>
+      <button class="btn-play" id="sendNewMsgBtn" style="width:100%;margin-top:14px;padding:12px">➤ Send Message</button>
+    </div>
+  </div>
+</div>
+
+<style>
+/* ── Messages Layout ── */
+.msg-layout {
+  display: flex; flex: 1; overflow: hidden;
+  height: calc(100vh - 58px);
+}
+
+/* ── Left Panel (Conversation List) ── */
+.msg-sidebar {
+  width: 320px; flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid rgba(167,139,250,.12);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+@media (max-width: 720px) {
+  .msg-sidebar { width: 100%; }
+  .msg-sidebar.hidden { display: none; }
+  .msg-chat { width: 100%; }
+  .msg-chat.hidden { display: none; }
+}
+
+.msg-sidebar-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 16px 10px;
+}
+.msg-sidebar-head h2 {
+  font-family: var(--font-head); font-size: 1.1rem; color: var(--text);
+}
+.new-msg-btn {
+  background: rgba(167,139,250,.15); border: 1px solid rgba(167,139,250,.25);
+  color: var(--purple); border-radius: 50%; width: 34px; height: 34px;
+  font-size: 1rem; display: flex; align-items: center; justify-content: center;
+  transition: all .18s; cursor: pointer;
+}
+.new-msg-btn:hover { background: rgba(167,139,250,.3); transform: scale(1.1); }
+
+.conv-search-wrap { padding: 0 12px 12px; }
+.conv-search {
+  width: 100%; background: rgba(167,139,250,.07); border: 1px solid rgba(167,139,250,.15);
+  border-radius: var(--r-sm); padding: 8px 12px; color: var(--text); font-size: .85rem;
+  font-weight: 700; outline: none; transition: border-color .18s;
+}
+.conv-search:focus { border-color: rgba(167,139,250,.4); }
+
+.conv-list { flex: 1; overflow-y: auto; }
+.conv-list::-webkit-scrollbar { width: 4px; }
+.conv-list::-webkit-scrollbar-track { background: transparent; }
+.conv-list::-webkit-scrollbar-thumb { background: rgba(167,139,250,.2); border-radius: 4px; }
+
+/* Conversation Item */
+.conv-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px; cursor: pointer;
+  border-bottom: 1px solid rgba(167,139,250,.06);
+  transition: background .15s; position: relative;
+}
+.conv-item:hover { background: rgba(167,139,250,.07); }
+.conv-item.active { background: rgba(167,139,250,.12); }
+.conv-item.unread .conv-name { color: var(--text); font-weight: 900; }
+.conv-item.unread .conv-preview { color: var(--muted); }
+.conv-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(167,139,250,.15); display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; flex-shrink: 0; position: relative;
+}
+.conv-avatar-dot {
+  position: absolute; bottom: 1px; right: 1px;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--green); border: 2px solid var(--surface);
+}
+.conv-info { flex: 1; overflow: hidden; }
+.conv-name { font-size: .9rem; font-weight: 800; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.conv-preview { font-size: .77rem; font-weight: 700; color: rgba(157,142,199,.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+.conv-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+.conv-time { font-size: .72rem; font-weight: 700; color: rgba(157,142,199,.5); }
+.conv-unread-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--purple);
+}
+
+/* ── Right Panel (Chat) ── */
+.msg-chat {
+  flex: 1; display: flex; flex-direction: column; overflow: hidden;
+  background: var(--bg);
+}
+.chat-empty {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 12px; text-align: center; padding: 40px;
+}
+.chat-empty-icon { font-size: 4rem; filter: drop-shadow(0 0 20px rgba(167,139,250,.4)); }
+.chat-empty h3 { font-family: var(--font-head); font-size: 1.5rem; color: var(--text); }
+.chat-empty p { color: var(--muted); font-size: .9rem; font-weight: 700; }
+
+.chat-active { display: flex; flex-direction: column; height: 100%; }
+.chat-active.hidden { display: none; }
+
+/* Chat Header */
+.chat-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid rgba(167,139,250,.1);
+  flex-shrink: 0;
+}
+.chat-back-btn {
+  display: none; background: none; border: none; color: var(--purple);
+  font-size: 1.4rem; cursor: pointer; padding: 4px; line-height: 1;
+}
+@media (max-width: 720px) { .chat-back-btn { display: block; } }
+.chat-head-avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(167,139,250,.15); display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; flex-shrink: 0;
+}
+.chat-head-info { flex: 1; }
+.chat-head-name { font-size: .95rem; font-weight: 800; color: var(--text); }
+.chat-head-status { font-size: .75rem; font-weight: 700; color: var(--green); }
+.chat-head-actions { display: flex; gap: 6px; }
+
+/* Messages */
+.chat-messages {
+  flex: 1; overflow-y: auto; padding: 20px 16px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.chat-messages::-webkit-scrollbar { width: 4px; }
+.chat-messages::-webkit-scrollbar-track { background: transparent; }
+.chat-messages::-webkit-scrollbar-thumb { background: rgba(167,139,250,.2); border-radius: 4px; }
+
+.msg-bubble-row {
+  display: flex; gap: 8px; align-items: flex-end;
+}
+.msg-bubble-row.mine { flex-direction: row-reverse; }
+
+.msg-bubble-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(167,139,250,.15); display: flex; align-items: center; justify-content: center;
+  font-size: .9rem; flex-shrink: 0;
+}
+.msg-bubble-row.mine .msg-bubble-avatar { display: none; }
+
+.msg-bubble {
+  max-width: 70%; padding: 10px 14px;
+  border-radius: 18px; font-size: .87rem; font-weight: 700;
+  line-height: 1.5; word-break: break-word;
+  position: relative;
+}
+.msg-bubble.theirs {
+  background: var(--card); color: var(--text);
+  border-bottom-left-radius: 4px;
+}
+.msg-bubble.mine {
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  color: #fff; border-bottom-right-radius: 4px;
+}
+.msg-time {
+  font-size: .68rem; font-weight: 700;
+  color: rgba(157,142,199,.45); margin-top: 3px;
+  text-align: right;
+}
+.msg-bubble-row.mine .msg-time { text-align: right; }
+.msg-bubble-row.theirs .msg-time { text-align: left; }
+
+.chat-date-divider {
+  text-align: center; padding: 8px 0;
+  font-size: .74rem; font-weight: 700; color: rgba(157,142,199,.45);
+}
+
+/* Typing indicator */
+.typing-indicator {
+  display: none; align-items: flex-end; gap: 8px; padding: 0 16px 8px;
+}
+.typing-indicator.visible { display: flex; }
+.typing-dots {
+  background: var(--card); border-radius: 18px; border-bottom-left-radius: 4px;
+  padding: 10px 14px; display: flex; gap: 4px; align-items: center;
+}
+.typing-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--muted);
+  animation: typingBounce 1.2s ease-in-out infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: .2s; }
+.typing-dot:nth-child(3) { animation-delay: .4s; }
+@keyframes typingBounce {
+  0%,60%,100% { transform: translateY(0); }
+  30% { transform: translateY(-6px); }
+}
+
+/* Input area */
+.chat-input-wrap {
+  padding: 12px 16px;
+  background: var(--surface);
+  border-top: 1px solid rgba(167,139,250,.1);
+  flex-shrink: 0;
+  position: relative;
+}
+.chat-input-row {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--card); border: 1px solid rgba(167,139,250,.15);
+  border-radius: 99px; padding: 6px 6px 6px 14px;
+}
+.chat-emoji-btn {
+  background: none; border: none; font-size: 1.2rem;
+  cursor: pointer; flex-shrink: 0; opacity: .7; transition: opacity .15s;
+}
+.chat-emoji-btn:hover { opacity: 1; }
+.chat-input {
+  flex: 1; background: none; border: none; outline: none;
+  color: var(--text); font-size: .87rem; font-weight: 700;
+  font-family: var(--font-body);
+}
+.chat-input::placeholder { color: rgba(157,142,199,.5); }
+.chat-send-btn {
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  border: none; color: #fff; width: 36px; height: 36px; border-radius: 50%;
+  font-size: 1rem; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .18s;
+}
+.chat-send-btn:hover { transform: scale(1.1); box-shadow: 0 4px 16px rgba(124,58,237,.5); }
+.chat-send-btn:disabled { opacity: .4; transform: none; cursor: not-allowed; }
+
+.emoji-picker {
+  position: absolute; bottom: 100%; left: 16px; right: 16px; margin-bottom: 8px;
+  background: var(--card); border: 1px solid rgba(167,139,250,.2);
+  border-radius: var(--r-md); padding: 10px; display: flex; flex-wrap: wrap; gap: 6px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.4);
+}
+.emoji-picker span {
+  font-size: 1.4rem; cursor: pointer; border-radius: 8px;
+  padding: 4px; transition: background .15s; line-height: 1;
+}
+.emoji-picker span:hover { background: rgba(167,139,250,.15); }
+
+/* Empty state text */
+.msg-empty-state {
+  color: var(--muted); font-size: .85rem; font-weight: 700;
+  text-align: center; padding: 32px 16px;
+}
+
+/* Utility */
+.hidden { display: none !important; }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 999;
+  background: rgba(8,4,22,.82); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.modal-box {
+  background: var(--card); border: 1px solid rgba(167,139,250,.2);
+  border-radius: var(--r-lg); width: 100%; box-shadow: 0 16px 64px rgba(0,0,0,.5);
+  overflow: hidden;
+}
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 1px solid rgba(167,139,250,.1);
+}
+.modal-title { font-family: var(--font-head); font-size: 1.1rem; color: var(--text); }
+.modal-close {
+  background: rgba(167,139,250,.1); border: 1px solid rgba(167,139,250,.2);
+  color: var(--muted); border-radius: 50%; width: 30px; height: 30px;
+  font-size: .85rem; cursor: pointer; transition: all .15s;
+}
+.modal-close:hover { background: rgba(244,114,182,.15); color: var(--pink); }
+.modal-body { padding: 20px; }
+.form-label { display: block; font-size: .82rem; font-weight: 800; color: var(--muted); margin-bottom: 6px; letter-spacing: .3px; }
+.form-input {
+  width: 100%; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 10px 14px; color: var(--text);
+  font-family: var(--font-body); font-size: .9rem; font-weight: 700; outline: none;
+  transition: border-color .18s;
+}
+.form-input:focus { border-color: var(--purple); }
+
+/* Suggestion item */
+.suggestion-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+  cursor: pointer; transition: background .15s;
+  border-bottom: 1px solid rgba(167,139,250,.06);
+}
+.suggestion-item:hover { background: rgba(167,139,250,.08); }
+.suggestion-item:last-child { border-bottom: none; }
+</style>
+
+<script src="security.js"></script>
+<script src="api.js"></script>
+<script src="script.js"></script>
+<script src="features.js"></script>
+<script src="notifications.js"></script>
+<script src="polish.js"></script>
+<script src="admin-button.js"></script>
+<script src="studio-button.js"></script>
+<script src="extras.js"></script>
+<script src="friends-local.js"></script>
+
+<script>
+/* ============================================================
+   EYLOX — Messages Page
+   Works online (API) and offline (localStorage)
+   ============================================================ */
+
+const API_BASE = 'http://localhost:3001/api';
+
+/* ── State ── */
+let conversations = [];   // array of { id, username, avatar, lastMsg, time, unread, online }
+let activeConvId  = null;
+let messages      = {};   // { convId: [ {id, text, mine, time} ] }
+let currentUser   = null;
+let pollInterval  = null;
+
+/* ── DOM refs ── */
+const convList    = document.getElementById('convList');
+const convSearch  = document.getElementById('convSearch');
+const chatEmpty   = document.getElementById('chatEmpty');
+const chatActive  = document.getElementById('chatActive');
+const chatMessages= document.getElementById('chatMessages');
+const chatInput   = document.getElementById('chatInput');
+const chatSendBtn = document.getElementById('chatSendBtn');
+const chatHeadAvatar = document.getElementById('chatHeadAvatar');
+const chatHeadName   = document.getElementById('chatHeadName');
+const chatHeadStatus = document.getElementById('chatHeadStatus');
+const emojiPicker    = document.getElementById('emojiPicker');
+const msgSidebar     = document.getElementById('msgSidebar');
+const msgChat        = document.getElementById('msgChat');
+
+/* ── Init ── */
+document.addEventListener('DOMContentLoaded', () => {
+  currentUser = (() => { try { return JSON.parse(localStorage.getItem('eylox_user')); } catch { return null; } })();
+  if (!currentUser) { currentUser = { _id: 'guest', username: 'Guest', avatar: '🎮' }; }
+
+  loadConversations();
+
+  /* Search filter */
+  convSearch.addEventListener('input', () => renderConvList(convSearch.value.toLowerCase()));
+
+  /* Send on Enter */
+  chatInput.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
+  chatSendBtn.addEventListener('click', sendMessage);
+
+  /* Emoji picker toggle */
+  document.getElementById('chatEmojiBtn').addEventListener('click', () => {
+    emojiPicker.classList.toggle('hidden');
+  });
+  document.querySelectorAll('.emoji-picker span').forEach(s => {
+    s.addEventListener('click', () => {
+      chatInput.value += s.textContent;
+      chatInput.focus();
+      emojiPicker.classList.add('hidden');
+    });
+  });
+
+  /* New Message button */
+  document.getElementById('newMsgBtn').addEventListener('click', () => openNewMsgModal());
+  document.getElementById('startChatBtn').addEventListener('click', () => openNewMsgModal());
+  document.getElementById('closeNewMsgModal').addEventListener('click', closeNewMsgModal);
+  document.getElementById('sendNewMsgBtn').addEventListener('click', sendNewMessage);
+  document.getElementById('newMsgModal').addEventListener('click', e => {
+    if (e.target.id === 'newMsgModal') closeNewMsgModal();
+  });
+
+  /* Back button (mobile) */
+  document.getElementById('chatBackBtn').addEventListener('click', () => {
+    msgSidebar.classList.remove('hidden');
+    msgChat.classList.add('hidden');
+  });
+
+  /* Profile button in chat head */
+  document.getElementById('chatProfileBtn').addEventListener('click', () => {
+    if (activeConvId) {
+      const c = conversations.find(x => x.id === activeConvId);
+      if (c) window.location.href = `profile.html?user=${encodeURIComponent(c.username)}`;
+    }
+  });
+
+  /* Username autocomplete */
+  document.getElementById('newMsgTarget').addEventListener('input', debounce(fetchUserSuggestions, 300));
+
+  /* Start polling */
+  pollInterval = setInterval(pollNewMessages, 5000);
+});
+
+/* ── Load / build conversation list ── */
+async function loadConversations() {
+  /* Try localStorage stored conversations */
+  const stored = getStoredConversations();
+  if (stored.length > 0) {
+    conversations = stored;
+    renderConvList();
+  }
+
+  /* Try friends list to seed contacts */
+  const friendsData = getStoredFriends();
+  if (friendsData.length > 0) {
+    friendsData.forEach(f => {
+      if (!conversations.find(c => c.id === f.id)) {
+        conversations.push({ id: f.id, username: f.username, avatar: f.avatar || '🎮', lastMsg: 'Send a message!', time: '', unread: false, online: f.online || false });
+      }
+    });
+    renderConvList();
+  }
+
+  /* Try API */
+  if (localStorage.getItem('eylox_token')) {
+    try {
+      const res = await fetch(`${API_BASE}/messages/conversations`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('eylox_token')}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.conversations) {
+          conversations = data.conversations.map(c => ({
+            id: c.otherUser._id,
+            username: c.otherUser.username,
+            avatar: c.otherUser.avatar || '🎮',
+            lastMsg: c.lastMessage?.content || '',
+            time: formatTime(c.lastMessage?.createdAt),
+            unread: c.unreadCount > 0,
+            online: c.otherUser.online || false,
+          }));
+          saveStoredConversations(conversations);
+          renderConvList();
+        }
+      }
+    } catch { /* offline */ }
+  }
+
+  if (conversations.length === 0) {
+    convList.innerHTML = '<p class="msg-empty-state">💬 No conversations yet.<br>Start a new message!</p>';
+  }
+}
+
+/* ── Render Conversation List ── */
+function renderConvList(filter = '') {
+  const filtered = filter ? conversations.filter(c => c.username.toLowerCase().includes(filter)) : conversations;
+  if (filtered.length === 0) {
+    convList.innerHTML = '<p class="msg-empty-state">No conversations found.</p>';
+    return;
+  }
+  convList.innerHTML = filtered.map(c => `
+    <div class="conv-item ${c.unread ? 'unread' : ''} ${c.id === activeConvId ? 'active' : ''}"
+         data-id="${c.id}" onclick="openConversation('${c.id}')">
+      <div class="conv-avatar">
+        ${c.avatar}
+        ${c.online ? '<div class="conv-avatar-dot"></div>' : ''}
+      </div>
+      <div class="conv-info">
+        <div class="conv-name">${escHtml(c.username)}</div>
+        <div class="conv-preview">${escHtml(c.lastMsg || 'Say hi!')}</div>
+      </div>
+      <div class="conv-meta">
+        ${c.time ? `<div class="conv-time">${c.time}</div>` : ''}
+        ${c.unread ? '<div class="conv-unread-dot"></div>' : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ── Open Conversation ── */
+async function openConversation(id) {
+  activeConvId = id;
+  const conv = conversations.find(c => c.id === id);
+  if (!conv) return;
+
+  /* Mobile: swap panels */
+  msgSidebar.classList.add('hidden');
+  msgChat.classList.remove('hidden');
+
+  /* Mark unread → read */
+  conv.unread = false;
+  renderConvList(convSearch.value.toLowerCase());
+
+  /* Update header */
+  chatHeadAvatar.textContent = conv.avatar;
+  chatHeadName.textContent   = conv.username;
+  chatHeadStatus.textContent = conv.online ? 'Online' : 'Offline';
+  chatHeadStatus.style.color = conv.online ? 'var(--green)' : 'var(--muted)';
+
+  /* Show chat */
+  chatEmpty.classList.add('hidden');
+  chatActive.classList.remove('hidden');
+
+  /* Load messages */
+  await loadMessages(id);
+  scrollToBottom();
+
+  chatInput.focus();
+}
+
+/* ── Load messages for a conversation ── */
+async function loadMessages(userId) {
+  /* From local storage first */
+  const key = `eylox_msgs_${currentUser._id || currentUser.username}_${userId}`;
+  try {
+    const stored = JSON.parse(localStorage.getItem(key) || '[]');
+    messages[userId] = stored;
+  } catch { messages[userId] = []; }
+
+  /* Try API */
+  if (localStorage.getItem('eylox_token')) {
+    try {
+      const res = await fetch(`${API_BASE}/messages/conversation/${userId}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('eylox_token')}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.messages) {
+          messages[userId] = data.messages.map(m => ({
+            id: m._id,
+            text: m.content,
+            mine: m.sender._id === currentUser._id,
+            time: formatTime(m.createdAt),
+            avatar: m.sender.avatar || '🎮',
+          }));
+          localStorage.setItem(key, JSON.stringify(messages[userId]));
+        }
+      }
+    } catch { /* offline */ }
+  }
+
+  renderMessages(userId);
+}
+
+/* ── Render messages ── */
+function renderMessages(userId) {
+  const msgs = messages[userId] || [];
+  if (msgs.length === 0) {
+    chatMessages.innerHTML = `
+      <div class="chat-date-divider">Start of conversation</div>
+      <div style="text-align:center;padding:32px;color:var(--muted);font-size:.85rem;font-weight:700">
+        Say hello! 👋
+      </div>`;
+    return;
+  }
+
+  let html = '';
+  let lastDate = null;
+  msgs.forEach(m => {
+    const d = m.time ? m.time.split(' ')[0] : 'Today';
+    if (d !== lastDate) {
+      html += `<div class="chat-date-divider">${d}</div>`;
+      lastDate = d;
+    }
+    const mine = m.mine;
+    html += `
+      <div class="msg-bubble-row ${mine ? 'mine' : 'theirs'}">
+        ${!mine ? `<div class="msg-bubble-avatar">${escHtml(m.avatar || '🎮')}</div>` : ''}
+        <div style="display:flex;flex-direction:column;${mine ? 'align-items:flex-end' : 'align-items:flex-start'}">
+          <div class="msg-bubble ${mine ? 'mine' : 'theirs'}">${escHtml(m.text)}</div>
+          <div class="msg-time">${escHtml(m.time || '')}</div>
+        </div>
+      </div>`;
+  });
+  chatMessages.innerHTML = html;
+}
+
+/* ── Send message ── */
+async function sendMessage() {
+  const text = chatInput.value.trim();
+  if (!text || !activeConvId) return;
+
+  chatInput.value = '';
+  chatSendBtn.disabled = true;
+  setTimeout(() => { chatSendBtn.disabled = false; }, 800);
+
+  const msg = {
+    id: Date.now().toString(),
+    text,
+    mine: true,
+    time: formatTime(new Date().toISOString()),
+    avatar: currentUser.avatar || '🎮',
+  };
+
+  if (!messages[activeConvId]) messages[activeConvId] = [];
+  messages[activeConvId].push(msg);
+
+  /* Save locally */
+  const key = `eylox_msgs_${currentUser._id || currentUser.username}_${activeConvId}`;
+  localStorage.setItem(key, JSON.stringify(messages[activeConvId]));
+
+  /* Update conversation preview */
+  const conv = conversations.find(c => c.id === activeConvId);
+  if (conv) { conv.lastMsg = text; conv.time = 'Just now'; }
+  renderConvList(convSearch.value.toLowerCase());
+
+  renderMessages(activeConvId);
+  scrollToBottom();
+
+  /* Try API */
+  if (localStorage.getItem('eylox_token')) {
+    try {
+      await fetch(`${API_BASE}/messages/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('eylox_token')}`,
+        },
+        body: JSON.stringify({ recipientId: activeConvId, content: text }),
+      });
+    } catch { /* offline — already saved locally */ }
+  }
+}
+
+/* ── Poll for new messages ── */
+async function pollNewMessages() {
+  if (!activeConvId || !localStorage.getItem('eylox_token')) return;
+  try {
+    const res = await fetch(`${API_BASE}/messages/conversation/${activeConvId}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('eylox_token')}` }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success && data.messages) {
+        const updated = data.messages.map(m => ({
+          id: m._id,
+          text: m.content,
+          mine: m.sender._id === currentUser._id,
+          time: formatTime(m.createdAt),
+          avatar: m.sender.avatar || '🎮',
+        }));
+        if (JSON.stringify(updated) !== JSON.stringify(messages[activeConvId])) {
+          messages[activeConvId] = updated;
+          renderMessages(activeConvId);
+          scrollToBottom();
+        }
+      }
+    }
+  } catch { /* offline */ }
+}
+
+/* ── New Message Modal ── */
+function openNewMsgModal() {
+  document.getElementById('newMsgModal').classList.remove('hidden');
+  document.getElementById('newMsgTarget').focus();
+}
+function closeNewMsgModal() {
+  document.getElementById('newMsgModal').classList.add('hidden');
+  document.getElementById('newMsgTarget').value = '';
+  document.getElementById('newMsgText').value = '';
+  document.getElementById('newMsgSuggestions').style.display = 'none';
+}
+async function sendNewMessage() {
+  const target = document.getElementById('newMsgTarget').value.trim();
+  const text   = document.getElementById('newMsgText').value.trim();
+  if (!target || !text) return;
+
+  /* Check friends list for username match */
+  const friends = getStoredFriends();
+  let found = friends.find(f => f.username.toLowerCase() === target.toLowerCase());
+
+  if (!found) {
+    /* Try API user lookup */
+    try {
+      const res = await fetch(`${API_BASE}/users?search=${encodeURIComponent(target)}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.users && data.users.length > 0) {
+          found = { id: data.users[0]._id, username: data.users[0].username, avatar: data.users[0].avatar || '🎮' };
+        }
+      }
+    } catch {}
+  }
+
+  if (!found) {
+    /* Create a local placeholder */
+    found = { id: `local_${target}`, username: target, avatar: '🎮' };
+  }
+
+  /* Add to conversations if not already present */
+  if (!conversations.find(c => c.id === found.id)) {
+    conversations.unshift({ id: found.id, username: found.username, avatar: found.avatar, lastMsg: text, time: 'Just now', unread: false, online: false });
+  }
+
+  closeNewMsgModal();
+  await openConversation(found.id);
+  chatInput.value = text;
+  sendMessage();
+}
+
+/* ── Autocomplete ── */
+async function fetchUserSuggestions() {
+  const val = document.getElementById('newMsgTarget').value.trim();
+  const box = document.getElementById('newMsgSuggestions');
+  if (val.length < 2) { box.style.display = 'none'; return; }
+
+  /* Check local friends first */
+  const friends = getStoredFriends().filter(f => f.username.toLowerCase().includes(val.toLowerCase())).slice(0, 5);
+  let users = friends;
+
+  /* Try API */
+  try {
+    const res = await fetch(`${API_BASE}/users?search=${encodeURIComponent(val)}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.users) users = data.users.slice(0, 5).map(u => ({ id: u._id, username: u.username, avatar: u.avatar || '🎮' }));
+    }
+  } catch {}
+
+  if (users.length === 0) { box.style.display = 'none'; return; }
+
+  box.style.display = 'block';
+  box.innerHTML = users.map(u => `
+    <div class="suggestion-item" onclick="selectUser('${escHtml(u.username)}')">
+      <span style="font-size:1.2rem">${escHtml(u.avatar || '🎮')}</span>
+      <span style="font-size:.87rem;font-weight:800">${escHtml(u.username)}</span>
+    </div>`).join('');
+}
+
+function selectUser(username) {
+  document.getElementById('newMsgTarget').value = username;
+  document.getElementById('newMsgSuggestions').style.display = 'none';
+  document.getElementById('newMsgText').focus();
+}
+
+/* ── Helpers ── */
+function scrollToBottom() {
+  setTimeout(() => { chatMessages.scrollTop = chatMessages.scrollHeight; }, 50);
+}
+
+function formatTime(iso) {
+  if (!iso) return '';
+  try {
+    const d = new Date(iso);
+    const now = new Date();
+    const diff = now - d;
+    if (diff < 60000) return 'Just now';
+    if (diff < 3600000) return `${Math.floor(diff/60000)}m ago`;
+    if (diff < 86400000) return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  } catch { return ''; }
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function debounce(fn, ms) {
+  let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
+}
+
+function getStoredFriends() {
+  try {
+    const f = JSON.parse(localStorage.getItem('eylox_friends_local') || '[]');
+    return f.map(x => ({ id: x._id || x.id || `local_${x.username}`, username: x.username, avatar: x.avatar || '🎮', online: x.online || false }));
+  } catch { return []; }
+}
+
+function getStoredConversations() {
+  try { return JSON.parse(localStorage.getItem('eylox_conversations') || '[]'); } catch { return []; }
+}
+
+function saveStoredConversations(list) {
+  try { localStorage.setItem('eylox_conversations', JSON.stringify(list)); } catch {}
+}
+</script>
+<script src="effects.js"></script>
+<script src="sound.js"></script>
+<script src="settings.js"></script>
+</body>
+</html>

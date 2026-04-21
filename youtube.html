@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📺 Gaming Videos — Eylox</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script>
+    try {
+      const hasSession = localStorage.getItem('eylox_token') || localStorage.getItem('eylox_guest') || localStorage.getItem('eylox_user');
+      if (!hasSession) window.location.replace('landing.html');
+    } catch {}
+  </script>
+  <style>
+    .yt-hero { background: linear-gradient(135deg,#1a0000 0%,#3a0800 50%,#200012 100%); border: 1px solid rgba(248,113,113,.2); border-radius: 20px; padding: 36px; margin-bottom: 28px; position: relative; overflow: hidden; }
+    .yt-hero::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse at 80% 50%, rgba(248,113,113,.1) 0%, transparent 70%); pointer-events:none; }
+    .yt-hero-title { font-family:'Fredoka One',cursive; font-size: clamp(1.8rem,4vw,2.6rem); color: var(--text,#f0e8ff); margin-bottom: 6px; }
+    .yt-hero-sub { color: var(--muted,#9d8ec7); font-weight: 700; font-size: .9rem; }
+    .yt-badge { display:inline-flex; align-items:center; gap:6px; background: rgba(248,113,113,.15); border: 1px solid rgba(248,113,113,.3); border-radius: 99px; padding: 4px 14px; font-size: .78rem; font-weight: 800; color: #f87171; margin-bottom: 14px; }
+    .vid-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
+    .vid-card { background: var(--card,#160a38); border: 1px solid var(--border2,#3a2480); border-radius: 16px; overflow: hidden; transition: transform .2s, box-shadow .2s; cursor: pointer; }
+    .vid-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(124,58,237,.3); }
+    .vid-thumb { width: 100%; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; font-size: 3rem; position: relative; overflow: hidden; }
+    .vid-play-btn { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,.3); opacity:0; transition: opacity .2s; font-size: 3rem; }
+    .vid-card:hover .vid-play-btn { opacity: 1; }
+    .vid-duration { position:absolute; bottom:8px; right:8px; background: rgba(0,0,0,.8); color:#fff; font-size:.72rem; font-weight:800; padding:2px 7px; border-radius:5px; font-family:'Nunito',sans-serif; }
+    .vid-body { padding: 14px; }
+    .vid-title { font-family:'Fredoka One',cursive; font-size: .95rem; color: var(--text,#f0e8ff); margin-bottom: 8px; line-height: 1.3; }
+    .vid-meta { display:flex; align-items:center; gap:8px; font-size: .72rem; color: var(--muted,#9d8ec7); font-weight: 700; }
+    .vid-av { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.8rem; flex-shrink:0; }
+    .vid-tag { display:inline-block; background: rgba(248,113,113,.15); color: #f87171; border: 1px solid rgba(248,113,113,.25); border-radius: 99px; font-size:.65rem; font-weight:900; padding:2px 8px; }
+    .vid-tag.purple { background: rgba(167,139,250,.15); color: #a78bfa; border-color: rgba(167,139,250,.25); }
+    .vid-tag.green  { background: rgba(74,222,128,.15);  color: #4ade80; border-color: rgba(74,222,128,.25); }
+    .section-header { display:flex; align-items:center; gap:10px; margin: 28px 0 16px; }
+    .section-title { font-family:'Fredoka One',cursive; font-size: 1.3rem; color: var(--text,#f0e8ff); }
+    .channel-card { display:flex; align-items:center; gap:14px; background: var(--card,#160a38); border:1px solid var(--border2,#3a2480); border-radius:14px; padding:16px; margin-bottom:10px; }
+    .ch-av { width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.5rem; flex-shrink:0; }
+    .ch-name { font-family:'Fredoka One',cursive; font-size:1rem; color:var(--text,#f0e8ff); }
+    .ch-subs { font-size:.75rem; color:var(--muted,#9d8ec7); font-weight:700; }
+    .ch-btn { margin-left:auto; background:linear-gradient(135deg,#dc2626,#ef4444); border:none; border-radius:99px; padding:7px 18px; color:#fff; font-family:'Nunito',sans-serif; font-weight:800; font-size:.78rem; cursor:pointer; transition:transform .15s; }
+    .ch-btn:hover { transform:scale(1.05); }
+    .ch-btn.subbed { background:rgba(248,113,113,.15); border:1px solid rgba(248,113,113,.3); color:#f87171; }
+    .add-video-form { background: var(--card,#160a38); border:1px solid var(--border2,#3a2480); border-radius:16px; padding:24px; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+    .form-row.full { grid-template-columns:1fr; }
+    .form-label { font-size:.78rem; font-weight:900; color:var(--muted,#9d8ec7); text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px; }
+    .form-input { width:100%; background:rgba(167,139,250,.07); border:1px solid var(--border2,#3a2480); border-radius:10px; padding:10px 14px; color:var(--text,#f0e8ff); font-family:'Nunito',sans-serif; font-weight:700; font-size:.85rem; outline:none; box-sizing:border-box; }
+    .form-input:focus { border-color:var(--purple,#a78bfa); }
+    .form-input option { background:#160a38; }
+    .submit-btn { background:linear-gradient(135deg,#dc2626,#a78bfa); border:none; border-radius:99px; padding:12px 28px; color:#fff; font-family:'Nunito',sans-serif; font-weight:800; font-size:.9rem; cursor:pointer; transition:transform .15s,box-shadow .15s; }
+    .submit-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(220,38,38,.4); }
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.85); z-index:9000; align-items:center; justify-content:center; padding:20px; }
+    .modal-overlay.show { display:flex; }
+    .vid-modal { background:linear-gradient(135deg,#0d0520,#1a0840); border:1px solid var(--border2,#3a2480); border-radius:20px; width:100%; max-width:680px; overflow:hidden; }
+    .vid-modal-player { aspect-ratio:16/9; display:flex; align-items:center; justify-content:center; font-size:5rem; background:rgba(0,0,0,.5); }
+    .vid-modal-body { padding:20px; }
+    .vid-modal-title { font-family:'Fredoka One',cursive; font-size:1.3rem; color:var(--text,#f0e8ff); margin-bottom:10px; }
+    .vid-modal-desc { font-size:.83rem; color:var(--muted,#9d8ec7); font-weight:700; line-height:1.6; margin-bottom:16px; }
+    .vid-modal-actions { display:flex; gap:10px; flex-wrap:wrap; }
+    .vid-modal-btn { padding:8px 18px; border-radius:99px; border:1px solid var(--border2,#3a2480); color:var(--text,#f0e8ff); background:rgba(167,139,250,.1); font-family:'Nunito',sans-serif; font-weight:800; font-size:.8rem; cursor:pointer; transition:background .15s; }
+    .vid-modal-btn:hover { background:rgba(167,139,250,.25); }
+    .close-btn { float:right; background:none; border:none; color:var(--muted,#9d8ec7); font-size:1.4rem; cursor:pointer; padding:0; line-height:1; }
+  </style>
+</head>
+<body data-page="youtube">
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <span class="sidebar-logo-icon">🎮</span>
+      <span class="sidebar-logo-text">Eylox</span>
+    </a>
+    <p class="sidebar-section-label">Menu</p>
+    <nav class="sidebar-nav"><ul>
+      <li><a href="index.html"    class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
+      <li><a href="games.html"    class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
+      <li><a href="friends.html"  class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span></a></li>
+      <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
+      <li><a href="profile.html"  class="sidebar-link"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
+    </ul></nav>
+    <div class="sidebar-divider"></div>
+    <p class="sidebar-section-label">More</p>
+    <nav class="sidebar-nav"><ul>
+      <li><a href="leaderboard.html"  class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
+      <li><a href="achievements.html" class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
+      <li><a href="communities.html"  class="sidebar-link"><span class="s-icon">🌍</span><span class="s-label">Communities</span></a></li>
+      <li><a href="live-events.html"  class="sidebar-link"><span class="s-icon">⚡</span><span class="s-label">Live Events</span></a></li>
+      <li><a href="shop.html"         class="sidebar-link"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
+      <li><a href="youtube.html"      class="sidebar-link active"><span class="s-icon">📺</span><span class="s-label">Videos</span></a></li>
+      <li><a href="#" class="sidebar-link" id="settingsBtn"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></a></li>
+      <li><a href="#" class="sidebar-link" id="logoutBtn"><span class="s-icon">🚪</span><span class="s-label">Logout</span></a></li>
+    </ul></nav>
+    <div class="sidebar-coins">
+      <span class="coins-icon">💰</span>
+      <div><div class="coins-amount" id="sideCoins">—</div><div class="coins-label">Eylux</div></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-area">
+    <div class="topbar">
+      <button class="topbar-menu" id="menuBtn">☰</button>
+      <div class="topbar-right">
+        <span class="topbar-avatar" id="topAv">📺</span>
+        <span class="topbar-name" id="topName">Player</span>
+      </div>
+    </div>
+
+    <div class="content" style="padding:20px 24px;max-width:1100px;margin:0 auto">
+
+      <!-- Hero -->
+      <div class="yt-hero">
+        <div class="yt-badge">📺 Gaming Video Hub</div>
+        <div class="yt-hero-title">📺 Gaming Videos</div>
+        <div class="yt-hero-sub">Showcase your games, share tutorials, and discover amazing gaming content</div>
+      </div>
+
+      <!-- Trending Videos -->
+      <div class="section-header">
+        <span style="font-size:1.4rem">🔥</span>
+        <span class="section-title">Trending Gaming Videos</span>
+      </div>
+      <div class="vid-grid" id="trendingGrid"></div>
+
+      <!-- Recommended Videos -->
+      <div class="section-header">
+        <span style="font-size:1.4rem">✨</span>
+        <span class="section-title">Recommended For You</span>
+        <button onclick="shuffleRec()" style="margin-left:auto;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.25);color:#a78bfa;border-radius:99px;padding:6px 16px;font-family:Nunito,sans-serif;font-weight:800;font-size:.78rem;cursor:pointer">↻ Refresh</button>
+      </div>
+      <div class="vid-grid" id="recGrid"></div>
+
+      <!-- Top Channels -->
+      <div class="section-header">
+        <span style="font-size:1.4rem">⭐</span>
+        <span class="section-title">Top Gaming Channels</span>
+      </div>
+      <div id="channelsContainer"></div>
+
+      <!-- Add Video -->
+      <div class="section-header">
+        <span style="font-size:1.4rem">➕</span>
+        <span class="section-title">Share Your Video</span>
+      </div>
+      <div class="add-video-form">
+        <div class="form-row">
+          <div>
+            <div class="form-label">Video Title</div>
+            <input class="form-input" id="vidTitle" placeholder="My Epic Ninja Dash Run!"/>
+          </div>
+          <div>
+            <div class="form-label">Category</div>
+            <select class="form-input" id="vidCat">
+              <option value="gameplay">🎮 Gameplay</option>
+              <option value="tutorial">📖 Tutorial</option>
+              <option value="highlight">✨ Highlight</option>
+              <option value="review">🔍 Review</option>
+              <option value="stream">📺 Stream</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row full">
+          <div>
+            <div class="form-label">Description</div>
+            <textarea class="form-input" id="vidDesc" rows="3" placeholder="Tell viewers what this video is about..."></textarea>
+          </div>
+        </div>
+        <div class="form-row">
+          <div>
+            <div class="form-label">Game</div>
+            <select class="form-input" id="vidGame">
+              <option>🥷 Ninja Dash</option>
+              <option>🚀 Sky Riders</option>
+              <option>🧩 Puzzle Palace</option>
+              <option>🌊 Ocean Quest</option>
+              <option>🐉 Dragon Escape</option>
+              <option>👾 Space Blaster</option>
+              <option>🏰 Block Kingdom</option>
+              <option>🚜 Farm Friends</option>
+            </select>
+          </div>
+          <div>
+            <div class="form-label">Tags (comma separated)</div>
+            <input class="form-input" id="vidTags" placeholder="speedrun, tips, funny"/>
+          </div>
+        </div>
+        <button class="submit-btn" onclick="submitVideo()">📤 Share Video</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Video Modal -->
+<div class="modal-overlay" id="vidModal" onclick="if(event.target===this)closeModal()">
+  <div class="vid-modal">
+    <div class="vid-modal-player" id="modalPlayer">🎬</div>
+    <div class="vid-modal-body">
+      <button class="close-btn" onclick="closeModal()">✕</button>
+      <div class="vid-modal-title" id="modalTitle"></div>
+      <div class="vid-modal-desc" id="modalDesc"></div>
+      <div class="vid-modal-actions">
+        <button class="vid-modal-btn" onclick="likeVideo()">👍 Like</button>
+        <button class="vid-modal-btn" onclick="alert('🔗 Link copied!')">🔗 Share</button>
+        <button class="vid-modal-btn" onclick="alert('⬇️ Download not available in browser mode')">⬇️ Save</button>
+        <button class="vid-modal-btn" onclick="closeModal()">✕ Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+const _user = (() => { try { return JSON.parse(localStorage.getItem('eylox_user')||'null'); } catch { return null; } })() || { username:'Player', avatar:'📺', coins:0 };
+document.getElementById('topName').textContent = _user.username;
+document.getElementById('topAv').textContent   = _user.avatar || '📺';
+document.getElementById('sideCoins').textContent = (_user.coins || 0).toLocaleString();
+document.getElementById('logoutBtn').addEventListener('click', e => {
+  e.preventDefault();
+  ['eylox_token','eylox_guest','eylox_user','eylox_is_owner'].forEach(k => localStorage.removeItem(k));
+  location.href = 'landing.html';
+});
+
+const ALL_VIDEOS = [
+  { id:'v1',  title:'WORLD RECORD Ninja Dash Run — 2.4M Points!!', thumb:'🥷', bg:'linear-gradient(135deg,#1e0a48,#3a1080)', views:'2.4M', duration:'12:34', channel:'SpeedMaster', channelAv:'⚡', cat:'highlight', desc:'Absolutely insane run that broke the world record. Watch the double-jump combo at 8:23!', likes:48200 },
+  { id:'v2',  title:'Sky Riders FULL Tutorial — Beginner to Pro Guide', thumb:'🚀', bg:'linear-gradient(135deg,#0a1e48,#103080)', views:'892K', duration:'24:10', channel:'ProGamer101', channelAv:'🎮', cat:'tutorial', desc:'The ultimate guide to mastering Sky Riders. Covers every obstacle pattern and scoring trick.', likes:31500 },
+  { id:'v3',  title:'Puzzle Palace Level 50 — No Mistakes Challenge', thumb:'🧩', bg:'linear-gradient(135deg,#1e3a0a,#308030)', views:'1.1M', duration:'18:45', channel:'PuzzleKing', channelAv:'🧠', cat:'gameplay', desc:'Can I beat Puzzle Palace level 50 without a single mistake? The suspense is REAL at level 47...', likes:55700 },
+  { id:'v4',  title:'Ocean Quest Speedrun in 4:32 — New PB!', thumb:'🌊', bg:'linear-gradient(135deg,#0a1848,#0e3060)', views:'445K', duration:'5:12', channel:'OceanDiver', channelAv:'🐠', cat:'gameplay', desc:'My personal best Ocean Quest speedrun. Managed to shave 18 seconds off my old time!', likes:22100 },
+  { id:'v5',  title:'Dragon Escape — Surviving for 10 MINUTES straight!', thumb:'🐉', bg:'linear-gradient(135deg,#480a0a,#801010)', views:'3.2M', duration:'11:22', channel:'DragonSlayer', channelAv:'🔥', cat:'highlight', desc:'10 minutes of non-stop dragon chasing madness. The dragon gets enraged at minute 7 — insane!', likes:127000 },
+  { id:'v6',  title:'Space Blaster — All Boss Patterns Explained', thumb:'👾', bg:'linear-gradient(135deg,#080020,#1a0060)', views:'678K', duration:'20:05', channel:'CosmoGamer', channelAv:'🌌', cat:'tutorial', desc:'Every boss in Space Blaster has a pattern. Learn them all and you\'ll never die again!', likes:34800 },
+  { id:'v7',  title:'Funny Moments Compilation — Eylox Best of 2025', thumb:'😂', bg:'linear-gradient(135deg,#2a1a00,#503000)', views:'5.8M', duration:'31:48', channel:'EyloxFunny', channelAv:'😂', cat:'highlight', desc:'100 of the funniest moments from Eylox players this year. I literally can\'t stop laughing at #47!', likes:289000 },
+  { id:'v8',  title:'Block Kingdom — Building the Perfect Tower Strategy', thumb:'🏰', bg:'linear-gradient(135deg,#1a0a00,#3a1a00)', views:'234K', duration:'15:30', channel:'BuilderPro', channelAv:'🏗️', cat:'tutorial', desc:'The ultimate Block Kingdom building guide. This strategy guarantees 100K+ score every time.', likes:12400 },
+  { id:'v9',  title:'Farm Friends — Max Score Secret Technique', thumb:'🚜', bg:'linear-gradient(135deg,#001a0a,#003a1a)', views:'189K', duration:'8:15', channel:'FarmMaster', channelAv:'🌾', cat:'gameplay', desc:'Did you know about the zigzag catch pattern? It doubles your catch rate. Mind-blowing!', likes:9800 },
+];
+
+const CHANNELS = [
+  { name:'SpeedMaster',  av:'⚡', bg:'linear-gradient(135deg,#7c3aed,#a78bfa)', subs:'1.2M', videos:48 },
+  { name:'ProGamer101',  av:'🎮', bg:'linear-gradient(135deg,#059669,#4ade80)', subs:'892K', videos:127 },
+  { name:'DragonSlayer', av:'🔥', bg:'linear-gradient(135deg,#dc2626,#f87171)', subs:'2.4M', videos:89 },
+  { name:'PuzzleKing',   av:'🧠', bg:'linear-gradient(135deg,#1d4ed8,#60a5fa)', subs:'654K', videos:63 },
+  { name:'EyloxFunny',   av:'😂', bg:'linear-gradient(135deg,#d97706,#fbbf24)', subs:'3.8M', videos:215 },
+];
+
+let subbed = JSON.parse(localStorage.getItem('eylox_yt_subs') || '[]');
+let myVideos = JSON.parse(localStorage.getItem('eylox_my_videos') || '[]');
+
+function vidCard(v) {
+  return `<div class="vid-card" onclick="openVideo('${v.id}')">
+    <div class="vid-thumb" style="background:${v.bg}">
+      ${v.thumb}
+      <div class="vid-play-btn">▶️</div>
+      <div class="vid-duration">${v.duration}</div>
+    </div>
+    <div class="vid-body">
+      <div class="vid-title">${v.title}</div>
+      <div class="vid-meta">
+        <div class="vid-av" style="background:linear-gradient(135deg,#7c3aed,#ec4899)">${v.channelAv}</div>
+        <span>${v.channel}</span>
+        <span>·</span><span>👁 ${v.views}</span>
+        <span>·</span><span>❤️ ${(v.likes/1000).toFixed(1)}K</span>
+        <span class="vid-tag ${v.cat==='tutorial'?'green':v.cat==='highlight'?'':' purple'}">${v.cat}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderTrending() {
+  document.getElementById('trendingGrid').innerHTML = ALL_VIDEOS.slice(0,6).map(vidCard).join('');
+}
+
+function shuffleRec() {
+  const shuffled = [...ALL_VIDEOS].sort(() => Math.random()-.5).slice(0,3);
+  document.getElementById('recGrid').innerHTML = shuffled.map(vidCard).join('');
+}
+
+function renderChannels() {
+  document.getElementById('channelsContainer').innerHTML = CHANNELS.map((ch,i) => `
+    <div class="channel-card">
+      <div class="ch-av" style="background:${ch.bg}">${ch.av}</div>
+      <div>
+        <div class="ch-name">${ch.name}</div>
+        <div class="ch-subs">👥 ${ch.subs} subscribers · 🎬 ${ch.videos} videos</div>
+      </div>
+      <button class="ch-btn ${subbed.includes(i)?'subbed':''}" onclick="toggleSub(${i},this)">${subbed.includes(i)?'✅ Subscribed':'📺 Subscribe'}</button>
+    </div>`).join('');
+}
+
+function toggleSub(i, btn) {
+  if (subbed.includes(i)) {
+    subbed = subbed.filter(s => s !== i);
+    btn.textContent = '📺 Subscribe';
+    btn.classList.remove('subbed');
+  } else {
+    subbed.push(i);
+    btn.textContent = '✅ Subscribed';
+    btn.classList.add('subbed');
+  }
+  localStorage.setItem('eylox_yt_subs', JSON.stringify(subbed));
+}
+
+function openVideo(id) {
+  const v = [...ALL_VIDEOS, ...myVideos].find(x => x.id === id);
+  if (!v) return;
+  document.getElementById('modalPlayer').textContent = v.thumb || '🎬';
+  document.getElementById('modalTitle').textContent  = v.title;
+  document.getElementById('modalDesc').innerHTML     = `<strong>${v.channel || 'You'}</strong> · ${v.views || 'New'} views · ❤️ ${v.likes || 0} likes<br/><br/>${v.desc || 'No description.'}`;
+  document.getElementById('vidModal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('vidModal').classList.remove('show');
+}
+
+function likeVideo() {
+  const btn = document.querySelector('.vid-modal-btn');
+  btn.textContent = '❤️ Liked!';
+  btn.style.color = '#f87171';
+  setTimeout(() => { btn.textContent = '👍 Like'; btn.style.color = ''; }, 2000);
+}
+
+function submitVideo() {
+  const title = document.getElementById('vidTitle').value.trim();
+  const desc  = document.getElementById('vidDesc').value.trim();
+  const cat   = document.getElementById('vidCat').value;
+  const game  = document.getElementById('vidGame').value;
+  if (!title) { alert('Please enter a video title!'); return; }
+  const newVid = {
+    id: 'my_' + Date.now(),
+    title, desc, cat,
+    thumb: game.split(' ')[0],
+    bg: 'linear-gradient(135deg,#1e0a48,#3a1080)',
+    views: '1', duration: '0:30',
+    channel: _user.username,
+    channelAv: _user.avatar || '🎮',
+    likes: 0,
+  };
+  myVideos.push(newVid);
+  localStorage.setItem('eylox_my_videos', JSON.stringify(myVideos));
+  document.getElementById('vidTitle').value = '';
+  document.getElementById('vidDesc').value  = '';
+  alert('✅ Video "' + title + '" shared successfully! It will appear in the feed.');
+  renderTrending();
+}
+
+renderTrending();
+shuffleRec();
+renderChannels();
+
+document.getElementById('menuBtn').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+</script>
+<script src="notifications.js"></script>
+<script src="admin-button.js"></script>
+<script src="studio-button.js"></script>
+<script src="effects.js"></script>
+<script src="sound.js"></script>
+<script src="settings.js"></script>
+</body>
+</html>

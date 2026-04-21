@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>∞ Eylox — Communities</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap"/>
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    try {
+      const hasSession = localStorage.getItem('eylox_token') ||
+                         localStorage.getItem('eylox_guest') ||
+                         localStorage.getItem('eylox_user');
+      if (!hasSession) window.location.replace('landing.html');
+    } catch {}
+  </script>
+</head>
+<body data-page="communities">
+<div class="app-shell">
+
+  <!-- ══════════ SIDEBAR ══════════ -->
+  <aside class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <span class="sidebar-logo-icon">🎮</span>
+      <span class="sidebar-logo-text">Eylox</span>
+    </a>
+    <p class="sidebar-section-label">Menu</p>
+    <nav class="sidebar-nav"><ul>
+      <li><a href="index.html"    class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
+      <li><a href="games.html"    class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
+      <li><a href="friends.html"  class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span><span class="s-badge" style="display:none">0</span></a></li>
+      <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
+      <li><a href="profile.html"  class="sidebar-link"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
+    </ul></nav>
+    <div class="sidebar-divider"></div>
+    <p class="sidebar-section-label">More</p>
+    <nav class="sidebar-nav"><ul>
+      <li><a href="leaderboard.html"   class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
+      <li><a href="achievements.html"  class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
+      <li><a href="communities.html"   class="sidebar-link active"><span class="s-icon">🌍</span><span class="s-label">Communities</span></a></li>
+      <li><a href="live-events.html"   class="sidebar-link"><span class="s-icon">⚡</span><span class="s-label">Live Events</span></a></li>
+      <li><a href="shop.html"          class="sidebar-link"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
+      <li><a href="#" class="sidebar-link" id="settingsBtn"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></a></li>
+      <li><a href="#" class="sidebar-link" id="logoutBtn"><span class="s-icon">🚪</span><span class="s-label">Logout</span></a></li>
+    </ul></nav>
+    <div class="sidebar-coins">
+      <img src="eylux-coin.png" class="coins-icon-img" alt="Eylux" />
+      <div><div class="coins-amount">—</div><div class="coins-label">Eylux</div></div>
+    </div>
+    <div class="sidebar-coins sidebar-trophies">
+      <span class="coins-icon">🏆</span>
+      <div><div class="trophies-amount">—</div><div class="coins-label">Trophies</div></div>
+    </div>
+  </aside>
+
+  <!-- ══════════ MAIN ══════════ -->
+  <div class="main-area">
+
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="search" class="search-input" id="commSearch" placeholder="Search communities…" aria-label="Search communities" />
+      </div>
+      <div class="topbar-right">
+        <button class="tb-btn" id="notifBellBtn" aria-label="Notifications">🔔<span class="notif-dot"></span></button>
+        <div class="tb-coins"><img src="eylux-coin.png" class="tb-coin-img" alt="EC"> <span id="topbarCoins">—</span></div>
+        <div class="tb-trophies"><span class="tb-trophy-icon">🏆</span> <span id="topbarTrophies">—</span></div>
+        <a href="profile.html" class="tb-avatar" aria-label="My Profile">🎮<span class="online-dot"></span></a>
+      </div>
+    </header>
+
+    <main class="page-content">
+
+      <!-- Page Header -->
+      <div class="comm-page-head">
+        <div>
+          <h1 class="comm-title">🌍 Communities</h1>
+          <p class="comm-subtitle">Join groups, share your passion, find your crew</p>
+        </div>
+        <button class="btn-play comm-create-btn" id="createCommBtn">+ Create Community</button>
+      </div>
+
+      <!-- Featured Banner -->
+      <div class="comm-featured" id="commFeatured">
+        <div class="cf-content">
+          <div class="cf-tag">🔥 FEATURED</div>
+          <div class="cf-name">Ninja Dash Masters</div>
+          <div class="cf-desc">The #1 community for Ninja Dash fans. Share your high scores, tips, and compete in weekly challenges!</div>
+          <div class="cf-meta">👥 12,400 members &nbsp;·&nbsp; 🎮 Gaming &nbsp;·&nbsp; ⚡ Very Active</div>
+          <button class="btn-play" style="padding:9px 22px;font-size:.85rem;margin-top:12px" onclick="joinCommunity('ninja-dash-masters')">Join Now</button>
+        </div>
+        <div class="cf-art">🥷</div>
+      </div>
+
+      <!-- My Communities -->
+      <div class="section" id="myCommSection" style="display:none">
+        <div class="section-header">
+          <h2 class="section-title">✅ My Communities</h2>
+          <span class="section-link" id="myCommCount">0 joined</span>
+        </div>
+        <div class="comm-row" id="myCommRow"></div>
+      </div>
+
+      <!-- Category Filter -->
+      <div class="comm-cats">
+        <button class="comm-cat-btn active" data-cat="all">🌍 All</button>
+        <button class="comm-cat-btn" data-cat="gaming">🎮 Gaming</button>
+        <button class="comm-cat-btn" data-cat="creative">🎨 Creative</button>
+        <button class="comm-cat-btn" data-cat="competitive">🏆 Competitive</button>
+        <button class="comm-cat-btn" data-cat="roleplay">🎭 Roleplay</button>
+        <button class="comm-cat-btn" data-cat="social">💬 Social</button>
+      </div>
+
+      <!-- Sort + Count -->
+      <div class="comm-toolbar">
+        <span id="commFoundCount" style="font-size:.82rem;font-weight:800;color:var(--muted)">Loading…</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span style="font-size:.8rem;font-weight:800;color:var(--muted)">Sort:</span>
+          <select id="commSort" class="comm-sort-select">
+            <option value="popular">Most Popular</option>
+            <option value="newest">Newest</option>
+            <option value="active">Most Active</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Communities Grid -->
+      <div class="comm-grid" id="commGrid">
+        <div class="comm-loading">Loading communities…</div>
+      </div>
+
+      <!-- Load More -->
+      <div style="text-align:center;margin-top:24px">
+        <button class="comm-load-more hidden" id="loadMoreBtn">Load More</button>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Create Community Modal -->
+<div class="modal-overlay hidden" id="createCommModal">
+  <div class="modal-box" style="max-width:500px">
+    <div class="modal-head">
+      <span class="modal-title">🌍 Create Community</span>
+      <button class="modal-close" id="closeCreateModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group-row">
+        <div style="flex:1">
+          <label class="form-label">Community Name *</label>
+          <input type="text" class="form-input" id="commName" placeholder="e.g. Speed Runners" maxlength="50" />
+        </div>
+        <div>
+          <label class="form-label">Icon (emoji)</label>
+          <input type="text" class="form-input" id="commAvatar" placeholder="🌍" maxlength="4" style="width:70px;text-align:center;font-size:1.3rem" />
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <label class="form-label">Category *</label>
+        <select class="form-input" id="commCategory">
+          <option value="">Select a category…</option>
+          <option value="gaming">🎮 Gaming</option>
+          <option value="creative">🎨 Creative</option>
+          <option value="competitive">🏆 Competitive</option>
+          <option value="roleplay">🎭 Roleplay</option>
+          <option value="social">💬 Social</option>
+        </select>
+      </div>
+      <div style="margin-top:14px">
+        <label class="form-label">Description</label>
+        <textarea class="form-input" id="commDesc" rows="3" placeholder="What is this community about?" maxlength="500" style="resize:vertical;min-height:80px"></textarea>
+      </div>
+      <div style="margin-top:14px">
+        <label class="form-label">Tags (comma separated)</label>
+        <input type="text" class="form-input" id="commTags" placeholder="e.g. fast, speedrun, racing" />
+      </div>
+      <div id="createCommError" style="display:none;color:var(--pink);font-size:.83rem;font-weight:700;margin-top:10px"></div>
+      <button class="btn-play" id="submitCreateComm" style="width:100%;margin-top:16px;padding:13px">🌍 Create Community</button>
+    </div>
+  </div>
+</div>
+
+<!-- Community Detail Modal -->
+<div class="modal-overlay hidden" id="commDetailModal">
+  <div class="modal-box" style="max-width:520px">
+    <div class="modal-head">
+      <span class="modal-title" id="commDetailTitle">Community</span>
+      <button class="modal-close" id="closeDetailModal">✕</button>
+    </div>
+    <div class="modal-body" id="commDetailBody"></div>
+  </div>
+</div>
+
+<style>
+/* ── Page head ── */
+.comm-page-head {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+  flex-wrap: wrap; margin-bottom: 24px;
+}
+.comm-title {
+  font-family: var(--font-head); font-size: clamp(1.6rem,4vw,2.2rem);
+  background: linear-gradient(135deg, var(--purple), var(--blue));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.comm-subtitle { color: var(--muted); font-weight: 700; font-size: .9rem; margin-top: 4px; }
+.comm-create-btn { padding: 10px 22px; font-size: .88rem; white-space: nowrap; }
+
+/* ── Featured Banner ── */
+.comm-featured {
+  background: linear-gradient(135deg, rgba(124,58,237,.18), rgba(14,165,233,.12));
+  border: 1px solid rgba(167,139,250,.25); border-radius: var(--r-lg);
+  padding: 24px 28px; margin-bottom: 28px;
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  position: relative; overflow: hidden;
+}
+.comm-featured::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at top left, rgba(167,139,250,.1), transparent 60%);
+  pointer-events: none;
+}
+.cf-content { flex: 1; }
+.cf-tag {
+  display: inline-block; background: rgba(244,114,182,.15); border: 1px solid rgba(244,114,182,.3);
+  border-radius: 99px; padding: 3px 12px; font-size: .72rem; font-weight: 900;
+  color: var(--pink); letter-spacing: .5px; margin-bottom: 10px;
+}
+.cf-name { font-family: var(--font-head); font-size: 1.5rem; color: var(--text); margin-bottom: 6px; }
+.cf-desc { color: var(--muted); font-size: .85rem; font-weight: 700; line-height: 1.6; max-width: 420px; }
+.cf-meta { color: rgba(157,142,199,.7); font-size: .78rem; font-weight: 800; margin-top: 8px; }
+.cf-art { font-size: 4rem; filter: drop-shadow(0 0 24px rgba(167,139,250,.5)); flex-shrink: 0; }
+
+/* ── Category Filter ── */
+.comm-cats {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;
+}
+.comm-cat-btn {
+  background: rgba(167,139,250,.08); border: 1px solid rgba(167,139,250,.15);
+  color: var(--muted); border-radius: 99px; padding: 7px 16px;
+  font-family: var(--font-body); font-size: .82rem; font-weight: 800;
+  cursor: pointer; transition: all .18s;
+}
+.comm-cat-btn:hover { background: rgba(167,139,250,.15); color: var(--text); }
+.comm-cat-btn.active { background: rgba(167,139,250,.22); border-color: var(--purple); color: var(--purple); }
+
+/* ── Toolbar ── */
+.comm-toolbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  margin-bottom: 18px;
+}
+.comm-sort-select {
+  background: var(--card); border: 1px solid rgba(167,139,250,.2);
+  border-radius: var(--r-sm); color: var(--text); padding: 6px 12px;
+  font-family: var(--font-body); font-size: .82rem; font-weight: 800; outline: none;
+  cursor: pointer;
+}
+
+/* ── Communities Grid ── */
+.comm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.comm-card {
+  background: var(--card); border: 1px solid rgba(167,139,250,.1);
+  border-radius: var(--r-lg); overflow: hidden;
+  cursor: pointer; transition: all .22s; position: relative;
+}
+.comm-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(0,0,0,.3), 0 0 0 1px rgba(167,139,250,.2);
+}
+.comm-card.joined { border-color: rgba(74,222,128,.3); }
+
+.comm-card-banner {
+  height: 72px; display: flex; align-items: center; justify-content: center;
+  font-size: 2.8rem; position: relative;
+  background: linear-gradient(135deg, var(--card), rgba(167,139,250,.08));
+}
+.comm-card-banner.cat-gaming     { background: linear-gradient(135deg, rgba(124,58,237,.12), rgba(60,165,250,.08)); }
+.comm-card-banner.cat-creative   { background: linear-gradient(135deg, rgba(244,114,182,.1), rgba(251,191,36,.08)); }
+.comm-card-banner.cat-competitive{ background: linear-gradient(135deg, rgba(253,230,138,.1), rgba(251,191,36,.08)); }
+.comm-card-banner.cat-roleplay   { background: linear-gradient(135deg, rgba(45,212,191,.1), rgba(96,165,250,.08)); }
+.comm-card-banner.cat-social     { background: linear-gradient(135deg, rgba(167,139,250,.1), rgba(244,114,182,.08)); }
+
+.comm-joined-badge {
+  position: absolute; top: 8px; right: 8px;
+  background: rgba(74,222,128,.15); border: 1px solid rgba(74,222,128,.3);
+  border-radius: 99px; padding: 2px 10px; font-size: .7rem; font-weight: 900; color: var(--green);
+}
+
+.comm-card-body { padding: 14px 16px 16px; }
+.comm-card-name { font-family: var(--font-head); font-size: 1rem; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.comm-card-desc { font-size: .78rem; font-weight: 700; color: var(--muted); line-height: 1.5; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.comm-card-meta { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+.comm-meta-chip {
+  background: rgba(167,139,250,.08); border-radius: 99px; padding: 3px 10px;
+  font-size: .72rem; font-weight: 800; color: var(--muted);
+}
+.comm-card-footer { display: flex; gap: 8px; }
+.comm-join-btn {
+  flex: 1; padding: 8px 14px; border-radius: 99px; border: none;
+  font-family: var(--font-body); font-size: .8rem; font-weight: 800;
+  cursor: pointer; transition: all .18s;
+  background: linear-gradient(135deg, #7c3aed, #a78bfa); color: #fff;
+}
+.comm-join-btn:hover { transform: scale(1.04); box-shadow: 0 4px 16px rgba(124,58,237,.4); }
+.comm-join-btn.leave {
+  background: rgba(244,114,182,.12); border: 1px solid rgba(244,114,182,.25); color: var(--pink);
+}
+.comm-join-btn.leave:hover { background: rgba(244,114,182,.22); }
+.comm-view-btn {
+  background: rgba(167,139,250,.1); border: 1px solid rgba(167,139,250,.2);
+  color: var(--purple); border-radius: 99px; padding: 8px 14px;
+  font-family: var(--font-body); font-size: .8rem; font-weight: 800;
+  cursor: pointer; transition: all .18s;
+}
+.comm-view-btn:hover { background: rgba(167,139,250,.2); }
+
+/* My communities row */
+.comm-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.my-comm-chip {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(74,222,128,.08); border: 1px solid rgba(74,222,128,.2);
+  border-radius: 99px; padding: 8px 14px; cursor: pointer; transition: all .18s;
+}
+.my-comm-chip:hover { background: rgba(74,222,128,.15); }
+.my-comm-chip .mc-icon { font-size: 1.1rem; }
+.my-comm-chip .mc-name { font-size: .83rem; font-weight: 800; color: var(--text); }
+
+/* Load more */
+.comm-load-more {
+  background: rgba(167,139,250,.1); border: 1px solid rgba(167,139,250,.22);
+  color: var(--purple); border-radius: 99px; padding: 10px 30px;
+  font-family: var(--font-body); font-size: .88rem; font-weight: 800;
+  cursor: pointer; transition: all .18s;
+}
+.comm-load-more:hover { background: rgba(167,139,250,.2); }
+
+.comm-loading {
+  grid-column: 1/-1; text-align: center; padding: 60px;
+  color: var(--muted); font-size: .9rem; font-weight: 700;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+
+/* ── Form ── */
+.form-group-row { display: flex; gap: 12px; align-items: flex-end; }
+.form-label { display: block; font-size: .82rem; font-weight: 800; color: var(--muted); margin-bottom: 6px; letter-spacing: .3px; }
+.form-input {
+  width: 100%; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 10px 14px; color: var(--text);
+  font-family: var(--font-body); font-size: .9rem; font-weight: 700; outline: none;
+  transition: border-color .18s;
+}
+.form-input:focus { border-color: var(--purple); }
+
+/* ── Modal ── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 999;
+  background: rgba(8,4,22,.82); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.modal-box {
+  background: var(--card); border: 1px solid rgba(167,139,250,.2);
+  border-radius: var(--r-lg); width: 100%; box-shadow: 0 16px 64px rgba(0,0,0,.5);
+  overflow: hidden; max-height: 90vh; overflow-y: auto;
+}
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 1px solid rgba(167,139,250,.1);
+  position: sticky; top: 0; background: var(--card); z-index: 2;
+}
+.modal-title { font-family: var(--font-head); font-size: 1.1rem; color: var(--text); }
+.modal-close {
+  background: rgba(167,139,250,.1); border: 1px solid rgba(167,139,250,.2);
+  color: var(--muted); border-radius: 50%; width: 30px; height: 30px;
+  font-size: .85rem; cursor: pointer; transition: all .15s; flex-shrink: 0;
+}
+.modal-close:hover { background: rgba(244,114,182,.15); color: var(--pink); }
+.modal-body { padding: 20px; }
+.hidden { display: none !important; }
+</style>
+
+<script src="security.js"></script>
+<script src="api.js"></script>
+<script src="script.js"></script>
+<script src="features.js"></script>
+<script src="notifications.js"></script>
+<script src="polish.js"></script>
+<script src="admin-button.js"></script>
+<script src="studio-button.js"></script>
+<script src="extras.js"></script>
+<script src="friends-local.js"></script>
+
+<script>
+/* ============================================================
+   EYLOX — Communities Page
+   ============================================================ */
+
+const API_BASE = 'http://localhost:3001/api';
+
+/* ── Default communities (offline fallback) ── */
+const DEFAULT_COMMUNITIES = [
+  { _id:'1', avatar:'🥷', name:'Ninja Dash Masters',   category:'gaming',      memberCount:12400, description:"The #1 community for Ninja Dash fans. Share your high scores, tips, and compete in weekly challenges!", tags:['ninja','speedrun','action'], featured:true,  stats:{lastActivity:new Date()} },
+  { _id:'2', avatar:'🌌', name:'Space Explorers',       category:'gaming',      memberCount:8900,  description:'Fans of space and sci-fi games. Coordinate missions and share discovery screenshots.',                 tags:['space','sci-fi','explore'],  featured:false, stats:{lastActivity:new Date()} },
+  { _id:'3', avatar:'🎨', name:'Creative Studio',       category:'creative',    memberCount:7200,  description:'Game creators, artists and builders unite! Share your creations and get feedback from the community.',  tags:['create','art','design'],     featured:false, stats:{lastActivity:new Date()} },
+  { _id:'4', avatar:'🏆', name:'Pro League',             category:'competitive', memberCount:6100,  description:'For the best of the best. Weekly tournaments, ranking battles, and prize pools for top competitors.',   tags:['pro','tournament','rank'],   featured:false, stats:{lastActivity:new Date()} },
+  { _id:'5', avatar:'🎭', name:'Roleplay World',         category:'roleplay',    memberCount:5500,  description:'Live your second life. Active RP sessions every day — city life, crime, school, and more!',             tags:['rp','drama','characters'],   featured:false, stats:{lastActivity:new Date()} },
+  { _id:'6', avatar:'🤝', name:'Eylox Newcomers',        category:'social',      memberCount:14200, description:'Welcome to Eylox! Meet other new players, get tips, and find your first friends here.',                tags:['welcome','new','friendly'],  featured:false, stats:{lastActivity:new Date()} },
+  { _id:'7', avatar:'🐉', name:'Dragon Slayers Guild',  category:'gaming',      memberCount:3800,  description:'Dedicated to Dragon Escape and all dragon-themed games. Raid boss alerts and strategy guides daily.',    tags:['dragon','guild','rpg'],      featured:false, stats:{lastActivity:new Date()} },
+  { _id:'8', avatar:'🎵', name:'Music Makers',           category:'creative',    memberCount:2600,  description:'Compose and share music for your games. Tutorials, feedback, and collab requests welcome!',             tags:['music','sound','compose'],   featured:false, stats:{lastActivity:new Date()} },
+  { _id:'9', avatar:'🚀', name:'Speed Runners',          category:'competitive', memberCount:4100,  description:'World record chasers and any% runners. Route planning, glitch hunting, and live PB attempts.',          tags:['speedrun','wr','any%'],      featured:false, stats:{lastActivity:new Date()} },
+  { _id:'10',avatar:'📺', name:'Content Creators Hub',  category:'social',      memberCount:3200,  description:'Eylox YouTubers and streamers share clips, collabs, and grow together. Promo swaps welcome!',           tags:['youtube','stream','content'],featured:false, stats:{lastActivity:new Date()} },
+  { _id:'11',avatar:'🏙️', name:'City Roleplay',          category:'roleplay',    memberCount:4700,  description:'Full city life simulation. Jobs, cars, businesses, gangs, police — immersive 24/7 RP server.',          tags:['city','cars','jobs','cops'], featured:false, stats:{lastActivity:new Date()} },
+  { _id:'12',avatar:'🧩', name:'Puzzle Masters',          category:'gaming',      memberCount:2100,  description:'Logic puzzles, brain teasers, and riddle games. Daily challenges posted at midnight.',                   tags:['puzzle','brain','logic'],    featured:false, stats:{lastActivity:new Date()} },
+];
+
+let allCommunities = [];
+let joinedIds      = new Set();
+let currentCat     = 'all';
+let currentSort    = 'popular';
+let searchQuery    = '';
+let page           = 1;
+
+/* ── Init ── */
+document.addEventListener('DOMContentLoaded', async () => {
+  loadJoined();
+  await fetchCommunities();
+
+  /* Category filter */
+  document.querySelectorAll('.comm-cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.comm-cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentCat = btn.dataset.cat;
+      page = 1;
+      renderGrid();
+    });
+  });
+
+  /* Sort */
+  document.getElementById('commSort').addEventListener('change', e => {
+    currentSort = e.target.value;
+    sortCommunities();
+    renderGrid();
+  });
+
+  /* Search */
+  document.getElementById('commSearch').addEventListener('input', e => {
+    searchQuery = e.target.value.toLowerCase();
+    renderGrid();
+  });
+
+  /* Create modal */
+  document.getElementById('createCommBtn').addEventListener('click', () => openCreateModal());
+  document.getElementById('closeCreateModal').addEventListener('click', () => closeCreateModal());
+  document.getElementById('createCommModal').addEventListener('click', e => { if (e.target.id === 'createCommModal') closeCreateModal(); });
+  document.getElementById('submitCreateComm').addEventListener('click', () => submitCreate());
+
+  /* Detail modal close */
+  document.getElementById('closeDetailModal').addEventListener('click', () => {
+    document.getElementById('commDetailModal').classList.add('hidden');
+  });
+  document.getElementById('commDetailModal').addEventListener('click', e => {
+    if (e.target.id === 'commDetailModal') document.getElementById('commDetailModal').classList.add('hidden');
+  });
+
+  /* Load more */
+  document.getElementById('loadMoreBtn').addEventListener('click', () => { page++; renderGrid(); });
+});
+
+/* ── Load joined from localStorage ── */
+function loadJoined() {
+  try {
+    const j = JSON.parse(localStorage.getItem('eylox_joined_communities') || '[]');
+    joinedIds = new Set(j);
+  } catch { joinedIds = new Set(); }
+}
+function saveJoined() {
+  try { localStorage.setItem('eylox_joined_communities', JSON.stringify([...joinedIds])); } catch {}
+}
+
+/* ── Fetch communities ── */
+async function fetchCommunities() {
+  let data = DEFAULT_COMMUNITIES;
+
+  try {
+    const res = await fetch(`${API_BASE}/communities?sort=${currentSort}&page=${page}`);
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success && json.communities?.length) data = json.communities;
+    }
+  } catch { /* offline */ }
+
+  allCommunities = data;
+  sortCommunities();
+  renderMyCommunities();
+  renderGrid();
+}
+
+/* ── Sort ── */
+function sortCommunities() {
+  if (currentSort === 'popular') allCommunities.sort((a,b) => (b.memberCount||0) - (a.memberCount||0));
+  else if (currentSort === 'newest') allCommunities.sort((a,b) => new Date(b.createdAt||0) - new Date(a.createdAt||0));
+  else if (currentSort === 'active') allCommunities.sort((a,b) => new Date(b.stats?.lastActivity||0) - new Date(a.stats?.lastActivity||0));
+}
+
+/* ── Render my communities ── */
+function renderMyCommunities() {
+  const section = document.getElementById('myCommSection');
+  const row     = document.getElementById('myCommRow');
+  if (joinedIds.size === 0) { section.style.display = 'none'; return; }
+
+  section.style.display = '';
+  document.getElementById('myCommCount').textContent = joinedIds.size + ' joined';
+
+  const myComms = allCommunities.filter(c => joinedIds.has(c._id));
+  row.innerHTML = myComms.map(c => `
+    <div class="my-comm-chip" onclick="openDetail('${c._id}')">
+      <span class="mc-icon">${c.avatar || '🌍'}</span>
+      <span class="mc-name">${escHtml(c.name)}</span>
+    </div>`).join('');
+}
+
+/* ── Render communities grid ── */
+function renderGrid() {
+  const grid = document.getElementById('commGrid');
+
+  let list = allCommunities;
+  if (currentCat !== 'all') list = list.filter(c => c.category === currentCat);
+  if (searchQuery) list = list.filter(c =>
+    c.name.toLowerCase().includes(searchQuery) ||
+    c.description?.toLowerCase().includes(searchQuery) ||
+    c.tags?.some(t => t.toLowerCase().includes(searchQuery))
+  );
+
+  const PAGE_SIZE = 9;
+  const shown = list.slice(0, page * PAGE_SIZE);
+
+  document.getElementById('commFoundCount').textContent = `${list.length} communities`;
+  document.getElementById('loadMoreBtn').classList.toggle('hidden', shown.length >= list.length);
+
+  if (list.length === 0) {
+    grid.innerHTML = `<div class="comm-loading" style="animation:none;opacity:.6">No communities found.</div>`;
+    return;
+  }
+
+  grid.innerHTML = shown.map(c => commCard(c)).join('');
+
+  /* Bind buttons */
+  grid.querySelectorAll('.comm-join-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const id = btn.closest('.comm-card').dataset.id;
+      toggleJoin(id, btn);
+    });
+  });
+  grid.querySelectorAll('.comm-view-btn, .comm-card-banner, .comm-card-name').forEach(el => {
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      const card = el.closest('.comm-card');
+      if (card) openDetail(card.dataset.id);
+    });
+  });
+}
+
+/* ── Build community card ── */
+function commCard(c) {
+  const joined  = joinedIds.has(c._id);
+  const catClass = 'cat-' + (c.category || 'gaming');
+  const tags     = (c.tags || []).slice(0,3).map(t => `<span class="comm-meta-chip">#${escHtml(t)}</span>`).join('');
+  return `
+  <div class="comm-card ${joined ? 'joined' : ''}" data-id="${c._id}">
+    <div class="comm-card-banner ${catClass}">
+      ${c.avatar || '🌍'}
+      ${joined ? '<div class="comm-joined-badge">✅ Joined</div>' : ''}
+    </div>
+    <div class="comm-card-body">
+      <div class="comm-card-name">${escHtml(c.name)}</div>
+      <div class="comm-card-desc">${escHtml(c.description || '')}</div>
+      <div class="comm-card-meta">
+        <span class="comm-meta-chip">👥 ${fmtNum(c.memberCount || 0)}</span>
+        <span class="comm-meta-chip">${catIcon(c.category)} ${c.category || 'gaming'}</span>
+        ${tags}
+      </div>
+      <div class="comm-card-footer">
+        <button class="comm-join-btn ${joined ? 'leave' : ''}">${joined ? '✕ Leave' : '+ Join'}</button>
+        <button class="comm-view-btn">View →</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ── Toggle join / leave ── */
+async function toggleJoin(id, btn) {
+  const isJoined = joinedIds.has(id);
+
+  if (isJoined) {
+    joinedIds.delete(id);
+    const c = allCommunities.find(x => x._id === id);
+    if (c) c.memberCount = Math.max(0, (c.memberCount || 1) - 1);
+  } else {
+    joinedIds.add(id);
+    const c = allCommunities.find(x => x._id === id);
+    if (c) c.memberCount = (c.memberCount || 0) + 1;
+  }
+  saveJoined();
+
+  /* Try API */
+  if (localStorage.getItem('eylox_token')) {
+    try {
+      const method = isJoined ? 'DELETE' : 'POST';
+      await fetch(`${API_BASE}/communities/${id}/join`, {
+        method,
+        headers: { Authorization: `Bearer ${localStorage.getItem('eylox_token')}` }
+      });
+    } catch {}
+  }
+
+  renderMyCommunities();
+  renderGrid();
+
+  /* Toast feedback */
+  const c = allCommunities.find(x => x._id === id);
+  showToast(isJoined ? `Left "${c?.name || ''}"` : `Joined "${c?.name || ''}"! 🎉`);
+}
+
+/* ── Join from outside the grid ── */
+function joinCommunity(nameOrId) {
+  const c = allCommunities.find(x => x.name.toLowerCase().replace(/\s/g,'-') === nameOrId || x._id === nameOrId);
+  if (c && !joinedIds.has(c._id)) { toggleJoin(c._id); }
+}
+
+/* ── Open detail modal ── */
+function openDetail(id) {
+  const c = allCommunities.find(x => x._id === id);
+  if (!c) return;
+  const joined = joinedIds.has(id);
+
+  document.getElementById('commDetailTitle').textContent = c.avatar + ' ' + c.name;
+  document.getElementById('commDetailBody').innerHTML = `
+    <div style="margin-bottom:18px">
+      <div style="background:linear-gradient(135deg,rgba(167,139,250,.1),rgba(14,165,233,.08));border-radius:var(--r-md);padding:20px;text-align:center;margin-bottom:14px">
+        <div style="font-size:3rem;margin-bottom:6px">${c.avatar || '🌍'}</div>
+        <div style="font-family:var(--font-head);font-size:1.2rem;color:var(--text)">${escHtml(c.name)}</div>
+        <div style="display:inline-block;margin-top:6px;background:rgba(167,139,250,.1);border-radius:99px;padding:3px 12px;font-size:.75rem;font-weight:900;color:var(--purple)">${catIcon(c.category)} ${c.category}</div>
+      </div>
+      <p style="color:var(--muted);font-size:.85rem;font-weight:700;line-height:1.7">${escHtml(c.description || 'No description.')}</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">
+      <div style="background:var(--surface);border-radius:var(--r-sm);padding:14px;text-align:center">
+        <div style="font-family:var(--font-head);font-size:1.5rem;color:var(--purple)">${fmtNum(c.memberCount || 0)}</div>
+        <div style="font-size:.72rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px">Members</div>
+      </div>
+      <div style="background:var(--surface);border-radius:var(--r-sm);padding:14px;text-align:center">
+        <div style="font-family:var(--font-head);font-size:1.5rem;color:var(--green)">⚡ Active</div>
+        <div style="font-size:.72rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px">Status</div>
+      </div>
+    </div>
+    ${c.tags?.length ? `
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">
+      ${c.tags.map(t => `<span style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.15);border-radius:99px;padding:4px 12px;font-size:.75rem;font-weight:800;color:var(--muted)">#${escHtml(t)}</span>`).join('')}
+    </div>` : ''}
+    <button class="btn-play" onclick="toggleJoin('${id}');document.getElementById('commDetailModal').classList.add('hidden')" style="width:100%;padding:13px">
+      ${joined ? '✕ Leave Community' : '+ Join Community'}
+    </button>
+  `;
+  document.getElementById('commDetailModal').classList.remove('hidden');
+}
+
+/* ── Create community ── */
+function openCreateModal() {
+  document.getElementById('createCommModal').classList.remove('hidden');
+  document.getElementById('commName').focus();
+}
+function closeCreateModal() {
+  document.getElementById('createCommModal').classList.add('hidden');
+  document.getElementById('createCommError').style.display = 'none';
+}
+async function submitCreate() {
+  const name     = document.getElementById('commName').value.trim();
+  const avatar   = document.getElementById('commAvatar').value.trim() || '🌍';
+  const category = document.getElementById('commCategory').value;
+  const desc     = document.getElementById('commDesc').value.trim();
+  const tags     = document.getElementById('commTags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const errEl    = document.getElementById('createCommError');
+
+  if (!name || !category) {
+    errEl.textContent = 'Please fill in the name and category.';
+    errEl.style.display = 'block'; return;
+  }
+  errEl.style.display = 'none';
+
+  const newComm = {
+    _id:         'local_' + Date.now(),
+    name, avatar, category, description: desc, tags,
+    memberCount: 1, featured: false,
+    stats:       { lastActivity: new Date() },
+  };
+
+  /* Try API */
+  if (localStorage.getItem('eylox_token')) {
+    try {
+      const res = await fetch(`${API_BASE}/communities`, {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json', Authorization:`Bearer ${localStorage.getItem('eylox_token')}` },
+        body: JSON.stringify({ name, avatar, category, description: desc, tags }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.community) newComm._id = json.community._id;
+      }
+    } catch {}
+  }
+
+  allCommunities.unshift(newComm);
+  joinedIds.add(newComm._id);
+  saveJoined();
+
+  closeCreateModal();
+  renderMyCommunities();
+  renderGrid();
+  showToast(`"${name}" community created! 🎉`);
+}
+
+/* ── Helpers ── */
+function catIcon(cat) {
+  return { gaming:'🎮', creative:'🎨', competitive:'🏆', roleplay:'🎭', social:'💬' }[cat] || '🌍';
+}
+function fmtNum(n) {
+  if (n >= 1000) return (n/1000).toFixed(n>=10000?0:1).replace(/\.0$/,'') + 'K';
+  return n.toString();
+}
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showToast(msg) {
+  if (typeof window.showNotification === 'function') { window.showNotification(msg); return; }
+  const t = document.createElement('div');
+  t.textContent = msg;
+  Object.assign(t.style, {
+    position:'fixed',bottom:'24px',right:'24px',zIndex:'9999',
+    background:'var(--card)',border:'1px solid rgba(167,139,250,.3)',
+    borderRadius:'12px',padding:'12px 18px',fontWeight:'800',fontSize:'.85rem',
+    color:'var(--text)',boxShadow:'0 8px 32px rgba(0,0,0,.4)',
+    transform:'translateY(20px)',opacity:'0',transition:'all .3s',
+  });
+  document.body.appendChild(t);
+  requestAnimationFrame(() => { t.style.transform='translateY(0)'; t.style.opacity='1'; });
+  setTimeout(() => { t.style.opacity='0'; t.style.transform='translateY(10px)'; setTimeout(()=>t.remove(),300); }, 3000);
+}
+</script>
+<script src="effects.js"></script>
+<script src="sound.js"></script>
+<script src="settings.js"></script>
+</body>
+</html>

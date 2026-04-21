@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>EYLOX Studio — AI Game Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#a78bfa;--green:#4ade80;--pink:#f472b6;--yellow:#fde68a;
+  --blue:#4fc3f7;--teal:#2dd4bf;--red:#f87171;--orange:#fb923c;
+  --bg:#05010f;--card:#0e0626;--card2:#150a35;--border:#2a1560;
+  --text:#f0e8ff;--muted:#9d8ec7;
+  --font-h:'Fredoka One',cursive;--font-b:'Nunito',sans-serif
+}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--font-b);}
+body{display:flex;flex-direction:column;align-items:center;}
+
+/* ── LOGIN GATE ── */
+#loginGate{
+  position:fixed;inset:0;background:var(--bg);z-index:999;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+  padding:24px;
+}
+#loginGate .logo{font-family:var(--font-h);font-size:2.2rem;background:linear-gradient(135deg,var(--purple),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;}
+#loginGate .sub{color:var(--muted);font-size:.9rem;font-weight:700;text-align:center;max-width:320px;}
+#loginGate .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:32px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:14px;}
+#loginGate input{background:rgba(167,139,250,.08);border:1px solid var(--border);color:var(--text);font-family:var(--font-b);font-weight:700;font-size:.95rem;padding:12px 16px;border-radius:12px;outline:none;transition:border-color .2s;}
+#loginGate input:focus{border-color:var(--purple);}
+#loginGate input::placeholder{color:var(--muted);}
+.btn-primary{background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff;font-family:var(--font-b);font-weight:800;font-size:1rem;padding:13px 28px;border-radius:99px;border:none;cursor:pointer;transition:all .22s;box-shadow:0 4px 20px rgba(167,139,250,.4);}
+.btn-primary:hover{transform:scale(1.04) translateY(-2px);box-shadow:0 8px 30px rgba(167,139,250,.55);}
+.btn-primary:active{transform:scale(.97);}
+#loginError{color:var(--red);font-size:.85rem;font-weight:700;text-align:center;display:none;}
+
+/* ── MAIN APP ── */
+#app{display:none;flex-direction:column;width:100%;min-height:100vh;}
+
+/* Top nav */
+.topnav{
+  display:flex;align-items:center;gap:12px;padding:10px 24px;
+  background:rgba(5,1,15,.96);backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 24px rgba(167,139,250,.08);
+}
+.topnav .logo{font-family:var(--font-h);font-size:1.4rem;background:linear-gradient(135deg,var(--purple),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex:1;}
+.owner-badge{background:linear-gradient(135deg,var(--yellow),var(--orange));color:#000;font-family:var(--font-h);font-size:.72rem;padding:4px 12px;border-radius:99px;font-weight:900;white-space:nowrap;}
+.topnav a{color:var(--muted);font-weight:700;font-size:.82rem;text-decoration:none;transition:color .18s;}
+.topnav a:hover{color:var(--purple);}
+
+/* Page layout */
+.page{max-width:1200px;width:100%;margin:0 auto;padding:32px 20px 60px;}
+
+/* Section header */
+.section-head{font-family:var(--font-h);font-size:1.6rem;margin-bottom:6px;}
+.section-sub{color:var(--muted);font-size:.88rem;font-weight:700;margin-bottom:24px;}
+
+/* Prompt area */
+.prompt-box{
+  background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:28px;display:flex;flex-direction:column;gap:16px;
+  box-shadow:0 4px 32px rgba(167,139,250,.08);
+}
+.prompt-label{font-weight:800;font-size:.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+textarea#promptInput{
+  background:rgba(167,139,250,.06);border:1px solid var(--border);color:var(--text);
+  font-family:var(--font-b);font-weight:700;font-size:.95rem;padding:14px 16px;
+  border-radius:14px;resize:vertical;min-height:90px;outline:none;transition:border-color .2s;line-height:1.6;
+}
+textarea#promptInput:focus{border-color:var(--purple);}
+textarea#promptInput::placeholder{color:var(--muted);}
+
+/* Quick prompts */
+.quick-row{display:flex;flex-wrap:wrap;gap:8px;}
+.quick-btn{
+  background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.25);
+  color:var(--purple);font-family:var(--font-b);font-weight:700;font-size:.78rem;
+  padding:6px 14px;border-radius:99px;cursor:pointer;transition:all .18s;white-space:nowrap;
+}
+.quick-btn:hover{background:rgba(167,139,250,.24);border-color:var(--purple);}
+
+/* Game type grid */
+.type-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;}
+.type-card{
+  background:rgba(167,139,250,.07);border:1px solid var(--border);border-radius:14px;
+  padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;
+}
+.type-card:hover,.type-card.sel{background:rgba(167,139,250,.2);border-color:var(--purple);transform:scale(1.03);}
+.type-card .t-icon{font-size:1.8rem;margin-bottom:6px;}
+.type-card .t-label{font-family:var(--font-h);font-size:.85rem;color:var(--text);}
+
+/* Generate button */
+.gen-btn{
+  background:linear-gradient(135deg,var(--green),#22d3ee);color:#fff;
+  font-family:var(--font-b);font-weight:900;font-size:1.05rem;
+  padding:15px 36px;border-radius:99px;border:none;cursor:pointer;
+  box-shadow:0 4px 24px rgba(74,222,128,.4);transition:all .24s;
+  display:flex;align-items:center;gap:10px;
+}
+.gen-btn:hover{transform:scale(1.05) translateY(-3px);box-shadow:0 8px 32px rgba(74,222,128,.55);}
+.gen-btn:active{transform:scale(.97);}
+.gen-btn.loading{opacity:.7;pointer-events:none;}
+.spinner{width:20px;height:20px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Output tabs */
+.tab-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+.tab{
+  background:rgba(167,139,250,.08);border:1px solid var(--border);
+  color:var(--muted);font-family:var(--font-b);font-weight:800;font-size:.8rem;
+  padding:7px 16px;border-radius:99px;cursor:pointer;transition:all .18s;
+}
+.tab.active{background:var(--purple);border-color:var(--purple);color:#fff;}
+
+/* Code blocks */
+.output-panel{display:none;}
+.output-panel.active{display:block;}
+.code-wrap{position:relative;}
+.code-block{
+  background:#080318;border:1px solid var(--border);border-radius:14px;
+  padding:20px;overflow-x:auto;font-family:'Courier New',monospace;font-size:.8rem;
+  line-height:1.7;color:#e0d0ff;white-space:pre;max-height:480px;overflow-y:auto;
+}
+.copy-btn{
+  position:absolute;top:10px;right:10px;
+  background:rgba(167,139,250,.2);border:1px solid rgba(167,139,250,.35);
+  color:var(--purple);font-family:var(--font-b);font-weight:800;font-size:.72rem;
+  padding:5px 12px;border-radius:99px;cursor:pointer;transition:all .18s;
+  backdrop-filter:blur(6px);
+}
+.copy-btn:hover{background:rgba(167,139,250,.38);}
+
+/* JSON output */
+.json-block{background:#080318;border:1px solid var(--border);border-radius:14px;padding:20px;overflow:auto;max-height:380px;}
+.j-key{color:#a78bfa;} .j-str{color:#4ade80;} .j-num{color:#fde68a;} .j-bool{color:#f472b6;}
+
+/* Cards row */
+.cards-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-bottom:24px;}
+.info-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;}
+.info-card h4{font-family:var(--font-h);font-size:1rem;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.info-card ul{list-style:none;display:flex;flex-direction:column;gap:6px;}
+.info-card li{font-size:.82rem;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:6px;}
+.info-card li::before{content:'▸';color:var(--purple);}
+
+/* Eylux badge */
+.eylux-chip{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#fde68a22,#fb923c22);border:1px solid #fde68a44;padding:4px 12px;border-radius:99px;font-size:.78rem;font-weight:800;color:var(--yellow);}
+
+/* Divider */
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:28px 0;}
+
+/* Toast */
+#toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--card2);border:1px solid var(--border);color:var(--text);
+  font-family:var(--font-b);font-weight:800;font-size:.88rem;padding:12px 24px;
+  border-radius:99px;z-index:999;transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+  white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.4);
+}
+#toast.show{transform:translateX(-50%) translateY(0);}
+
+/* Reward type buttons */
+.reward-btn{
+  background:rgba(167,139,250,.08);border:1px solid var(--border);
+  color:var(--muted);font-family:var(--font-b);font-weight:700;font-size:.82rem;
+  padding:8px 18px;border-radius:99px;cursor:pointer;transition:all .18s;white-space:nowrap;
+}
+.reward-btn:hover{background:rgba(167,139,250,.18);}
+.reward-btn.sel{background:linear-gradient(135deg,rgba(124,58,237,.4),rgba(236,72,153,.3));border-color:var(--purple);color:var(--text);box-shadow:0 0 12px rgba(167,139,250,.3);}
+
+/* Publish success banner */
+.publish-banner{
+  background:linear-gradient(135deg,rgba(74,222,128,.15),rgba(34,211,238,.1));
+  border:1px solid rgba(74,222,128,.35);border-radius:14px;
+  padding:14px 20px;margin-top:16px;display:flex;align-items:center;gap:12px;
+  font-weight:700;font-size:.88rem;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+
+/* Responsive */
+@media(max-width:600px){.page{padding:20px 14px 50px;}.topnav{padding:8px 14px;}.prompt-box{padding:18px;}}
+</style>
+</head>
+<body>
+
+<!-- ═══════ LOGIN GATE ═══════ -->
+<div id="loginGate">
+  <div class="logo">⚙️ EYLOX Studio</div>
+  <div class="sub">Owner access only. Enter your credentials to continue.</div>
+  <div class="card">
+    <div style="font-weight:800;font-size:.82rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Username</div>
+    <input type="text" id="lgUser" placeholder="Username" autocomplete="off"/>
+    <div style="font-weight:800;font-size:.82rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Password</div>
+    <input type="password" id="lgPass" placeholder="Password" autocomplete="off"/>
+    <div id="loginError">❌ Invalid credentials. Access denied.</div>
+    <button class="btn-primary" id="lgBtn" style="margin-top:4px;">🔑 Enter Studio</button>
+  </div>
+  <a href="index.html" style="color:var(--muted);font-size:.82rem;font-weight:700;text-decoration:none;margin-top:8px;">← Back to Eylox</a>
+</div>
+
+<!-- ═══════ MAIN APP ═══════ -->
+<div id="app">
+  <nav class="topnav">
+    <div class="logo">⚙️ EYLOX Studio</div>
+    <span class="owner-badge">👑 OWNER</span>
+    <a href="index.html">← Home</a>
+  </nav>
+
+  <div class="page">
+    <!-- HEADER -->
+    <div style="margin-bottom:32px;">
+      <div class="section-head">🎮 AI Roblox Game Generator</div>
+      <div class="section-sub">Describe your game and instantly get Lua scripts, JSON plans, UI code, and Eylux currency integration — ready for Roblox Studio.</div>
+    </div>
+
+    <!-- PROMPT BOX -->
+    <div class="prompt-box" style="margin-bottom:24px;">
+      <div class="prompt-label">Describe Your Game</div>
+      <textarea id="promptInput" placeholder="e.g. Build a horror escape game with monsters and puzzles, neon lights, Eylux rewards…"></textarea>
+
+      <div>
+        <div class="prompt-label" style="margin-bottom:8px;">Quick Prompts</div>
+        <div class="quick-row">
+          <button class="quick-btn" onclick="setPrompt('Build a horror escape game with monsters and hidden keys')">👻 Horror Escape</button>
+          <button class="quick-btn" onclick="setPrompt('Create a colorful Obby with floating platforms and coin collection')">🟦 Obby</button>
+          <button class="quick-btn" onclick="setPrompt('Make a racing simulator with neon city tracks and leaderboards')">🏎️ Racing</button>
+          <button class="quick-btn" onclick="setPrompt('Build a Tycoon game with upgradeable buildings and Eylux rewards')">🏗️ Tycoon</button>
+          <button class="quick-btn" onclick="setPrompt('Create a zombie survival simulator with waves and weapon upgrades')">🧟 Zombie Survival</button>
+          <button class="quick-btn" onclick="setPrompt('Make a parkour game with speed boosts and time trials')">🏃 Parkour</button>
+          <button class="quick-btn" onclick="setPrompt('Build a treasure hunt adventure with maze maps and puzzles')">🗺️ Treasure Hunt</button>
+          <button class="quick-btn" onclick="setPrompt('Create a mini-game hub with 5 different games and Eylux prizes')">🎪 Mini-Game Hub</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="prompt-label" style="margin-bottom:10px;">Game Type</div>
+        <div class="type-grid" id="typeGrid">
+          <div class="type-card sel" data-type="Obby" onclick="selType(this)"><div class="t-icon">🟦</div><div class="t-label">Obby</div></div>
+          <div class="type-card" data-type="Racing" onclick="selType(this)"><div class="t-icon">🏎️</div><div class="t-label">Racing</div></div>
+          <div class="type-card" data-type="Tycoon" onclick="selType(this)"><div class="t-icon">🏗️</div><div class="t-label">Tycoon</div></div>
+          <div class="type-card" data-type="Simulator" onclick="selType(this)"><div class="t-icon">⚙️</div><div class="t-label">Simulator</div></div>
+          <div class="type-card" data-type="Horror" onclick="selType(this)"><div class="t-icon">👻</div><div class="t-label">Horror</div></div>
+          <div class="type-card" data-type="Mini-Game" onclick="selType(this)"><div class="t-icon">🎪</div><div class="t-label">Mini-Games</div></div>
+          <div class="type-card" data-type="Survival" onclick="selType(this)"><div class="t-icon">🧟</div><div class="t-label">Survival</div></div>
+          <div class="type-card" data-type="Parkour" onclick="selType(this)"><div class="t-icon">🏃</div><div class="t-label">Parkour</div></div>
+        </div>
+      </div>
+
+      <!-- Reward Type -->
+      <div>
+        <div class="prompt-label" style="margin-bottom:10px;">Game Reward Type</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;" id="rewardRow">
+          <button class="reward-btn sel" data-reward="coins"   onclick="selReward(this)">💰 Gives Coins</button>
+          <button class="reward-btn"     data-reward="trophies" onclick="selReward(this)">🏆 Gives Trophies</button>
+          <button class="reward-btn"     data-reward="both"    onclick="selReward(this)">💰+🏆 Both</button>
+        </div>
+        <div style="margin-top:8px;font-size:.76rem;font-weight:700;color:var(--muted)" id="rewardDesc">Players earn Eylux coins when they play or score well.</div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+        <button class="gen-btn" id="genBtn" onclick="generateGame()">
+          <span id="genIcon">✨</span>
+          <span id="genLabel">Generate Game</span>
+        </button>
+        <button onclick="clearAll()" style="background:transparent;border:1px solid var(--border);color:var(--muted);font-family:var(--font-b);font-weight:700;font-size:.82rem;padding:10px 20px;border-radius:99px;cursor:pointer;">🗑️ Clear</button>
+      </div>
+    </div>
+
+    <!-- OUTPUT -->
+    <div id="outputSection" style="display:none;">
+      <div class="divider"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+        <div>
+          <div class="section-head" id="outTitle">🎮 Generated Game</div>
+          <div class="section-sub" id="outSub"></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <button id="publishBtn" onclick="publishGame()" style="background:linear-gradient(135deg,#7c3aed,#a855f7,#ec4899);color:#fff;font-family:var(--font-b);font-weight:800;font-size:.82rem;padding:10px 20px;border-radius:99px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(168,85,247,.5);transition:all .2s;">🚀 Publish to Eylox</button>
+          <button onclick="downloadAll()" style="background:linear-gradient(135deg,var(--yellow),var(--orange));color:#000;font-family:var(--font-b);font-weight:800;font-size:.82rem;padding:10px 20px;border-radius:99px;border:none;cursor:pointer;">📦 Download All</button>
+        </div>
+      </div>
+
+      <!-- Summary cards -->
+      <div class="cards-row" id="summaryCards"></div>
+
+      <!-- Tabs -->
+      <div class="tab-row">
+        <div class="tab active" onclick="switchTab('json',this)">📋 Game Plan</div>
+        <div class="tab" onclick="switchTab('map',this)">🗺️ Map Script</div>
+        <div class="tab" onclick="switchTab('gameplay',this)">⚙️ Gameplay</div>
+        <div class="tab" onclick="switchTab('ui',this)">🖥️ UI Script</div>
+        <div class="tab" onclick="switchTab('minigame',this)">🎪 Mini-Games</div>
+        <div class="tab" onclick="switchTab('eylux',this)">🪙 Eylux System</div>
+        <div class="tab" onclick="switchTab('guide',this)">📖 Setup Guide</div>
+      </div>
+
+      <!-- JSON Plan -->
+      <div class="output-panel active" id="panel-json">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+          <div style="font-weight:800;font-size:.9rem;">📋 JSON Game Plan</div>
+          <span class="eylux-chip">🪙 Eylux Integrated</span>
+        </div>
+        <div class="code-wrap">
+          <button class="copy-btn" onclick="copyCode('jsonOut')">📋 Copy</button>
+          <pre class="code-block" id="jsonOut"></pre>
+        </div>
+      </div>
+
+      <!-- Map Script -->
+      <div class="output-panel" id="panel-map">
+        <div style="font-weight:800;font-size:.9rem;margin-bottom:12px;">🗺️ Map Generation Script (Lua)</div>
+        <div class="code-wrap">
+          <button class="copy-btn" onclick="copyCode('mapOut')">📋 Copy</button>
+          <pre class="code-block" id="mapOut"></pre>
+        </div>
+      </div>
+
+      <!-- Gameplay Script -->
+      <div class="output-panel" id="panel-gameplay">
+        <div style="font-weight:800;font-size:.9rem;margin-bottom:12px;">⚙️ Gameplay Script (Lua)</div>
+        <div class="code-wrap">
+          <button class="copy-btn" onclick="copyCode('gameplayOut')">📋 Copy</button>
+          <pre class="code-block" id="gameplayOut"></pre>
+        </div>
+      </div>
+
+      <!-- UI Script -->
+      <div class="output-panel" id="panel-ui">
+        <div style="font-weight:800;font-size:.9rem;margin-bottom:12px;">🖥️ UI Script (Lua)</div>
+        <div class="code-wrap">
+          <button class="copy-btn" onclick="copyCode('uiOut')">📋 Copy</button>
+          <pre class="code-block" id="uiOut"></pre>
+        </div>
+      </div>
+
+      <!-- Mini-game Script -->
+      <div class="output-panel" id="panel-minigame">
+        <div style="font-weight:800;font-size:.9rem;margin-bottom:12px;">🎪 Mini-Game Script (Lua)</div>
+        <div class="code-wrap">
+          <button class="copy-btn" onclick="copyCode('minigameOut')">📋 Copy</button>
+          <pre class="code-block" id="minigameOut"></pre>
+        </div>
+      </div>
+
+      <!-- Eylux Script -->
+      <div class="output-panel" id="panel-eylux">
+        <div style="font-weight:800;font-size:.9rem;margin-bottom:12px;">🪙 Eylux Currency System (Lua)</div>
+        <div class="code-wrap">
+          <button class="copy-btn" onclick="copyCode('eyluxOut')">📋 Copy</button>
+          <pre class="code-block" id="eyluxOut"></pre>
+        </div>
+      </div>
+
+      <!-- Setup Guide -->
+      <div class="output-panel" id="panel-guide">
+        <div style="font-weight:800;font-size:.9rem;margin-bottom:12px;">📖 Step-by-Step Setup Guide</div>
+        <div id="guideOut" style="display:flex;flex-direction:column;gap:14px;"></div>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div id="historySection" style="margin-top:40px;display:none;">
+      <div class="divider"></div>
+      <div style="font-family:var(--font-h);font-size:1.2rem;margin-bottom:16px;">🕓 Generation History</div>
+      <div id="historyList" style="display:flex;flex-direction:column;gap:10px;"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast">✅ Copied!</div>
+
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════
+   AUTH
+══════════════════════════════════════════ */
+const OWNER_USER = 'Eylox';
+const OWNER_PASS = 'EyadYasser';
+
+function checkAuth(){
+  if(localStorage.getItem('eylox_studio_auth')==='1'){unlock();}
+}
+document.getElementById('lgBtn').addEventListener('click',tryLogin);
+document.getElementById('lgPass').addEventListener('keydown',e=>{if(e.key==='Enter')tryLogin();});
+
+function tryLogin(){
+  const u=document.getElementById('lgUser').value.trim();
+  const p=document.getElementById('lgPass').value;
+  if(u===OWNER_USER&&p===OWNER_PASS){
+    localStorage.setItem('eylox_studio_auth','1');
+    document.getElementById('loginGate').style.display='none';
+    unlock();
+  }else{
+    document.getElementById('loginError').style.display='block';
+    document.getElementById('lgPass').value='';
+    document.getElementById('lgPass').focus();
+  }
+}
+function unlock(){
+  document.getElementById('loginGate').style.display='none';
+  document.getElementById('app').style.display='flex';
+  loadHistory();
+}
+checkAuth();
+
+/* ══════════════════════════════════════════
+   GAME TYPE SELECTOR
+══════════════════════════════════════════ */
+let selectedType='Obby';
+function selType(el){
+  document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  selectedType=el.dataset.type;
+}
+function setPrompt(txt){ document.getElementById('promptInput').value=txt; }
+
+/* ── Reward type selector ── */
+let selectedReward='coins';
+const REWARD_DESC={
+  coins:'Players earn Eylux coins when they play or score well.',
+  trophies:'Players earn a Trophy 🏆 when they win or set a high score.',
+  both:'Players earn both Eylux coins AND a Trophy for wins and milestones.',
+};
+function selReward(el){
+  document.querySelectorAll('.reward-btn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+  selectedReward=el.dataset.reward;
+  document.getElementById('rewardDesc').textContent=REWARD_DESC[selectedReward];
+}
+
+/* ── Publish to Eylox ── */
+let _lastPlan=null;
+function publishGame(){
+  if(!_lastPlan){toast('⚠️ Generate a game first!');return;}
+  const id='custom_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+  const tmpl=TEMPLATES[selectedType]||TEMPLATES.Obby;
+  const genreMap={Obby:'adventure',Racing:'racing',Tycoon:'building',Simulator:'roleplay',Horror:'survival','Mini-Game':'action',Survival:'survival',Parkour:'action'};
+  const entry={
+    id,
+    title:_lastPlan.gameTitle,
+    type:selectedType,
+    emoji:tmpl.icon,
+    genre:genreMap[selectedType]||'action',
+    reward:selectedReward,
+    rewardCoins:selectedReward==='trophies'?0:50,
+    rewardTrophies:selectedReward==='coins'?0:1,
+    players:Math.floor(Math.random()*1000)+100,
+    stars:(4+Math.random()).toFixed(1),
+    publishedAt:Date.now(),
+    badge:'NEW',
+  };
+  const games=JSON.parse(localStorage.getItem('eylox_custom_games')||'[]');
+  /* Replace if same title already published */
+  const idx=games.findIndex(g=>g.title===entry.title);
+  if(idx>=0)games.splice(idx,1);
+  games.unshift(entry);
+  localStorage.setItem('eylox_custom_games',JSON.stringify(games));
+  /* Show success banner */
+  const existing=document.getElementById('publishBanner');
+  if(existing)existing.remove();
+  const banner=document.createElement('div');
+  banner.id='publishBanner';
+  banner.className='publish-banner';
+  banner.innerHTML=`<span style="font-size:1.5rem">🚀</span><div><div style="color:var(--green);font-family:'Fredoka One',cursive;font-size:1rem;margin-bottom:2px">"${entry.title}" published!</div><div style="color:var(--muted);font-size:.78rem">Visible in the Discover page for all players. Reward: <strong style="color:var(--text)">${selectedReward==='both'?'💰 Coins + 🏆 Trophies':selectedReward==='trophies'?'🏆 Trophies':'💰 Coins'}</strong></div></div><button onclick="this.closest('.publish-banner').remove()" style="margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem">✕</button>`;
+  document.getElementById('outputSection').insertBefore(banner,document.getElementById('outputSection').firstChild.nextSibling);
+  document.getElementById('publishBtn').textContent='✅ Published!';
+  setTimeout(()=>{document.getElementById('publishBtn').textContent='🚀 Publish to Eylox';},3000);
+  toast('🚀 Game published to Eylox!');
+}
+
+/* ══════════════════════════════════════════
+   TAB SWITCHER
+══════════════════════════════════════════ */
+function switchTab(id,el){
+  document.querySelectorAll('.output-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  el.classList.add('active');
+}
+
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
+let toastT=null;
+function toast(msg='✅ Done!'){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2000);
+}
+function copyCode(id){
+  const el=document.getElementById(id); if(!el)return;
+  navigator.clipboard.writeText(el.textContent).then(()=>toast('📋 Copied to clipboard!')).catch(()=>{
+    const sel=window.getSelection(),r=document.createRange(); r.selectNodeContents(el); sel.removeAllRanges(); sel.addRange(r);
+    document.execCommand('copy'); sel.removeAllRanges(); toast('📋 Copied!');
+  });
+}
+
+/* ══════════════════════════════════════════
+   GENERATOR ENGINE
+══════════════════════════════════════════ */
+const TEMPLATES = {
+  Obby:     {icon:'🟦',mapType:'floating platforms',mechanics:['jumping','fall detection','checkpoints','speed pads','coin collection'],style:'bright colorful',enemies:false,vehicles:false},
+  Racing:   {icon:'🏎️',mapType:'neon city track',mechanics:['vehicle control','lap counter','speed boosts','collisions','leaderboard'],style:'neon futuristic',enemies:false,vehicles:true},
+  Tycoon:   {icon:'🏗️',mapType:'open plot island',mechanics:['resource collection','building upgrades','passive income','worker NPCs','expansion'],style:'cartoon colorful',enemies:false,vehicles:false},
+  Simulator:{icon:'⚙️',mapType:'open world arena',mechanics:['interaction','stat growth','leveling','inventory','quests'],style:'realistic cartoon',enemies:false,vehicles:false},
+  Horror:   {icon:'👻',mapType:'dark mansion',mechanics:['flashlight','monster AI','key hunting','jump scares','hiding spots'],style:'dark atmospheric',enemies:true,vehicles:false},
+  'Mini-Game':{icon:'🎪',mapType:'lobby hub',mechanics:['game voting','mini-game teleport','timer','score tracking','podium'],style:'bright fun',enemies:false,vehicles:false},
+  Survival: {icon:'🧟',mapType:'open city ruins',mechanics:['wave spawning','weapon system','health','crafting','safe zones'],style:'gritty post-apoc',enemies:true,vehicles:false},
+  Parkour:  {icon:'🏃',mapType:'sky platforms',mechanics:['wall running','speed boots','checkpoint rings','time trial','ghost replay'],style:'neon minimal',enemies:false,vehicles:false},
+};
+
+const EYLUX_EARN = {
+  Obby:     ['Complete level (+50)','Collect coins (+5 each)','No-death run (+200)','Daily first play (+100)'],
+  Racing:   ['Win race (+150)','Lap record (+80)','Collect tokens (+10)','Daily login (+50)'],
+  Tycoon:   ['Milestone upgrade (+100)','Hourly passive (+20)','Complete quest (+200)','Invite friend (+500)'],
+  Simulator:['Level up (+75)','Complete task (+40)','Achievement unlock (+150)','Daily login (+50)'],
+  Horror:   ['Find key (+60)','Clear floor (+200)','Survive 5 min (+100)','No-hit room (+300)'],
+  'Mini-Game':['Win game (+80)','Participate (+20)','Tournament win (+500)','Daily streak (+50)'],
+  Survival: ['Survive wave (+40)','Boss kill (+200)','Headshot streak (+100)','Daily login (+50)'],
+  Parkour:  ['Beat record (+100)','Complete course (+60)','Ghost beat (+200)','Daily first (+80)'],
+};
+
+function generateGame(){
+  const prompt=document.getElementById('promptInput').value.trim();
+  if(!prompt){toast('⚠️ Please enter a game description!');return;}
+  const btn=document.getElementById('genBtn');
+  const icon=document.getElementById('genIcon');
+  const label=document.getElementById('genLabel');
+  btn.classList.add('loading');
+  icon.innerHTML='<div class="spinner"></div>';
+  label.textContent='Generating…';
+  setTimeout(()=>_doGenerate(prompt),900+Math.random()*600);
+}
+
+function _doGenerate(prompt){
+  const tmpl=TEMPLATES[selectedType]||TEMPLATES.Obby;
+  const earn=EYLUX_EARN[selectedType]||EYLUX_EARN.Obby;
+  const gameName=_inferName(prompt,selectedType);
+  const hasMiniGames=prompt.toLowerCase().includes('mini')||selectedType==='Mini-Game';
+
+  // Build JSON plan
+  const plan={
+    gameTitle:gameName,gameType:selectedType,
+    map:{type:tmpl.mapType,size:'medium',theme:_inferTheme(prompt),procedural:selectedType==='Horror'||selectedType==='Survival'},
+    mechanics:tmpl.mechanics,
+    enemies:{enabled:tmpl.enemies,types:tmpl.enemies?_inferEnemies(prompt):[]},
+    vehicles:{enabled:tmpl.vehicles,types:tmpl.vehicles?['Sports Car','Truck','Motorbike']:[]},
+    UIElements:['Health Bar','Eylux Counter','Coin Counter','Level/Score Display','Settings Menu','Leaderboard','Notification Popup'],
+    style:{theme:tmpl.style,colorPalette:_inferColors(prompt),lighting:prompt.toLowerCase().includes('neon')?'neon bloom':'standard'},
+    objectives:_inferObjectives(prompt,selectedType),
+    currencySystem:{name:'Eylux',symbol:'💎',earnMethods:earn,spendMethods:['Buy cosmetics','Unlock maps','Buy power-ups','VIP pass'],dailyReward:{day1:50,day2:75,day3:100,day4:150,day5:200,day6:300,day7:500},autoSave:true},
+    miniGames:hasMiniGames?['Coin Rush (30s)','Obstacle Race','Last Man Standing','Bomb Dodge','Speed Quiz']:['Optional: add mini-games'],
+    leaderboard:{global:true,friends:true,weekly:true},
+    folderStructure:{ServerScriptService:['GameManager.lua','EyluxSystem.lua','EnemyAI.lua'],StarterPlayerScripts:['PlayerController.lua','UIManager.lua'],StarterGui:['MainMenu.rbxmx','HUD.rbxmx','ShopGui.rbxmx'],ReplicatedStorage:['GameConfig.lua','Remotes folder'],Workspace:['Map folder','Checkpoints folder','SpawnPoints']},
+  };
+
+  _lastPlan=plan;
+  const planStr=JSON.stringify(plan,null,2);
+
+  // Generate all scripts
+  const mapScript=_genMapScript(gameName,selectedType,tmpl,prompt);
+  const gameplayScript=_genGameplayScript(gameName,selectedType,tmpl,prompt);
+  const uiScript=_genUIScript(gameName,selectedType);
+  const miniGameScript=_genMiniGameScript(gameName,hasMiniGames);
+  const eyluxScript=_genEyluxScript(gameName,earn);
+  const guide=_genGuide(gameName,selectedType);
+
+  // Display
+  document.getElementById('jsonOut').textContent=planStr;
+  document.getElementById('mapOut').textContent=mapScript;
+  document.getElementById('gameplayOut').textContent=gameplayScript;
+  document.getElementById('uiOut').textContent=uiScript;
+  document.getElementById('minigameOut').textContent=miniGameScript;
+  document.getElementById('eyluxOut').textContent=eyluxScript;
+  _renderGuide(guide);
+  _renderSummaryCards(plan);
+  document.getElementById('outTitle').textContent=`🎮 ${gameName}`;
+  document.getElementById('outSub').textContent=`${selectedType} · ${tmpl.mapType} · ${plan.mechanics.length} mechanics · Eylux integrated`;
+  document.getElementById('outputSection').style.display='block';
+  document.getElementById('outputSection').scrollIntoView({behavior:'smooth',block:'start'});
+
+  // Reset button
+  const btn=document.getElementById('genBtn');
+  btn.classList.remove('loading');
+  document.getElementById('genIcon').textContent='✨';
+  document.getElementById('genLabel').textContent='Generate Game';
+
+  // Save history
+  _saveHistory({name:gameName,type:selectedType,prompt,time:Date.now()});
+  toast('✅ Game generated!');
+}
+
+/* ── Inference helpers ── */
+function _inferName(prompt,type){
+  const words=prompt.replace(/[^a-zA-Z0-9 ]/g,'').split(' ').filter(w=>w.length>3);
+  const caps=words.filter(w=>w[0]===w[0].toUpperCase()&&w.length>4);
+  if(caps.length>0)return caps.slice(0,2).join(' ')+(type==='Tycoon'?' Tycoon':'');
+  const themes={Horror:'Haunted Escape',Racing:'Turbo City Racing',Tycoon:'Build Empire Tycoon',Simulator:'Pro Simulator',Obby:'Sky Obby Challenge',Survival:'Last Survivor','Mini-Game':'Party Games Hub',Parkour:'Ultra Parkour'};
+  return themes[type]||'Eylox Game';
+}
+function _inferTheme(prompt){
+  const p=prompt.toLowerCase();
+  if(p.includes('neon'))return 'neon futuristic';
+  if(p.includes('horror')||p.includes('scary'))return 'dark gothic';
+  if(p.includes('jungle')||p.includes('forest'))return 'tropical nature';
+  if(p.includes('space'))return 'sci-fi cosmic';
+  if(p.includes('candy')||p.includes('sweet'))return 'candy land';
+  if(p.includes('ice')||p.includes('snow'))return 'winter arctic';
+  return 'colorful cartoon';
+}
+function _inferColors(prompt){
+  const p=prompt.toLowerCase();
+  if(p.includes('neon'))return ['#00ffff','#ff00ff','#ffff00','#00ff88'];
+  if(p.includes('horror'))return ['#1a0030','#400000','#800000','#ffffff'];
+  if(p.includes('jungle'))return ['#16a34a','#854d0e','#65a30d','#fde68a'];
+  return ['#a78bfa','#4ade80','#f472b6','#fde68a','#4fc3f7'];
+}
+function _inferEnemies(prompt){
+  const p=prompt.toLowerCase();
+  if(p.includes('zombie'))return ['Zombie Walker','Crawler','Spitter','Boss Zombie'];
+  if(p.includes('monster'))return ['Shadow Monster','Crawler','Giant Beast'];
+  if(p.includes('ghost'))return ['Ghost','Phantom','Shadow'];
+  return ['Enemy NPC','Patrol Guard','Boss Enemy'];
+}
+function _inferObjectives(prompt,type){
+  const base={
+    Obby:['Reach the end without falling','Collect all coins','Beat the timer'],
+    Racing:['Win 1st place','Complete all laps','Beat your best time'],
+    Tycoon:['Reach max upgrade level','Earn 1,000,000 Eylux','Unlock all buildings'],
+    Simulator:['Reach max level','Complete all quests','Fill inventory'],
+    Horror:['Find all keys','Escape the mansion','Survive 10 minutes'],
+    'Mini-Game':['Win 3 mini-games','Top the leaderboard','Collect 500 Eylux'],
+    Survival:['Survive 30 waves','Kill 500 enemies','Unlock all weapons'],
+    Parkour:['Complete the course','Beat world record','Collect all gems'],
+  };
+  return base[type]||['Complete the game','Earn Eylux','Beat your high score'];
+}
+
+/* ══════════════════════════════════════════
+   SCRIPT GENERATORS
+══════════════════════════════════════════ */
+function _genMapScript(name,type,tmpl,prompt){
+  const theme=_inferTheme(prompt);
+  const isNeon=prompt.toLowerCase().includes('neon');
+
+return `-- ============================================
+-- ${name} | MAP GENERATOR
+-- Generated by EYLOX Studio
+-- Place in: ServerScriptService/MapGenerator.lua
+-- ============================================
+
+local Workspace   = game:GetService("Workspace")
+local RunService  = game:GetService("RunService")
+local TweenService= game:GetService("TweenService")
+
+-- CONFIG
+local MAP_CONFIG = {
+	gameType   = "${type}",
+	theme      = "${theme}",
+	mapName    = "${name}",
+	seed       = math.random(1000, 9999),
+}
+
+-- ── Helper: Create a Part ──────────────────
+local function makePart(parent, size, pos, color, material, anchored)
+	local p     = Instance.new("Part")
+	p.Size      = size
+	p.Position  = pos
+	p.BrickColor= BrickColor.new(color or "Medium stone grey")
+	p.Material  = material or Enum.Material.SmoothPlastic
+	p.Anchored  = anchored ~= false
+	p.Parent    = parent
+	return p
+end
+
+-- ── Helper: Add Glow ──────────────────────
+local function addGlow(part, color, brightness)
+	local light = Instance.new("PointLight")
+	light.Color      = color or Color3.fromRGB(167, 139, 250)
+	light.Brightness = brightness or 2
+	light.Range      = 20
+	light.Parent     = part
+end
+
+-- ── Helper: Add Billboard Label ───────────
+local function addLabel(part, text, color)
+	local bg = Instance.new("BillboardGui")
+	bg.Size  = UDim2.new(0, 200, 0, 50)
+	bg.AlwaysOnTop = true
+	bg.Parent = part
+	local lbl = Instance.new("TextLabel")
+	lbl.Size = UDim2.new(1,0,1,0)
+	lbl.BackgroundTransparency = 1
+	lbl.TextColor3 = color or Color3.fromRGB(255,255,255)
+	lbl.Text = text
+	lbl.Font = Enum.Font.GothamBold
+	lbl.TextScaled = true
+	lbl.Parent = bg
+end
+
+-- ══════════════════════════════════════════
+-- MAP FOLDER SETUP
+-- ══════════════════════════════════════════
+local mapFolder = Instance.new("Folder")
+mapFolder.Name  = "Map_" .. MAP_CONFIG.mapName
+mapFolder.Parent = Workspace
+
+-- ── Baseplate ─────────────────────────────
+local base = makePart(mapFolder, Vector3.new(512, 4, 512), Vector3.new(0, -2, 0), "${type==='Horror'?'Black':'Bright green'}")
+base.Name = "Baseplate"
+${isNeon?`addGlow(base, Color3.fromRGB(0, 255, 200), 0.5)`:'-- No glow on base for this theme'}
+
+-- ── Ambient Lighting ──────────────────────
+local lighting = game:GetService("Lighting")
+${type==='Horror'?`lighting.Brightness     = 0.5
+lighting.Ambient        = Color3.fromRGB(30, 0, 50)
+lighting.OutdoorAmbient = Color3.fromRGB(10, 0, 20)
+lighting.ClockTime      = 0  -- Midnight
+local fog = Instance.new("Atmosphere")
+fog.Density   = 0.4
+fog.Color     = Color3.fromRGB(30, 0, 50)
+fog.Parent    = lighting`:
+type==='Racing'?`lighting.Brightness     = 2
+lighting.ClockTime      = 0
+lighting.Ambient        = Color3.fromRGB(20, 20, 60)
+local bloom = Instance.new("BloomEffect")
+bloom.Intensity = 1.5
+bloom.Threshold = 0.8
+bloom.Parent    = lighting`:
+`lighting.Brightness     = 3
+lighting.ClockTime      = 14
+lighting.Ambient        = Color3.fromRGB(100, 100, 140)`}
+
+${_mapBody(name,type,tmpl,isNeon)}
+
+-- ── Spawn Locations ───────────────────────
+for i = 1, 8 do
+	local angle = (i - 1) * (math.pi * 2 / 8)
+	local spawnX = math.cos(angle) * 15
+	local spawnZ = math.sin(angle) * 15
+	local spawn  = Instance.new("SpawnLocation")
+	spawn.Position = Vector3.new(spawnX, 5, spawnZ)
+	spawn.Size     = Vector3.new(4, 1, 4)
+	spawn.BrickColor = BrickColor.new("Bright green")
+	spawn.TeamColor  = BrickColor.new("Bright green")
+	spawn.Anchored   = true
+	spawn.Parent     = mapFolder
+end
+
+-- ── Coins / Collectibles ──────────────────
+local function spawnCoin(pos)
+	local coin = makePart(mapFolder, Vector3.new(2, 0.3, 2), pos, "Bright yellow")
+	coin.Name  = "Coin"
+	coin.Shape = Enum.PartType.Cylinder
+	addGlow(coin, Color3.fromRGB(255, 220, 50), 1.5)
+	addLabel(coin, "🪙 +5 Eylux")
+	-- Spin animation
+	local ts   = TweenService
+	local info = TweenInfo.new(1.5, Enum.EasingStyle.Linear, Enum.EasingDirection.In, -1)
+	local goal = { CFrame = coin.CFrame * CFrame.Angles(0, math.pi * 2, 0) }
+	ts:Create(coin, info, goal):Play()
+	return coin
+end
+
+-- Scatter coins across map
+local coinPositions = {}
+for i = 1, 30 do
+	local angle  = (i / 30) * math.pi * 2
+	local radius = math.random(20, 80)
+	table.insert(coinPositions, Vector3.new(
+		math.cos(angle) * radius,
+		math.random(3, 20),
+		math.sin(angle) * radius
+	))
+end
+for _, pos in ipairs(coinPositions) do
+	spawnCoin(pos)
+end
+
+print("[EYLOX Studio] Map loaded: " .. MAP_CONFIG.mapName)
+`;
+}
+
+function _mapBody(name,type,tmpl,isNeon){
+  if(type==='Obby')return `
+-- ── OBBY PLATFORMS ────────────────────────
+local platformColors = {"Bright red","Bright blue","Bright green","Bright yellow","Bright orange","Bright violet"}
+local platformCount  = 40
+local prevX, prevY, prevZ = 0, 5, 0
+
+for i = 1, platformCount do
+	local color = platformColors[(i % #platformColors) + 1]
+	local width = math.random(6, 14)
+	local depth = math.random(6, 14)
+	local nextX = prevX + math.random(8, 16) * (math.random() > 0.5 and 1 or -0.5)
+	local nextY = prevY + math.random(-2, 8)
+	local nextZ = prevZ + math.random(8, 18)
+
+	local plat = makePart(mapFolder, Vector3.new(width, 1.5, depth),
+		Vector3.new(nextX, nextY, nextZ), color)
+	plat.Name = "Platform_" .. i
+
+	-- Checkpoint every 10 platforms
+	if i % 10 == 0 then
+		local cp = Instance.new("Part")
+		cp.Name     = "Checkpoint_" .. math.floor(i/10)
+		cp.Size     = Vector3.new(4, 6, 1)
+		cp.Position = Vector3.new(nextX, nextY + 3, nextZ)
+		cp.BrickColor = BrickColor.new("Bright green")
+		cp.Transparency = 0.5
+		cp.Anchored  = true
+		cp.CanCollide = false
+		cp.Parent    = mapFolder
+		addGlow(cp, Color3.fromRGB(74, 222, 128), 2)
+		addLabel(cp, "✅ Checkpoint " .. math.floor(i/10))
+	end
+
+	-- Moving platforms (every 5th)
+	if i % 5 == 0 then
+		local info = TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true)
+		local goal = { Position = plat.Position + Vector3.new(0, 6, 0) }
+		TweenService:Create(plat, info, goal):Play()
+	end
+
+	prevX, prevY, prevZ = nextX, nextY, nextZ
+end
+
+-- Final endpoint
+local finish = makePart(mapFolder, Vector3.new(14, 2, 14), Vector3.new(prevX, prevY+1, prevZ+10), "Bright green")
+finish.Name = "Finish"
+addGlow(finish, Color3.fromRGB(74, 222, 128), 3)
+addLabel(finish, "🏁 FINISH! +200 Eylux")
+`;
+  if(type==='Racing')return `
+-- ── RACING TRACK ──────────────────────────
+local trackWidth = 24
+local trackPoints = {
+	Vector3.new(0,0,0), Vector3.new(100,0,0), Vector3.new(150,0,80),
+	Vector3.new(100,0,160), Vector3.new(0,0,200), Vector3.new(-100,0,160),
+	Vector3.new(-150,0,80), Vector3.new(-100,0,0), Vector3.new(0,0,0)
+}
+for i = 1, #trackPoints - 1 do
+	local a, b = trackPoints[i], trackPoints[i+1]
+	local mid  = (a + b) / 2
+	local dist = (b - a).Magnitude
+	local seg  = makePart(mapFolder, Vector3.new(trackWidth, 1, dist), mid, "Dark grey")
+	seg.Name   = "TrackSeg_" .. i
+	seg.CFrame = CFrame.lookAt(mid, b) * CFrame.Angles(0, math.pi/2, 0)
+	-- Neon edge lights
+	local leftLight  = makePart(mapFolder, Vector3.new(1, 2, dist), mid + Vector3.new(-trackWidth/2,1,0), "Cyan")
+	local rightLight = makePart(mapFolder, Vector3.new(1, 2, dist), mid + Vector3.new( trackWidth/2,1,0), "Cyan")
+	leftLight.CFrame  = CFrame.lookAt(mid + Vector3.new(-trackWidth/2,1,0), b) * CFrame.Angles(0, math.pi/2, 0)
+	rightLight.CFrame = CFrame.lookAt(mid + Vector3.new( trackWidth/2,1,0), b) * CFrame.Angles(0, math.pi/2, 0)
+	addGlow(leftLight,  Color3.fromRGB(0, 255, 255), 2)
+	addGlow(rightLight, Color3.fromRGB(255, 0, 255), 2)
+	leftLight.Parent  = mapFolder
+	rightLight.Parent = mapFolder
+end
+-- Start/Finish line
+local startLine = makePart(mapFolder, Vector3.new(trackWidth, 0.2, 3), Vector3.new(0, 1, -5), "White")
+startLine.Name  = "StartFinishLine"
+addLabel(startLine, "🏁 START / FINISH")
+`;
+  return `
+-- ── GENERIC MAP ───────────────────────────
+-- Terrain blocks
+for i = 1, 20 do
+	local px = math.random(-80, 80)
+	local pz = math.random(-80, 80)
+	local ph = math.random(2, 12)
+	local block = makePart(mapFolder, Vector3.new(math.random(8,20), ph, math.random(8,20)),
+		Vector3.new(px, ph/2, pz), "Medium stone grey")
+	block.Name = "Block_" .. i
+	${isNeon?`addGlow(block, Color3.fromRGB(167, 139, 250), 0.8)`:''}
+end
+`;
+}
+
+function _genGameplayScript(name,type,tmpl,prompt){
+return `-- ============================================
+-- ${name} | GAMEPLAY MANAGER
+-- Generated by EYLOX Studio
+-- Place in: ServerScriptService/GameManager.lua
+-- ============================================
+
+local Players       = game:GetService("Players")
+local RunService    = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService  = game:GetService("TweenService")
+
+-- ── Remotes Setup ─────────────────────────
+local Remotes = Instance.new("Folder")
+Remotes.Name  = "Remotes"
+Remotes.Parent = ReplicatedStorage
+
+local function makeRemote(name, isFunction)
+	local r = Instance.new(isFunction and "RemoteFunction" or "RemoteEvent")
+	r.Name   = name
+	r.Parent = Remotes
+	return r
+end
+
+local AddEylux      = makeRemote("AddEylux")
+local UpdateHUD     = makeRemote("UpdateHUD")
+local PlayerDied    = makeRemote("PlayerDied")
+local CheckpointHit = makeRemote("CheckpointHit")
+local GameStart     = makeRemote("GameStart")
+local GameEnd       = makeRemote("GameEnd")
+
+-- ── Game Config ───────────────────────────
+local GAME_CONFIG = {
+	gameType        = "${type}",
+	maxPlayers      = 12,
+	startDelay      = 5,     -- seconds before game starts
+	${type==='Racing'?`lapCount = 3,
+	trackLength = 500,`:''}
+	${type==='Horror'?`totalKeys  = 5,
+	ghostSpeed = 14,
+	flashlightRange = 40,`:''}
+	${type==='Obby'?`totalCheckpoints = 4,
+	fallingDeathY   = -50,`:''}
+	respawnTime     = 3,
+	coinValue       = 5,     -- Eylux per coin
+}
+
+-- ── Player Data ───────────────────────────
+local playerData = {}
+
+local function initPlayer(player)
+	playerData[player.UserId] = {
+		eylux       = 0,
+		coins       = 0,
+		score       = 0,
+		checkpoint  = 0,
+		${type==='Racing'?'lap = 0, lapTimes = {},' :''}
+		${type==='Horror'?'keysFound = 0,' :''}
+		alive       = true,
+		joinTime    = os.time(),
+	}
+	print("[GameManager] Player joined: " .. player.Name)
+end
+
+Players.PlayerAdded:Connect(function(player)
+	initPlayer(player)
+	player.CharacterAdded:Connect(function(char)
+		-- Wait for humanoid
+		local hum = char:WaitForChild("Humanoid")
+		hum.Died:Connect(function()
+			if playerData[player.UserId] then
+				playerData[player.UserId].alive = false
+				PlayerDied:FireClient(player)
+			end
+			-- Respawn
+			task.wait(GAME_CONFIG.respawnTime)
+			player:LoadCharacter()
+		end)
+	end)
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+	playerData[player.UserId] = nil
+end)
+
+-- ── Coin Collection ───────────────────────
+local function setupCoinTouch(coin)
+	coin.Touched:Connect(function(hit)
+		local char = hit.Parent
+		local player = Players:GetPlayerFromCharacter(char)
+		if not player then return end
+		local data = playerData[player.UserId]
+		if not data then return end
+
+		data.coins = data.coins + 1
+		data.eylux = data.eylux + GAME_CONFIG.coinValue
+
+		AddEylux:FireClient(player, GAME_CONFIG.coinValue, "Coin collected!")
+		UpdateHUD:FireClient(player, {
+			coins = data.coins,
+			eylux = data.eylux,
+			score = data.score,
+		})
+
+		-- Destroy coin with effect
+		local ts   = TweenService
+		local info = TweenInfo.new(0.3)
+		ts:Create(coin, info, {Size = Vector3.new(0,0,0), Transparency = 1}):Play()
+		task.wait(0.3)
+		coin:Destroy()
+	end)
+end
+
+-- Find and connect all coins in workspace
+for _, obj in pairs(workspace:GetDescendants()) do
+	if obj:IsA("BasePart") and obj.Name == "Coin" then
+		setupCoinTouch(obj)
+	end
+end
+
+${type==='Obby'?`
+-- ── OBBY: Checkpoint System ───────────────
+local checkpoints = {}
+for _, obj in pairs(workspace:GetDescendants()) do
+	if obj:IsA("BasePart") and obj.Name:find("Checkpoint") then
+		local num = tonumber(obj.Name:match("%d+")) or 0
+		checkpoints[num] = obj
+		obj.Touched:Connect(function(hit)
+			local player = Players:GetPlayerFromCharacter(hit.Parent)
+			if not player then return end
+			local data = playerData[player.UserId]
+			if not data or data.checkpoint >= num then return end
+			data.checkpoint = num
+			data.score = data.score + 100
+			data.eylux = data.eylux + 25
+			CheckpointHit:FireClient(player, num, data.eylux)
+			UpdateHUD:FireClient(player, {score = data.score, eylux = data.eylux})
+			print("[Obby] " .. player.Name .. " reached checkpoint " .. num)
+		end)
+	end
+end
+
+-- Finish line
+local finish = workspace:FindFirstChild("Finish", true)
+if finish then
+	finish.Touched:Connect(function(hit)
+		local player = Players:GetPlayerFromCharacter(hit.Parent)
+		if not player then return end
+		local data = playerData[player.UserId]
+		if not data then return end
+		data.eylux = data.eylux + 200
+		data.score = data.score + 500
+		AddEylux:FireClient(player, 200, "🏁 Course Complete! +200 Eylux!")
+		GameEnd:FireClient(player, {score = data.score, eylux = data.eylux, won = true})
+	end)
+end
+
+-- Fall detection
+RunService.Heartbeat:Connect(function()
+	for _, player in pairs(Players:GetPlayers()) do
+		local char = player.Character
+		if char then
+			local hrp = char:FindFirstChild("HumanoidRootPart")
+			if hrp and hrp.Position.Y < GAME_CONFIG.fallingDeathY then
+				local hum = char:FindFirstChild("Humanoid")
+				if hum then hum.Health = 0 end
+			end
+		end
+	end
+end)
+`:''}
+
+${type==='Horror'?`
+-- ── HORROR: Key System ────────────────────
+local function setupKey(keyPart)
+	keyPart.Touched:Connect(function(hit)
+		local player = Players:GetPlayerFromCharacter(hit.Parent)
+		if not player then return end
+		local data = playerData[player.UserId]
+		if not data then return end
+		data.keysFound = data.keysFound + 1
+		data.eylux = data.eylux + 60
+		AddEylux:FireClient(player, 60, "🗝️ Key Found! +60 Eylux")
+		keyPart:Destroy()
+		if data.keysFound >= GAME_CONFIG.totalKeys then
+			data.eylux = data.eylux + 200
+			GameEnd:FireClient(player, {score = data.score, eylux = data.eylux, won = true, message = "You Escaped!"})
+		end
+	end)
+end
+for _, obj in pairs(workspace:GetDescendants()) do
+	if obj:IsA("BasePart") and obj.Name:find("Key") then setupKey(obj) end
+end
+
+-- Ghost AI
+local function spawnGhost(position)
+	local ghost = Instance.new("Part")
+	ghost.Name = "Ghost"
+	ghost.Size = Vector3.new(3, 5, 3)
+	ghost.Position = position
+	ghost.BrickColor = BrickColor.new("Ghost grey")
+	ghost.Transparency = 0.5
+	ghost.Material = Enum.Material.ForceField
+	ghost.Parent = workspace
+	-- Chase nearest player
+	RunService.Heartbeat:Connect(function()
+		local nearest, minDist = nil, math.huge
+		for _, p in pairs(Players:GetPlayers()) do
+			if p.Character then
+				local hrp = p.Character:FindFirstChild("HumanoidRootPart")
+				if hrp then
+					local d = (hrp.Position - ghost.Position).Magnitude
+					if d < minDist then minDist = d; nearest = hrp end
+				end
+			end
+		end
+		if nearest and minDist < 80 then
+			local dir = (nearest.Position - ghost.Position).Unit
+			ghost.CFrame = ghost.CFrame + dir * GAME_CONFIG.ghostSpeed * 0.016
+		end
+	end)
+end
+-- Spawn ghosts
+spawnGhost(Vector3.new(20, 3, 20))
+spawnGhost(Vector3.new(-30, 3, 40))
+spawnGhost(Vector3.new(50, 3, -20))
+`:''}
+
+${type==='Racing'?`
+-- ── RACING: Lap Counter ───────────────────
+local startLine = workspace:FindFirstChild("StartFinishLine", true)
+local playerLapData = {}
+if startLine then
+	startLine.Touched:Connect(function(hit)
+		local player = Players:GetPlayerFromCharacter(hit.Parent)
+		if not player then return end
+		local data = playerData[player.UserId]
+		if not data then return end
+		local now = os.time()
+		if not playerLapData[player.UserId] then playerLapData[player.UserId] = now end
+		if (now - (playerLapData[player.UserId] or now)) < 5 then return end -- debounce
+		playerLapData[player.UserId] = now
+		data.score = data.score + 1
+		local lapEylux = 150 - (data.score * 10)
+		if lapEylux > 0 then
+			data.eylux = data.eylux + lapEylux
+			AddEylux:FireClient(player, lapEylux, "🏎️ Lap " .. data.score .. " Complete!")
+		end
+		UpdateHUD:FireClient(player, {score = data.score, eylux = data.eylux})
+		if data.score >= GAME_CONFIG.lapCount then
+			data.eylux = data.eylux + 300
+			GameEnd:FireClient(player, {score = data.score, eylux = data.eylux, won = true, message = "Race Complete!"})
+		end
+	end)
+end
+`:''}
+
+-- ── Score & Leaderboard ───────────────────
+local function getLeaderboard()
+	local lb = {}
+	for userId, data in pairs(playerData) do
+		local player = Players:GetPlayerByUserId(userId)
+		if player then
+			table.insert(lb, {name = player.Name, score = data.score, eylux = data.eylux})
+		end
+	end
+	table.sort(lb, function(a, b) return a.score > b.score end)
+	return lb
+end
+
+-- Broadcast leaderboard every 30 seconds
+task.spawn(function()
+	while true do
+		task.wait(30)
+		local lb = getLeaderboard()
+		for _, player in pairs(Players:GetPlayers()) do
+			UpdateHUD:FireClient(player, {leaderboard = lb})
+		end
+	end
+end)
+
+print("[EYLOX Studio] ${name} GameManager loaded successfully!")
+`;
+}
+
+function _genUIScript(name,type){
+return `-- ============================================
+-- ${name} | UI MANAGER
+-- Generated by EYLOX Studio
+-- Place in: StarterPlayerScripts/UIManager.lua
+-- ============================================
+
+local Players       = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService  = game:GetService("TweenService")
+
+local player  = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Wait for remotes
+local Remotes       = ReplicatedStorage:WaitForChild("Remotes")
+local AddEylux      = Remotes:WaitForChild("AddEylux")
+local UpdateHUD     = Remotes:WaitForChild("UpdateHUD")
+local PlayerDied    = Remotes:WaitForChild("PlayerDied")
+local GameEnd       = Remotes:WaitForChild("GameEnd")
+
+-- ── BUILD HUD ────────────────────────────
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name  = "${name}_HUD"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+
+-- Background frame (top bar)
+local topBar = Instance.new("Frame")
+topBar.Name   = "TopBar"
+topBar.Size   = UDim2.new(1, 0, 0, 56)
+topBar.Position = UDim2.new(0, 0, 0, 0)
+topBar.BackgroundColor3 = Color3.fromRGB(5, 1, 15)
+topBar.BackgroundTransparency = 0.2
+topBar.BorderSizePixel = 0
+topBar.Parent = screenGui
+local topCorner = Instance.new("UIStroke")
+topCorner.Color = Color3.fromRGB(42, 21, 96)
+topCorner.Thickness = 2
+topCorner.Parent = topBar
+
+-- Score Label
+local scoreLabel = Instance.new("TextLabel")
+scoreLabel.Name = "ScoreLabel"
+scoreLabel.Size = UDim2.new(0.25, 0, 1, 0)
+scoreLabel.Position = UDim2.new(0, 12, 0, 0)
+scoreLabel.BackgroundTransparency = 1
+scoreLabel.Text = "⭐ 0"
+scoreLabel.TextColor3 = Color3.fromRGB(253, 230, 138)
+scoreLabel.Font = Enum.Font.GothamBold
+scoreLabel.TextScaled = true
+scoreLabel.Parent = topBar
+
+-- Eylux Label
+local eyluxLabel = Instance.new("TextLabel")
+eyluxLabel.Name = "EyluxLabel"
+eyluxLabel.Size = UDim2.new(0.25, 0, 1, 0)
+eyluxLabel.Position = UDim2.new(0.25, 0, 0, 0)
+eyluxLabel.BackgroundTransparency = 1
+eyluxLabel.Text = "💎 0 Eylux"
+eyluxLabel.TextColor3 = Color3.fromRGB(167, 139, 250)
+eyluxLabel.Font = Enum.Font.GothamBold
+eyluxLabel.TextScaled = true
+eyluxLabel.Parent = topBar
+
+-- Coins Label
+local coinsLabel = Instance.new("TextLabel")
+coinsLabel.Name = "CoinsLabel"
+coinsLabel.Size = UDim2.new(0.2, 0, 1, 0)
+coinsLabel.Position = UDim2.new(0.5, 0, 0, 0)
+coinsLabel.BackgroundTransparency = 1
+coinsLabel.Text = "🪙 0"
+coinsLabel.TextColor3 = Color3.fromRGB(253, 230, 138)
+coinsLabel.Font = Enum.Font.GothamBold
+coinsLabel.TextScaled = true
+coinsLabel.Parent = topBar
+
+-- Game title
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Name = "TitleLabel"
+titleLabel.Size = UDim2.new(0, 200, 0, 30)
+titleLabel.Position = UDim2.new(0.5, -100, 0, 12)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "${name}"
+titleLabel.TextColor3 = Color3.fromRGB(240, 232, 255)
+titleLabel.Font = Enum.Font.FredokaOne
+titleLabel.TextScaled = true
+titleLabel.Parent = topBar
+
+-- ── NOTIFICATION POPUP ────────────────────
+local notifGui = Instance.new("Frame")
+notifGui.Name  = "Notification"
+notifGui.Size  = UDim2.new(0, 300, 0, 60)
+notifGui.Position = UDim2.new(0.5, -150, 0, -70)
+notifGui.BackgroundColor3 = Color3.fromRGB(14, 6, 38)
+notifGui.BackgroundTransparency = 0.1
+notifGui.BorderSizePixel = 0
+notifGui.Parent = screenGui
+local notifCorner = Instance.new("UICorner")
+notifCorner.CornerRadius = UDim.new(0, 14)
+notifCorner.Parent = notifGui
+
+local notifText = Instance.new("TextLabel")
+notifText.Size = UDim2.new(1, -20, 1, 0)
+notifText.Position = UDim2.new(0, 10, 0, 0)
+notifText.BackgroundTransparency = 1
+notifText.Text = ""
+notifText.TextColor3 = Color3.fromRGB(74, 222, 128)
+notifText.Font = Enum.Font.GothamBold
+notifText.TextScaled = true
+notifText.Parent = notifGui
+
+local notifActive = false
+local function showNotif(msg, color)
+	if notifActive then return end
+	notifActive = true
+	notifText.Text = msg
+	notifText.TextColor3 = color or Color3.fromRGB(74, 222, 128)
+	TweenService:Create(notifGui, TweenInfo.new(0.4, Enum.EasingStyle.Back), {
+		Position = UDim2.new(0.5, -150, 0, 10)
+	}):Play()
+	task.wait(2.2)
+	TweenService:Create(notifGui, TweenInfo.new(0.3), {
+		Position = UDim2.new(0.5, -150, 0, -70)
+	}):Play()
+	task.wait(0.35)
+	notifActive = false
+end
+
+-- ── GAME OVER SCREEN ─────────────────────
+local goScreen = Instance.new("Frame")
+goScreen.Name  = "GameOverScreen"
+goScreen.Size  = UDim2.new(1, 0, 1, 0)
+goScreen.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+goScreen.BackgroundTransparency = 0.3
+goScreen.Visible = false
+goScreen.Parent  = screenGui
+local goCorner = Instance.new("UICorner")
+goCorner.CornerRadius = UDim.new(0, 0)
+goCorner.Parent = goScreen
+
+local goTitle = Instance.new("TextLabel")
+goTitle.Size = UDim2.new(0.8, 0, 0.15, 0)
+goTitle.Position = UDim2.new(0.1, 0, 0.25, 0)
+goTitle.BackgroundTransparency = 1
+goTitle.Text = "🏆 Game Complete!"
+goTitle.TextColor3 = Color3.fromRGB(253, 230, 138)
+goTitle.Font = Enum.Font.FredokaOne
+goTitle.TextScaled = true
+goTitle.Parent = goScreen
+
+local goStats = Instance.new("TextLabel")
+goStats.Size = UDim2.new(0.8, 0, 0.1, 0)
+goStats.Position = UDim2.new(0.1, 0, 0.42, 0)
+goStats.BackgroundTransparency = 1
+goStats.Text = ""
+goStats.TextColor3 = Color3.fromRGB(200, 180, 255)
+goStats.Font = Enum.Font.GothamBold
+goStats.TextScaled = true
+goStats.Parent = goScreen
+
+-- ── REMOTE HANDLERS ──────────────────────
+AddEylux.OnClientEvent:Connect(function(amount, message)
+	local current = tonumber(eyluxLabel.Text:match("%d+")) or 0
+	local newVal  = current + amount
+	eyluxLabel.Text = "💎 " .. newVal .. " Eylux"
+	-- Bounce animation
+	TweenService:Create(eyluxLabel, TweenInfo.new(0.15, Enum.EasingStyle.Back),
+		{TextTransparency = 0.2}):Play()
+	task.wait(0.15)
+	TweenService:Create(eyluxLabel, TweenInfo.new(0.15), {TextTransparency = 0}):Play()
+	if message then showNotif("💎 " .. message, Color3.fromRGB(167, 139, 250)) end
+end)
+
+UpdateHUD.OnClientEvent:Connect(function(data)
+	if data.score then scoreLabel.Text  = "⭐ " .. data.score end
+	if data.eylux then eyluxLabel.Text  = "💎 " .. data.eylux .. " Eylux" end
+	if data.coins then coinsLabel.Text  = "🪙 " .. data.coins end
+end)
+
+PlayerDied.OnClientEvent:Connect(function()
+	showNotif("💀 You died! Respawning…", Color3.fromRGB(248, 113, 113))
+end)
+
+GameEnd.OnClientEvent:Connect(function(data)
+	goScreen.Visible = true
+	goTitle.Text = data.won and "🏆 " .. (data.message or "Victory!") or "💀 Game Over"
+	goStats.Text = string.format("Score: %d  |  Eylux Earned: 💎%d", data.score or 0, data.eylux or 0)
+end)
+
+print("[EYLOX Studio] UI loaded for ${name}")
+`;
+}
+
+function _genMiniGameScript(name,hasMiniGames){
+if(!hasMiniGames)return `-- No mini-games configured for this game type.
+-- To add mini-games, include "mini-game" in your prompt!\n\n-- Example usage:\n-- local MiniGame = require(ReplicatedStorage.MiniGame)\n-- MiniGame.start("CoinRush", player)`;
+return `-- ============================================
+-- ${name} | MINI-GAME SYSTEM
+-- Generated by EYLOX Studio
+-- Place in: ServerScriptService/MiniGameManager.lua
+-- ============================================
+
+local Players       = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService  = game:GetService("TweenService")
+
+local MiniGameManager = {}
+
+-- Config
+local MINI_GAMES = {
+	CoinRush     = { duration = 30, eyluxReward = 80,  description = "Collect as many coins as possible in 30s!" },
+	ObstacleRace = { duration = 60, eyluxReward = 120, description = "Race through the obstacle course!" },
+	BombDodge    = { duration = 45, eyluxReward = 100, description = "Dodge the falling bombs!" },
+	LastStanding = { duration = 90, eyluxReward = 200, description = "Be the last one standing!" },
+	SpeedQuiz    = { duration = 20, eyluxReward = 60,  description = "Answer trivia to earn Eylux!" },
+}
+
+local currentMiniGame = nil
+local miniGameActive  = false
+
+-- ── COIN RUSH ────────────────────────────
+local function startCoinRush(participants)
+	local arena = workspace:FindFirstChild("MiniGameArena") or workspace
+	-- Spawn coins
+	local coins = {}
+	for i = 1, 50 do
+		local coin = Instance.new("Part")
+		coin.Name     = "MiniCoin"
+		coin.Size     = Vector3.new(2, 0.3, 2)
+		coin.Position = Vector3.new(math.random(-40,40), 3, math.random(-40,40))
+		coin.BrickColor = BrickColor.new("Bright yellow")
+		coin.Shape    = Enum.PartType.Cylinder
+		coin.Anchored = true
+		coin.Parent   = arena
+		table.insert(coins, coin)
+	end
+	local scores = {}
+	for _, p in pairs(participants) do scores[p.UserId] = 0 end
+	-- Touch handler
+	for _, coin in pairs(coins) do
+		coin.Touched:Connect(function(hit)
+			local p = Players:GetPlayerFromCharacter(hit.Parent)
+			if not p or not scores[p.UserId] then return end
+			scores[p.UserId] = scores[p.UserId] + 1
+			coin:Destroy()
+		end)
+	end
+	-- End after duration
+	task.wait(MINI_GAMES.CoinRush.duration)
+	-- Find winner
+	local winner, winScore = nil, -1
+	for userId, s in pairs(scores) do
+		if s > winScore then winScore = s; winner = Players:GetPlayerByUserId(userId) end
+	end
+	-- Clean up
+	for _, c in pairs(arena:GetDescendants()) do if c.Name == "MiniCoin" then c:Destroy() end end
+	return winner, winScore
+end
+
+-- ── BOMB DODGE ───────────────────────────
+local function startBombDodge(participants)
+	local alive = {}
+	for _, p in pairs(participants) do alive[p.UserId] = true end
+	local bombTimer = 0
+	local connection
+	connection = game:GetService("RunService").Heartbeat:Connect(function(dt)
+		bombTimer = bombTimer + dt
+		if bombTimer >= 1.5 then
+			bombTimer = 0
+			-- Drop bomb
+			local bomb = Instance.new("Part")
+			bomb.Name     = "Bomb"
+			bomb.Size     = Vector3.new(3, 3, 3)
+			bomb.Position = Vector3.new(math.random(-35, 35), 40, math.random(-35, 35))
+			bomb.BrickColor = BrickColor.new("Really black")
+			bomb.Shape    = Enum.PartType.Ball
+			bomb.Parent   = workspace
+			-- Explode on touch
+			bomb.Touched:Connect(function(hit)
+				local p = Players:GetPlayerFromCharacter(hit.Parent)
+				if p and alive[p.UserId] then
+					alive[p.UserId] = false
+					local hum = hit.Parent:FindFirstChild("Humanoid")
+					if hum then hum.Health = 0 end
+				end
+				bomb:Destroy()
+			end)
+			task.delay(5, function() if bomb and bomb.Parent then bomb:Destroy() end end)
+		end
+	end)
+	task.wait(MINI_GAMES.BombDodge.duration)
+	connection:Disconnect()
+	-- Clean up bombs
+	for _, obj in pairs(workspace:GetDescendants()) do if obj.Name == "Bomb" then obj:Destroy() end end
+	-- Last alive wins
+	local survivors = {}
+	for userId, isAlive in pairs(alive) do
+		if isAlive then table.insert(survivors, Players:GetPlayerByUserId(userId)) end
+	end
+	return survivors
+end
+
+-- ── MINI-GAME LAUNCHER ────────────────────
+function MiniGameManager.startRandom(participants)
+	if miniGameActive then return end
+	miniGameActive = true
+	local games = {"CoinRush", "BombDodge"}
+	local chosen = games[math.random(1, #games)]
+	currentMiniGame = chosen
+	print("[MiniGame] Starting: " .. chosen)
+	-- Notify players
+	local Remotes = ReplicatedStorage:WaitForChild("Remotes")
+	if Remotes:FindFirstChild("UpdateHUD") then
+		for _, p in pairs(participants) do
+			Remotes.UpdateHUD:FireClient(p, {notification = "🎪 Mini-Game: " .. MINI_GAMES[chosen].description})
+		end
+	end
+	task.wait(3) -- Countdown
+	if chosen == "CoinRush" then
+		local winner, score = startCoinRush(participants)
+		if winner then
+			print("[MiniGame] Winner: " .. winner.Name .. " (" .. score .. " coins)")
+			if Remotes:FindFirstChild("AddEylux") then
+				Remotes.AddEylux:FireClient(winner, MINI_GAMES.CoinRush.eyluxReward, "🏆 Mini-Game Winner! +" .. MINI_GAMES.CoinRush.eyluxReward .. " Eylux")
+			end
+		end
+	elseif chosen == "BombDodge" then
+		local survivors = startBombDodge(participants)
+		for _, s in pairs(survivors) do
+			if Remotes:FindFirstChild("AddEylux") then
+				Remotes.AddEylux:FireClient(s, MINI_GAMES.BombDodge.eyluxReward, "💣 Survived! +" .. MINI_GAMES.BombDodge.eyluxReward .. " Eylux")
+			end
+		end
+	end
+	miniGameActive  = false
+	currentMiniGame = nil
+end
+
+-- Auto-trigger mini-game every 5 minutes
+task.spawn(function()
+	while true do
+		task.wait(300) -- 5 minutes
+		local allPlayers = Players:GetPlayers()
+		if #allPlayers >= 2 then
+			MiniGameManager.startRandom(allPlayers)
+		end
+	end
+end)
+
+return MiniGameManager
+`;
+}
+
+function _genEyluxScript(name,earnMethods){
+return `-- ============================================
+-- EYLUX CURRENCY SYSTEM
+-- Generated by EYLOX Studio
+-- Place in: ServerScriptService/EyluxSystem.lua
+-- ============================================
+
+local Players       = game:GetService("Players")
+local DataStoreService = game:GetService("DataStoreService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- DataStore for persistence
+local EyluxStore = DataStoreService:GetDataStore("EyluxData_v1")
+
+local EyluxSystem = {}
+
+-- ── Default Player Data ───────────────────
+local DEFAULT_DATA = {
+	eylux        = 0,
+	totalEarned  = 0,
+	lastLogin    = 0,
+	loginStreak  = 0,
+	achievements = {},
+}
+
+-- ── Daily Reward Table ────────────────────
+local DAILY_REWARDS = {
+	[1] = 50,  [2] = 75,  [3] = 100,
+	[4] = 150, [5] = 200, [6] = 300, [7] = 500,
+}
+
+-- In-memory cache
+local playerEylux = {}
+
+-- ── Load Data ─────────────────────────────
+local function loadData(player)
+	local success, data = pcall(function()
+		return EyluxStore:GetAsync("player_" .. player.UserId)
+	end)
+	if success and data then
+		playerEylux[player.UserId] = data
+	else
+		playerEylux[player.UserId] = table.clone(DEFAULT_DATA)
+	end
+	print("[Eylux] Loaded data for " .. player.Name .. " | Balance: 💎" .. playerEylux[player.UserId].eylux)
+end
+
+-- ── Save Data ─────────────────────────────
+local function saveData(player)
+	local data = playerEylux[player.UserId]
+	if not data then return end
+	local success, err = pcall(function()
+		EyluxStore:SetAsync("player_" .. player.UserId, data)
+	end)
+	if success then
+		print("[Eylux] Saved data for " .. player.Name)
+	else
+		warn("[Eylux] Save failed for " .. player.Name .. ": " .. tostring(err))
+	end
+end
+
+-- ── Add Eylux ─────────────────────────────
+function EyluxSystem.add(player, amount, reason)
+	local data = playerEylux[player.UserId]
+	if not data then return 0 end
+	data.eylux       = data.eylux + amount
+	data.totalEarned = data.totalEarned + amount
+	-- Fire client
+	local Remotes = ReplicatedStorage:FindFirstChild("Remotes")
+	if Remotes and Remotes:FindFirstChild("AddEylux") then
+		Remotes.AddEylux:FireClient(player, amount, reason)
+	end
+	print("[Eylux] +" .. amount .. " for " .. player.Name .. (reason and (" (" .. reason .. ")") or ""))
+	return data.eylux
+end
+
+-- ── Spend Eylux ───────────────────────────
+function EyluxSystem.spend(player, amount, item)
+	local data = playerEylux[player.UserId]
+	if not data then return false, "No data" end
+	if data.eylux < amount then return false, "Not enough Eylux" end
+	data.eylux = data.eylux - amount
+	print("[Eylux] -" .. amount .. " for " .. player.Name .. " (bought: " .. tostring(item) .. ")")
+	return true, data.eylux
+end
+
+-- ── Get Balance ───────────────────────────
+function EyluxSystem.getBalance(player)
+	local data = playerEylux[player.UserId]
+	return data and data.eylux or 0
+end
+
+-- ── Daily Reward ──────────────────────────
+function EyluxSystem.claimDailyReward(player)
+	local data = playerEylux[player.UserId]
+	if not data then return false, "No data" end
+	local now = os.time()
+	local lastLogin = data.lastLogin or 0
+	local hoursSince = (now - lastLogin) / 3600
+	if hoursSince < 20 then
+		return false, "Already claimed today! Come back in " .. math.ceil(20 - hoursSince) .. " hours."
+	end
+	-- Check streak
+	if hoursSince < 48 then
+		data.loginStreak = (data.loginStreak or 0) + 1
+	else
+		data.loginStreak = 1
+	end
+	local streak = math.min(data.loginStreak, 7)
+	local reward = DAILY_REWARDS[streak] or 50
+	data.lastLogin = now
+	EyluxSystem.add(player, reward, "🌟 Day " .. streak .. " Login Reward!")
+	return true, reward, streak
+end
+
+-- ── Leaderboard ───────────────────────────
+function EyluxSystem.getTopPlayers(limit)
+	local lb = {}
+	for userId, data in pairs(playerEylux) do
+		local player = Players:GetPlayerByUserId(userId)
+		if player then
+			table.insert(lb, {name = player.Name, eylux = data.eylux, total = data.totalEarned})
+		end
+	end
+	table.sort(lb, function(a, b) return a.eylux > b.eylux end)
+	local result = {}
+	for i = 1, math.min(limit or 10, #lb) do table.insert(result, lb[i]) end
+	return result
+end
+
+-- ── Auto-Save every 60s ───────────────────
+task.spawn(function()
+	while true do
+		task.wait(60)
+		for _, player in pairs(Players:GetPlayers()) do
+			saveData(player)
+		end
+	end
+end)
+
+-- ── Events ────────────────────────────────
+Players.PlayerAdded:Connect(function(player)
+	loadData(player)
+	-- Auto daily reward on join
+	task.wait(3)
+	local ok, reward, streak = EyluxSystem.claimDailyReward(player)
+	if ok then
+		local Remotes = ReplicatedStorage:WaitForChild("Remotes")
+		if Remotes:FindFirstChild("AddEylux") then
+			Remotes.AddEylux:FireClient(player, reward, "🌟 Daily Reward Day " .. streak .. ": +" .. reward .. " Eylux!")
+		end
+	end
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+	saveData(player)
+	playerEylux[player.UserId] = nil
+end)
+
+-- Save on server close
+game:BindToClose(function()
+	for _, player in pairs(Players:GetPlayers()) do saveData(player) end
+end)
+
+-- ── Earn Methods Reference ────────────────
+--[[
+  EARN METHODS FOR ${name}:
+${earnMethods.map(m=>`  - ${m}`).join('\n')}
+
+  SPEND METHODS:
+  - EyluxSystem.spend(player, 100, "Speed Boost")
+  - EyluxSystem.spend(player, 500, "VIP Pass")
+  - EyluxSystem.spend(player, 200, "Cosmetic Skin")
+
+  EXAMPLE USAGE:
+  EyluxSystem.add(player, 50, "Completed level!")
+  EyluxSystem.add(player, 200, "Won race!")
+  local ok, msg = EyluxSystem.spend(player, 100, "Power-Up")
+  local balance = EyluxSystem.getBalance(player)
+]]
+
+print("[EYLOX Studio] Eylux System loaded!")
+return EyluxSystem
+`;
+}
+
+function _genGuide(name,type){
+  return [
+    {icon:'📁',title:'Create Folder Structure',body:`In Roblox Studio's Explorer:\n• ServerScriptService → New Script: "GameManager"\n• ServerScriptService → New Script: "EyluxSystem"\n• ServerScriptService → New Script: "MiniGameManager"\n• StarterPlayerScripts → New LocalScript: "UIManager"\n• ReplicatedStorage → New Folder: "Remotes"`},
+    {icon:'📋',title:'Paste the Scripts',body:`Copy each generated script tab and paste into the matching Roblox script.\n• Game Plan JSON → Use as reference guide\n• Map Script → ServerScriptService/MapGenerator\n• Gameplay Script → ServerScriptService/GameManager\n• UI Script → StarterPlayerScripts/UIManager\n• Eylux Script → ServerScriptService/EyluxSystem\n• Mini-Games → ServerScriptService/MiniGameManager`},
+    {icon:'🗺️',title:`Set Up ${type} Map`,body:`Run MapGenerator script first (it auto-builds the map).\n${type==='Obby'?'• 40 platforms auto-spawn with checkpoints\n• Moving platforms every 5th platform\n• Finish line gives +200 Eylux':type==='Racing'?'• Oval neon track auto-generates\n• Lane markers and edge glow lights\n• Start/Finish line with lap detection':'• Map generates automatically on game start\n• Coins scatter across the map\n• Lighting adjusts to your theme'}`},
+    {icon:'🪙',title:'Eylux System Setup',body:`The Eylux system is fully automatic:\n• Auto-saves to DataStore every 60 seconds\n• Daily rewards on login (Day 1–7 streak)\n• All earn methods fire AddEylux remote automatically\n• Spend Eylux: EyluxSystem.spend(player, amount, itemName)\n• Get balance: EyluxSystem.getBalance(player)`},
+    {icon:'🎨',title:'Customize Visuals',body:`Recommended tweaks in Roblox Studio:\n• Lighting → Add "BloomEffect" for neon look\n• SkyBox → Insert Sky object with custom textures\n• Colors → Change BrickColor in Map script line 1\n• Add "ParticleEmitter" to coins for sparkle effect\n• Use "SurfaceGui" on platforms for custom textures`},
+    {icon:'🚀',title:'Publish & Test',body:`• Press Play to test locally\n• Check Output window for "[EYLOX Studio]" messages\n• Verify Eylux adds/saves correctly\n• Fix any "nil" errors (usually missing RemoteEvents)\n• Publish via File → Publish to Roblox\n• Enable "Allow Copying" if you want community access`},
+  ];
+}
+
+function _renderGuide(steps){
+  const el=document.getElementById('guideOut'); el.innerHTML='';
+  steps.forEach((s,i)=>{
+    const div=document.createElement('div');
+    div.style.cssText='background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;';
+    div.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><div style="width:32px;height:32px;background:linear-gradient(135deg,var(--purple),var(--blue));border-radius:99px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:.85rem;flex-shrink:0;">${i+1}</div><div style="font-family:var(--font-h);font-size:1rem;">${s.icon} ${s.title}</div></div><pre style="color:var(--muted);font-size:.82rem;font-family:var(--font-b);font-weight:700;line-height:1.7;white-space:pre-wrap;">${s.body}</pre>`;
+    el.appendChild(div);
+  });
+}
+
+function _renderSummaryCards(plan){
+  const el=document.getElementById('summaryCards'); el.innerHTML='';
+  const cards=[
+    {title:'🎮 Game Type',items:[plan.gameType,plan.map.type,plan.style.theme]},
+    {title:'⚙️ Mechanics',items:plan.mechanics.slice(0,4)},
+    {title:'🪙 Eylux Earn',items:plan.currencySystem.earnMethods.slice(0,4)},
+    {title:'📁 Files Needed',items:Object.keys(plan.folderStructure)},
+  ];
+  cards.forEach(c=>{
+    const div=document.createElement('div');
+    div.className='info-card';
+    div.innerHTML=`<h4>${c.title}</h4><ul>${c.items.map(i=>`<li>${i}</li>`).join('')}</ul>`;
+    el.appendChild(div);
+  });
+}
+
+/* ── CLEAR ── */
+function clearAll(){
+  document.getElementById('promptInput').value='';
+  document.getElementById('outputSection').style.display='none';
+  toast('🗑️ Cleared!');
+}
+
+/* ── DOWNLOAD ALL ── */
+function downloadAll(){
+  const tabs=[
+    {id:'jsonOut',name:'game-plan.json'},
+    {id:'mapOut',name:'MapGenerator.lua'},
+    {id:'gameplayOut',name:'GameManager.lua'},
+    {id:'uiOut',name:'UIManager.lua'},
+    {id:'minigameOut',name:'MiniGameManager.lua'},
+    {id:'eyluxOut',name:'EyluxSystem.lua'},
+  ];
+  tabs.forEach(t=>{
+    const el=document.getElementById(t.id); if(!el||!el.textContent.trim())return;
+    const blob=new Blob([el.textContent],{type:'text/plain'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=t.name; a.click();
+  });
+  toast('📦 Downloading all scripts!');
+}
+
+/* ── HISTORY ── */
+function _saveHistory(entry){
+  try{
+    let h=JSON.parse(localStorage.getItem('eylox_studio_history')||'[]');
+    h.unshift(entry); h=h.slice(0,20);
+    localStorage.setItem('eylox_studio_history',JSON.stringify(h));
+    loadHistory();
+  }catch{}
+}
+function loadHistory(){
+  try{
+    const h=JSON.parse(localStorage.getItem('eylox_studio_history')||'[]');
+    const sec=document.getElementById('historySection');
+    const list=document.getElementById('historyList');
+    if(!h.length){sec.style.display='none';return;}
+    sec.style.display='block'; list.innerHTML='';
+    h.forEach(entry=>{
+      const div=document.createElement('div');
+      div.style.cssText='background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .18s;';
+      div.onmouseenter=()=>div.style.borderColor='var(--purple)';
+      div.onmouseleave=()=>div.style.borderColor='var(--border)';
+      const t=new Date(entry.time);
+      div.innerHTML=`<div style="font-size:1.5rem">${TEMPLATES[entry.type]?.icon||'🎮'}</div><div style="flex:1;"><div style="font-family:var(--font-h);font-size:.95rem;">${entry.name}</div><div style="color:var(--muted);font-size:.75rem;font-weight:700;">${entry.type} · ${t.toLocaleDateString()}</div></div><div style="color:var(--muted);font-size:.72rem;font-weight:700;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${entry.prompt.slice(0,60)}…</div>`;
+      div.onclick=()=>{document.getElementById('promptInput').value=entry.prompt;const tc=document.querySelector(`[data-type="${entry.type}"]`);if(tc)selType(tc);};
+      list.appendChild(div);
+    });
+  }catch{}
+}
+</script>
+</body>
+</html>

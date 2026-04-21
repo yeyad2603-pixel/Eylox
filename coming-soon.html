@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eylox — Coming Soon!</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── Coming Soon Page ── */
+    .cs-wrap {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Floating particles */
+    .particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.15;
+      animation: float-up linear infinite;
+    }
+    .particle:nth-child(1)  { width:14px; height:14px; background:var(--purple); left:8%;  animation-duration:9s;  animation-delay:0s; }
+    .particle:nth-child(2)  { width:8px;  height:8px;  background:var(--blue);   left:20%; animation-duration:12s; animation-delay:2s; }
+    .particle:nth-child(3)  { width:18px; height:18px; background:var(--pink);   left:35%; animation-duration:8s;  animation-delay:1s; }
+    .particle:nth-child(4)  { width:10px; height:10px; background:var(--green);  left:50%; animation-duration:11s; animation-delay:3s; }
+    .particle:nth-child(5)  { width:12px; height:12px; background:var(--yellow); left:65%; animation-duration:10s; animation-delay:0.5s; }
+    .particle:nth-child(6)  { width:7px;  height:7px;  background:var(--orange); left:80%; animation-duration:13s; animation-delay:4s; }
+    .particle:nth-child(7)  { width:16px; height:16px; background:var(--blue);   left:92%; animation-duration:7s;  animation-delay:1.5s; }
+
+    @keyframes float-up {
+      0%   { transform: translateY(110vh) scale(0.8); opacity: 0; }
+      10%  { opacity: 0.15; }
+      90%  { opacity: 0.15; }
+      100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+    }
+
+    /* Content card */
+    .cs-card {
+      position: relative;
+      z-index: 1;
+      background: rgba(30, 16, 80, 0.75);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 56px 48px;
+      max-width: 580px;
+      width: 100%;
+      box-shadow: var(--shadow-card), var(--shadow-glow);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    /* Big emoji */
+    .cs-emoji {
+      font-size: 72px;
+      display: block;
+      margin-bottom: 16px;
+      animation: bounce-soft 2.4s ease-in-out infinite;
+    }
+    @keyframes bounce-soft {
+      0%, 100% { transform: translateY(0);    }
+      50%       { transform: translateY(-12px); }
+    }
+
+    /* Logo */
+    .cs-logo {
+      font-family: var(--font-head);
+      font-size: 2.4rem;
+      background: linear-gradient(135deg, var(--purple) 0%, var(--blue) 60%, var(--pink) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    /* Headline */
+    .cs-headline {
+      font-family: var(--font-head);
+      font-size: clamp(1.9rem, 5vw, 2.8rem);
+      color: var(--text);
+      margin-bottom: 14px;
+      line-height: 1.2;
+    }
+    .cs-headline span {
+      background: linear-gradient(90deg, var(--yellow), var(--orange));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Sub-text */
+    .cs-sub {
+      color: var(--muted);
+      font-size: 1.05rem;
+      margin-bottom: 36px;
+      line-height: 1.7;
+    }
+
+    /* Progress bar */
+    .cs-progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .cs-progress-label strong {
+      color: var(--purple);
+    }
+    .cs-progress-track {
+      background: var(--card);
+      border-radius: 99px;
+      height: 12px;
+      overflow: hidden;
+      margin-bottom: 36px;
+      border: 1px solid var(--border);
+    }
+    .cs-progress-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--purple), var(--blue), var(--pink));
+      width: 40%;
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 8px rgba(167,139,250,0.5); }
+      50%       { box-shadow: 0 0 20px rgba(167,139,250,0.9); }
+    }
+
+    /* Notify form */
+    .cs-form {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+      border-radius: 30px;
+    }
+    .cs-form input[type="email"] {
+      flex: 1;
+      min-width: 180px;
+      padding: 13px 18px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .cs-form input[type="email"]:focus {
+      border-color: var(--purple);
+      box-shadow: 0 0 0 3px rgba(167,139,250,0.2);
+    }
+    .cs-form input[type="email"]::placeholder { color: var(--muted); }
+    .cs-form button {
+      padding: 13px 24px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      color: #fff;
+      font-family: var(--font-head);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      white-space: nowrap;
+    }
+    .cs-form button:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-glow);
+    }
+    .cs-form button:active { transform: translateY(0); }
+
+    /* Thank-you message (hidden by default) */
+    .cs-thanks {
+      display: none;
+      color: var(--green);
+      font-size: 0.95rem;
+      margin-top: -20px;
+      margin-bottom: 20px;
+    }
+
+    /* Feature chips */
+    .cs-features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 32px;
+    }
+    .cs-chip {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 6px 16px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .cs-chip span { margin-right: 4px; }
+
+    /* Footer note */
+    .cs-note {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .cs-note a {
+      color: var(--purple);
+      text-decoration: none;
+    }
+    .cs-note a:hover { text-decoration: underline; }
+
+    /* Responsive */
+    @media (max-width: 500px) {
+      .cs-card { padding: 36px 24px; }
+      .cs-emoji { font-size: 56px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating particles background -->
+  <div class="particles" aria-hidden="true">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <div class="cs-wrap">
+    <div class="cs-card">
+
+      <!-- Logo -->
+      <div class="cs-logo">🎮 Eylox</div>
+
+      <!-- Hero emoji -->
+      <span class="cs-emoji" role="img" aria-label="Rocket">🚀</span>
+
+      <!-- Headline -->
+      <h1 class="cs-headline">Something <span>Epic</span> is Coming!</h1>
+
+      <!-- Sub -->
+      <p class="cs-sub">
+        We're building the most fun &amp; safe gaming world for kids.<br>
+        Stay tuned — the adventure starts soon!
+      </p>
+
+      <!-- Progress -->
+      <div class="cs-progress-label">
+        <span>Build progress</span>
+        <strong>40% done</strong>
+      </div>
+      <div class="cs-progress-track">
+        <div class="cs-progress-fill"></div>
+      </div>
+
+      <!-- Notify form -->
+      <form class="cs-form" id="notifyForm">
+        <input type="email" id="emailInput" placeholder="your@email.com" required aria-label="Email address" />
+        <button type="submit">🔔 Notify Me</button>
+      </form>
+      <p class="cs-thanks" id="thankMsg">✅ You're on the list! We'll ping you when we launch.</p>
+
+      <!-- Feature chips -->
+      <div class="cs-features" aria-label="Upcoming features">
+        <div class="cs-chip"><span>🕹️</span> 500+ Games</div>
+        <div class="cs-chip"><span>🛡️</span> 100% Kid Safe</div>
+        <div class="cs-chip"><span>👥</span> Multiplayer</div>
+        <div class="cs-chip"><span>🏆</span> Leaderboards</div>
+        <div class="cs-chip"><span>💸</span> Free to Play</div>
+      </div>
+
+      <!-- Footer note -->
+      <p class="cs-note">© 2026 Eylox · Made with ❤️ for kids</p>
+
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('notifyForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      this.style.display = 'none';
+      document.getElementById('thankMsg').style.display = 'block';
+    });
+  </script>
+
+</body>
+</html>

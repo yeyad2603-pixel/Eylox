@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Eylox — Obby 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:#000;overflow:hidden;font-family:'Nunito',sans-serif}
+canvas{display:block}
+
+/* ─── HUD ─── */
+#hud{position:fixed;inset:0;pointer-events:none;z-index:10;font-family:'Fredoka One',cursive}
+.pill{
+  background:rgba(0,0,0,.58);backdrop-filter:blur(14px);
+  border:1.5px solid rgba(255,255,255,.18);border-radius:16px;
+  padding:7px 18px;color:#fff;display:flex;align-items:center;gap:8px;
+  font-size:1rem;white-space:nowrap
+}
+.pill .val{font-size:1.3rem;color:#FFD700}
+#hud-top{
+  position:absolute;top:0;left:0;right:0;
+  display:flex;align-items:flex-start;justify-content:center;
+  padding:14px 16px;gap:12px
+}
+#hud-right{position:absolute;top:14px;right:14px;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+
+/* Back */
+#back-btn{
+  position:fixed;top:14px;left:14px;z-index:50;pointer-events:all;
+  background:rgba(0,0,0,.65);border:1.5px solid rgba(167,139,250,.5);
+  color:#c4b5fd;border-radius:12px;padding:7px 16px;
+  cursor:pointer;font-family:'Fredoka One',cursive;font-size:.95rem;
+  transition:all .18s;text-decoration:none;display:inline-block
+}
+#back-btn:hover{background:rgba(124,58,237,.7);color:#fff}
+
+/* Checkpoint banner */
+#cp-banner{
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(.5);
+  background:linear-gradient(135deg,#6A0DAD,#a855f7);
+  color:#fff;border-radius:22px;padding:18px 44px;
+  font-size:2rem;font-family:'Fredoka One',cursive;
+  display:none;z-index:200;box-shadow:0 0 60px rgba(168,85,247,.8);
+  pointer-events:none
+}
+#cp-banner.show{display:block;animation:cpPop .6s ease forwards}
+@keyframes cpPop{
+  0%  {transform:translate(-50%,-50%) scale(.5);opacity:0}
+  60% {transform:translate(-50%,-50%) scale(1.08);opacity:1}
+  100%{transform:translate(-50%,-50%) scale(1);opacity:1}
+}
+
+/* Death flash */
+#death-flash{position:fixed;inset:0;background:rgba(220,0,0,.45);display:none;z-index:300;pointer-events:none}
+
+/* Win screen */
+#win-screen{
+  position:fixed;inset:0;background:rgba(0,0,0,.88);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  z-index:400;color:#fff;font-family:'Fredoka One',cursive;
+  backdrop-filter:blur(12px)
+}
+#win-screen h1{font-size:clamp(2.4rem,8vw,4.5rem);color:#FFD700;text-shadow:0 0 40px #FFD700;margin-bottom:14px}
+.win-stat{font-size:1.4rem;margin:5px 0;color:#d8b4fe}
+.win-stat span{color:#fff}
+#win-btns{display:flex;gap:14px;margin-top:28px;flex-wrap:wrap;justify-content:center}
+.wbtn{
+  padding:13px 38px;border:none;border-radius:16px;
+  font-size:1.15rem;font-family:'Fredoka One',cursive;
+  cursor:pointer;transition:transform .18s;pointer-events:all
+}
+.wbtn.p{background:linear-gradient(135deg,#6A0DAD,#a855f7);color:#fff;box-shadow:0 4px 24px rgba(168,85,247,.5)}
+.wbtn.s{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);color:#d8b4fe}
+.wbtn:hover{transform:scale(1.06)}
+
+/* Progress bar */
+#prog-wrap{position:fixed;bottom:0;left:0;right:0;height:5px;background:rgba(255,255,255,.12);z-index:20;pointer-events:none}
+#prog-bar{height:100%;width:0;transition:width .6s ease;background:linear-gradient(90deg,#6A0DAD,#FFD700,#4ECDC4)}
+
+/* Mobile controls */
+#mob-ctrl{
+  position:fixed;bottom:18px;left:0;right:0;
+  display:none;justify-content:space-between;align-items:flex-end;
+  padding:0 18px;z-index:20;pointer-events:none
+}
+@media(pointer:coarse){#mob-ctrl{display:flex}}
+#joy-zone{
+  width:120px;height:120px;
+  background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.25);
+  border-radius:50%;position:relative;pointer-events:all;flex-shrink:0
+}
+#joy-knob{
+  width:48px;height:48px;
+  background:rgba(255,255,255,.45);border:2px solid rgba(255,255,255,.75);
+  border-radius:50%;position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);pointer-events:none
+}
+#jump-mob{
+  width:80px;height:80px;
+  background:rgba(255,215,0,.65);border:3px solid #FFD700;
+  border-radius:50%;color:#fff;
+  font-family:'Fredoka One',cursive;font-size:1.15rem;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:all;cursor:pointer;user-select:none;
+  -webkit-tap-highlight-color:transparent
+}
+#jump-mob:active{transform:scale(.92)}
+
+/* Controls hint */
+#ctrl-hint{
+  position:fixed;bottom:12px;left:50%;transform:translateX(-50%);
+  color:rgba(255,255,255,.35);font-size:.65rem;font-weight:700;
+  pointer-events:none;white-space:nowrap;z-index:5
+}
+@media(pointer:coarse){#ctrl-hint{display:none}}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<a id="back-btn" href="games.html">← Games</a>
+
+<div id="hud">
+  <div id="hud-top">
+    <div class="pill">🏁 CP&nbsp;<span class="val" id="hud-cp">0/5</span></div>
+    <div class="pill">⏱&nbsp;<span class="val" id="hud-time">0:00</span></div>
+  </div>
+  <div id="hud-right">
+    <div class="pill">🪙&nbsp;<span class="val" id="hud-coins">0</span></div>
+  </div>
+</div>
+
+<div id="cp-banner">🏁 Checkpoint <span id="cp-num">1</span>! ✅</div>
+<div id="death-flash"></div>
+
+<div id="win-screen">
+  <h1>🎉 YOU WIN!</h1>
+  <p class="win-stat">Time: <span id="w-time">—</span></p>
+  <p class="win-stat">Coins Collected: <span id="w-coins">—</span> 🪙</p>
+  <p class="win-stat">Checkpoints: <span id="w-cp">—</span></p>
+  <div id="win-btns">
+    <button class="wbtn p" onclick="location.reload()">🔄 Play Again</button>
+    <button class="wbtn s" onclick="location.href='games.html'">← Games</button>
+  </div>
+</div>
+
+<div id="prog-wrap"><div id="prog-bar"></div></div>
+
+<div id="mob-ctrl">
+  <div id="joy-zone"><div id="joy-knob"></div></div>
+  <div id="jump-mob">JUMP</div>
+</div>
+
+<div id="ctrl-hint">WASD / Arrows — Move &nbsp;|&nbsp; SPACE — Jump (double jump!) &nbsp;|&nbsp; Mouse — Camera</div>
+
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+
+// ════════════════════════════════════════════════════
+// RENDERER + SCENE
+// ════════════════════════════════════════════════════
+const canvas   = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
+renderer.toneMapping       = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87CEEB);
+scene.fog = new THREE.Fog(0xA8D8F0, 70, 320);
+
+const camera = new THREE.PerspectiveCamera(68, 1, 0.1, 600);
+camera.position.set(0, 12, 16);
+
+function onResize() {
+  const w = innerWidth, h = innerHeight;
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+}
+window.addEventListener('resize', onResize);
+onResize();
+
+// ─── Lights ───
+const sun = new THREE.DirectionalLight(0xFFFAE0, 2.5);
+sun.position.set(60, 120, 60);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.near   =   1;
+sun.shadow.camera.far    = 500;
+sun.shadow.camera.left   = sun.shadow.camera.bottom = -200;
+sun.shadow.camera.right  = sun.shadow.camera.top    =  200;
+sun.shadow.bias = -0.0008;
+scene.add(sun);
+scene.add(new THREE.AmbientLight(0x8BAFD4, 1.0));
+scene.add(new THREE.HemisphereLight(0x87CEEB, 0x5DBB63, 0.55));
+
+// ─── Clouds ───
+const clouds = [];
+function mkCloud(x, y, z) {
+  const g = new THREE.Group();
+  const m = new THREE.MeshLambertMaterial({ color: 0xFFFFFF, transparent: true, opacity: 0.88 });
+  [[0,0,0,4,2.2,3.5],[3,.4,0,3.2,2,2.8],[-2.8,.3,.5,2.8,1.8,2.5]].forEach(([cx,cy,cz,w,h,d]) => {
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), m);
+    mesh.position.set(cx,cy,cz);
+    g.add(mesh);
+  });
+  g.position.set(x,y,z);
+  scene.add(g);
+  clouds.push(g);
+}
+for (let i = 0; i < 16; i++) mkCloud(Math.random()*380-60, 30+Math.random()*20, Math.random()*90-45);
+
+// ════════════════════════════════════════════════════
+// LEVEL  (x, y, z, w, h, d, color, optional move/flags)
+// ════════════════════════════════════════════════════
+const DEFS = [
+  // START
+  { x:0,   y:0,  z:0,  w:14, h:1.5, d:14, col:0x5DBB63 },
+
+  // Section 1 — Easy green platforms
+  { x:18,  y:1,  z:0,  w:5,  h:1, d:5,  col:0x98FB98 },
+  { x:28,  y:2,  z:4,  w:4,  h:1, d:4,  col:0x7EC850 },
+  { x:38,  y:3,  z:-2, w:4,  h:1, d:4,  col:0x5DBB63 },
+  { x:46,  y:4,  z:3,  w:3.5,h:1, d:5,  col:0x3CB371 },
+
+  // CHECKPOINT 1
+  { x:56,  y:5,  z:0,  w:9,  h:1.5, d:9, col:0x44CC44, checkpoint:1 },
+
+  // Section 2 — Moving platforms (blue)
+  { x:68,  y:5,  z:0,  w:4,  h:1, d:4,  col:0x87CEEB, move:{axis:'x',range:7,spd:2.0} },
+  { x:80,  y:6,  z:0,  w:3.5,h:1, d:3.5,col:0x6495ED, move:{axis:'z',range:6,spd:2.6} },
+  { x:90,  y:7,  z:6,  w:3,  h:1, d:3,  col:0x4169E1 },
+  { x:100, y:8,  z:-2, w:4,  h:1, d:4,  col:0x1E90FF, move:{axis:'x',range:10,spd:3.0} },
+
+  // CHECKPOINT 2
+  { x:112, y:9,  z:0,  w:9,  h:1.5, d:9, col:0x4499FF, checkpoint:2 },
+
+  // Section 3 — Narrow boards (orange)
+  { x:122, y:9,  z:0,  w:2.2,h:1, d:10, col:0xFF8C00 },
+  { x:132, y:10, z:0,  w:10, h:1, d:2.2,col:0xFF7000 },
+  { x:144, y:11, z:0,  w:3,  h:1, d:3,  col:0xFF5500, move:{axis:'y',range:2.5,spd:2.2} },
+  { x:152, y:11, z:-5, w:4,  h:1, d:4,  col:0xFF4500 },
+
+  // CHECKPOINT 3
+  { x:160, y:12, z:0,  w:9,  h:1.5, d:9, col:0xFF6600, checkpoint:3 },
+
+  // Section 4 — Combo (purple)
+  { x:170, y:12, z:5,  w:3.5,h:1, d:3.5,col:0xAA44FF, move:{axis:'z',range:8,spd:3.4} },
+  { x:178, y:13, z:-4, w:3,  h:1, d:3,  col:0x8A2BE2 },
+  { x:186, y:14, z:0,  w:2.5,h:1, d:2.5,col:0x7B68EE, move:{axis:'x',range:6,spd:4.0} },
+  { x:194, y:15, z:5,  w:3,  h:1, d:3,  col:0x6A0DAD },
+
+  // CHECKPOINT 4
+  { x:202, y:16, z:0,  w:9,  h:1.5, d:9, col:0x9400D3, checkpoint:4 },
+
+  // Section 5 — Final push (gold/red)
+  { x:212, y:16, z:0,  w:2.5,h:1, d:2.5,col:0xFFD700, move:{axis:'x',range:9,spd:4.5} },
+  { x:222, y:17, z:0,  w:2,  h:1, d:2,  col:0xFFA500, move:{axis:'z',range:7,spd:4.5} },
+  { x:230, y:18, z:0,  w:2.5,h:1, d:2.5,col:0xFF6600 },
+
+  // CHECKPOINT 5
+  { x:238, y:19, z:0,  w:9,  h:1.5, d:9, col:0xFF8800, checkpoint:5 },
+
+  // FINISH
+  { x:250, y:20, z:0,  w:15, h:1.5, d:15, col:0xFFD700, finish:true },
+];
+
+const TOTAL_CPS = DEFS.filter(d => d.checkpoint).length;
+const cpPositions = { 0: new THREE.Vector3(0, 2.5, 0) };
+DEFS.forEach(d => { if (d.checkpoint) cpPositions[d.checkpoint] = new THREE.Vector3(d.x, d.y+2.5, d.z); });
+
+// ════════════════════════════════════════════════════
+// BUILD LEVEL
+// ════════════════════════════════════════════════════
+const collidables      = [];
+const movingPlatforms  = [];
+const checkpointRings  = [];
+const coinObjects      = [];
+
+DEFS.forEach(def => {
+  const mat  = new THREE.MeshLambertMaterial({ color: def.col });
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(def.w, def.h, def.d), mat);
+  mesh.position.set(def.x, def.y, def.z);
+  mesh.castShadow = mesh.receiveShadow = true;
+  mesh.userData = def;
+  scene.add(mesh);
+  collidables.push(mesh);
+
+  if (def.move) {
+    movingPlatforms.push({ mesh, def, base: new THREE.Vector3(def.x, def.y, def.z), t: Math.random()*Math.PI*2, carrying: false });
+  }
+
+  // Checkpoint ring
+  if (def.checkpoint) {
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(3.2, 0.28, 10, 32),
+      new THREE.MeshStandardMaterial({ color:0xFFD700, emissive:0xFFAA00, emissiveIntensity:2, metalness:0.3 })
+    );
+    ring.rotation.x = Math.PI/2;
+    ring.position.set(def.x, def.y+3.8, def.z);
+    ring.userData.cpId = def.checkpoint;
+    scene.add(ring);
+    checkpointRings.push(ring);
+    const pl = new THREE.PointLight(0xFFDD00, 1.5, 14);
+    pl.position.copy(ring.position);
+    scene.add(pl);
+  }
+
+  // Finish decorations
+  if (def.finish) {
+    const starMat = new THREE.MeshStandardMaterial({ color:0xFFD700, emissive:0xFFD700, emissiveIntensity:2.5 });
+    for (let i = 0; i < 8; i++) {
+      const a = (i/8)*Math.PI*2;
+      const star = new THREE.Mesh(new THREE.OctahedronGeometry(1.0), starMat);
+      star.position.set(def.x+Math.cos(a)*7, def.y+3, def.z+Math.sin(a)*7);
+      star.userData.fi = i;
+      scene.add(star);
+      coinObjects.push({ mesh:star, isStar:true });
+    }
+    const pl = new THREE.PointLight(0xFFD700, 4, 30);
+    pl.position.set(def.x, def.y+6, def.z);
+    scene.add(pl);
+  }
+
+  // Coins on platforms
+  if (!def.finish && DEFS.indexOf(def) > 0) {
+    const cnt = def.checkpoint ? 3 : (Math.random()>.4 ? 2 : 1);
+    for (let i = 0; i < cnt; i++) {
+      const coin = new THREE.Mesh(
+        new THREE.CylinderGeometry(.38,.38,.14,14),
+        new THREE.MeshStandardMaterial({ color:0xFFD700, emissive:0xFFAA00, emissiveIntensity:.7, metalness:.5, roughness:.3 })
+      );
+      coin.position.set(
+        def.x + (Math.random()-.5)*(def.w-1.5),
+        def.y + def.h*.5 + .55,
+        def.z + (Math.random()-.5)*(def.d-1.5)
+      );
+      coin.rotation.z = Math.PI/2;
+      coin.userData.collected = false;
+      scene.add(coin);
+      coinObjects.push({ mesh:coin, isStar:false });
+    }
+  }
+});
+
+// Lava floor
+const lava = new THREE.Mesh(
+  new THREE.PlaneGeometry(900, 400),
+  new THREE.MeshStandardMaterial({ color:0xFF1500, emissive:0xFF3300, emissiveIntensity:.8, roughness:.9 })
+);
+lava.rotation.x = -Math.PI/2;
+lava.position.set(125,-15,0);
+scene.add(lava);
+const lavaGlow = new THREE.PointLight(0xFF3300, 2, 35);
+lavaGlow.position.set(0,-13,0);
+scene.add(lavaGlow);
+
+// Decorative pillars
+DEFS.slice(0,12).forEach(d => {
+  const pil = new THREE.Mesh(
+    new THREE.CylinderGeometry(.35,.55,d.y+15,8),
+    new THREE.MeshLambertMaterial({ color: d.col })
+  );
+  pil.position.set(d.x,(d.y-15)/2-.5,d.z);
+  pil.castShadow = true;
+  scene.add(pil);
+});
+
+// ════════════════════════════════════════════════════
+// BLOCKY AVATAR (Roblox style)
+// ════════════════════════════════════════════════════
+let bodyCol = 0x4ECDC4, legCol = 0x2C3E50, hatCol = 0xFF6B6B;
+try {
+  const eq = JSON.parse(localStorage.getItem('eylox_equipped')||'{}');
+  if (eq.bodyColor) bodyCol = eq.bodyColor;
+  if (eq.legColor)  legCol  = eq.legColor;
+  if (eq.hatColor)  hatCol  = eq.hatColor;
+} catch {}
+
+const avatar = new THREE.Group();
+scene.add(avatar);
+avatar.position.set(0, 2.5, 0);
+
+const mBody = new THREE.MeshLambertMaterial({ color: bodyCol });
+const mLeg  = new THREE.MeshLambertMaterial({ color: legCol  });
+const mFace = new THREE.MeshLambertMaterial({ color: 0xFFDDAA });
+const mHat  = new THREE.MeshLambertMaterial({ color: hatCol  });
+const mEye  = new THREE.MeshLambertMaterial({ color: 0x1a1a2e });
+
+function bx(w,h,d,mat,px,py,pz,parent){
+  const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);
+  m.position.set(px,py,pz);
+  m.castShadow=true;
+  parent.add(m);
+  return m;
+}
+
+// Body parts (origin at feet)
+bx(1.0,1.2,.6,mBody,  0, 1.8,   0,  avatar); // torso
+bx(.9, .9, .9,mFace,  0, 2.85,  0,  avatar); // head
+bx(1.05,.28,1.05,mHat,0, 3.38,  0,  avatar); // hat brim
+bx(.75, .44,.75,mHat, 0, 3.65,  0,  avatar); // hat top
+bx(.18, .18,.05,mEye,-0.22,2.88,.44,avatar); // left eye
+bx(.18, .18,.05,mEye, 0.22,2.88,.44,avatar); // right eye
+bx(.36, .1, .05,mEye, 0,  2.62,.44, avatar); // smile
+
+// Arm pivot groups
+const lArmG = new THREE.Group(); lArmG.position.set(-0.75,2.25,0); avatar.add(lArmG);
+bx(.42,1.1,.42,mBody,0,-.55,0,lArmG);
+const rArmG = new THREE.Group(); rArmG.position.set(0.75,2.25,0);  avatar.add(rArmG);
+bx(.42,1.1,.42,mBody,0,-.55,0,rArmG);
+
+// Leg pivot groups
+const lLegG = new THREE.Group(); lLegG.position.set(-0.28,1.15,0); avatar.add(lLegG);
+bx(.44,1.1,.44,mLeg,0,-.55,0,lLegG);
+const rLegG = new THREE.Group(); rLegG.position.set(0.28,1.15,0);  avatar.add(rLegG);
+bx(.44,1.1,.44,mLeg,0,-.55,0,rLegG);
+
+// ════════════════════════════════════════════════════
+// PHYSICS
+// ════════════════════════════════════════════════════
+const vel      = new THREE.Vector3();
+const GRAVITY  = -27;
+const JUMP_V   =  13.5;
+const DJ_V     =  11.0;
+const SPEED    =   8.5;
+const FRICTION =   0.74;
+
+let onGround = false, canDJ = false, jumpHeld = false;
+let isDead = false, gameWon = false;
+let gameTime = 0, gameCoins = 0, cpReached = 0, lastCP = 0;
+
+const downRay = new THREE.Raycaster();
+downRay.ray.direction.set(0,-1,0);
+
+// ════════════════════════════════════════════════════
+// INPUT
+// ════════════════════════════════════════════════════
+const keys = new Set();
+window.addEventListener('keydown', e => { keys.add(e.code); if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)) e.preventDefault(); });
+window.addEventListener('keyup',   e => keys.delete(e.code));
+
+// Camera orbit
+let camTheta = Math.PI, camPhi = 0.36, camDist = 12;
+let dragging = false, prevMX = 0, prevMY = 0;
+
+canvas.addEventListener('mousedown', e => { dragging=true; prevMX=e.clientX; prevMY=e.clientY; });
+window.addEventListener('mouseup',   () => dragging=false);
+window.addEventListener('mousemove', e => {
+  if (!dragging) return;
+  camTheta -= (e.clientX-prevMX)*.005;
+  camPhi = Math.max(.05,Math.min(1.25,camPhi+(e.clientY-prevMY)*.005));
+  prevMX=e.clientX; prevMY=e.clientY;
+});
+window.addEventListener('wheel', e => {
+  camDist = Math.max(5,Math.min(20,camDist+e.deltaY*.02));
+},{passive:true});
+
+// Touch camera
+const camT = {};
+canvas.addEventListener('touchstart', e=>{[...e.changedTouches].forEach(t=>{camT[t.identifier]={x:t.clientX,y:t.clientY}})},{passive:true});
+canvas.addEventListener('touchmove',  e=>{[...e.changedTouches].forEach(t=>{const p=camT[t.identifier];if(!p)return;camTheta-=(t.clientX-p.x)*.005;camPhi=Math.max(.05,Math.min(1.25,camPhi+(t.clientY-p.y)*.005));camT[t.identifier]={x:t.clientX,y:t.clientY}})},{passive:true});
+canvas.addEventListener('touchend',   e=>{[...e.changedTouches].forEach(t=>delete camT[t.identifier])},{passive:true});
+
+// Mobile joystick
+let joyX=0, joyY=0, joyTId=-1;
+const joyZone=document.getElementById('joy-zone');
+const joyKnob=document.getElementById('joy-knob');
+const jumpMob=document.getElementById('jump-mob');
+const JR=42;
+
+function setJoy(dx,dy){
+  const len=Math.min(JR,Math.sqrt(dx*dx+dy*dy)),a=Math.atan2(dy,dx);
+  joyX=Math.cos(a)*len/JR; joyY=Math.sin(a)*len/JR;
+  joyKnob.style.transform=`translate(calc(-50% + ${Math.cos(a)*len}px),calc(-50% + ${Math.sin(a)*len}px))`;
+}
+joyZone.addEventListener('touchstart',e=>{e.preventDefault();const t=e.changedTouches[0];joyTId=t.identifier;const r=joyZone.getBoundingClientRect();setJoy(t.clientX-(r.left+r.width/2),t.clientY-(r.top+r.height/2))},{passive:false});
+joyZone.addEventListener('touchmove', e=>{e.preventDefault();const t=[...e.changedTouches].find(t=>t.identifier===joyTId);if(!t)return;const r=joyZone.getBoundingClientRect();setJoy(t.clientX-(r.left+r.width/2),t.clientY-(r.top+r.height/2))},{passive:false});
+const resetJoy=()=>{joyX=0;joyY=0;joyKnob.style.transform='translate(-50%,-50%)'};
+joyZone.addEventListener('touchend',resetJoy);joyZone.addEventListener('touchcancel',resetJoy);
+jumpMob.addEventListener('touchstart',e=>{e.preventDefault();keys.add('Space')},{passive:false});
+jumpMob.addEventListener('touchend',  e=>{e.preventDefault();keys.delete('Space')},{passive:false});
+
+// ════════════════════════════════════════════════════
+// HUD helpers
+// ════════════════════════════════════════════════════
+const hudTime  = document.getElementById('hud-time');
+const hudCoins = document.getElementById('hud-coins');
+const hudCp    = document.getElementById('hud-cp');
+const progBar  = document.getElementById('prog-bar');
+
+function fmt(s){const m=Math.floor(s/60);return `${m}:${String(Math.floor(s%60)).padStart(2,'0')}`;}
+
+let cpBannerT=0;
+function showCpBanner(n){
+  document.getElementById('cp-num').textContent=n;
+  const el=document.getElementById('cp-banner');
+  el.className=''; void el.offsetWidth; el.className='show';
+  cpBannerT=2.6;
+}
+
+function flashDeath(){
+  const el=document.getElementById('death-flash');
+  el.style.display='block'; setTimeout(()=>el.style.display='none',480);
+}
+
+function showWin(){
+  document.getElementById('w-time').textContent  = fmt(gameTime);
+  document.getElementById('w-coins').textContent = gameCoins;
+  document.getElementById('w-cp').textContent    = `${cpReached}/${TOTAL_CPS}`;
+  document.getElementById('win-screen').style.display='flex';
+  try{
+    const u=JSON.parse(localStorage.getItem('eylox_user')||'{}');
+    if(u.username){const k='eylox_hs_obby3d',b=+(localStorage.getItem(k)||Infinity);if(gameTime<b)localStorage.setItem(k,gameTime);}
+  }catch{}
+}
+
+// ════════════════════════════════════════════════════
+// GAME LOOP
+// ════════════════════════════════════════════════════
+const clock = new THREE.Clock();
+let animT = 0;
+
+(function loop(){
+  requestAnimationFrame(loop);
+  const dt = Math.min(clock.getDelta(), .05);
+  if (!gameWon && !isDead) update(dt);
+  renderer.render(scene, camera);
+})();
+
+function update(dt){
+  gameTime += dt;
+
+  // CP banner countdown
+  if(cpBannerT>0){cpBannerT-=dt;if(cpBannerT<=0)document.getElementById('cp-banner').className='';}
+
+  // ─── Input direction ───
+  const mx = (keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0)+joyX;
+  const mz = (keys.has('KeyS')||keys.has('ArrowDown') ?1:0)-(keys.has('KeyW')||keys.has('ArrowUp')  ?1:0)+joyY;
+
+  const camF = new THREE.Vector3(-Math.sin(camTheta),0,-Math.cos(camTheta));
+  const camR = new THREE.Vector3( Math.cos(camTheta),0,-Math.sin(camTheta));
+  const wish = camR.clone().multiplyScalar(mx).add(camF.clone().multiplyScalar(-mz));
+  wish.y=0;
+
+  const moving = wish.lengthSq()>.001;
+  if(moving){
+    wish.normalize();
+    vel.x=wish.x*SPEED; vel.z=wish.z*SPEED;
+    const ta=Math.atan2(wish.x,wish.z);
+    let diff=ta-avatar.rotation.y;
+    while(diff>Math.PI)diff-=Math.PI*2;
+    while(diff<-Math.PI)diff+=Math.PI*2;
+    avatar.rotation.y+=diff*.2;
+  }else{
+    vel.x*=FRICTION; vel.z*=FRICTION;
+  }
+
+  // ─── Jump ───
+  const wj=keys.has('Space');
+  if(wj&&!jumpHeld){
+    if(onGround){vel.y=JUMP_V;onGround=false;canDJ=true;}
+    else if(canDJ){vel.y=DJ_V;canDJ=false;}
+    jumpHeld=true;
+  }
+  if(!wj) jumpHeld=false;
+
+  // ─── Gravity + integrate ───
+  vel.y+=GRAVITY*dt;
+  avatar.position.addScaledVector(vel,dt);
+
+  // ─── Update moving platforms ───
+  movingPlatforms.forEach(mp=>{
+    mp.t+=dt;
+    const off=Math.sin(mp.t*mp.def.move.spd)*mp.def.move.range;
+    const prev=Math.sin((mp.t-dt)*mp.def.move.spd)*mp.def.move.range;
+    const delta=off-prev;
+    switch(mp.def.move.axis){
+      case 'x': mp.mesh.position.x=mp.base.x+off; if(mp.carrying) avatar.position.x+=delta; break;
+      case 'z': mp.mesh.position.z=mp.base.z+off; if(mp.carrying) avatar.position.z+=delta; break;
+      case 'y': mp.mesh.position.y=mp.base.y+Math.abs(off); break;
+    }
+    mp.carrying=false;
+  });
+
+  // ─── Ground raycast (5-point sweep) ───
+  onGround=false;
+  let bestY=-Infinity, bestMesh=null;
+  [[.3,.3],[-.3,.3],[.3,-.3],[-.3,-.3],[0,0]].forEach(([ox,oz])=>{
+    downRay.set(
+      new THREE.Vector3(avatar.position.x+ox, avatar.position.y+.4, avatar.position.z+oz),
+      new THREE.Vector3(0,-1,0)
+    );
+    const hits=downRay.intersectObjects(collidables,false);
+    if(hits.length>0&&hits[0].distance<.72&&hits[0].point.y>bestY){bestY=hits[0].point.y;bestMesh=hits[0].object;}
+  });
+
+  if(bestMesh&&vel.y<=.08){
+    onGround=true;
+    avatar.position.y=bestY;
+    vel.y=0; canDJ=false;
+    const mp=movingPlatforms.find(m=>m.mesh===bestMesh);
+    if(mp) mp.carrying=true;
+    if(bestMesh.userData.finish&&!gameWon){gameWon=true;setTimeout(showWin,400);}
+  }
+
+  // ─── Death zone ───
+  if(avatar.position.y<-18) die();
+
+  // ─── Checkpoints ───
+  checkpointRings.forEach(r=>{
+    const id=r.userData.cpId;
+    if(id>cpReached&&r.position.distanceTo(avatar.position)<6){
+      cpReached=id; lastCP=id;
+      showCpBanner(id);
+      hudCp.textContent=`${cpReached}/${TOTAL_CPS}`;
+      progBar.style.width=`${(cpReached/(TOTAL_CPS+1))*100}%`;
+    }
+    r.rotation.z+=dt*1.6;
+  });
+
+  // ─── Coins ───
+  coinObjects.forEach((c,i)=>{
+    if(c.isStar){c.mesh.rotation.y+=dt*2.2;c.mesh.position.y+=Math.sin(Date.now()*.002+c.mesh.userData.fi)*.003;return;}
+    if(c.mesh.userData.collected) return;
+    c.mesh.rotation.y+=dt*2.8;
+    if(c.mesh.position.distanceTo(avatar.position)<1.9){
+      c.mesh.userData.collected=true;
+      scene.remove(c.mesh);
+      gameCoins++;
+      hudCoins.textContent=gameCoins;
+    }
+  });
+
+  // ─── Limb animation ───
+  animT+=dt*(moving?7.5:2.5);
+  if(moving&&onGround){
+    const s=Math.sin(animT)*.68;
+    lLegG.rotation.x= s; rLegG.rotation.x=-s;
+    lArmG.rotation.x=-s*.72; rArmG.rotation.x=s*.72;
+  }else if(!onGround){
+    lArmG.rotation.x=-0.72; rArmG.rotation.x=-0.72;
+    const t=Math.min(1,vel.y<0?-vel.y/22:0);
+    lLegG.rotation.x=.25+t*.35; rLegG.rotation.x=.25+t*.35;
+  }else{
+    lLegG.rotation.x*=.84; rLegG.rotation.x*=.84;
+    lArmG.rotation.x=Math.sin(animT*.5)*.08;
+    rArmG.rotation.x=Math.sin(animT*.5+Math.PI)*.08;
+  }
+
+  // ─── Camera follow ───
+  const cx=avatar.position.x+camDist*Math.sin(camTheta)*Math.cos(camPhi);
+  const cy=avatar.position.y+camDist*Math.sin(camPhi)+4;
+  const cz=avatar.position.z+camDist*Math.cos(camTheta)*Math.cos(camPhi);
+  camera.position.lerp(new THREE.Vector3(cx,cy,cz),.1);
+  camera.lookAt(avatar.position.x, avatar.position.y+2.2, avatar.position.z);
+
+  // ─── Clouds drift ───
+  clouds.forEach(c=>{c.position.x-=dt*1.8;if(c.position.x<-100)c.position.x=450;});
+
+  // ─── Lava light flicker ───
+  lavaGlow.position.x=avatar.position.x;
+  lavaGlow.position.z=avatar.position.z;
+  lavaGlow.intensity=1.5+Math.sin(Date.now()*.004)*.5;
+
+  hudTime.textContent=fmt(gameTime);
+}
+
+function die(){
+  if(isDead) return;
+  isDead=true; flashDeath();
+  setTimeout(()=>{
+    const p=cpPositions[lastCP];
+    avatar.position.set(p.x,p.y,p.z);
+    vel.set(0,0,0); isDead=false;
+  },580);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>∞ Eylox — Login</title>
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    /* If already logged in, skip login page */
+    try {
+      const hasSession = localStorage.getItem('eylox_token') || localStorage.getItem('eylox_guest');
+      if (hasSession) window.location.replace('index.html');
+    } catch {}
+  </script>
+</head>
+<body>
+<div class="login-page">
+  <!-- Floating background stars -->
+  <div class="login-stars" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+
+  <!-- Top bar -->
+  <div class="login-topbar">
+    <a href="index.html" class="login-logo-link">
+      <img src="eylox-logo.png" class="login-topbar-logo" alt="Eylox" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+      <span style="display:none;font-family:'Fredoka One',cursive;font-size:1.3rem;color:#a78bfa">🎮 Eylox</span>
+    </a>
+    <nav class="login-nav">
+      <a href="index.html">🏠 Home</a>
+      <a href="games.html">🕹️ Games</a>
+    </nav>
+  </div>
+
+  <!-- Centered card -->
+  <div class="login-body">
+    <div class="login-card">
+
+      <div class="login-brand-wrap">
+        <img src="eylox-logo.png" class="login-brand-img" alt="Eylox" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <span class="login-brand" style="display:none">🎮 Eylox</span>
+      </div>
+      <p class="login-tag">Welcome back, Gamer! Log in to play 🚀</p>
+
+      <!-- Tab switcher -->
+      <div style="display:flex;gap:0;margin-bottom:24px;border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--border);">
+        <button id="tabLogin"    onclick="showTab('login')"    style="flex:1;padding:10px;background:rgba(167,139,250,.18);color:var(--purple);border:none;font-family:var(--font-body);font-weight:800;font-size:.9rem;cursor:pointer;">🔑 Login</button>
+        <button id="tabRegister" onclick="showTab('register')" style="flex:1;padding:10px;background:transparent;color:var(--muted);border:none;font-family:var(--font-body);font-weight:800;font-size:.9rem;cursor:pointer;">✨ Sign Up</button>
+      </div>
+
+      <!-- Server error banner -->
+      <div id="serverError" style="display:none;background:rgba(244,114,182,.12);border:1px solid var(--pink);border-radius:var(--r-sm);padding:10px 14px;color:var(--pink);font-size:.85rem;font-weight:700;margin-bottom:16px;"></div>
+
+      <!-- ── LOGIN FORM ── -->
+      <form id="loginForm" novalidate style="display:block">
+
+        <div class="form-group">
+          <label class="form-label" for="username">👤 Username</label>
+          <input type="text" id="username" name="username" class="form-input"
+            placeholder="e.g. CoolGamer123" autocomplete="username" />
+          <p class="form-error" id="errUser">Please enter your username</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">🔒 Password</label>
+          <div style="position:relative">
+            <input type="password" id="password" name="password" class="form-input"
+              placeholder="Your secret password" autocomplete="current-password"
+              style="padding-right:50px" />
+            <button type="button" id="eyeBtn"
+              style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.1rem;">
+              👁
+            </button>
+          </div>
+          <p class="form-hint">Keep your password secret! 🤫</p>
+          <p class="form-error" id="errPass">Please enter your password</p>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-w" style="margin-top:8px">
+          🔑 Login &amp; Play!
+        </button>
+
+      </form>
+
+      <!-- ── REGISTER FORM ── -->
+      <form id="registerForm" novalidate style="display:none">
+
+        <div class="form-group">
+          <label class="form-label" for="regUsername">👤 Choose a Username</label>
+          <input type="text" id="regUsername" class="form-input" placeholder="e.g. CoolGamer123" autocomplete="off" />
+          <p class="form-hint">3–20 chars, letters/numbers/underscores only</p>
+          <p class="form-error" id="errRegUser"></p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="regEmail">📧 Email</label>
+          <input type="email" id="regEmail" class="form-input" placeholder="your@email.com" autocomplete="email" />
+          <p class="form-error" id="errRegEmail"></p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="regPassword">🔒 Password</label>
+          <input type="password" id="regPassword" class="form-input" placeholder="Min 6 characters" autocomplete="new-password" />
+          <p class="form-error" id="errRegPass"></p>
+        </div>
+
+        <button type="submit" class="btn btn-secondary btn-w" style="margin-top:8px">
+          ✨ Create My Account!
+        </button>
+
+      </form>
+
+      <div class="divider">or</div>
+
+      <a href="#" class="btn btn-green btn-w" id="guestLoginBtn">🎮 Play as Guest</a>
+
+      <p class="signup-prompt" id="switchPrompt">
+        New to Eylox? <a href="#" onclick="showTab('register');return false;">Create a free account!</a>
+      </p>
+
+    </div>
+  </div>
+
+</div>
+<script src="security.js"></script>
+<script src="api.js"></script>
+<script src="script.js"></script>
+<script src="polish.js"></script>
+<script>
+/* ── Per-user shop save/restore ── */
+/* alwaysClear=true → new account (never restore); false → login (restore if saved) */
+function swapUserShop(newUsername, alwaysClear) {
+  // Save the previous user's shop state so they get it back later
+  const prev = (() => { try { return JSON.parse(localStorage.getItem('eylox_user'))?.username; } catch { return null; } })();
+  if (prev) {
+    const d = { o: localStorage.getItem('eylox_owned_items'), e: localStorage.getItem('eylox_equipped'), v: localStorage.getItem('eylox_inventory') };
+    localStorage.setItem('eylox_shop_u_' + prev.toLowerCase(), JSON.stringify(d));
+  }
+  if (alwaysClear) {
+    // New account — always start with a blank shop
+    localStorage.removeItem('eylox_owned_items');
+    localStorage.removeItem('eylox_equipped');
+    localStorage.removeItem('eylox_inventory');
+    localStorage.removeItem('eylox_shop_u_' + newUsername.toLowerCase());
+    return;
+  }
+  // Returning login — restore their saved shop
+  try {
+    const saved = JSON.parse(localStorage.getItem('eylox_shop_u_' + newUsername.toLowerCase()) || 'null');
+    if (saved) {
+      saved.o ? localStorage.setItem('eylox_owned_items', saved.o) : localStorage.removeItem('eylox_owned_items');
+      saved.e ? localStorage.setItem('eylox_equipped',    saved.e) : localStorage.removeItem('eylox_equipped');
+      saved.v ? localStorage.setItem('eylox_inventory',   saved.v) : localStorage.removeItem('eylox_inventory');
+    } else {
+      localStorage.removeItem('eylox_owned_items');
+      localStorage.removeItem('eylox_equipped');
+      localStorage.removeItem('eylox_inventory');
+    }
+  } catch {
+    localStorage.removeItem('eylox_owned_items');
+    localStorage.removeItem('eylox_equipped');
+    localStorage.removeItem('eylox_inventory');
+  }
+}
+
+/* ── Guest button ── */
+document.getElementById('guestLoginBtn').addEventListener('click', e => {
+  e.preventDefault();
+  localStorage.setItem('eylox_guest', '1');
+  if (!localStorage.getItem('eylox_user')) {
+    localStorage.setItem('eylox_user', JSON.stringify({
+      _id: 'guest_' + Date.now(), username: 'Guest',
+      avatar: '🎮', coins: 100, wins: 0, badges: [], recentlyPlayed: [],
+    }));
+  }
+  window.location.href = 'index.html';
+});
+
+/* ── Auto-select tab from URL param ── */
+const _urlTab = new URLSearchParams(location.search).get('tab');
+if (_urlTab === 'register') showTab('register');
+
+/* ── Tab switcher ── */
+function showTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('loginForm').style.display    = isLogin ? 'block' : 'none';
+  document.getElementById('registerForm').style.display = isLogin ? 'none'  : 'block';
+  document.getElementById('tabLogin').style.background    = isLogin ? 'rgba(167,139,250,.18)' : 'transparent';
+  document.getElementById('tabLogin').style.color         = isLogin ? 'var(--purple)' : 'var(--muted)';
+  document.getElementById('tabRegister').style.background = isLogin ? 'transparent' : 'rgba(167,139,250,.18)';
+  document.getElementById('tabRegister').style.color      = isLogin ? 'var(--muted)' : 'var(--purple)';
+  document.getElementById('switchPrompt').innerHTML = isLogin
+    ? 'New to Eylox? <a href="#" onclick="showTab(\'register\');return false;">Create a free account!</a>'
+    : 'Already have an account? <a href="#" onclick="showTab(\'login\');return false;">Log in here!</a>';
+  document.getElementById('serverError').style.display = 'none';
+}
+
+/* ── Register form ── */
+document.getElementById('registerForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const username = document.getElementById('regUsername').value.trim();
+  const email    = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const errDiv   = document.getElementById('serverError');
+  const btn      = e.target.querySelector('button[type=submit]');
+
+  /* Clear errors */
+  ['errRegUser','errRegEmail','errRegPass'].forEach(id => { document.getElementById(id).style.display = 'none'; });
+
+  let ok = true;
+  if (!username) { showFieldErr('errRegUser', 'Username is required'); ok = false; }
+  if (!email)    { showFieldErr('errRegEmail', 'Email is required');    ok = false; }
+  if (!password) { showFieldErr('errRegPass', 'Password is required');  ok = false; }
+  if (!ok) return;
+
+  btn.textContent = '⏳ Creating account…'; btn.disabled = true;
+
+  try {
+    const data = await Auth.register(username, email, password);
+    if (data) {
+      localStorage.removeItem('eylox_guest');
+      btn.textContent = '🎉 Account created!';
+      window.location.href = 'index.html';
+    } else {
+      /* Server offline — save account locally so session persists */
+      const newUser = { _id: 'local_' + username, username, avatar: '🎮', coins: 100, wins: 0, badges: ['New Player'], recentlyPlayed: [], createdAt: Date.now() };
+      localStorage.setItem('eylox_token', 'offline_' + Date.now());
+      localStorage.setItem('eylox_user',  JSON.stringify(newUser));
+      localStorage.removeItem('eylox_guest');
+      swapUserShop(username, true); // new account → always clear
+      btn.textContent = '🎮 Account created!';
+      setTimeout(() => { window.location.href = 'index.html'; }, 700);
+    }
+  } catch (err) {
+    errDiv.textContent = '❌ ' + err.message;
+    errDiv.style.display = 'block';
+    btn.textContent = '✨ Create My Account!'; btn.disabled = false;
+  }
+});
+
+function showFieldErr(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.style.display = 'block';
+}
+
+/* Override login form to use API */
+document.getElementById('loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const errDiv   = document.getElementById('serverError');
+  const btn      = e.target.querySelector('button[type=submit]');
+
+  ['errUser','errPass'].forEach(id => { document.getElementById(id).style.display = 'none'; });
+  errDiv.style.display = 'none';
+
+  let ok = true;
+  if (!username) { document.getElementById('errUser').style.display = 'block'; ok = false; }
+  if (!password) { document.getElementById('errPass').style.display = 'block'; ok = false; }
+  if (!ok) return;
+
+  /* Rate limit check */
+  if (window.EyloxLoginCheck && !window.EyloxLoginCheck()) {
+    errDiv.textContent = `🔒 Too many failed attempts. Try again in ${window.EyloxLockoutSecs ? window.EyloxLockoutSecs() : 300}s.`;
+    errDiv.style.display = 'block';
+    return;
+  }
+
+  btn.textContent = '⏳ Logging in…'; btn.disabled = true;
+
+  try {
+    /* Validate username/password chars */
+    if (!/^[a-zA-Z0-9_.\-]{2,32}$/.test(username)) {
+      errDiv.textContent = '❌ Username can only contain letters, numbers, _ . -';
+      errDiv.style.display = 'block';
+      btn.textContent = '🔑 Login & Play!'; btn.disabled = false;
+      return;
+    }
+    /* Owner check */
+    if (username.toLowerCase() === 'eylox' && password === 'EyadYasser') {
+      localStorage.setItem('eylox_is_owner', 'true');
+    } else {
+      localStorage.removeItem('eylox_is_owner');
+    }
+    /* Record login history */
+    try {
+      const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+      const hist = JSON.parse(localStorage.getItem('eylox_login_history') || '[]');
+      hist.unshift({ username, time: Date.now(), device: isMobile ? '📱 Mobile' : '💻 Desktop' });
+      localStorage.setItem('eylox_login_history', JSON.stringify(hist.slice(0, 200)));
+    } catch {}
+    const data = await Auth.login(username, password);
+    if (data) {
+      if (window.EyloxLoginSuccess) window.EyloxLoginSuccess();
+      const newToken = 'online_' + Date.now();
+      localStorage.removeItem('eylox_guest');
+      swapUserShop(username);
+      localStorage.setItem('eylox_shop_token', newToken);
+      window.location.href = 'index.html';
+    } else {
+      /* Server offline — save session with entered username so it persists */
+      const newToken = 'offline_' + Date.now();
+      const offlineUser = { _id: 'local_' + username, username, avatar: '🎮', coins: 100, wins: 0, badges: [], recentlyPlayed: [], createdAt: Date.now() };
+      localStorage.setItem('eylox_token', newToken);
+      localStorage.setItem('eylox_user',  JSON.stringify(offlineUser));
+      localStorage.removeItem('eylox_guest');
+      swapUserShop(username);
+      localStorage.setItem('eylox_shop_token', newToken);
+      if (window.EyloxLoginSuccess) window.EyloxLoginSuccess();
+      btn.textContent = '🎮 Welcome, ' + username + '!';
+      setTimeout(() => { window.location.href = 'index.html'; }, 700);
+    }
+  } catch (err) {
+    if (window.EyloxLoginFail) window.EyloxLoginFail();
+    const remaining = window.EyloxLockoutSecs ? window.EyloxLockoutSecs() : 0;
+    errDiv.textContent = remaining > 0
+      ? `🔒 Too many failed attempts. Try again in ${remaining}s.`
+      : '❌ ' + err.message;
+    errDiv.style.display = 'block';
+    btn.textContent = '🔑 Login & Play!'; btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>

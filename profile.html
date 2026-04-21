@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>∞ Eylox — Profile</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="profile">
+<div class="app-shell">
+
+  <aside class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-logo"><span class="sidebar-logo-icon">🎮</span><span class="sidebar-logo-text">Eylox</span></a>
+    <p class="sidebar-section-label">Menu</p>
+    <nav class="sidebar-nav"><ul>
+      <li><a href="index.html"    class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
+      <li><a href="games.html"    class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
+      <li><a href="friends.html"  class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span><span class="s-badge" style="display:none">0</span></a></li>
+      <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
+      <li><a href="profile.html"  class="sidebar-link active"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
+    </ul></nav>
+    <div class="sidebar-divider"></div>
+    <p class="sidebar-section-label">More</p>
+    <nav class="sidebar-nav"><ul>
+      <li><a href="leaderboard.html"  class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
+      <li><a href="achievements.html" class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
+      <li><a href="communities.html"  class="sidebar-link"><span class="s-icon">🌍</span><span class="s-label">Communities</span></a></li>
+      <li><a href="live-events.html"  class="sidebar-link"><span class="s-icon">⚡</span><span class="s-label">Live Events</span></a></li>
+      <li><a href="shop.html"         class="sidebar-link"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
+      <li><a href="#" class="sidebar-link" id="settingsBtn"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></a></li>
+      <li><a href="#" class="sidebar-link" id="logoutBtn"><span class="s-icon">🚪</span><span class="s-label">Logout</span></a></li>
+    </ul></nav>
+    <div class="sidebar-coins"><img src="eylux-coin.png" class="coins-icon-img" alt="Eylux" /><div><div class="coins-amount">—</div><div class="coins-label">Eylux</div></div></div>
+    <div class="sidebar-coins sidebar-trophies"><span class="coins-icon">🏆</span><div><div class="trophies-amount">—</div><div class="coins-label">Trophies</div></div></div>
+  </aside>
+
+  <div class="main-area">
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      <div class="search-wrap"><span class="search-icon">🔍</span><input type="search" class="search-input" placeholder="Search games…" aria-label="Search" /></div>
+      <div class="topbar-right">
+        <button class="tb-btn" aria-label="Notifications">🔔<span class="notif-dot"></span></button>
+        <div class="tb-coins"><img src="eylux-coin.png" class="tb-coin-img" alt="EC"> <span>—</span></div>
+        <a href="profile.html" class="tb-avatar">🎮<span class="online-dot"></span></a>
+      </div>
+    </header>
+
+    <!-- Profile hero -->
+    <div class="profile-hero-bar">
+      <div class="ph-avatar-wrap">
+        <div class="ph-ring"></div>
+        <div class="ph-inner" id="avatarPickBtn" title="Click to change avatar" style="cursor:pointer">🎮</div>
+        <div class="ph-level-badge" id="phLevelBadge">Lv.1</div>
+      </div>
+      <div class="ph-info">
+        <h1 class="ph-username">Player</h1>
+        <p class="ph-handle">@player_eylox</p>
+        <span class="ph-badge">⭐ Eylox Gamer</span>
+        <!-- XP bar injected here by script -->
+        <div class="ph-xp-wrap" id="phXpWrap">
+          <div class="ph-xp-bar"><div class="ph-xp-fill" id="phXpFill" style="width:0%"></div></div>
+          <span class="ph-xp-label" id="phXpLabel">0 / 500 XP</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="profile-stats-bar">
+      <div class="ps-box"><div class="ps-num" id="stat-games">—</div><div class="ps-lbl">🎮 Games</div></div>
+      <div class="ps-box"><div class="ps-num" id="stat-friends">—</div><div class="ps-lbl">🤝 Friends</div></div>
+      <div class="ps-box"><div class="ps-num" id="stat-wins">—</div><div class="ps-lbl">🏆 Wins</div></div>
+      <div class="ps-box"><div class="ps-num" id="stat-badges">—</div><div class="ps-lbl">🎖️ Badges</div></div>
+      <div class="ps-box"><div class="ps-num" id="stat-coins">—</div><div class="ps-lbl">💰 Coins</div></div>
+    </div>
+
+    <main class="page-content">
+
+      <!-- Achievements -->
+      <div class="section">
+        <div class="sub-title">🏆 Achievements</div>
+        <div class="sub-note">Badges you've earned on your journey</div>
+        <div class="sub-divider"></div>
+        <!-- Populated by features.js -->
+        <div class="achievements" id="achievements-wrap">
+          <p class="empty-msg">Loading…</p>
+        </div>
+      </div>
+
+      <!-- Recently played -->
+      <div class="section">
+        <div class="sub-title">🎮 Recently Played</div>
+        <div class="sub-note">Jump back into your favourite games</div>
+        <div class="sub-divider"></div>
+        <!-- Populated by features.js -->
+        <div class="games-grid" id="profile-games-grid">
+          <p class="empty-msg">Loading…</p>
+        </div>
+        <div style="margin-top:20px;text-align:center">
+          <a href="games.html" class="btn btn-secondary">🕹️ Discover More Games</a>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+<script src="security.js"></script>
+<script src="api.js"></script>
+<script src="script.js"></script>
+<script src="features.js"></script>
+<script src="notifications.js"></script>
+<script src="polish.js"></script>
+<script src="admin-button.js"></script>
+<script src="studio-button.js"></script>
+<script src="extras.js"></script>
+<style>
+/* ── XP bar ── */
+.ph-xp-wrap { display:flex; align-items:center; gap:10px; margin-top:8px; }
+.ph-xp-bar { flex:1; max-width:220px; height:8px; background:rgba(167,139,250,.15); border-radius:99px; overflow:hidden; border:1px solid rgba(167,139,250,.2); }
+.ph-xp-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,#7c3aed,#a78bfa,#60a5fa); transition:width 1.2s cubic-bezier(.22,.61,.36,1); }
+.ph-xp-label { font-size:.72rem; font-weight:800; color:var(--muted); white-space:nowrap; }
+.ph-level-badge {
+  position:absolute; bottom:-4px; right:-4px;
+  background:linear-gradient(135deg,#7c3aed,#a78bfa); color:#fff;
+  font-size:.62rem; font-weight:900; padding:2px 7px; border-radius:99px;
+  border:2px solid var(--bg); font-family:'Fredoka One',cursive; letter-spacing:.3px;
+  white-space:nowrap;
+}
+/* ── Achievement card flips ── */
+.ach {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 14px 16px; font-size: .9rem; font-weight: 800; color: var(--text);
+  text-align: center; transition: transform .2s, box-shadow .2s, border-color .2s;
+  cursor: default;
+}
+.ach:hover { transform: translateY(-4px) scale(1.04); box-shadow: 0 8px 28px rgba(167,139,250,.3); border-color: rgba(167,139,250,.5); }
+/* ── Profile stats bar fancy ── */
+.ps-box { transition: transform .2s; }
+.ps-box:hover { transform: translateY(-3px); }
+.ps-num { background: linear-gradient(135deg,var(--purple),var(--blue)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+</style>
+<script>
+/* XP + level system based on coins */
+(function(){
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const u = Auth?.getUser?.();
+    if (!u) return;
+    const coins = u.coins || 0;
+    const xpPerLevel = 500;
+    const level = Math.floor(coins / xpPerLevel) + 1;
+    const xpInLevel = coins % xpPerLevel;
+    const xpPct = Math.min((xpInLevel / xpPerLevel) * 100, 100);
+    const badge = document.getElementById('phLevelBadge');
+    if (badge) badge.textContent = 'Lv.' + level;
+    const fill = document.getElementById('phXpFill');
+    if (fill) setTimeout(()=>{ fill.style.width = xpPct+'%'; }, 300);
+    const label = document.getElementById('phXpLabel');
+    if (label) label.textContent = xpInLevel.toLocaleString() + ' / ' + xpPerLevel + ' XP';
+  });
+})();
+</script>
+<script src="effects.js"></script>
+<script src="sound.js"></script>
+<script src="settings.js"></script>
+</body>
+</html>

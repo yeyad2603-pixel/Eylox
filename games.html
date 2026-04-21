@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>∞ Eylox — Discover</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="games">
+<div class="app-shell">
+
+  <aside class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-logo"><span class="sidebar-logo-icon">🎮</span><span class="sidebar-logo-text">Eylox</span></a>
+    <p class="sidebar-section-label">Menu</p>
+    <nav class="sidebar-nav"><ul>
+      <li><a href="index.html"    class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
+      <li><a href="games.html"    class="sidebar-link active"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
+      <li><a href="friends.html"  class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span><span class="s-badge" style="display:none">0</span></a></li>
+      <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
+      <li><a href="profile.html"  class="sidebar-link"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
+    </ul></nav>
+    <div class="sidebar-divider"></div>
+    <p class="sidebar-section-label">More</p>
+    <nav class="sidebar-nav"><ul>
+      <li><a href="leaderboard.html"  class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
+      <li><a href="achievements.html" class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
+      <li><a href="communities.html"  class="sidebar-link"><span class="s-icon">🌍</span><span class="s-label">Communities</span></a></li>
+      <li><a href="live-events.html"  class="sidebar-link"><span class="s-icon">⚡</span><span class="s-label">Live Events</span></a></li>
+      <li><a href="shop.html"         class="sidebar-link"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
+      <li><a href="#" class="sidebar-link" id="settingsBtn"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></a></li>
+      <li><a href="#" class="sidebar-link" id="logoutBtn"><span class="s-icon">🚪</span><span class="s-label">Logout</span></a></li>
+    </ul></nav>
+    <div class="sidebar-coins"><img src="eylux-coin.png" class="coins-icon-img" alt="Eylux" /><div><div class="coins-amount">—</div><div class="coins-label">Eylux</div></div></div>
+    <div class="sidebar-coins sidebar-trophies"><span class="coins-icon">🏆</span><div><div class="trophies-amount">—</div><div class="coins-label">Trophies</div></div></div>
+  </aside>
+
+  <div class="main-area">
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      <div class="search-wrap"><span class="search-icon">🔍</span><input type="search" class="search-input" placeholder="Search games…" aria-label="Search games" /></div>
+      <div class="topbar-right">
+        <button class="tb-btn" aria-label="Notifications">🔔<span class="notif-dot"></span></button>
+        <div class="tb-coins"><img src="eylux-coin.png" class="tb-coin-img" alt="EC"> <span>0</span></div>
+        <a href="profile.html" class="tb-avatar">🎮<span class="online-dot"></span></a>
+      </div>
+    </header>
+
+    <main class="page-content">
+
+      <!-- Featured Spotlight -->
+      <div class="games-spotlight">
+        <div class="gs-left">
+          <div class="gs-tag">⭐ EDITOR'S PICK</div>
+          <h2 class="gs-title">Ninja Dash</h2>
+          <p class="gs-desc">The most addictive runner on Eylox. Jump, dodge, and double-jump your way to glory. Can you beat 10,000 points?</p>
+          <div class="gs-meta">👥 75K players &nbsp;·&nbsp; ⭐ 4.8 &nbsp;·&nbsp; 🎮 Action</div>
+          <button class="btn-play gs-btn" data-id="ninja-dash" data-title="Ninja Dash" data-thumb="🥷" data-genre="action">▶ Play Now</button>
+        </div>
+        <div class="gs-right" aria-hidden="true">
+          <div class="gs-thumb-big">🥷💨</div>
+        </div>
+      </div>
+
+      <!-- ══ 3D GAMES SECTION ══ -->
+      <div class="g3d-section">
+        <div class="g3d-header">
+          <div class="g3d-tag">🆕 BRAND NEW • 3D</div>
+          <h2 class="g3d-title">Play in Full 3D</h2>
+          <p class="g3d-sub">Roblox-style immersive worlds — jump, explore, and collect!</p>
+        </div>
+        <div class="g3d-grid">
+
+          <div class="g3d-card" onclick="location.href='game3d-obby.html'">
+            <div class="g3d-thumb">🏃‍♂️💨</div>
+            <div class="g3d-badge">3D</div>
+            <div class="g3d-info">
+              <h3 class="g3d-name">Obby World</h3>
+              <p class="g3d-meta">🌟 25 Platforms • Checkpoints • Coins • Double Jump</p>
+              <div class="g3d-stats">👥 3D Parkour &nbsp;·&nbsp; ⭐ 5.0 &nbsp;·&nbsp; ⚡ Action</div>
+            </div>
+            <button class="g3d-btn">▶ Play 3D</button>
+          </div>
+
+          <div class="g3d-card" onclick="location.href='game3d-treasure.html'">
+            <div class="g3d-thumb">💎🗺️</div>
+            <div class="g3d-badge">3D</div>
+            <div class="g3d-info">
+              <h3 class="g3d-name">Treasure Hunt</h3>
+              <p class="g3d-meta">🌴 3D Island • 8 Hidden Treasures • Shovel • 3-Min Race</p>
+              <div class="g3d-stats">👥 3D Adventure &nbsp;·&nbsp; ⭐ 5.0 &nbsp;·&nbsp; 🗺️ Explore</div>
+            </div>
+            <button class="g3d-btn">▶ Play 3D</button>
+          </div>
+
+          <div class="g3d-card g3d-soon">
+            <div class="g3d-thumb">🏙️🚗</div>
+            <div class="g3d-badge g3d-soon-badge">SOON</div>
+            <div class="g3d-info">
+              <h3 class="g3d-name">City Roleplay</h3>
+              <p class="g3d-meta">🏗️ 3D City • Cars • Jobs • Shops • Full Roleplay World</p>
+              <div class="g3d-stats">👥 Coming Soon &nbsp;·&nbsp; 🌍 Roleplay</div>
+            </div>
+            <button class="g3d-btn g3d-soon-btn" disabled>🔒 Coming Soon</button>
+          </div>
+
+          <div class="g3d-card g3d-soon">
+            <div class="g3d-thumb">☠️⚓</div>
+            <div class="g3d-badge g3d-soon-badge">SOON</div>
+            <div class="g3d-info">
+              <h3 class="g3d-name">Pirate Bay 3D</h3>
+              <p class="g3d-meta">🚢 3D Ships • Ocean • Sword Battles • Treasure Maps</p>
+              <div class="g3d-stats">👥 Coming Soon &nbsp;·&nbsp; ⚔️ Adventure</div>
+            </div>
+            <button class="g3d-btn g3d-soon-btn" disabled>🔒 Coming Soon</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Recently Played Section -->
+      <div class="recently-played" id="recentlyPlayedSection" style="display: none;">
+        <div class="recently-played-header">
+          <h2>🕐 Continue Playing</h2>
+          <a href="#" class="section-link" onclick="document.getElementById('recentlyPlayedSection').style.display='none'">Clear ×</a>
+        </div>
+        <div class="recently-played-grid" id="recentlyPlayedGrid">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+
+      <div class="page-controls">
+        <p class="game-count">Loading games… 🎮</p>
+        <div class="filter-tabs">
+          <button class="f-tab active" data-genre="">🎮 All</button>
+          <button class="f-tab" data-genre="adventure">🗺️ Adventure</button>
+          <button class="f-tab" data-genre="action">⚡ Action</button>
+          <button class="f-tab" data-genre="puzzle">🧩 Puzzle</button>
+          <button class="f-tab" data-genre="racing">🏎️ Racing</button>
+          <button class="f-tab" data-genre="building">🏗️ Building</button>
+          <button class="f-tab" data-genre="survival">💀 Survival</button>
+          <button class="f-tab" data-genre="roleplay">🌻 Roleplay</button>
+        </div>
+      </div>
+
+      <!-- Grid populated by features.js -->
+      <div class="games-grid" id="games-grid">
+        <!-- Static fallback cards so page looks great before JS loads -->
+        <div class="game-card" data-game-id="ninja-dash"><div class="card-thumb t-purple">🥷💨</div><div class="card-body"><span class="card-badge b-action">Action</span><h3 class="card-title">Ninja Dash</h3><div class="card-meta">👥 75K <span class="dot"></span> ⭐ 4.8</div><button class="btn-play" data-id="ninja-dash" data-title="Ninja Dash" data-thumb="🥷" data-genre="action">▶ Play Now</button></div></div>
+        <div class="game-card" data-game-id="sky-riders"><div class="card-thumb t-blue">🚀✨</div><div class="card-body"><span class="card-badge b-racing">Racing</span><h3 class="card-title">Sky Riders</h3><div class="card-meta">👥 120K <span class="dot"></span> ⭐ 4.8</div><button class="btn-play" data-id="sky-riders" data-title="Sky Riders" data-thumb="🚀" data-genre="racing">▶ Play Now</button></div></div>
+        <div class="game-card" data-game-id="dragon-escape"><div class="card-thumb t-pink">🐉🔥</div><div class="card-body"><span class="card-badge b-survival">Survival</span><h3 class="card-title">Dragon Escape</h3><div class="card-meta">👥 47K <span class="dot"></span> ⭐ 4.6</div><button class="btn-play" data-id="dragon-escape" data-title="Dragon Escape" data-thumb="🐉" data-genre="survival">▶ Play Now</button></div></div>
+        <div class="game-card" data-game-id="puzzle-palace"><div class="card-thumb t-green">🧩👻</div><div class="card-body"><span class="card-badge b-puzzle">Puzzle</span><h3 class="card-title">Puzzle Palace</h3><div class="card-meta">👥 52K <span class="dot"></span> ⭐ 4.4</div><button class="btn-play" data-id="puzzle-palace" data-title="Puzzle Palace" data-thumb="🧩" data-genre="puzzle">▶ Play Now</button></div></div>
+        <div class="game-card" data-game-id="ocean-quest"><div class="card-thumb t-teal">🤿🐠</div><div class="card-body"><span class="card-badge b-adventure">Adventure</span><h3 class="card-title">Ocean Quest</h3><div class="card-meta">👥 64K <span class="dot"></span> ⭐ 4.6</div><button class="btn-play" data-id="ocean-quest" data-title="Ocean Quest" data-thumb="🌊" data-genre="adventure">▶ Play Now</button></div></div>
+        <div class="game-card" data-game-id="block-kingdom"><div class="card-thumb t-yellow">🏰👑</div><div class="card-body"><span class="card-badge b-building">Building</span><h3 class="card-title">Block Kingdom</h3><div class="card-meta">👥 98K <span class="dot"></span> ⭐ 4.7</div><button class="btn-play" data-id="block-kingdom" data-title="Block Kingdom" data-thumb="🏰" data-genre="building">▶ Play Now</button></div></div>
+        <div class="game-card" data-game-id="farm-friends"><div class="card-thumb t-indigo">🌻🐮</div><div class="card-body"><span class="card-badge b-roleplay">Roleplay</span><h3 class="card-title">Farm Friends</h3><div class="card-meta">👥 75K <span class="dot"></span> ⭐ 4.6</div><button class="btn-play" data-id="farm-friends" data-title="Farm Friends" data-thumb="🌻" data-genre="roleplay">▶ Play Now</button></div></div>
+        <div class="game-card" data-game-id="space-blaster"><div class="card-thumb t-purple">🛸⭐</div><div class="card-body"><span class="card-badge b-action">Action</span><h3 class="card-title">Space Blaster</h3><div class="card-meta">👥 73K <span class="dot"></span> ⭐ 4.6</div><button class="btn-play" data-id="space-blaster" data-title="Space Blaster" data-thumb="🌌" data-genre="action">▶ Play Now</button></div></div>
+        <div class="game-card" data-game-id="haunted-house"><div class="card-thumb t-pink">👻🏚️</div><div class="card-body"><span class="card-badge b-survival">Survival</span><h3 class="card-title">Haunted House</h3><div class="card-meta">👥 35K <span class="dot"></span> ⭐ 4.6</div><button class="btn-play" data-id="haunted-house" data-title="Haunted House" data-thumb="👻" data-genre="survival">▶ Play Now</button></div></div>
+        <div class="game-card" data-game-id="race-city"><div class="card-thumb t-yellow">🏎️🛣️</div><div class="card-body"><span class="card-badge b-racing">Racing</span><h3 class="card-title">Race City</h3><div class="card-meta">👥 35K <span class="dot"></span> ⭐ 4.6</div><button class="btn-play" data-id="race-city" data-title="Race City" data-thumb="🏎️" data-genre="racing">▶ Play Now</button></div></div>
+        <div class="game-card" data-game-id="jungle-run"><div class="card-thumb t-green">🌿🏃</div><div class="card-body"><span class="card-badge b-adventure">Adventure</span><h3 class="card-title">Jungle Run</h3><div class="card-meta">👥 35K <span class="dot"></span> ⭐ 4.8</div><button class="btn-play" data-id="jungle-run" data-title="Jungle Run" data-thumb="🌿" data-genre="adventure">▶ Play Now</button></div></div>
+        <div class="game-card" data-game-id="candy-chaos"><div class="card-thumb t-pink">🍬🎪</div><div class="card-body"><span class="card-badge b-action">Action</span><h3 class="card-title">Candy Chaos</h3><div class="card-meta">👥 75K <span class="dot"></span> ⭐ 4.6</div><button class="btn-play" data-id="candy-chaos" data-title="Candy Chaos" data-thumb="🍬" data-genre="action">▶ Play Now</button></div></div>
+        <div class="game-card" data-game-id="ice-fortress"><div class="card-thumb t-blue">🧊❄️</div><div class="card-body"><span class="card-badge b-building">Building</span><h3 class="card-title">Ice Fortress</h3><div class="card-meta">👥 75K <span class="dot"></span> ⭐ 4.6</div><button class="btn-play" data-id="ice-fortress" data-title="Ice Fortress" data-thumb="🧊" data-genre="building">▶ Play Now</button></div></div>
+        <div class="game-card" data-game-id="logic-lab"><div class="card-thumb t-teal">🔬💡</div><div class="card-body"><span class="card-badge b-puzzle">Puzzle</span><h3 class="card-title">Logic Lab</h3><div class="card-meta">👥 35K <span class="dot"></span> ⭐ 4.6</div><button class="btn-play" data-id="logic-lab" data-title="Logic Lab" data-thumb="🔬" data-genre="puzzle">▶ Play Now</button></div></div>
+        <div class="game-card" data-game-id="pirate-bay"><div class="card-thumb t-yellow">☠️⚓</div><div class="card-body"><span class="card-badge b-adventure">Adventure</span><h3 class="card-title">Pirate Bay</h3><div class="card-meta">👥 35K <span class="dot"></span> ⭐ 4.8</div><button class="btn-play" data-id="pirate-bay" data-title="Pirate Bay" data-thumb="☠️" data-genre="adventure">▶ Play Now</button></div></div>
+        <div class="game-card" data-game-id="treasure-hunt"><div class="card-thumb t-teal">💎🗺️</div><div class="card-body"><span class="card-badge b-adventure">Adventure</span><h3 class="card-title">Treasure Hunt</h3><div class="card-meta">👥 35K <span class="dot"></span> ⭐ 4.6</div><button class="btn-play" data-id="treasure-hunt" data-title="Treasure Hunt" data-thumb="💎" data-genre="adventure">▶ Play Now</button></div></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+<script src="security.js"></script>
+<script src="api.js"></script>
+<script src="script.js"></script>
+<script src="recently-played.js"></script>
+<script src="features.js"></script>
+<script src="notifications.js"></script>
+<script src="polish.js"></script>
+<script src="admin-button.js"></script>
+<script src="studio-button.js"></script>
+<script src="extras.js"></script>
+<script src="custom-games.js"></script>
+<script src="thumbnails.js"></script>
+<style>
+/* ── Games page spotlight ── */
+.games-spotlight {
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(135deg, rgba(124,58,237,.3) 0%, rgba(59,130,246,.2) 60%, rgba(236,72,153,.15) 100%);
+  border: 1.5px solid rgba(167,139,250,.3); border-radius: 22px;
+  padding: 36px 40px; margin-bottom: 28px;
+  position: relative; overflow: hidden;
+  box-shadow: 0 8px 40px rgba(124,58,237,.2);
+}
+.games-spotlight::before {
+  content:''; position:absolute; top:-40%; right:-5%;
+  width:280px; height:280px;
+  background:radial-gradient(circle, rgba(167,139,250,.2) 0%, transparent 70%);
+  border-radius:50%; pointer-events:none;
+}
+.gs-left { position:relative; z-index:1; max-width: 480px; }
+.gs-tag {
+  display:inline-block; padding:4px 14px; border-radius:99px; margin-bottom:12px;
+  background:rgba(253,230,138,.15); border:1px solid rgba(253,230,138,.4);
+  color:#fde68a; font-size:.7rem; font-weight:900; letter-spacing:1.5px;
+}
+.gs-title { font-family:'Fredoka One',cursive; font-size:clamp(1.8rem,4vw,2.8rem); color:#f0e8ff; margin-bottom:10px; line-height:1.1; }
+.gs-desc { color:#9d8ec7; font-size:.95rem; font-weight:700; line-height:1.6; margin-bottom:12px; }
+.gs-meta { color:#9d8ec7; font-size:.8rem; font-weight:700; margin-bottom:20px; }
+.gs-btn { width:auto; padding:14px 28px; font-size:1rem; }
+.gs-right { font-size:5rem; flex-shrink:0; animation:gs-bob 3s ease-in-out infinite; }
+@keyframes gs-bob { 0%,100%{transform:translateY(0) rotate(-5deg)} 50%{transform:translateY(-14px) rotate(5deg)} }
+
+/* ── Filter tab emoji ── */
+.f-tab { transition: background .18s, color .18s, transform .15s; }
+.f-tab:hover { transform: translateY(-2px); }
+
+@media(max-width:600px) { .gs-right{display:none} .games-spotlight{padding:24px 20px} }
+
+/* ══ 3D GAMES SECTION ══ */
+.g3d-section {
+  margin-bottom: 32px;
+}
+.g3d-header {
+  margin-bottom: 18px;
+}
+.g3d-tag {
+  display:inline-block; padding:4px 14px; border-radius:99px; margin-bottom:10px;
+  background:linear-gradient(135deg,rgba(255,100,0,.2),rgba(255,200,0,.2));
+  border:1px solid rgba(255,165,0,.5);
+  color:#FFD700; font-size:.72rem; font-weight:900; letter-spacing:1.5px;
+  animation:g3dTagGlow 2s ease-in-out infinite alternate;
+}
+@keyframes g3dTagGlow{0%{box-shadow:0 0 6px rgba(255,215,0,.2)}100%{box-shadow:0 0 16px rgba(255,215,0,.6)}}
+.g3d-title {
+  font-family:'Fredoka One',cursive; font-size:clamp(1.4rem,3.5vw,2.2rem);
+  color:#f0e8ff; margin-bottom:6px;
+}
+.g3d-sub { color:#9d8ec7; font-size:.9rem; font-weight:700; }
+
+.g3d-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:16px;
+}
+.g3d-card {
+  background:linear-gradient(135deg,rgba(30,12,60,.9),rgba(15,5,35,.95));
+  border:1.5px solid rgba(255,215,0,.35);
+  border-radius:20px; padding:20px;
+  cursor:pointer; transition:all .22s;
+  position:relative; overflow:hidden;
+  display:flex; flex-direction:column; gap:12px;
+  box-shadow:0 4px 24px rgba(255,215,0,.1);
+}
+.g3d-card:hover {
+  transform:translateY(-4px) scale(1.01);
+  border-color:rgba(255,215,0,.7);
+  box-shadow:0 8px 36px rgba(255,215,0,.25);
+}
+.g3d-card::before {
+  content:'3D';
+  position:absolute;top:0;right:0;
+  background:linear-gradient(135deg,#D4AF37,#FFD700);
+  color:#1a1000;font-family:'Fredoka One',cursive;font-size:.65rem;
+  padding:4px 10px;border-radius:0 18px 0 12px;font-weight:900;
+  letter-spacing:.5px;
+}
+.g3d-soon::before{content:'SOON';background:linear-gradient(135deg,#666,#999);color:#000}
+.g3d-thumb {
+  font-size:3rem;
+  filter:drop-shadow(0 0 12px rgba(255,215,0,.5));
+  line-height:1;
+}
+.g3d-badge { display:none; }
+.g3d-info { flex:1; }
+.g3d-name {
+  font-family:'Fredoka One',cursive; font-size:1.25rem;
+  color:#f0e8ff; margin-bottom:6px;
+}
+.g3d-meta { color:#9d8ec7; font-size:.8rem; font-weight:700; line-height:1.5; margin-bottom:8px; }
+.g3d-stats { color:#6d5fa0; font-size:.75rem; font-weight:700; }
+.g3d-btn {
+  width:100%; padding:11px;
+  background:linear-gradient(135deg,#D4AF37,#FFD700);
+  color:#1a1000; border:none; border-radius:12px;
+  font-family:'Fredoka One',cursive; font-size:1.05rem;
+  cursor:pointer; transition:all .18s;
+  font-weight:900; letter-spacing:.3px;
+}
+.g3d-btn:hover { transform:scale(1.03); box-shadow:0 4px 16px rgba(255,215,0,.5); }
+.g3d-soon { opacity:.62; cursor:default; }
+.g3d-soon:hover { transform:none; }
+.g3d-soon-btn { background:rgba(100,100,100,.4);color:#666;cursor:not-allowed; }
+.g3d-soon-btn:hover { transform:none;box-shadow:none; }
+</style>
+<script src="effects.js"></script>
+<script src="sound.js"></script>
+<script src="settings.js"></script>
+</body>
+</html>

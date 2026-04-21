@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>∞ Eylox — Shop</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script>
+    try {
+      const s = localStorage.getItem('eylox_token')||localStorage.getItem('eylox_guest')||localStorage.getItem('eylox_user');
+      if (!s) window.location.replace('landing.html');
+    } catch {}
+  </script>
+</head>
+<body data-page="shop">
+<div class="app-shell">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <span class="sidebar-logo-icon">🎮</span>
+      <span class="sidebar-logo-text">Eylox</span>
+    </a>
+    <p class="sidebar-section-label">Menu</p>
+    <nav class="sidebar-nav"><ul>
+      <li><a href="index.html"    class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
+      <li><a href="games.html"    class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
+      <li><a href="friends.html"  class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span><span class="s-badge" style="display:none">0</span></a></li>
+      <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
+      <li><a href="profile.html"  class="sidebar-link"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
+    </ul></nav>
+    <div class="sidebar-divider"></div>
+    <p class="sidebar-section-label">More</p>
+    <nav class="sidebar-nav"><ul>
+      <li><a href="leaderboard.html"  class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
+      <li><a href="achievements.html" class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
+      <li><a href="communities.html"  class="sidebar-link"><span class="s-icon">🌍</span><span class="s-label">Communities</span></a></li>
+      <li><a href="live-events.html"  class="sidebar-link"><span class="s-icon">⚡</span><span class="s-label">Live Events</span></a></li>
+      <li><a href="shop.html"         class="sidebar-link active"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
+      <li><a href="#" class="sidebar-link" id="settingsBtn"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></a></li>
+      <li><a href="#" class="sidebar-link" id="logoutBtn"><span class="s-icon">🚪</span><span class="s-label">Logout</span></a></li>
+    </ul></nav>
+    <div class="sidebar-coins">
+      <img src="eylux-coin.png" class="coins-icon-img" alt="Eylux" />
+      <div><div class="coins-amount" id="sidebarCoins">—</div><div class="coins-label">Eylux</div></div>
+    </div>
+    <div class="sidebar-coins sidebar-trophies">
+      <span class="coins-icon">🏆</span>
+      <div><div class="trophies-amount">—</div><div class="coins-label">Trophies</div></div>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="main-area">
+    <!-- ── Topbar ── -->
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      <div class="search-wrap"><span class="search-icon">🛒</span><input type="search" class="search-input" placeholder="Search items…" id="shopSearch" aria-label="Search shop"/></div>
+      <div class="topbar-right">
+        <button class="tb-btn" aria-label="Notifications">🔔<span class="notif-dot"></span></button>
+        <div class="tb-coins"><img src="eylux-coin.png" class="tb-coin-img" alt="EC"> <span id="topbarCoins">—</span></div>
+        <a href="profile.html" class="tb-avatar" aria-label="My Profile">🎮<span class="online-dot"></span></a>
+      </div>
+    </header>
+
+    <main class="page-content">
+
+      <!-- Shop Hero -->
+      <div style="background:linear-gradient(135deg,rgba(124,58,237,.22),rgba(236,72,153,.18));border:1px solid rgba(167,139,250,.2);border-radius:var(--r-lg);padding:28px 32px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:.72rem;font-weight:900;letter-spacing:1.5px;color:var(--purple);text-transform:uppercase;margin-bottom:6px">🛒 EYLOX MARKETPLACE</div>
+          <h1 style="font-family:var(--font-head);font-size:2rem;margin-bottom:6px">Spend your coins wisely!</h1>
+          <p style="color:var(--muted);font-size:.88rem;font-weight:700">Buy avatar emojis, badges, effects and boosts. Items are yours forever.</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;flex-wrap:wrap">
+          <div style="background:rgba(253,230,138,.12);border:1px solid rgba(253,230,138,.3);border-radius:var(--r-md);padding:14px 22px;text-align:center">
+            <div style="font-family:var(--font-head);font-size:1.6rem;color:var(--yellow);display:flex;align-items:center;justify-content:center;gap:6px"><img src="eylux-coin.png" style="width:28px;height:28px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(255,180,0,.5))"><span id="heroCoins">—</span></div>
+            <div style="font-size:.7rem;font-weight:900;color:var(--muted);letter-spacing:.5px">YOUR EYLUX</div>
+          </div>
+          <div style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);border-radius:var(--r-md);padding:14px 22px;text-align:center">
+            <div style="font-family:var(--font-head);font-size:1.6rem;color:#fbbf24;display:flex;align-items:center;justify-content:center;gap:6px">🏆 <span id="heroWins">—</span></div>
+            <div style="font-size:.7rem;font-weight:900;color:var(--muted);letter-spacing:.5px">YOUR WINS</div>
+          </div>
+          <div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:var(--r-md);padding:14px 22px;text-align:center">
+            <div style="font-family:var(--font-head);font-size:1.6rem;color:var(--green)" id="heroOwned">0</div>
+            <div style="font-size:.7rem;font-weight:900;color:var(--muted);letter-spacing:.5px">ITEMS OWNED</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category Tabs -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px" id="catTabs">
+        <button class="shop-tab active" data-cat="avatars">🎭 Avatars</button>
+        <button class="shop-tab" data-cat="badges">🏅 Badges</button>
+        <button class="shop-tab" data-cat="effects">✨ Effects</button>
+        <button class="shop-tab" data-cat="boosts">⚡ Boosts</button>
+      </div>
+
+      <!-- Items Grid -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px" id="shopGrid"></div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toastContainer"></div>
+
+<style>
+/* ── Shop tab pills ── */
+.shop-tab {
+  padding: 10px 20px; border-radius: 99px; border: 1px solid var(--border);
+  background: var(--card); color: var(--muted); font-family: var(--font-body);
+  font-weight: 800; font-size: .85rem; cursor: pointer;
+  transition: background .18s, color .18s, border-color .18s;
+}
+.shop-tab.active, .shop-tab:hover {
+  background: rgba(167,139,250,.18); color: var(--purple); border-color: rgba(167,139,250,.4);
+}
+
+/* ── Item card ── */
+.shop-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--r-md);
+  padding: 20px 16px; display: flex; flex-direction: column; align-items: center;
+  gap: 10px; text-align: center; transition: transform .2s, border-color .2s;
+  position: relative;
+}
+.shop-card:hover { transform: translateY(-3px); border-color: rgba(167,139,250,.4); }
+.shop-card.owned { border-color: rgba(74,222,128,.35); }
+.shop-card.equipped { border-color: rgba(253,230,138,.6); box-shadow: 0 0 18px rgba(253,230,138,.18); }
+
+.shop-emoji { font-size: 2.8rem; line-height: 1; }
+.shop-name  { font-family: var(--font-head); font-size: 1rem; color: var(--text); }
+.shop-price { font-weight: 900; font-size: .88rem; color: var(--yellow); }
+
+.rarity-badge {
+  position: absolute; top: 10px; right: 10px;
+  font-size: .58rem; font-weight: 900; padding: 2px 7px; border-radius: 99px;
+  letter-spacing: .5px; text-transform: uppercase;
+}
+.rarity-common    { background: rgba(157,142,199,.15); color: var(--muted); border: 1px solid rgba(157,142,199,.2); }
+.rarity-rare      { background: rgba(79,195,247,.12); color: #4fc3f7; border: 1px solid rgba(79,195,247,.25); }
+.rarity-epic      { background: rgba(167,139,250,.15); color: var(--purple); border: 1px solid rgba(167,139,250,.3); }
+.rarity-legendary { background: rgba(253,230,138,.18); color: var(--yellow); border: 1px solid rgba(253,230,138,.35); }
+
+.shop-btn {
+  width: 100%; padding: 9px; border-radius: var(--r-sm); border: none;
+  font-family: var(--font-body); font-weight: 800; font-size: .82rem;
+  cursor: pointer; transition: transform .15s, opacity .15s;
+}
+.shop-btn:active { transform: scale(.96); }
+.shop-btn-buy    { background: linear-gradient(135deg,#7c3aed,#a78bfa); color: #fff; }
+.shop-btn-own    { background: rgba(74,222,128,.15); color: var(--green); border: 1px solid rgba(74,222,128,.3); cursor: default; }
+.shop-btn-equip  { background: rgba(253,230,138,.15); color: var(--yellow); border: 1px solid rgba(253,230,138,.3); }
+.shop-btn-equipped { background: linear-gradient(135deg,#b45309,#fde68a); color: #1a0800; cursor: default; }
+
+/* Equipped glow on owned-active */
+.shop-card.equipped .shop-emoji { filter: drop-shadow(0 0 8px var(--yellow)); }
+
+/* Can't afford label */
+.cant-buy-label {
+  color: #f87171;
+  font-weight: 900;
+  font-size: .82rem;
+  text-align: center;
+  padding: 7px 10px;
+  border-radius: var(--r-sm);
+  background: rgba(248,113,113,.1);
+  border: 1px solid rgba(248,113,113,.28);
+  width: 100%;
+  line-height: 1.3;
+}
+</style>
+
+<script src="security.js"></script>
+<script src="api.js"></script>
+<script src="features.js"></script>
+<script src="notifications.js"></script>
+<script src="polish.js"></script>
+<script src="admin-button.js"></script>
+<script src="studio-button.js"></script>
+<script>
+/* ══════════════════════════════════════════════════
+   SHOP CATALOG
+══════════════════════════════════════════════════ */
+const CATALOG = {
+  avatars: [
+    { id:'av-cat',     emoji:'🐱', name:'Cat',          price:100,  rarity:'common' },
+    { id:'av-lion',    emoji:'🦁', name:'Lion',         price:200,  rarity:'common' },
+    { id:'av-fox',     emoji:'🦊', name:'Fox',          price:250,  rarity:'common' },
+    { id:'av-panda',   emoji:'🐼', name:'Panda',        price:300,  rarity:'common' },
+    { id:'av-wolf',    emoji:'🐺', name:'Wolf',         price:300,  rarity:'common' },
+    { id:'av-tiger',   emoji:'🐯', name:'Tiger',        price:350,  rarity:'rare' },
+    { id:'av-ghost',   emoji:'👻', name:'Ghost',        price:350,  rarity:'rare' },
+    { id:'av-alien',   emoji:'👾', name:'Alien',        price:400,  rarity:'rare' },
+    { id:'av-robot',   emoji:'🤖', name:'Robot',        price:400,  rarity:'rare' },
+    { id:'av-ninja',   emoji:'🥷', name:'Ninja',        price:450,  rarity:'rare' },
+    { id:'av-wizard',  emoji:'🧙', name:'Wizard',       price:500,  rarity:'rare' },
+    { id:'av-dragon',  emoji:'🐲', name:'Dragon',       price:500,  rarity:'rare' },
+    { id:'av-fire',    emoji:'🔥', name:'Flame',        price:600,  rarity:'epic' },
+    { id:'av-unicorn', emoji:'🦄', name:'Unicorn',      price:600,  rarity:'epic' },
+    { id:'av-diamond', emoji:'💎', name:'Diamond',      price:800,  rarity:'epic' },
+    { id:'av-crown',   emoji:'👑', name:'Crown',        price:1000, rarity:'legendary' },
+  ],
+  badges: [
+    { id:'bg-gamer',   emoji:'🎮', name:'Gamer',        price:300,  rarity:'common' },
+    { id:'bg-star',    emoji:'🌟', name:'Star Player',  price:500,  rarity:'common' },
+    { id:'bg-rocket',  emoji:'🚀', name:'Sky High',     price:450,  rarity:'rare' },
+    { id:'bg-target',  emoji:'🎯', name:'Sharpshooter', price:600,  rarity:'rare' },
+    { id:'bg-fire',    emoji:'🔥', name:'Fire Streak',  price:750,  rarity:'rare' },
+    { id:'bg-brain',   emoji:'🧠', name:'Big Brain',    price:500,  rarity:'rare' },
+    { id:'bg-rainbow', emoji:'🌈', name:'Rainbow',      price:600,  rarity:'rare' },
+    { id:'bg-skull',   emoji:'💀', name:'Survivor',     price:700,  rarity:'epic' },
+    { id:'bg-bolt',    emoji:'⚡', name:'Speed Demon',  price:800,  rarity:'epic' },
+    { id:'bg-diamond', emoji:'💎', name:'Elite',        price:1000, rarity:'epic' },
+    { id:'bg-trophy',  emoji:'🏆', name:'Champion',     price:1200, rarity:'legendary' },
+    { id:'bg-royalty', emoji:'👑', name:'Royalty',      price:1500, rarity:'legendary' },
+  ],
+  effects: [
+    { id:'ef-sparkle',  emoji:'✨', name:'Sparkle',       price:5,  rarity:'common', winsPrice:true },
+    { id:'ef-blossom',  emoji:'🌸', name:'Blossom',       price:8,  rarity:'rare',   winsPrice:true },
+    { id:'ef-wave',     emoji:'🌊', name:'Ocean Wave',    price:8,  rarity:'rare',   winsPrice:true },
+    { id:'ef-frost',    emoji:'❄️', name:'Frost Aura',   price:10, rarity:'rare',   winsPrice:true },
+    { id:'ef-toxic',    emoji:'☣️', name:'Toxic',        price:10, rarity:'rare',   winsPrice:true },
+    { id:'ef-electric', emoji:'⚡', name:'Electric',     price:15, rarity:'epic',   winsPrice:true },
+    { id:'ef-firework', emoji:'🎆', name:'Fireworks',    price:15, rarity:'epic',   winsPrice:true },
+    { id:'ef-rainbow',  emoji:'🌈', name:'Rainbow Trail', price:20, rarity:'epic',   winsPrice:true },
+  ],
+  boosts: [
+    { id:'bo-luck',    emoji:'🍀', name:'Lucky Charm',     price:2,  rarity:'common', consumable:true, winsPrice:true },
+    { id:'bo-spin',    emoji:'🎡', name:'Extra Spin',      price:2,  rarity:'common', consumable:true, winsPrice:true },
+    { id:'bo-shield',  emoji:'🛡️', name:'Shield (1 game)',price:3,  rarity:'common', consumable:true, winsPrice:true },
+    { id:'bo-2x',      emoji:'⚡', name:'2× Coins (1hr)', price:5,  rarity:'rare',   consumable:true, winsPrice:true },
+    { id:'bo-magnet',  emoji:'🧲', name:'Coin Magnet',     price:7,  rarity:'rare',   consumable:true, winsPrice:true },
+    { id:'bo-5x',      emoji:'💥', name:'5× Coins (30m)', price:10, rarity:'epic',   consumable:true, winsPrice:true },
+  ],
+};
+
+/* ── State helpers ── */
+function getUser() {
+  try { return JSON.parse(localStorage.getItem('eylox_user')); } catch { return null; }
+}
+function saveUser(u) { localStorage.setItem('eylox_user', JSON.stringify(u)); }
+function getOwned()    { try { return JSON.parse(localStorage.getItem('eylox_owned_items') || '[]'); } catch { return []; } }
+function getEquipped() { try { return JSON.parse(localStorage.getItem('eylox_equipped')    || '{}'); } catch { return {}; } }
+
+/* ── Persist shop state under a per-user key so it survives re-login ── */
+function saveShopSnapshot() {
+  try {
+    const u = getUser();
+    if (!u?.username) return;
+    const snapshot = {
+      owned:     JSON.parse(localStorage.getItem('eylox_owned_items') || '[]'),
+      equipped:  JSON.parse(localStorage.getItem('eylox_equipped')    || '{}'),
+      inventory: JSON.parse(localStorage.getItem('eylox_inventory')   || '{}'),
+    };
+    localStorage.setItem('eylox_shopdata_' + u.username, JSON.stringify(snapshot));
+  } catch {}
+}
+
+const MAX_COINS = 1_000_000_000; // 1 billion cap
+
+function getCoins() {
+  const u = getUser();
+  return Math.min(u?.coins ?? 100, MAX_COINS);
+}
+function deductCoins(n) {
+  const u = getUser();
+  if (!u) return false;
+  const current = Math.min(u.coins || 0, MAX_COINS);
+  if (current < n) return false;
+  u.coins = current - n;
+  saveUser(u);
+  return true;
+}
+function addCoins(n) {
+  const u = getUser();
+  if (!u) return;
+  u.coins = Math.min((u.coins || 0) + n, MAX_COINS);
+  saveUser(u);
+  refreshCoins();
+}
+
+function getWins() {
+  const u = getUser();
+  return Math.max(0, Math.floor(u?.wins ?? 0));
+}
+function deductWins(n) {
+  const u = getUser();
+  if (!u) return false;
+  const current = Math.max(0, Math.floor(u.wins || 0));
+  if (current < n) return false;
+  u.wins = current - n;
+  saveUser(u);
+  return true;
+}
+
+/* ══════════════════════════════════════════════
+   BOOST ACTIVATION SYSTEM
+══════════════════════════════════════════════ */
+const BOOST_EFFECTS = {
+  'bo-luck':   { label:'Lucky Charm',   duration: 0,        effect: 'luck',      desc:'Your next game gives +50% wins chance!', icon:'🍀', oneShot: true },
+  'bo-spin':   { label:'Extra Spin',    duration: 0,        effect: 'spin',      desc:'Instantly awarded 100 bonus Eylux!',    icon:'🎡', oneShot: true },
+  'bo-shield': { label:'Shield',        duration: 0,        effect: 'shield',    desc:'You\'re protected from coin loss next game!', icon:'🛡️', oneShot: true },
+  'bo-2x':     { label:'2× Coins',      duration: 3600000,  effect: 'coins_2x',  desc:'2× coins earned for 1 hour!',           icon:'⚡', multiplier: 2 },
+  'bo-magnet': { label:'Coin Magnet',   duration: 3600000,  effect: 'magnet',    desc:'Auto-collecting coins for 1 hour!',     icon:'🧲' },
+  'bo-5x':     { label:'5× Coins',      duration: 1800000,  effect: 'coins_5x',  desc:'5× coins earned for 30 minutes!',       icon:'💥', multiplier: 5 },
+};
+
+function getActiveBoosts() {
+  try {
+    const raw = JSON.parse(localStorage.getItem('eylox_active_boosts') || '{}');
+    const now = Date.now();
+    const clean = {};
+    Object.entries(raw).forEach(([k, v]) => {
+      if (v.expiresAt === 0 || v.expiresAt > now) clean[k] = v;
+    });
+    if (JSON.stringify(clean) !== JSON.stringify(raw)) localStorage.setItem('eylox_active_boosts', JSON.stringify(clean));
+    return clean;
+  } catch { return {}; }
+}
+function isBoostActive(id) { return !!getActiveBoosts()[id]; }
+
+function activateBoost(id, emoji, name) {
+  const inv = JSON.parse(localStorage.getItem('eylox_inventory') || '{}');
+  if (!inv[id] || inv[id] < 1) { toast('❌ You don\'t have this boost!', 'pink'); return; }
+
+  const effect = BOOST_EFFECTS[id];
+  if (!effect) return;
+
+  /* Deduct from inventory */
+  inv[id]--;
+  if (inv[id] <= 0) delete inv[id];
+  localStorage.setItem('eylox_inventory', JSON.stringify(inv));
+
+  /* One-shot effects */
+  if (effect.oneShot) {
+    if (effect.effect === 'spin') {
+      localStorage.setItem('eylox_pending_spin', '1');
+      toast(`🎡 Extra Spin unlocked! Redirecting to spin wheel…`, 'green');
+      setTimeout(() => { window.location.href = 'index.html#spin'; }, 900);
+      return;
+    } else if (effect.effect === 'luck') {
+      const active = getActiveBoosts();
+      active[id] = { expiresAt: 0, effect: effect.effect, oneShot: true };
+      localStorage.setItem('eylox_active_boosts', JSON.stringify(active));
+      toast(`🍀 Lucky Charm active! Next game is lucky!`, 'green');
+    } else if (effect.effect === 'shield') {
+      const active = getActiveBoosts();
+      active[id] = { expiresAt: 0, effect: effect.effect, oneShot: true };
+      localStorage.setItem('eylox_active_boosts', JSON.stringify(active));
+      toast(`🛡️ Shield active! You're protected next game!`, 'green');
+    }
+  } else {
+    /* Timed boost */
+    const active = getActiveBoosts();
+    active[id] = { expiresAt: Date.now() + effect.duration, effect: effect.effect, multiplier: effect.multiplier || 1 };
+    localStorage.setItem('eylox_active_boosts', JSON.stringify(active));
+    toast(`${emoji} ${name} activated! ${effect.desc}`, 'green');
+  }
+
+  window.EyloxSFX?.boost();
+  renderActiveBoostsBanner();
+  renderGrid(currentCat);
+  refreshOwned();
+}
+
+function renderActiveBoostsBanner() {
+  const active = getActiveBoosts();
+  const ids = Object.keys(active);
+  let banner = document.getElementById('activeBoostsBanner');
+  if (!ids.length) { if (banner) banner.style.display = 'none'; return; }
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'activeBoostsBanner';
+    banner.style.cssText = 'background:linear-gradient(135deg,rgba(74,222,128,.12),rgba(45,212,191,.08));border:1px solid rgba(74,222,128,.25);border-radius:var(--r-md);padding:12px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap';
+    document.querySelector('.page-content main, .page-content')?.prepend(banner);
+  }
+  banner.style.display = 'flex';
+  banner.innerHTML = `<span style="font-size:.7rem;font-weight:900;color:#4ade80;text-transform:uppercase;letter-spacing:.8px;white-space:nowrap">⚡ Active Boosts</span>` +
+    ids.map(id => {
+      const b = active[id];
+      const e = BOOST_EFFECTS[id];
+      const timeLeft = b.expiresAt > 0 ? Math.ceil((b.expiresAt - Date.now()) / 60000) + 'm left' : 'Active';
+      return `<span style="background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.3);color:#4ade80;padding:5px 12px;border-radius:99px;font-size:.75rem;font-weight:800">${e?.icon || '⚡'} ${e?.label || id} · ${timeLeft}</span>`;
+    }).join('');
+}
+
+/* ── Toast ── */
+function toast(msg, type = 'green') {
+  const c = document.getElementById('toastContainer');
+  if (!c) return;
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 3200);
+}
+
+/* ── Refresh coin displays ── */
+function refreshCoins() {
+  const c = getCoins();
+  const fmt = Number(c).toLocaleString();
+  document.getElementById('heroCoins').textContent = fmt;
+  document.getElementById('topbarCoins').textContent = fmt;
+  document.getElementById('sidebarCoins').textContent = fmt;
+  const tbAll = document.querySelectorAll('.tb-coins span, .coins-amount');
+  tbAll.forEach(el => { if (el.id !== 'topbarCoins' && el.id !== 'sidebarCoins') el.textContent = fmt; });
+}
+
+/* ── Refresh wins display ── */
+function refreshWins() {
+  const w = getWins();
+  const fmt = Number(w).toLocaleString();
+  document.getElementById('heroWins').textContent = fmt;
+  document.querySelectorAll('.trophies-amount').forEach(el => el.textContent = fmt);
+  const topT = document.getElementById('topbarTrophies');
+  if (topT) topT.textContent = fmt;
+}
+
+/* ── Refresh owned count ── */
+function refreshOwned() {
+  document.getElementById('heroOwned').textContent = getOwned().length;
+}
+
+/* ── Render shop grid ── */
+let currentCat = 'avatars';
+function renderGrid(cat) {
+  currentCat = cat;
+  const items = CATALOG[cat] || [];
+  const owned = getOwned();
+  const equipped = getEquipped();
+  const q = document.getElementById('shopSearch')?.value.toLowerCase() || '';
+
+  const filtered = q ? items.filter(i => i.name.toLowerCase().includes(q) || i.emoji.includes(q)) : items;
+
+  document.getElementById('shopGrid').innerHTML = filtered.map(item => {
+    const isOwned    = owned.includes(item.id);
+    const isEquipped = equipped[cat] === item.id;
+    const useWins    = !!item.winsPrice;
+    const canAfford  = useWins ? getWins() >= item.price : getCoins() >= item.price;
+    const priceIcon  = useWins
+      ? `<span style="font-size:1rem;vertical-align:middle">🏆</span>`
+      : `<img src="eylux-coin.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;margin-right:2px">`;
+    const priceIconSm = useWins
+      ? `<span style="font-size:.85rem;vertical-align:middle">🏆</span>`
+      : `<img src="eylux-coin.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle">`;
+    const currencyLabel = useWins ? 'Wins' : 'Eylux';
+
+    let btnHtml = '';
+    const inv = JSON.parse(localStorage.getItem('eylox_inventory') || '{}');
+    const invQty = inv[item.id] || 0;
+    const isActive = isBoostActive(item.id);
+
+    if (isEquipped) {
+      btnHtml = `<button class="shop-btn shop-btn-equipped" disabled>✓ Equipped</button>`;
+    } else if (cat === 'boosts' && invQty > 0) {
+      const boostLabel = isActive ? '⚡ Active!' : `Use ×${invQty}`;
+      btnHtml = `<button class="shop-btn ${isActive ? 'shop-btn-equipped' : 'shop-btn-equip'}" ${isActive ? 'disabled' : `onclick="activateBoost('${item.id}','${item.emoji}','${item.name}')"`}>${boostLabel}</button>
+        <button class="shop-btn shop-btn-buy" style="margin-top:4px" onclick="buyItem('${cat}','${item.id}',${item.price},'${item.emoji}','${item.name}')">${priceIcon} ${item.price.toLocaleString()}</button>`;
+    } else if (isOwned && cat !== 'boosts') {
+      btnHtml = `<button class="shop-btn shop-btn-equip" onclick="equipItem('${cat}','${item.id}','${item.emoji}')">Equip →</button>`;
+    } else if (!canAfford) {
+      btnHtml = `
+        <div class="cant-buy-label">Not enough ${currencyLabel}!</div>
+        <div style="font-size:.72rem;color:var(--muted);font-weight:700;margin-top:2px">${priceIconSm} ${item.price.toLocaleString()} ${currencyLabel}</div>`;
+    } else {
+      btnHtml = `<button class="shop-btn shop-btn-buy" onclick="buyItem('${cat}','${item.id}',${item.price},'${item.emoji}','${item.name}')">${priceIcon} ${item.price.toLocaleString()} ${currencyLabel}</button>`;
+    }
+
+    return `
+    <div class="shop-card${isOwned||invQty>0?' owned':''}${isEquipped?' equipped':''}${isActive?' active-boost':''}">
+      <span class="rarity-badge rarity-${item.rarity}">${item.rarity}</span>
+      ${item.consumable ? `<span style="position:absolute;top:10px;left:10px;font-size:.58rem;font-weight:900;color:var(--teal);background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.25);padding:2px 7px;border-radius:99px;text-transform:uppercase;letter-spacing:.5px">×${invQty||0}</span>` : ''}
+      <div class="shop-emoji">${item.emoji}</div>
+      <div class="shop-name">${item.name}</div>
+      ${isActive ? `<div style="font-size:.68rem;font-weight:900;color:#4ade80;margin-bottom:2px" data-boost-timer="${item.id}"></div>` : ''}
+      ${btnHtml}
+    </div>`;
+  }).join('') || `<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--muted);font-weight:800">No items found 🔍</div>`;
+}
+
+/* ── Buy item ── */
+function buyItem(cat, id, price, emoji, name) {
+  const item = CATALOG[cat].find(i => i.id === id);
+  const useWins = !!item?.winsPrice;
+
+  if (useWins) {
+    if (getWins() < price) {
+      toast(`❌ Not enough wins! Need ${price} 🏆`, 'pink');
+      return;
+    }
+    if (!deductWins(price)) { toast('❌ Purchase failed', 'pink'); return; }
+  } else {
+    if (getCoins() < price) {
+      toast(`❌ Not enough Eylux! Need ${price.toLocaleString()} 🪙`, 'pink');
+      return;
+    }
+    if (!deductCoins(price)) { toast('❌ Purchase failed', 'pink'); return; }
+  }
+
+  /* Add to owned (unless consumable boost) */
+  if (!item?.consumable) {
+    const owned = getOwned();
+    if (!owned.includes(id)) owned.push(id);
+    localStorage.setItem('eylox_owned_items', JSON.stringify(owned));
+    /* Auto-equip if it's an avatar */
+    if (cat === 'avatars') equipItem(cat, id, emoji, true);
+  } else {
+    /* consumable: add to inventory */
+    const inv = JSON.parse(localStorage.getItem('eylox_inventory') || '{}');
+    inv[id] = (inv[id] || 0) + 1;
+    localStorage.setItem('eylox_inventory', JSON.stringify(inv));
+  }
+
+  refreshCoins();
+  refreshWins();
+  refreshOwned();
+  saveShopSnapshot();                    /* ← persist so re-login keeps purchases */
+  renderGrid(currentCat);
+  window.EyloxSFX?.purchase();
+  const currencyStr = useWins ? `${price} 🏆 wins` : `🪙 ${price.toLocaleString()} Eylux`;
+  toast(`✅ Bought ${emoji} ${name}!`, 'green');
+  Notifs.push('🛒 Purchase Complete', `You bought ${emoji} ${name} for ${currencyStr}!`, 'shop');
+
+  /* Burst animation on the spent currency display */
+  const heroNum = document.getElementById(useWins ? 'heroWins' : 'heroCoins');
+  if (heroNum) { heroNum.style.transform = 'scale(1.35)'; setTimeout(() => { heroNum.style.transform = ''; }, 220); }
+}
+
+/* ── Equip item ── */
+function equipItem(cat, id, emoji, silent = false) {
+  const equipped = getEquipped();
+  equipped[cat] = id;
+  localStorage.setItem('eylox_equipped', JSON.stringify(equipped));
+
+  /* Apply avatar immediately to user profile */
+  if (cat === 'avatars') {
+    const u = getUser();
+    if (u) { u.avatar = emoji; saveUser(u); }
+    document.querySelectorAll('.tb-avatar').forEach(el => {
+      const dot = el.querySelector('.online-dot');
+      el.textContent = emoji;
+      if (dot) el.appendChild(dot);
+    });
+  }
+
+  /* Apply visual effect immediately */
+  if (cat === 'effects') {
+    window.EyloxApplyEffect?.(id);
+  }
+
+  saveShopSnapshot();                    /* ← persist equipped state too */
+  renderGrid(currentCat);
+  if (!silent) { window.EyloxSFX?.equip(); toast(`✅ ${emoji} equipped!`, 'yellow'); }
+}
+
+/* ── Tab switching ── */
+document.getElementById('catTabs').addEventListener('click', e => {
+  const btn = e.target.closest('.shop-tab');
+  if (!btn) return;
+  document.querySelectorAll('.shop-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid(btn.dataset.cat);
+});
+
+/* ── Search ── */
+document.getElementById('shopSearch').addEventListener('input', () => renderGrid(currentCat));
+
+/* ── Menu button ── */
+document.getElementById('menuBtn').addEventListener('click', () => {
+  const s = document.getElementById('sidebar');
+  const o = document.getElementById('sidebarOverlay');
+  s.classList.toggle('open');
+  o.classList.toggle('show');
+});
+document.getElementById('sidebarOverlay').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+});
+
+/* ── Boot ── */
+document.addEventListener('DOMContentLoaded', () => {
+  refreshCoins();
+  refreshWins();
+  refreshOwned();
+  renderGrid('avatars');
+  renderActiveBoostsBanner();
+  /* Live countdown on boost timers */
+  setInterval(() => {
+    document.querySelectorAll('[data-boost-timer]').forEach(el => {
+      const id = el.dataset.boostTimer;
+      const b = getActiveBoosts()[id];
+      if (!b) { el.textContent = ''; return; }
+      if (b.expiresAt === 0) { el.textContent = '● Active'; return; }
+      const mins = Math.ceil((b.expiresAt - Date.now()) / 60000);
+      el.textContent = mins > 0 ? `⏱ ${mins}m left` : 'Expired';
+    });
+  }, 5000);
+});
+</script>
+<script src="effects.js"></script>
+<script src="sound.js"></script>
+<script src="settings.js"></script>
+</body>
+</html>

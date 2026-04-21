@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>∞ Eylox — Home</title>
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    /* Redirect to landing only if there is truly no session at all */
+    try {
+      const hasSession = localStorage.getItem('eylox_token') ||
+                         localStorage.getItem('eylox_guest') ||
+                         localStorage.getItem('eylox_user');
+      if (!hasSession) window.location.replace('landing.html');
+    } catch {}
+  </script>
+</head>
+<body data-page="home">
+<div class="app-shell">
+
+  <!-- ══════════ SIDEBAR ══════════ -->
+  <aside class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <span class="sidebar-logo-icon">🎮</span>
+      <span class="sidebar-logo-text">Eylox</span>
+    </a>
+    <p class="sidebar-section-label">Menu</p>
+    <nav class="sidebar-nav"><ul>
+      <li><a href="index.html"    class="sidebar-link active"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
+      <li><a href="games.html"    class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
+      <li><a href="friends.html"  class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span><span class="s-badge" style="display:none">0</span></a></li>
+      <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
+      <li><a href="profile.html"  class="sidebar-link"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
+    </ul></nav>
+    <div class="sidebar-divider"></div>
+    <p class="sidebar-section-label">More</p>
+    <nav class="sidebar-nav"><ul>
+      <li><a href="leaderboard.html"  class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
+      <li><a href="achievements.html" class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
+      <li><a href="communities.html"  class="sidebar-link"><span class="s-icon">🌍</span><span class="s-label">Communities</span></a></li>
+      <li><a href="live-events.html"  class="sidebar-link"><span class="s-icon">⚡</span><span class="s-label">Live Events</span></a></li>
+      <li><a href="shop.html"         class="sidebar-link"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
+      <li><a href="#" class="sidebar-link" id="settingsBtn"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></a></li>
+      <li><a href="#" class="sidebar-link" id="logoutBtn"><span class="s-icon">🚪</span><span class="s-label">Logout</span></a></li>
+    </ul></nav>
+    <div class="sidebar-coins">
+      <img src="eylux-coin.png" class="coins-icon-img" alt="Eylux" />
+      <div><div class="coins-amount">—</div><div class="coins-label">Eylux</div></div>
+    </div>
+    <div class="sidebar-coins sidebar-trophies">
+      <span class="coins-icon">🏆</span>
+      <div><div class="trophies-amount">—</div><div class="coins-label">Trophies</div></div>
+    </div>
+  </aside>
+
+  <!-- ══════════ MAIN ══════════ -->
+  <div class="main-area">
+
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="search" class="search-input" placeholder="Search games…" aria-label="Search games" />
+      </div>
+      <div class="topbar-right">
+        <button class="tb-btn" id="notifBellBtn" aria-label="Notifications">🔔<span class="notif-dot"></span></button>
+        <div class="tb-coins"><img src="eylux-coin.png" class="tb-coin-img" alt="EC"> <span id="topbarCoins">—</span></div>
+        <div class="tb-trophies"><span class="tb-trophy-icon">🏆</span> <span id="topbarTrophies">—</span></div>
+        <a href="admin.html" class="tb-btn" id="adminBtn" style="display:none;position:relative;background:linear-gradient(135deg,#78350f,#f59e0b,#fde68a);color:#1a0800;border-radius:99px;padding:7px 16px;font-size:.8rem;font-weight:900;text-decoration:none;gap:6px;align-items:center;letter-spacing:.3px;box-shadow:0 4px 20px rgba(245,158,11,.55),0 0 0 2px rgba(253,230,138,.25);border:none;font-family:var(--font-head);overflow:visible;width:auto;height:auto;flex-shrink:0;transition:transform .18s,box-shadow .18s;" onmouseover="this.style.transform='scale(1.08) translateY(-2px)';this.style.boxShadow='0 8px 32px rgba(245,158,11,.8),0 0 0 3px rgba(253,230,138,.4)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(245,158,11,.55),0 0 0 2px rgba(253,230,138,.25)'">
+          <span style="animation:crown-spin 4s linear infinite;display:inline-block">👑</span> Admin
+          <span style="position:absolute;top:-4px;right:-4px;width:10px;height:10px;background:#4ade80;border-radius:50%;border:2px solid var(--bg);box-shadow:0 0 6px #4ade80"></span>
+        </a>
+        <a href="profile.html" class="tb-avatar" aria-label="My Profile">🎮<span class="online-dot"></span></a>
+      </div>
+    </header>
+
+    <main class="page-content">
+
+      <!-- Welcome Banner -->
+      <div class="welcome-banner">
+        <div class="welcome-text">
+          <h1>Welcome back, <span class="welcome-name">Player! 👋</span></h1>
+          <p>Ready to play? <a href="friends.html" style="color:var(--purple);text-decoration:none;font-weight:800">Check your friends</a> and discover new games!</p>
+          <div id="streakBadge" style="display:none;margin-top:10px;display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(253,230,138,.1));border:1px solid rgba(245,158,11,.35);border-radius:99px;padding:5px 14px;font-size:.8rem;font-weight:800;color:#fde68a"></div>
+        </div>
+        <div class="welcome-art">🚀</div>
+      </div>
+
+      <!-- Friends Online -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">🤝 Friends Online</h2>
+          <a href="friends.html" class="section-link">See all →</a>
+        </div>
+        <div class="friends-row" id="friends-row">
+          <!-- Populated by friends-local.js on DOMContentLoaded -->
+        </div>
+      </div>
+
+      <!-- Continue Playing -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">▶️ Continue Playing</h2>
+          <a href="games.html" class="section-link">All games →</a>
+        </div>
+        <div class="games-grid lg" id="continue-grid">
+          <!-- Populated by features.js when logged in -->
+          <div class="game-card" data-game-id="sky-riders"><div class="card-thumb" data-img="sky-riders"></div><div class="card-body"><span class="card-badge b-racing">Racing</span><h3 class="card-title">Sky Riders</h3><div class="card-meta">👥 120K <span class="dot"></span> ⭐ 4.8</div><button class="btn-play" data-id="sky-riders" data-title="Sky Riders" data-thumb="🚀" data-genre="racing">▶ Resume</button></div></div>
+          <div class="game-card" data-game-id="block-kingdom"><div class="card-thumb" data-img="block-kingdom"></div><div class="card-body"><span class="card-badge b-building">Building</span><h3 class="card-title">Block Kingdom</h3><div class="card-meta">👥 98K <span class="dot"></span> ⭐ 4.7</div><button class="btn-play" data-id="block-kingdom" data-title="Block Kingdom" data-thumb="🏰" data-genre="building">▶ Resume</button></div></div>
+          <div class="game-card" data-game-id="ninja-dash"><div class="card-thumb" data-img="ninja-dash"></div><div class="card-body"><span class="card-badge b-action">Action</span><h3 class="card-title">Ninja Dash</h3><div class="card-meta">👥 75K <span class="dot"></span> ⭐ 4.6</div><button class="btn-play" data-id="ninja-dash" data-title="Ninja Dash" data-thumb="🥷" data-genre="action">▶ Resume</button></div></div>
+        </div>
+      </div>
+
+      <!-- Daily Challenge Banner -->
+      <div class="daily-challenge-banner">
+        <div class="dcb-left">
+          <div class="dcb-tag">🔥 DAILY CHALLENGE</div>
+          <h3 class="dcb-title">Can you survive <span>100 seconds</span> in Ninja Dash?</h3>
+          <p class="dcb-desc">Complete today's challenge for <strong>+500 💰 bonus coins</strong> and the exclusive <strong>🏅 Daily Hero</strong> badge.</p>
+          <div class="dcb-actions">
+            <button class="btn-play dcb-btn" data-id="ninja-dash" data-title="Ninja Dash" data-thumb="🥷" data-genre="action">⚡ Accept Challenge</button>
+            <div class="dcb-timer" id="dcbTimer">Resets in <strong id="dcbCountdown">—</strong></div>
+          </div>
+        </div>
+        <div class="dcb-right" aria-hidden="true">🥷<span class="dcb-vs">VS</span>⏱️</div>
+      </div>
+
+      <!-- Hot Right Now -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">🔥 Hot Right Now</h2>
+          <a href="games.html" class="section-link">See all →</a>
+        </div>
+        <div class="hot-scroll-row" id="hot-row">
+          <div class="hot-card" data-game-id="ninja-dash"><div class="hot-rank">1</div><div class="hot-thumb" data-img="ninja-dash"></div><div class="hot-info"><span class="hot-title">Ninja Dash</span><span class="hot-players">👥 12.4K playing</span></div><button class="btn-play hot-btn" data-id="ninja-dash" data-title="Ninja Dash" data-thumb="🥷" data-genre="action">▶</button></div>
+          <div class="hot-card" data-game-id="sky-riders"><div class="hot-rank">2</div><div class="hot-thumb" data-img="sky-riders"></div><div class="hot-info"><span class="hot-title">Sky Riders</span><span class="hot-players">👥 9.1K playing</span></div><button class="btn-play hot-btn" data-id="sky-riders" data-title="Sky Riders" data-thumb="🚀" data-genre="racing">▶</button></div>
+          <div class="hot-card" data-game-id="dragon-escape"><div class="hot-rank">3</div><div class="hot-thumb" data-img="dragon-escape"></div><div class="hot-info"><span class="hot-title">Dragon Escape</span><span class="hot-players">👥 7.8K playing</span></div><button class="btn-play hot-btn" data-id="dragon-escape" data-title="Dragon Escape" data-thumb="🐉" data-genre="survival">▶</button></div>
+          <div class="hot-card" data-game-id="puzzle-palace"><div class="hot-rank">4</div><div class="hot-thumb" data-img="puzzle-palace"></div><div class="hot-info"><span class="hot-title">Puzzle Palace</span><span class="hot-players">👥 6.2K playing</span></div><button class="btn-play hot-btn" data-id="puzzle-palace" data-title="Puzzle Palace" data-thumb="🧩" data-genre="puzzle">▶</button></div>
+          <div class="hot-card" data-game-id="ocean-quest"><div class="hot-rank">5</div><div class="hot-thumb" data-img="ocean-quest"></div><div class="hot-info"><span class="hot-title">Ocean Quest</span><span class="hot-players">👥 5.5K playing</span></div><button class="btn-play hot-btn" data-id="ocean-quest" data-title="Ocean Quest" data-thumb="🌊" data-genre="adventure">▶</button></div>
+          <div class="hot-card" data-game-id="block-kingdom"><div class="hot-rank">6</div><div class="hot-thumb" data-img="block-kingdom"></div><div class="hot-info"><span class="hot-title">Block Kingdom</span><span class="hot-players">👥 4.9K playing</span></div><button class="btn-play hot-btn" data-id="block-kingdom" data-title="Block Kingdom" data-thumb="🏰" data-genre="building">▶</button></div>
+        </div>
+      </div>
+
+      <!-- Daily Spin Wheel -->
+      <div id="spinSection" style="background:linear-gradient(135deg,rgba(167,139,250,.14),rgba(236,72,153,.1));border:1px solid rgba(167,139,250,.25);border-radius:var(--r-lg);padding:24px 28px;margin-bottom:28px;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <div style="font-size:.7rem;font-weight:900;letter-spacing:1.5px;color:var(--purple);text-transform:uppercase;margin-bottom:6px">🎡 DAILY FREE SPIN</div>
+          <h3 style="font-family:var(--font-head);font-size:1.4rem;margin-bottom:4px">Spin for FREE coins!</h3>
+          <p style="color:var(--muted);font-size:.84rem;font-weight:700">Win up to <strong style="color:var(--yellow)">1,000 🪙</strong> every day. Resets at midnight.</p>
+          <div id="spinCooldown" style="margin-top:10px;font-size:.8rem;font-weight:800;color:var(--muted)"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:12px;flex-shrink:0">
+          <div id="spinWheel" style="position:relative;width:120px;height:120px">
+            <canvas id="spinCanvas" width="120" height="120" style="border-radius:50%;cursor:pointer"></canvas>
+          </div>
+          <button id="spinBtn" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;border:none;border-radius:99px;padding:10px 28px;font-family:var(--font-body);font-weight:900;font-size:.88rem;cursor:pointer;transition:transform .15s;box-shadow:0 4px 18px rgba(124,58,237,.45)">🎡 SPIN!</button>
+        </div>
+      </div>
+
+      <!-- Top Players Leaderboard -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">🏆 Top Players This Week</h2>
+          <a href="leaderboard.html" class="section-link">Full board →</a>
+        </div>
+        <div class="leaderboard-list">
+          <div class="lb-row lb-gold">  <span class="lb-pos">🥇</span><div class="lb-av" style="background:linear-gradient(135deg,#7c3aed,#ec4899)">🦁</div><div class="lb-info"><span class="lb-name">NinjaKing99</span><span class="lb-sub">Ninja Dash · 42,810 pts</span></div><span class="lb-coins">💰 8,400</span></div>
+          <div class="lb-row lb-silver"><span class="lb-pos">🥈</span><div class="lb-av" style="background:linear-gradient(135deg,#0ea5e9,#6366f1)">🐯</div><div class="lb-info"><span class="lb-name">StarBlaster_X</span><span class="lb-sub">Space Blaster · 38,200 pts</span></div><span class="lb-coins">💰 6,100</span></div>
+          <div class="lb-row lb-bronze"><span class="lb-pos">🥉</span><div class="lb-av" style="background:linear-gradient(135deg,#059669,#0ea5e9)">🐼</div><div class="lb-info"><span class="lb-name">DragonSlayer</span><span class="lb-sub">Dragon Escape · 31,500 pts</span></div><span class="lb-coins">💰 4,800</span></div>
+          <div class="lb-row"><span class="lb-pos lb-num">4</span><div class="lb-av" style="background:linear-gradient(135deg,#d97706,#f43f5e)">🦊</div><div class="lb-info"><span class="lb-name">PuzzleWizard</span><span class="lb-sub">Puzzle Palace · 28,900 pts</span></div><span class="lb-coins">💰 3,200</span></div>
+          <div class="lb-row"><span class="lb-pos lb-num">5</span><div class="lb-av" style="background:linear-gradient(135deg,#7c3aed,#0ea5e9)">🤖</div><div class="lb-info"><span class="lb-name">OceanRunner</span><span class="lb-sub">Ocean Quest · 24,100 pts</span></div><span class="lb-coins">💰 2,700</span></div>
+        </div>
+      </div>
+
+      <!-- Recommended Games -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">🌟 Recommended For You</h2>
+          <a href="games.html" class="section-link">Browse all →</a>
+        </div>
+        <div class="games-grid" id="recommended-grid">
+          <!-- Populated by features.js -->
+          <div class="game-card" data-game-id="ninja-dash"><div class="card-thumb" data-img="ninja-dash"></div><div class="card-body"><span class="card-badge b-action">Action</span><h3 class="card-title">Ninja Dash</h3><div class="card-meta">👥 75K <span class="dot"></span> ⭐ 4.8</div><button class="btn-play" data-id="ninja-dash" data-title="Ninja Dash" data-thumb="🥷" data-genre="action">▶ Play Now</button></div></div>
+          <div class="game-card" data-game-id="puzzle-palace"><div class="card-thumb" data-img="puzzle-palace"></div><div class="card-body"><span class="card-badge b-puzzle">Puzzle</span><h3 class="card-title">Puzzle Palace</h3><div class="card-meta">👥 52K <span class="dot"></span> ⭐ 4.4</div><button class="btn-play" data-id="puzzle-palace" data-title="Puzzle Palace" data-thumb="🧩" data-genre="puzzle">▶ Play Now</button></div></div>
+          <div class="game-card" data-game-id="dragon-escape"><div class="card-thumb" data-img="dragon-escape"></div><div class="card-body"><span class="card-badge b-survival">Survival</span><h3 class="card-title">Dragon Escape</h3><div class="card-meta">👥 47K <span class="dot"></span> ⭐ 4.6</div><button class="btn-play" data-id="dragon-escape" data-title="Dragon Escape" data-thumb="🐉" data-genre="survival">▶ Play Now</button></div></div>
+          <div class="game-card" data-game-id="ocean-quest"><div class="card-thumb" data-img="ocean-quest"></div><div class="card-body"><span class="card-badge b-adventure">Adventure</span><h3 class="card-title">Ocean Quest</h3><div class="card-meta">👥 64K <span class="dot"></span> ⭐ 4.6</div><button class="btn-play" data-id="ocean-quest" data-title="Ocean Quest" data-thumb="🌊" data-genre="adventure">▶ Play Now</button></div></div>
+          <div class="game-card" data-game-id="block-kingdom"><div class="card-thumb" data-img="block-kingdom"></div><div class="card-body"><span class="card-badge b-building">Building</span><h3 class="card-title">Block Kingdom</h3><div class="card-meta">👥 98K <span class="dot"></span> ⭐ 4.7</div><button class="btn-play" data-id="block-kingdom" data-title="Block Kingdom" data-thumb="🏰" data-genre="building">▶ Play Now</button></div></div>
+          <div class="game-card" data-game-id="farm-friends"><div class="card-thumb" data-img="farm-friends"></div><div class="card-body"><span class="card-badge b-roleplay">Roleplay</span><h3 class="card-title">Farm Friends</h3><div class="card-meta">👥 75K <span class="dot"></span> ⭐ 4.6</div><button class="btn-play" data-id="farm-friends" data-title="Farm Friends" data-thumb="🌻" data-genre="roleplay">▶ Play Now</button></div></div>
+        </div>
+      </div>
+
+
+
+      <!-- ══════════════════════════════════════════════
+           EPIC HYPE SECTION — THE FUTURE OF GAMING
+      ══════════════════════════════════════════════ -->
+
+      <!-- Live Stats Bar -->
+      <div class="hype-stats-bar">
+        <div class="hype-stat"><span class="hype-stat-num" data-target="10482">0</span><span class="hype-stat-label">Players Online</span></div>
+        <div class="hype-stat-div"></div>
+        <div class="hype-stat"><span class="hype-stat-num" data-target="16">0</span><span class="hype-stat-label">Playable Games</span></div>
+        <div class="hype-stat-div"></div>
+        <div class="hype-stat"><span class="hype-stat-num" data-target="4910230">0</span><span class="hype-stat-label">Games Played</span></div>
+        <div class="hype-stat-div"></div>
+        <div class="hype-stat"><span class="hype-stat-num">∞</span><span class="hype-stat-label">Fun Guaranteed</span></div>
+      </div>
+
+      <!-- Cinematic Feature Showcase -->
+      <div class="hype-showcase">
+        <canvas id="hypeCanvas" class="hype-canvas" aria-hidden="true"></canvas>
+        <div class="hype-showcase-inner">
+          <div class="hype-badge-pill">🔥 THE HOTTEST GAMING PLATFORM OF 2026</div>
+          <h2 class="hype-title">
+            <span class="hype-title-line1">Play. Win. Become</span>
+            <span class="hype-title-line2">A <span class="hype-word-cycle" id="hypeWord">Legend</span>.</span>
+          </h2>
+          <p class="hype-desc">16 handcrafted games. Zero downloads. Infinite bragging rights.<br>This is the game platform the world has been waiting for.</p>
+          <div class="hype-cta-row">
+            <a href="games.html" class="hype-btn-primary">🚀 Play Free Now</a>
+            <a href="#hypeNotify" class="hype-btn-ghost">📬 Get Notified</a>
+          </div>
+          <!-- Floating game cards 3D showcase -->
+          <div class="hype-float-cards" aria-hidden="true">
+            <div class="hf-card hf-c1"><div class="hf-thumb">🥷</div><div class="hf-name">Ninja Dash</div><div class="hf-stars">⭐⭐⭐⭐⭐</div></div>
+            <div class="hf-card hf-c2"><div class="hf-thumb">🚀</div><div class="hf-name">Sky Riders</div><div class="hf-stars">⭐⭐⭐⭐⭐</div></div>
+            <div class="hf-card hf-c3"><div class="hf-thumb">🌊</div><div class="hf-name">Ocean Quest</div><div class="hf-stars">⭐⭐⭐⭐⭐</div></div>
+            <div class="hf-card hf-c4"><div class="hf-thumb">💀</div><div class="hf-name">Haunted House</div><div class="hf-stars">⭐⭐⭐⭐⭐</div></div>
+            <div class="hf-card hf-c5"><div class="hf-thumb">🐉</div><div class="hf-name">Dragon Escape</div><div class="hf-stars">⭐⭐⭐⭐⭐</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Why YouTubers Love Eylox -->
+      <div class="hype-creator-section">
+        <div class="hype-creator-inner">
+          <div class="hype-creator-left">
+            <div class="hype-creator-badge">🎬 FOR CONTENT CREATORS</div>
+            <h3 class="hype-creator-title">Made to Go Viral</h3>
+            <p class="hype-creator-desc">Every Eylox game is built for clips. Screen shake. Coin explosions. Epic comebacks. Whether you're a small channel or a mega creator — Eylox is your next banger video.</p>
+            <div class="hype-creator-perks">
+              <div class="hype-perk"><span class="hype-perk-icon">⚡</span><div><strong>Instant hype moments</strong><br><span>Every game is clip-worthy</span></div></div>
+              <div class="hype-perk"><span class="hype-perk-icon">🏆</span><div><strong>Leaderboard challenges</strong><br><span>Challenge your viewers to beat your score</span></div></div>
+              <div class="hype-perk"><span class="hype-perk-icon">💰</span><div><strong>Coin economy</strong><br><span>Earn Eylox coins, flex on your audience</span></div></div>
+              <div class="hype-perk"><span class="hype-perk-icon">🎮</span><div><strong>Zero friction</strong><br><span>Play in any browser, no download</span></div></div>
+            </div>
+            <a href="games.html" class="hype-btn-primary" style="display:inline-flex;margin-top:8px">🎬 Start Playing</a>
+          </div>
+          <div class="hype-creator-right">
+            <div class="hype-phone-mockup">
+              <div class="hype-phone-screen">
+                <div class="hype-phone-topbar">🎮 Eylox</div>
+                <div class="hype-phone-game">
+                  <div class="hype-phone-score">Score: <strong>9,840</strong></div>
+                  <div class="hype-phone-canvas-fake">
+                    <div class="hype-fx-coin hfc1">+🪙50</div>
+                    <div class="hype-fx-coin hfc2">+🪙20</div>
+                    <div class="hype-fx-coin hfc3">LEVEL UP!</div>
+                    <div class="hype-char">🥷</div>
+                    <div class="hype-obs hob1">🪨</div>
+                    <div class="hype-obs hob2">⚡</div>
+                  </div>
+                  <div class="hype-phone-coins">💰 <strong>1,240</strong> Eylux</div>
+                </div>
+              </div>
+              <div class="hype-phone-glow"></div>
+            </div>
+            <!-- Fake viewer reactions -->
+            <div class="hype-reactions" aria-hidden="true">
+              <div class="hype-react hr1">😱 insane score!!</div>
+              <div class="hype-react hr2">💀 HOW</div>
+              <div class="hype-react hr3">🔥🔥🔥</div>
+              <div class="hype-react hr4">this game is craaazy</div>
+              <div class="hype-react hr5">W game fr</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature Grid -->
+      <div class="hype-features-grid-section">
+        <div class="hype-fg-label">WHY EYLOX HITS DIFFERENT</div>
+        <div class="hype-fg-grid">
+          <div class="hype-fg-card hfg-purple">
+            <div class="hfg-icon">🎮</div>
+            <h4>16 Unique Games</h4>
+            <p>Every game has its own engine, mechanics, and feel. Not the same game reskinned — real variety.</p>
+          </div>
+          <div class="hype-fg-card hfg-blue">
+            <div class="hfg-icon">💰</div>
+            <h4>Eylox Coin Economy</h4>
+            <p>Win coins in every game. They update live on screen. Flex your balance in your profile.</p>
+          </div>
+          <div class="hype-fg-card hfg-pink">
+            <div class="hfg-icon">🔥</div>
+            <h4>Daily Streaks</h4>
+            <p>Come back every day to build your streak. The longer you play, the bigger the legend.</p>
+          </div>
+          <div class="hype-fg-card hfg-green">
+            <div class="hfg-icon">📱</div>
+            <h4>Any Device</h4>
+            <p>Phone, tablet, laptop, or TV. Full touch controls on mobile. Zero compromise.</p>
+          </div>
+          <div class="hype-fg-card hfg-yellow">
+            <div class="hfg-icon">👑</div>
+            <h4>Owner Access</h4>
+            <p>100+ Roblox-style admin commands. Ban, give coins, announce to the world. Real power.</p>
+          </div>
+          <div class="hype-fg-card hfg-teal">
+            <div class="hfg-icon">🚀</div>
+            <h4>Always Growing</h4>
+            <p>New games, features, and events dropping constantly. This is only the beginning.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Epic Coming Soon / Notify -->
+      <div class="hype-coming-soon" id="hypeNotify">
+        <canvas id="csCanvas" class="hype-cs-canvas" aria-hidden="true"></canvas>
+        <div class="hype-cs-inner">
+          <div class="hype-cs-rocket">🚀</div>
+          <div class="hype-cs-tag">NEXT LEVEL INCOMING</div>
+          <h2 class="hype-cs-title">Something <span class="hype-cs-epic">EPIC</span> is Coming</h2>
+          <p class="hype-cs-sub">Multiplayer battles. Global leaderboards. Seasonal events.<br>500+ games. Creator tournaments. The biggest update in Eylox history.</p>
+
+          <!-- Animated progress -->
+          <div class="hype-cs-progress-wrap">
+            <div class="hype-cs-prog-labels">
+              <span>Build Progress</span><strong id="csPercent">0%</strong>
+            </div>
+            <div class="hype-cs-prog-track">
+              <div class="hype-cs-prog-fill" id="csProgFill"></div>
+              <div class="hype-cs-prog-glow"></div>
+            </div>
+          </div>
+
+          <!-- Countdown -->
+          <div class="hype-countdown">
+            <div class="hype-cd-block"><span class="hype-cd-num" id="cdDays">00</span><span class="hype-cd-label">Days</span></div>
+            <div class="hype-cd-sep">:</div>
+            <div class="hype-cd-block"><span class="hype-cd-num" id="cdHours">00</span><span class="hype-cd-label">Hours</span></div>
+            <div class="hype-cd-sep">:</div>
+            <div class="hype-cd-block"><span class="hype-cd-num" id="cdMins">00</span><span class="hype-cd-label">Mins</span></div>
+            <div class="hype-cd-sep">:</div>
+            <div class="hype-cd-block"><span class="hype-cd-num" id="cdSecs">00</span><span class="hype-cd-label">Secs</span></div>
+          </div>
+
+          <!-- Notify form -->
+          <form class="hype-notify-form" id="hypeNotifyForm">
+            <input type="email" id="hypeEmail" class="hype-notify-input" placeholder="your@email.com" required />
+            <button type="submit" class="hype-notify-btn">🔔 Notify Me</button>
+          </form>
+          <p class="hype-notify-thanks" id="hypeNotifyThanks">🎉 You're on the list! See you at launch!</p>
+
+          <!-- Feature chips -->
+          <div class="hype-cs-chips">
+            <span class="hype-cs-chip">🕹️ 500+ Games</span>
+            <span class="hype-cs-chip">👥 Multiplayer</span>
+            <span class="hype-cs-chip">🏆 Tournaments</span>
+            <span class="hype-cs-chip">🌍 Global Leaderboards</span>
+            <span class="hype-cs-chip">💸 Free to Play</span>
+            <span class="hype-cs-chip">🛡️ 100% Safe</span>
+          </div>
+          <p class="hype-cs-foot">© 2026 Eylox · Made with ❤️ for the world · <a href="games.html" style="color:var(--purple)">Play Now →</a></p>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<style>
+@keyframes crown-spin { 0%,80%,100%{transform:rotate(0deg)} 85%{transform:rotate(-20deg)} 92%{transform:rotate(15deg)} 96%{transform:rotate(-8deg)} }
+
+/* ── Daily Challenge Banner ── */
+.daily-challenge-banner {
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  background: linear-gradient(135deg, rgba(245,158,11,.22) 0%, rgba(239,68,68,.18) 60%, rgba(124,58,237,.15) 100%);
+  border: 1.5px solid rgba(245,158,11,.4); border-radius: 20px;
+  padding: 28px 32px; margin-bottom: 36px; position: relative; overflow: hidden;
+  box-shadow: 0 6px 32px rgba(245,158,11,.15);
+}
+.daily-challenge-banner::before {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(245,158,11,.03) 20px, rgba(245,158,11,.03) 21px);
+  pointer-events: none;
+}
+.dcb-left { position: relative; z-index: 1; flex: 1; }
+.dcb-tag {
+  display: inline-block; padding: 3px 12px; border-radius: 99px; margin-bottom: 10px;
+  background: rgba(245,158,11,.2); border: 1px solid rgba(245,158,11,.5);
+  color: #fde68a; font-size: .7rem; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase;
+}
+.dcb-title {
+  font-family: var(--font-head); font-size: clamp(1.1rem,2.5vw,1.55rem); color: var(--text);
+  margin-bottom: 8px; line-height: 1.25;
+}
+.dcb-title span { color: #fbbf24; }
+.dcb-desc { color: var(--muted); font-size: .88rem; font-weight: 700; margin-bottom: 16px; line-height: 1.5; }
+.dcb-desc strong { color: var(--text); }
+.dcb-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.dcb-btn { width: auto; padding: 12px 24px; font-size: .88rem; background: linear-gradient(135deg,#d97706,#f59e0b,#fde68a); color: #1a0800; box-shadow: 0 4px 20px rgba(245,158,11,.5); }
+.dcb-timer { color: var(--muted); font-size: .8rem; font-weight: 700; }
+.dcb-timer strong { color: var(--yellow); }
+.dcb-right {
+  font-size: 3.5rem; flex-shrink: 0; display: flex; align-items: center; gap: 12px;
+  animation: dcb-float 2.5s ease-in-out infinite; position: relative; z-index: 1;
+}
+.dcb-vs { font-family: var(--font-head); font-size: 1.2rem; color: var(--muted); }
+@keyframes dcb-float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+/* ── Hot scroll row ── */
+.hot-scroll-row {
+  display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none;
+}
+.hot-scroll-row::-webkit-scrollbar { display: none; }
+.hot-card {
+  min-width: 220px; display: flex; align-items: center; gap: 12px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+  padding: 12px 14px; transition: transform .2s, border-color .2s;
+  flex-shrink: 0;
+}
+.hot-card:hover { transform: translateY(-3px); border-color: rgba(167,139,250,.4); }
+.hot-rank { font-family: var(--font-head); font-size: 1.1rem; color: var(--muted); width: 20px; flex-shrink: 0; }
+.hot-thumb { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
+.hot-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.hot-title { font-family: var(--font-head); font-size: .88rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hot-players { font-size: .72rem; font-weight: 700; color: var(--muted); }
+.hot-btn { width: 32px; height: 32px; min-width: 32px; padding: 0; font-size: .8rem; border-radius: 50%; margin: 0; flex-shrink: 0; }
+
+/* ── Leaderboard ── */
+.leaderboard-list { display: flex; flex-direction: column; gap: 8px; }
+.lb-row {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+  padding: 12px 16px; transition: transform .18s, border-color .18s;
+}
+.lb-row:hover { transform: translateX(4px); border-color: rgba(167,139,250,.35); }
+.lb-gold   { border-color: rgba(245,158,11,.4); background: linear-gradient(90deg,rgba(245,158,11,.1),var(--card)); }
+.lb-silver { border-color: rgba(156,163,175,.3); background: linear-gradient(90deg,rgba(156,163,175,.08),var(--card)); }
+.lb-bronze { border-color: rgba(180,83,9,.3); background: linear-gradient(90deg,rgba(180,83,9,.1),var(--card)); }
+.lb-pos { font-size: 1.3rem; flex-shrink: 0; width: 28px; text-align: center; }
+.lb-num { font-family: var(--font-head); font-size: 1rem; color: var(--muted); }
+.lb-av { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+.lb-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.lb-name { font-family: var(--font-head); font-size: .95rem; color: var(--text); }
+.lb-sub  { font-size: .72rem; font-weight: 700; color: var(--muted); }
+.lb-coins { font-size: .82rem; font-weight: 800; color: var(--yellow); white-space: nowrap; flex-shrink: 0; }
+
+@media (max-width:600px) {
+  .daily-challenge-banner { padding: 20px 18px; }
+  .dcb-right { display: none; }
+  .lb-sub { display: none; }
+}
+
+/* ══════════════════════════════════════════════
+   HYPE SECTION STYLES
+══════════════════════════════════════════════ */
+
+/* Stats bar */
+.hype-stats-bar {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0; flex-wrap: wrap;
+  background: linear-gradient(90deg, rgba(124,58,237,.18), rgba(236,72,153,.18));
+  border: 1px solid rgba(167,139,250,.25); border-radius: 16px;
+  padding: 18px 32px; margin: 24px 0;
+  backdrop-filter: blur(10px);
+}
+.hype-stat { display: flex; flex-direction: column; align-items: center; padding: 0 28px; gap: 2px; }
+.hype-stat-num {
+  font-family: var(--font-head); font-size: 1.9rem; font-weight: 900;
+  background: linear-gradient(135deg, #a78bfa, #60a5fa, #f472b6);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  line-height: 1;
+}
+.hype-stat-label { font-size: .7rem; font-weight: 800; color: var(--muted); letter-spacing: .8px; text-transform: uppercase; }
+.hype-stat-div { width: 1px; height: 40px; background: var(--border); }
+
+/* Cinematic showcase */
+.hype-showcase {
+  position: relative; overflow: hidden; border-radius: 24px;
+  min-height: 520px; margin: 0 0 24px;
+  background: radial-gradient(ellipse at 50% 0%, #1a0050 0%, #07011a 70%);
+  border: 1px solid rgba(167,139,250,.2);
+  display: flex; align-items: center; justify-content: center;
+}
+.hype-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.hype-showcase-inner {
+  position: relative; z-index: 2; text-align: center;
+  padding: 60px 32px 280px; max-width: 700px; margin: 0 auto;
+}
+.hype-badge-pill {
+  display: inline-block; padding: 6px 18px; border-radius: 99px;
+  background: linear-gradient(135deg, rgba(245,158,11,.2), rgba(250,204,21,.1));
+  border: 1px solid rgba(245,158,11,.4); color: #fde68a;
+  font-size: .72rem; font-weight: 900; letter-spacing: 1px; margin-bottom: 20px;
+  animation: badge-pulse 2.5s ease-in-out infinite;
+}
+@keyframes badge-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.4)} 50%{box-shadow:0 0 0 8px rgba(245,158,11,0)} }
+.hype-title { font-family: var(--font-head); line-height: 1.1; margin-bottom: 20px; }
+.hype-title-line1 { display: block; font-size: clamp(2rem,5vw,3.2rem); color: var(--text); }
+.hype-title-line2 {
+  display: block; font-size: clamp(2.6rem,7vw,4.4rem);
+  background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 40%, #f472b6 80%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hype-word-cycle { display: inline-block; }
+.hype-desc { color: var(--muted); font-size: 1.05rem; line-height: 1.7; margin-bottom: 32px; }
+.hype-cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 0; }
+.hype-btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 32px; border-radius: 99px;
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  color: #fff; font-family: var(--font-head); font-size: 1rem; font-weight: 800;
+  text-decoration: none; border: none; cursor: pointer;
+  box-shadow: 0 8px 32px rgba(124,58,237,.45);
+  transition: transform .18s, box-shadow .18s;
+}
+.hype-btn-primary:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 14px 40px rgba(124,58,237,.65); }
+.hype-btn-ghost {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 32px; border-radius: 99px;
+  background: rgba(167,139,250,.08); border: 1.5px solid rgba(167,139,250,.4);
+  color: var(--purple); font-family: var(--font-head); font-size: 1rem; font-weight: 800;
+  text-decoration: none; cursor: pointer;
+  transition: background .18s, transform .18s;
+}
+.hype-btn-ghost:hover { background: rgba(167,139,250,.18); transform: translateY(-2px); }
+
+/* Floating 3D game cards */
+.hype-float-cards {
+  position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%);
+  width: 680px; height: 240px; pointer-events: none;
+}
+.hf-card {
+  position: absolute; width: 110px;
+  background: rgba(15,4,40,.9); border: 1px solid rgba(167,139,250,.3);
+  border-radius: 16px; padding: 14px 10px;
+  text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  backdrop-filter: blur(8px); transform-style: preserve-3d;
+  animation: hf-float linear infinite;
+}
+.hf-thumb { font-size: 2rem; margin-bottom: 6px; }
+.hf-name { font-size: .72rem; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.hf-stars { font-size: .6rem; }
+.hf-c1 { left: 0; bottom: 0; animation-duration: 4.5s; animation-delay: 0s; }
+.hf-c2 { left: 130px; bottom: 40px; animation-duration: 5s; animation-delay: .7s; }
+.hf-c3 { left: 260px; bottom: 60px; animation-duration: 4.2s; animation-delay: 1.2s; }
+.hf-c4 { left: 390px; bottom: 30px; animation-duration: 5.3s; animation-delay: .3s; }
+.hf-c5 { left: 520px; bottom: 10px; animation-duration: 4.8s; animation-delay: 1.6s; }
+@keyframes hf-float { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-14px) rotate(2deg)} }
+
+/* Creator section */
+.hype-creator-section {
+  border-radius: 24px; overflow: hidden;
+  background: linear-gradient(135deg, rgba(15,4,40,.95) 0%, rgba(7,1,26,.95) 100%);
+  border: 1px solid rgba(167,139,250,.18); margin-bottom: 24px;
+}
+.hype-creator-inner { display: flex; gap: 0; min-height: 440px; }
+.hype-creator-left { flex: 1; padding: 52px 48px; min-width: 0; }
+.hype-creator-badge {
+  display: inline-block; padding: 5px 14px; border-radius: 99px;
+  background: rgba(244,114,182,.15); border: 1px solid rgba(244,114,182,.3);
+  color: var(--pink); font-size: .7rem; font-weight: 900; letter-spacing: 1px; margin-bottom: 16px;
+}
+.hype-creator-title { font-family: var(--font-head); font-size: clamp(1.8rem,4vw,2.8rem); color: var(--text); margin-bottom: 12px; line-height: 1.1; }
+.hype-creator-desc { color: var(--muted); font-size: .95rem; line-height: 1.7; margin-bottom: 28px; }
+.hype-creator-perks { display: flex; flex-direction: column; gap: 16px; margin-bottom: 28px; }
+.hype-perk { display: flex; align-items: flex-start; gap: 14px; }
+.hype-perk-icon { font-size: 1.4rem; flex-shrink: 0; width: 36px; height: 36px; background: rgba(167,139,250,.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+.hype-perk strong { display: block; font-size: .88rem; color: var(--text); font-weight: 800; margin-bottom: 1px; }
+.hype-perk span { font-size: .8rem; color: var(--muted); }
+.hype-creator-right {
+  width: 380px; flex-shrink: 0; background: radial-gradient(ellipse at 50% 30%, rgba(124,58,237,.25) 0%, rgba(7,1,26,0) 70%);
+  display: flex; align-items: center; justify-content: center; position: relative; padding: 40px 20px;
+}
+/* Phone mockup */
+.hype-phone-mockup { position: relative; z-index: 2; }
+.hype-phone-screen {
+  width: 200px; background: #0a021e; border-radius: 32px; border: 3px solid rgba(167,139,250,.35);
+  overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.8), 0 0 0 1px rgba(167,139,250,.15);
+}
+.hype-phone-topbar { background: rgba(124,58,237,.3); padding: 10px 16px; font-size: .78rem; font-weight: 800; color: var(--purple); border-bottom: 1px solid rgba(167,139,250,.2); }
+.hype-phone-game { padding: 14px; min-height: 260px; position: relative; overflow: hidden; background: linear-gradient(180deg, #080014 0%, #160024 100%); }
+.hype-phone-score { font-size: .72rem; font-weight: 800; color: var(--muted); margin-bottom: 12px; }
+.hype-phone-coins { font-size: .72rem; font-weight: 800; color: var(--yellow); position: absolute; bottom: 12px; left: 14px; }
+.hype-phone-canvas-fake { position: relative; height: 180px; }
+.hype-char { position: absolute; font-size: 1.6rem; bottom: 10px; left: 20px; animation: char-run .4s ease-in-out infinite alternate; }
+@keyframes char-run { 0%{transform:translateY(0)} 100%{transform:translateY(-5px)} }
+.hype-obs { position: absolute; font-size: 1.3rem; bottom: 10px; animation: obs-move 1.8s linear infinite; }
+.hob1 { animation-delay: 0s; }
+.hob2 { animation-delay: .9s; }
+@keyframes obs-move { 0%{right:-30px} 100%{right:200px} }
+.hype-fx-coin { position: absolute; font-size: .72rem; font-weight: 900; color: var(--yellow); opacity: 0; animation: fc-pop 2s ease-in-out infinite; }
+.hfc1 { top: 20px; left: 30px; animation-delay: 0s; }
+.hfc2 { top: 60px; left: 80px; animation-delay: .9s; }
+.hfc3 { top: 100px; left: 20px; color: var(--green); font-size: .7rem; animation-delay: 1.7s; }
+@keyframes fc-pop { 0%{opacity:0;transform:translateY(0)} 20%{opacity:1} 70%{opacity:1;transform:translateY(-24px)} 100%{opacity:0;transform:translateY(-32px)} }
+.hype-phone-glow { position: absolute; inset: -20px; background: radial-gradient(ellipse at 50% 80%, rgba(124,58,237,.35) 0%, transparent 70%); border-radius: 50%; pointer-events: none; animation: pg-pulse 3s ease-in-out infinite; }
+@keyframes pg-pulse { 0%,100%{opacity:.6} 50%{opacity:1} }
+/* Chat reactions */
+.hype-reactions { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 8px; }
+.hype-react {
+  background: rgba(15,4,40,.9); border: 1px solid rgba(167,139,250,.2);
+  border-radius: 99px; padding: 5px 12px; font-size: .72rem; font-weight: 800;
+  color: var(--text); white-space: nowrap; opacity: 0;
+  animation: react-pop 5s ease-in-out infinite;
+}
+.hr1{animation-delay:0s} .hr2{animation-delay:1s} .hr3{animation-delay:2s} .hr4{animation-delay:3s} .hr5{animation-delay:4s}
+@keyframes react-pop { 0%{opacity:0;transform:translateX(20px)} 10%{opacity:1;transform:translateX(0)} 80%{opacity:1} 100%{opacity:0} }
+
+/* Feature grid */
+.hype-features-grid-section { margin-bottom: 24px; }
+.hype-fg-label { text-align: center; font-size: .7rem; font-weight: 900; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 20px; }
+.hype-fg-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.hype-fg-card {
+  border-radius: 18px; padding: 28px 24px; position: relative; overflow: hidden;
+  transition: transform .2s, box-shadow .2s; cursor: default;
+  border: 1px solid transparent;
+}
+.hype-fg-card:hover { transform: translateY(-5px) scale(1.02); }
+.hfg-purple { background: linear-gradient(135deg, rgba(124,58,237,.25), rgba(139,92,246,.1)); border-color: rgba(124,58,237,.3); }
+.hfg-blue   { background: linear-gradient(135deg, rgba(37,99,235,.25), rgba(96,165,250,.1)); border-color: rgba(59,130,246,.3); }
+.hfg-pink   { background: linear-gradient(135deg, rgba(219,39,119,.25), rgba(244,114,182,.1)); border-color: rgba(236,72,153,.3); }
+.hfg-green  { background: linear-gradient(135deg, rgba(5,150,105,.25), rgba(74,222,128,.1)); border-color: rgba(16,185,129,.3); }
+.hfg-yellow { background: linear-gradient(135deg, rgba(217,119,6,.25), rgba(253,230,138,.1)); border-color: rgba(245,158,11,.3); }
+.hfg-teal   { background: linear-gradient(135deg, rgba(13,148,136,.25), rgba(45,212,191,.1)); border-color: rgba(20,184,166,.3); }
+.hfg-icon { font-size: 2rem; margin-bottom: 12px; }
+.hype-fg-card h4 { font-family: var(--font-head); font-size: 1.05rem; color: var(--text); margin-bottom: 8px; }
+.hype-fg-card p { font-size: .82rem; color: var(--muted); line-height: 1.6; }
+
+/* Coming Soon epic section */
+.hype-coming-soon {
+  position: relative; overflow: hidden; border-radius: 28px;
+  min-height: 680px; display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(ellipse at 50% 0%, #200060 0%, #0a0024 50%, #07011a 100%);
+  border: 1.5px solid rgba(167,139,250,.25);
+  box-shadow: 0 0 120px rgba(124,58,237,.3);
+  margin-bottom: 24px;
+}
+.hype-cs-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.hype-cs-inner { position: relative; z-index: 2; text-align: center; padding: 64px 32px 56px; max-width: 680px; }
+.hype-cs-rocket { font-size: 72px; display: block; margin-bottom: 16px; animation: cs-rocket 3s ease-in-out infinite; }
+@keyframes cs-rocket { 0%,100%{transform:translateY(0) rotate(-5deg)} 50%{transform:translateY(-18px) rotate(5deg)} }
+.hype-cs-tag {
+  display: inline-block; padding: 5px 18px; border-radius: 99px; margin-bottom: 18px;
+  background: linear-gradient(135deg, rgba(245,158,11,.2), rgba(250,204,21,.1));
+  border: 1px solid rgba(245,158,11,.5); color: #fde68a;
+  font-size: .72rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase;
+}
+.hype-cs-title {
+  font-family: var(--font-head); font-size: clamp(2.2rem,6vw,3.8rem);
+  color: var(--text); margin-bottom: 16px; line-height: 1.1;
+}
+.hype-cs-epic {
+  background: linear-gradient(90deg, #f59e0b, #f472b6, #a78bfa);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  animation: epic-glow 2s ease-in-out infinite;
+}
+@keyframes epic-glow { 0%,100%{filter:brightness(1)} 50%{filter:brightness(1.3)} }
+.hype-cs-sub { color: var(--muted); font-size: 1rem; line-height: 1.7; margin-bottom: 36px; }
+/* Progress bar */
+.hype-cs-progress-wrap { margin-bottom: 36px; }
+.hype-cs-prog-labels { display: flex; justify-content: space-between; font-size: .82rem; color: var(--muted); margin-bottom: 8px; font-weight: 700; }
+.hype-cs-prog-labels strong { color: var(--purple); font-size: .92rem; }
+.hype-cs-prog-track { height: 14px; background: rgba(167,139,250,.1); border-radius: 99px; overflow: hidden; position: relative; border: 1px solid rgba(167,139,250,.15); }
+.hype-cs-prog-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #7c3aed, #a78bfa, #f472b6); width: 0; transition: width 2.5s cubic-bezier(.22,.61,.36,1); }
+.hype-cs-prog-glow { position: absolute; top: 0; right: 0; width: 40px; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,.4)); animation: prog-glow-sweep 2s ease-in-out infinite; }
+@keyframes prog-glow-sweep { 0%{right:100%;opacity:0} 20%{opacity:1} 100%{right:-10%;opacity:0} }
+/* Countdown */
+.hype-countdown { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 36px; flex-wrap: wrap; }
+.hype-cd-block { display: flex; flex-direction: column; align-items: center; padding: 0 16px; }
+.hype-cd-num {
+  font-family: var(--font-head); font-size: clamp(2rem,6vw,3.2rem); font-weight: 900;
+  background: linear-gradient(135deg, #a78bfa, #60a5fa);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  line-height: 1;
+}
+.hype-cd-label { font-size: .65rem; font-weight: 900; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
+.hype-cd-sep { font-family: var(--font-head); font-size: 2.5rem; color: var(--purple); opacity: .5; margin-bottom: 20px; }
+/* Notify form */
+.hype-notify-form { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 10px; }
+.hype-notify-input {
+  flex: 1; min-width: 200px; max-width: 320px; padding: 13px 20px; border-radius: 99px;
+  background: rgba(167,139,250,.08); border: 1.5px solid rgba(167,139,250,.3);
+  color: var(--text); font-family: var(--font-body); font-size: .92rem; outline: none;
+  transition: border-color .18s;
+}
+.hype-notify-input:focus { border-color: var(--purple); }
+.hype-notify-input::placeholder { color: var(--muted); }
+.hype-notify-btn {
+  padding: 13px 28px; border-radius: 99px; border: none;
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  color: #fff; font-family: var(--font-head); font-size: .95rem; cursor: pointer;
+  box-shadow: 0 6px 24px rgba(124,58,237,.4); transition: transform .15s, box-shadow .15s;
+}
+.hype-notify-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(124,58,237,.6); }
+.hype-notify-thanks { display: none; color: var(--green); font-size: .9rem; font-weight: 800; margin-bottom: 20px; }
+/* Chips */
+.hype-cs-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 24px 0 20px; }
+.hype-cs-chip {
+  background: rgba(167,139,250,.1); border: 1px solid rgba(167,139,250,.2);
+  border-radius: 99px; padding: 6px 16px; font-size: .78rem; font-weight: 800; color: var(--muted);
+  transition: background .15s, color .15s;
+}
+.hype-cs-chip:hover { background: rgba(167,139,250,.2); color: var(--text); }
+.hype-cs-foot { font-size: .78rem; color: var(--muted); margin-top: 8px; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .hype-creator-inner { flex-direction: column; }
+  .hype-creator-right { width: 100%; min-height: 300px; }
+  .hype-fg-grid { grid-template-columns: repeat(2, 1fr); }
+  .hype-float-cards { display: none; }
+  .hype-showcase-inner { padding-bottom: 60px; }
+  .hype-stats-bar { gap: 12px; padding: 14px 16px; }
+  .hype-stat { padding: 0 12px; }
+  .hype-stat-div { display: none; }
+  .hype-reactions { display: none; }
+}
+@media (max-width: 600px) {
+  .hype-fg-grid { grid-template-columns: 1fr; }
+  .hype-creator-left { padding: 32px 24px; }
+  .hype-cs-inner { padding: 48px 20px 40px; }
+  .hype-showcase-inner { padding: 40px 20px 40px; }
+}
+</style>
+
+<script>
+/* ── Daily challenge countdown ── */
+(function(){
+  function tickDcb() {
+    const now = new Date();
+    const midnight = new Date(now); midnight.setHours(24,0,0,0);
+    const diff = midnight - now;
+    const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
+    const el = document.getElementById('dcbCountdown');
+    if (el) el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+  tickDcb(); setInterval(tickDcb, 1000);
+})();
+
+/* ── Hype section scripts ── */
+(function() {
+
+  /* ── Animated counter ── */
+  function animateCount(el, target, duration) {
+    const start = performance.now();
+    const isInfinity = el.textContent === '∞';
+    if (isInfinity) return;
+    function step(now) {
+      const t = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - t, 4);
+      const v = Math.floor(ease * target);
+      el.textContent = v.toLocaleString();
+      if (t < 1) requestAnimationFrame(step);
+      else el.textContent = target.toLocaleString();
+    }
+    requestAnimationFrame(step);
+  }
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.querySelectorAll('.hype-stat-num[data-target]').forEach(el => {
+        animateCount(el, +el.dataset.target, 2200);
+      });
+      obs.unobserve(e.target);
+    });
+  }, { threshold: 0.3 });
+  const statsBar = document.querySelector('.hype-stats-bar');
+  if (statsBar) obs.observe(statsBar);
+
+  /* ── Word cycling ── */
+  const words = ['Legend','Champion','Hero','Unstoppable','Epic','Iconic'];
+  let wi = 0;
+  const wordEl = document.getElementById('hypeWord');
+  if (wordEl) {
+    setInterval(() => {
+      wordEl.style.opacity = '0';
+      wordEl.style.transform = 'translateY(8px)';
+      setTimeout(() => {
+        wi = (wi + 1) % words.length;
+        wordEl.textContent = words[wi];
+        wordEl.style.transition = 'opacity .4s, transform .4s';
+        wordEl.style.opacity = '1';
+        wordEl.style.transform = 'translateY(0)';
+      }, 300);
+      wordEl.style.transition = 'opacity .3s, transform .3s';
+    }, 2000);
+  }
+
+  /* ── Particle canvas (showcase) ── */
+  const hc = document.getElementById('hypeCanvas');
+  if (hc) {
+    const ctx = hc.getContext('2d');
+    let pts = [];
+    function resize() { hc.width = hc.offsetWidth; hc.height = hc.offsetHeight; pts = Array.from({length:90},()=>({x:Math.random()*hc.width,y:Math.random()*hc.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.8+.5,a:Math.random()})); }
+    function draw() {
+      ctx.clearRect(0,0,hc.width,hc.height);
+      pts.forEach(p => {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x<0) p.x=hc.width; if (p.x>hc.width) p.x=0;
+        if (p.y<0) p.y=hc.height; if (p.y>hc.height) p.y=0;
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle = `rgba(167,139,250,${p.a*.6})`; ctx.fill();
+      });
+      pts.forEach((p,i) => {
+        for (let j=i+1;j<pts.length;j++) {
+          const dx=p.x-pts[j].x, dy=p.y-pts[j].y, d=Math.sqrt(dx*dx+dy*dy);
+          if (d<100) { ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(pts[j].x,pts[j].y); ctx.strokeStyle=`rgba(167,139,250,${.12*(1-d/100)})`; ctx.lineWidth=.8; ctx.stroke(); }
+        }
+      });
+      requestAnimationFrame(draw);
+    }
+    resize(); draw();
+    window.addEventListener('resize', resize);
+  }
+
+  /* ── Coming Soon particle canvas ── */
+  const csc = document.getElementById('csCanvas');
+  if (csc) {
+    const ctx2 = csc.getContext('2d');
+    let stars = [];
+    function resize2() { csc.width=csc.offsetWidth; csc.height=csc.offsetHeight; stars=Array.from({length:120},()=>({x:Math.random()*csc.width,y:Math.random()*csc.height,s:Math.random()*2+.5,v:Math.random()*.5+.3,o:Math.random()})); }
+    function draw2() {
+      ctx2.clearRect(0,0,csc.width,csc.height);
+      stars.forEach(s=>{
+        s.y+=s.v; if(s.y>csc.height){s.y=0;s.x=Math.random()*csc.width;}
+        s.o=.3+.7*Math.abs(Math.sin(Date.now()/1000+s.x));
+        ctx2.beginPath(); ctx2.arc(s.x,s.y,s.s,0,Math.PI*2);
+        ctx2.fillStyle=`rgba(200,180,255,${s.o*0.7})`; ctx2.fill();
+      });
+      requestAnimationFrame(draw2);
+    }
+    resize2(); draw2();
+    window.addEventListener('resize',resize2);
+  }
+
+  /* ── Progress bar animate on scroll ── */
+  const progFill = document.getElementById('csProgFill');
+  const progPct  = document.getElementById('csPercent');
+  if (progFill) {
+    const pObs = new IntersectionObserver(entries => {
+      if (!entries[0].isIntersecting) return;
+      progFill.style.width = '40%';
+      let p = 0;
+      const t = setInterval(() => { p++; if (progPct) progPct.textContent = p+'%'; if(p>=40) clearInterval(t); }, 30);
+      pObs.disconnect();
+    }, { threshold: 0.3 });
+    const csSection = document.querySelector('.hype-coming-soon');
+    if (csSection) pObs.observe(csSection);
+  }
+
+  /* ── Countdown to launch date ── */
+  const LAUNCH = new Date('2026-09-01T00:00:00');
+  function tickCd() {
+    const diff = LAUNCH - Date.now();
+    if (diff <= 0) return;
+    const d = Math.floor(diff/864e5), h = Math.floor((diff%864e5)/36e5), m = Math.floor((diff%36e5)/6e4), s = Math.floor((diff%6e4)/1e3);
+    const pad = n => String(n).padStart(2,'0');
+    const dEl=document.getElementById('cdDays'),hEl=document.getElementById('cdHours'),mEl=document.getElementById('cdMins'),sEl=document.getElementById('cdSecs');
+    if(dEl)dEl.textContent=pad(d); if(hEl)hEl.textContent=pad(h); if(mEl)mEl.textContent=pad(m); if(sEl)sEl.textContent=pad(s);
+  }
+  tickCd(); setInterval(tickCd, 1000);
+
+  /* ── Notify form ── */
+  const nf = document.getElementById('hypeNotifyForm');
+  if (nf) {
+    nf.addEventListener('submit', e => {
+      e.preventDefault();
+      nf.style.display = 'none';
+      const t = document.getElementById('hypeNotifyThanks');
+      if (t) t.style.display = 'block';
+      /* Confetti burst */
+      for (let i=0;i<40;i++) spawnConfetti();
+    });
+  }
+
+  function spawnConfetti() {
+    const el = document.createElement('div');
+    const colors = ['#a78bfa','#60a5fa','#f472b6','#fde68a','#4ade80'];
+    el.style.cssText = `position:fixed;top:60%;left:${40+Math.random()*20}%;width:8px;height:8px;border-radius:${Math.random()>0.5?'50%':'2px'};background:${colors[Math.floor(Math.random()*colors.length)]};pointer-events:none;z-index:9999;animation:conf-fall 1.5s ease-out forwards`;
+    const kx = (Math.random()-.5)*300, ky = -200-Math.random()*200;
+    const style = document.createElement('style');
+    const id = 'cf'+Date.now()+Math.random();
+    el.id = id;
+    style.textContent = `@keyframes conf-fall{0%{transform:translate(0,0) rotate(0deg);opacity:1}100%{transform:translate(${kx}px,${ky}px) rotate(${Math.random()*720}deg);opacity:0}}`;
+    document.head.appendChild(style);
+    document.body.appendChild(el);
+    setTimeout(()=>{el.remove();style.remove();},1600);
+  }
+
+})();
+</script>
+<script src="security.js"></script>
+<script src="api.js"></script>
+<script src="script.js"></script>
+<script src="features.js"></script>
+<script src="notifications.js"></script>
+<script src="polish.js"></script>
+<script src="admin-button.js"></script>
+<script src="studio-button.js"></script>
+<script src="extras.js"></script>
+<script src="custom-games.js"></script>
+<script src="thumbnails.js"></script>
+<script src="friends-local.js"></script>
+<script>
+// Show admin button only for the Owner account
+(function() {
+  if (localStorage.getItem('eylox_is_owner') === 'true') {
+    const btn = document.getElementById('adminBtn');
+    if (btn) btn.style.display = 'flex';
+  }
+})();
+
+// Show streak badge
+(function() {
+  const streak = parseInt(localStorage.getItem('eylox_streak') || '0');
+  const el = document.getElementById('streakBadge');
+  if (el && streak > 0) {
+    const fire = streak >= 7 ? '🔥🔥' : streak >= 3 ? '🔥' : '✨';
+    el.textContent = fire + ' ' + streak + '-day streak!';
+    el.style.display = 'inline-flex';
+  }
+})();
+</script>
+
+<script>
+/* ══════════════════════════════════════════════════
+   DAILY SPIN WHEEL
+══════════════════════════════════════════════════ */
+(function() {
+  const REWARDS = [
+    { label:'50 🪙',   coins:50,   color:'#4a1080' },
+    { label:'100 🪙',  coins:100,  color:'#7c3aed' },
+    { label:'200 🪙',  coins:200,  color:'#059669' },
+    { label:'75 🪙',   coins:75,   color:'#1e40af' },
+    { label:'500 🪙',  coins:500,  color:'#b45309' },
+    { label:'150 🪙',  coins:150,  color:'#be185d' },
+    { label:'1000 🪙', coins:1000, color:'#7f1d1d' },
+    { label:'25 🪙',   coins:25,   color:'#374151' },
+  ];
+
+  const canvas = document.getElementById('spinCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const cx = 60, cy = 60, r = 58;
+  const slice = (Math.PI * 2) / REWARDS.length;
+  let angle = 0, spinning = false;
+
+  function drawWheel(rot) {
+    ctx.clearRect(0, 0, 120, 120);
+    REWARDS.forEach((seg, i) => {
+      const start = rot + i * slice;
+      const end   = start + slice;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, r, start, end);
+      ctx.closePath();
+      ctx.fillStyle = seg.color;
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,.15)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(start + slice / 2);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 8px Nunito,sans-serif';
+      ctx.fillText(seg.label, r - 6, 3);
+      ctx.restore();
+    });
+    /* Pointer arrow */
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - r - 2);
+    ctx.lineTo(cx - 6, cy - r + 10);
+    ctx.lineTo(cx + 6, cy - r + 10);
+    ctx.closePath();
+    ctx.fillStyle = '#fde68a';
+    ctx.fill();
+  }
+
+  drawWheel(angle);
+
+  function checkCooldown() {
+    const last = parseInt(localStorage.getItem('eylox_last_spin') || '0');
+    const now  = Date.now();
+    const ms   = 24 * 3600 * 1000;
+    if (now - last < ms) {
+      const left = ms - (now - last);
+      const h = Math.floor(left / 3600000);
+      const m = Math.floor((left % 3600000) / 60000);
+      document.getElementById('spinCooldown').textContent = `⏳ Next spin in ${h}h ${m}m`;
+      document.getElementById('spinBtn').disabled = true;
+      document.getElementById('spinBtn').style.opacity = '.45';
+      document.getElementById('spinBtn').style.cursor = 'not-allowed';
+      return false;
+    }
+    document.getElementById('spinCooldown').textContent = '✅ Free spin available!';
+    return true;
+  }
+
+  checkCooldown();
+
+  /* ── Auto-trigger pending spin from Extra Spin boost ── */
+  if (localStorage.getItem('eylox_pending_spin') === '1') {
+    localStorage.removeItem('eylox_pending_spin');
+    localStorage.removeItem('eylox_last_spin'); // bypass cooldown for bonus spin
+    checkCooldown();
+    setTimeout(() => document.getElementById('spinBtn').click(), 600);
+  }
+
+  document.getElementById('spinBtn').addEventListener('click', () => {
+    if (spinning || !checkCooldown()) return;
+    spinning = true;
+    document.getElementById('spinBtn').disabled = true;
+    window.EyloxSFX?.spin();
+
+    /* Pick random winner */
+    const winIdx = Math.floor(Math.random() * REWARDS.length);
+    /* Rare 1000 coin = 5% chance; re-roll toward it */
+    const totalSpins = 5 + Math.random() * 3; /* 5-8 full rotations */
+    const targetAngle = angle + (Math.PI * 2 * totalSpins) +
+      (-winIdx * slice - angle % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+
+    const start = Date.now();
+    const duration = 4200;
+    const startAngle = angle;
+
+    function easeOut(t) { return 1 - Math.pow(1 - t, 4); }
+
+    function tick() {
+      const elapsed = Date.now() - start;
+      const t = Math.min(elapsed / duration, 1);
+      angle = startAngle + (targetAngle - startAngle) * easeOut(t);
+      drawWheel(angle);
+      if (t < 1) { requestAnimationFrame(tick); return; }
+
+      /* Done — award coins */
+      const reward = REWARDS[winIdx];
+      try {
+        const u = JSON.parse(localStorage.getItem('eylox_user') || 'null');
+        if (u) {
+          u.coins = Math.min((u.coins || 0) + reward.coins, 1000000000);
+          localStorage.setItem('eylox_user', JSON.stringify(u));
+        }
+        /* Update all coin displays */
+        const fmt = Number(u?.coins || 0).toLocaleString();
+        document.querySelectorAll('.tb-coins span,.coins-amount').forEach(el => el.textContent = fmt);
+        /* Notification */
+        if (typeof Notifs !== 'undefined') {
+          Notifs.push('🎡 Daily Spin!', `You won 🪙 ${reward.coins.toLocaleString()} coins from the spin wheel! Come back tomorrow for another spin!`, 'reward');
+        }
+      } catch {}
+
+      localStorage.setItem('eylox_last_spin', Date.now().toString());
+      spinning = false;
+      window.EyloxSFX?.win();
+
+      /* Show win popup */
+      const popup = document.createElement('div');
+      popup.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.4);z-index:9999;background:linear-gradient(135deg,#1e0050,#3a0070);border:2px solid rgba(253,230,138,.5);border-radius:24px;padding:36px 48px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.6);transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .3s`;
+      popup.innerHTML = `
+        <div style="font-size:3rem;margin-bottom:10px">🎉</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:1.8rem;color:#fde68a;margin-bottom:6px">+${reward.coins.toLocaleString()} 🪙</div>
+        <div style="color:rgba(255,255,255,.7);font-size:.85rem;font-weight:700">Added to your wallet!</div>
+        <button onclick="this.parentElement.remove()" style="margin-top:20px;background:rgba(167,139,250,.2);border:1px solid rgba(167,139,250,.4);color:#a78bfa;padding:9px 24px;border-radius:99px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:'Nunito',sans-serif">✓ Awesome!</button>
+      `;
+      document.body.appendChild(popup);
+      requestAnimationFrame(() => { popup.style.transform = 'translate(-50%,-50%) scale(1)'; });
+
+      checkCooldown();
+    }
+
+    requestAnimationFrame(tick);
+  });
+
+  canvas.addEventListener('click', () => document.getElementById('spinBtn').click());
+})();
+</script>
+<script src="effects.js"></script>
+<script src="sound.js"></script>
+<script src="settings.js"></script>
+</body>
+</html>

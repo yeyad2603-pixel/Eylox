@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>∞ Eylox — Live Events</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script>
+    try {
+      const s = localStorage.getItem('eylox_token')||localStorage.getItem('eylox_guest')||localStorage.getItem('eylox_user');
+      if (!s) window.location.replace('landing.html');
+    } catch {}
+  </script>
+</head>
+<body data-page="events">
+<div class="app-shell">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <span class="sidebar-logo-icon">🎮</span>
+      <span class="sidebar-logo-text">Eylox</span>
+    </a>
+    <p class="sidebar-section-label">Menu</p>
+    <nav class="sidebar-nav"><ul>
+      <li><a href="index.html"    class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
+      <li><a href="games.html"    class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
+      <li><a href="friends.html"  class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span></a></li>
+      <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
+      <li><a href="profile.html"  class="sidebar-link"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
+    </ul></nav>
+    <div class="sidebar-divider"></div>
+    <p class="sidebar-section-label">More</p>
+    <nav class="sidebar-nav"><ul>
+      <li><a href="leaderboard.html"  class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
+      <li><a href="achievements.html" class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
+      <li><a href="communities.html"  class="sidebar-link"><span class="s-icon">🌍</span><span class="s-label">Communities</span></a></li>
+      <li><a href="live-events.html"  class="sidebar-link active"><span class="s-icon">⚡</span><span class="s-label">Live Events</span></a></li>
+      <li><a href="shop.html"         class="sidebar-link"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
+      <li><a href="#" class="sidebar-link" id="settingsBtn"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></a></li>
+      <li><a href="#" class="sidebar-link" id="logoutBtn"><span class="s-icon">🚪</span><span class="s-label">Logout</span></a></li>
+    </ul></nav>
+    <div class="sidebar-coins">
+      <img src="eylux-coin.png" class="coins-icon-img" alt="Eylux"/>
+      <div><div class="coins-amount">—</div><div class="coins-label">Eylux</div></div>
+    </div>
+    <div class="sidebar-coins sidebar-trophies">
+      <span class="coins-icon">🏆</span>
+      <div><div class="trophies-amount">—</div><div class="coins-label">Trophies</div></div>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="main-area">
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      <div class="search-wrap"><span class="search-icon">⚡</span><input type="search" class="search-input" placeholder="Search events…" id="evtSearch"/></div>
+      <div class="topbar-right">
+        <button class="tb-btn" aria-label="Notifications">🔔<span class="notif-dot"></span></button>
+        <div class="tb-coins"><img src="eylux-coin.png" class="tb-coin-img" alt="EC"> <span id="topbarCoins">—</span></div>
+        <div class="tb-trophies"><span class="tb-trophy-icon">🏆</span> <span id="topbarTrophies">—</span></div>
+        <a href="profile.html" class="tb-avatar">🎮<span class="online-dot"></span></a>
+      </div>
+    </header>
+
+    <main class="page-content">
+
+      <!-- Hero -->
+      <div class="evt-hero">
+        <div class="evt-hero-pulse"></div>
+        <div class="evt-hero-content">
+          <div class="evt-hero-badge">⚡ LIVE NOW</div>
+          <h1 style="font-family:var(--font-head);font-size:clamp(1.8rem,4vw,2.8rem);margin-bottom:8px">Compete. Win. <span class="evt-gradient-text">Dominate.</span></h1>
+          <p style="color:var(--muted);font-size:.95rem;font-weight:700;max-width:520px">Join live tournaments, daily challenges and limited-time events to earn massive rewards.</p>
+          <div class="evt-hero-stats">
+            <div class="evt-hs-box"><span class="evt-hs-num" id="liveCount">3</span><span class="evt-hs-lbl">Live Now</span></div>
+            <div class="evt-hs-box"><span class="evt-hs-num">12</span><span class="evt-hs-lbl">This Week</span></div>
+            <div class="evt-hs-box"><span class="evt-hs-num" id="joinedCount">0</span><span class="evt-hs-lbl">Joined</span></div>
+          </div>
+        </div>
+        <div class="evt-hero-art">🏆</div>
+      </div>
+
+      <!-- Filter tabs -->
+      <div class="evt-tabs" id="evtTabs">
+        <button class="evt-tab active" data-filter="all">🌐 All</button>
+        <button class="evt-tab" data-filter="active">🔴 Live</button>
+        <button class="evt-tab" data-filter="upcoming">🕐 Upcoming</button>
+        <button class="evt-tab" data-filter="daily">📅 Daily</button>
+        <button class="evt-tab" data-filter="tournament">🏆 Tournaments</button>
+      </div>
+
+      <!-- Events grid -->
+      <div class="evt-grid" id="evtGrid"></div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ── Event Detail Modal ── -->
+<div class="evt-modal-overlay" id="evtModal">
+  <div class="evt-modal">
+    <button class="evt-modal-close" id="evtModalClose">✕</button>
+    <div id="evtModalBody"></div>
+  </div>
+</div>
+
+<div id="toastContainer"></div>
+
+<style>
+/* ── Events Hero ── */
+.evt-hero {
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg, rgba(124,58,237,.3) 0%, rgba(236,72,153,.2) 50%, rgba(14,165,233,.15) 100%);
+  border: 1px solid rgba(167,139,250,.3); border-radius: var(--r-xl);
+  padding: 36px 40px; margin-bottom: 32px;
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  box-shadow: 0 8px 48px rgba(124,58,237,.2);
+}
+.evt-hero-pulse {
+  position: absolute; top: -80px; right: -80px;
+  width: 320px; height: 320px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(167,139,250,.18), transparent 70%);
+  animation: evt-pulse 4s ease-in-out infinite;
+}
+@keyframes evt-pulse { 0%,100%{transform:scale(1);opacity:.6} 50%{transform:scale(1.3);opacity:1} }
+.evt-hero-content { position: relative; flex: 1; }
+.evt-hero-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(239,68,68,.2); border: 1px solid rgba(239,68,68,.4);
+  color: #f87171; font-size: .72rem; font-weight: 900; letter-spacing: 1px;
+  padding: 4px 12px; border-radius: 99px; margin-bottom: 12px;
+  animation: blink-badge 2s ease-in-out infinite;
+}
+@keyframes blink-badge { 0%,100%{opacity:1} 50%{opacity:.6} }
+.evt-gradient-text {
+  background: linear-gradient(90deg, var(--purple), var(--pink));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.evt-hero-stats { display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
+.evt-hs-box { text-align: center; }
+.evt-hs-num { display: block; font-family: var(--font-head); font-size: 1.6rem; color: var(--purple); }
+.evt-hs-lbl { font-size: .7rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+.evt-hero-art { font-size: 5rem; flex-shrink: 0; animation: art-float 3s ease-in-out infinite; }
+
+/* ── Tabs ── */
+.evt-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+.evt-tab {
+  padding: 9px 18px; border-radius: 99px; border: 1px solid var(--border);
+  background: var(--card); color: var(--muted); font-family: var(--font-body);
+  font-weight: 800; font-size: .82rem; cursor: pointer;
+  transition: all .18s;
+}
+.evt-tab.active, .evt-tab:hover {
+  background: rgba(167,139,250,.18); color: var(--purple); border-color: rgba(167,139,250,.4);
+}
+
+/* ── Events Grid ── */
+.evt-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px;
+}
+
+/* ── Event Card ── */
+.evt-card {
+  background: linear-gradient(160deg, var(--card) 0%, rgba(35,14,86,.95) 100%);
+  border: 1px solid rgba(167,139,250,.18); border-radius: var(--r-lg);
+  overflow: hidden; cursor: pointer;
+  transition: transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s, border-color .22s;
+  animation: section-rise .4s cubic-bezier(.22,.61,.36,1) both;
+}
+.evt-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  border-color: rgba(167,139,250,.5);
+  box-shadow: 0 16px 48px rgba(124,58,237,.3);
+}
+.evt-card-banner {
+  height: 80px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; position: relative; overflow: hidden;
+}
+.evt-card-banner::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.08) 50%, transparent 70%);
+  transform: translateX(-110%); transition: transform .6s ease;
+}
+.evt-card:hover .evt-card-banner::before { transform: translateX(110%); }
+.evt-card-icon { font-size: 2.4rem; }
+.evt-card-status {
+  font-size: .62rem; font-weight: 900; padding: 4px 10px; border-radius: 99px;
+  letter-spacing: .5px; text-transform: uppercase;
+}
+.s-live     { background: rgba(239,68,68,.25); color: #f87171; border: 1px solid rgba(239,68,68,.4); animation: blink-badge 1.5s ease-in-out infinite; }
+.s-upcoming { background: rgba(251,191,36,.2);  color: #fbbf24; border: 1px solid rgba(251,191,36,.35); }
+.s-daily    { background: rgba(74,222,128,.2);  color: #4ade80; border: 1px solid rgba(74,222,128,.35); }
+.s-ended    { background: rgba(157,142,199,.15);color: var(--muted); border: 1px solid rgba(157,142,199,.2); }
+
+.evt-card-body { padding: 18px 20px 20px; }
+.evt-card-type { font-size: .65rem; font-weight: 900; color: var(--purple); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 6px; }
+.evt-card-title { font-family: var(--font-head); font-size: 1.1rem; margin-bottom: 8px; line-height: 1.2; }
+.evt-card-desc { font-size: .78rem; font-weight: 700; color: var(--muted); line-height: 1.5; margin-bottom: 14px; }
+.evt-card-meta { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.evt-meta-pill {
+  display: flex; align-items: center; gap: 5px; font-size: .72rem; font-weight: 800;
+  color: var(--muted); background: rgba(167,139,250,.07); border: 1px solid rgba(167,139,250,.12);
+  padding: 4px 10px; border-radius: 99px;
+}
+.evt-card-rewards {
+  display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+}
+.evt-reward {
+  display: flex; align-items: center; gap: 4px; font-size: .75rem; font-weight: 900;
+  padding: 5px 10px; border-radius: 99px;
+}
+.evt-reward-coins { background: rgba(253,230,138,.15); color: var(--yellow); border: 1px solid rgba(253,230,138,.3); }
+.evt-reward-wins  { background: rgba(251,191,36,.15);  color: #fbbf24;        border: 1px solid rgba(251,191,36,.3); }
+.evt-reward-badge { background: rgba(167,139,250,.15); color: var(--purple);  border: 1px solid rgba(167,139,250,.3); }
+
+.evt-countdown { font-family: var(--font-head); font-size: .85rem; color: var(--pink); margin-bottom: 14px; }
+.evt-participants {
+  display: flex; align-items: center; gap: 6px; font-size: .75rem; font-weight: 800; color: var(--muted); margin-bottom: 14px;
+}
+.evt-part-bar { flex: 1; height: 4px; background: rgba(167,139,250,.15); border-radius: 99px; overflow: hidden; }
+.evt-part-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--purple), var(--pink)); transition: width .6s ease; }
+
+.evt-join-btn {
+  width: 100%; padding: 11px; border: none; border-radius: var(--r-sm);
+  font-family: var(--font-body); font-weight: 900; font-size: .88rem; cursor: pointer;
+  transition: transform .18s, box-shadow .18s; position: relative; overflow: hidden;
+}
+.evt-join-btn.can-join {
+  background: linear-gradient(135deg, #7c3aed, #a855f7, #ec4899);
+  color: #fff; box-shadow: 0 4px 18px rgba(124,58,237,.4);
+}
+.evt-join-btn.can-join:hover { transform: scale(1.04) translateY(-2px); box-shadow: 0 8px 28px rgba(124,58,237,.65); }
+.evt-join-btn.joined {
+  background: rgba(74,222,128,.15); color: #4ade80;
+  border: 1px solid rgba(74,222,128,.3); cursor: default;
+}
+.evt-join-btn.ended { background: rgba(157,142,199,.1); color: var(--muted); border: 1px solid rgba(157,142,199,.2); cursor: default; }
+
+/* ── Modal ── */
+.evt-modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.75); backdrop-filter: blur(6px);
+  z-index: 1000; align-items: center; justify-content: center; padding: 20px;
+}
+.evt-modal-overlay.show { display: flex; }
+.evt-modal {
+  background: linear-gradient(160deg, var(--surface) 0%, #160840 100%);
+  border: 1px solid rgba(167,139,250,.3); border-radius: var(--r-xl);
+  padding: 36px; max-width: 560px; width: 100%; max-height: 85vh; overflow-y: auto;
+  position: relative; box-shadow: 0 24px 80px rgba(0,0,0,.6);
+  animation: card-float-in .35s cubic-bezier(.34,1.56,.64,1) both;
+}
+.evt-modal-close {
+  position: absolute; top: 16px; right: 16px;
+  background: rgba(167,139,250,.1); border: 1px solid rgba(167,139,250,.2);
+  color: var(--muted); width: 32px; height: 32px; border-radius: 50%;
+  font-size: .9rem; cursor: pointer; transition: background .15s, color .15s;
+}
+.evt-modal-close:hover { background: rgba(248,113,113,.2); color: #f87171; }
+
+/* ── Leaderboard in modal ── */
+.evt-lb-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px; border-radius: var(--r-sm);
+  transition: background .15s;
+}
+.evt-lb-row:hover { background: rgba(167,139,250,.06); }
+.evt-lb-rank { font-family: var(--font-head); font-size: 1rem; width: 28px; text-align: center; flex-shrink: 0; }
+.evt-lb-avatar { font-size: 1.3rem; width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg,#7c3aed,#ec4899); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+</style>
+
+<script src="security.js"></script>
+<script src="api.js"></script>
+<script src="features.js"></script>
+<script src="notifications.js"></script>
+<script src="polish.js"></script>
+<script src="admin-button.js"></script>
+<script src="studio-button.js"></script>
+<script src="effects.js"></script>
+<script src="sound.js"></script>
+<script src="settings.js"></script>
+<script>
+/* ══════════════════════════════════════════════
+   EYLOX LIVE EVENTS — Offline version
+══════════════════════════════════════════════ */
+
+const NOW = Date.now();
+const H = 3600000, M = 60000;
+
+const EVENTS = [
+  {
+    id: 'evt-ninja-weekly',
+    type: 'tournament', status: 'active',
+    icon: '🥷', color: 'linear-gradient(135deg,#7c3aed,#ec4899)',
+    title: 'Ninja Dash Weekly Cup',
+    desc: 'Compete for the highest score in Ninja Dash this week. Top 10 players win big Eylux rewards!',
+    game: 'Ninja Dash', participants: 847, maxParticipants: 1000,
+    endsIn: NOW + 18 * H,
+    rewards: [{ type:'coins', label:'🪙 5,000 Eylux' }, { type:'wins', label:'🏆 +20 Wins' }, { type:'badge', label:'🥷 Ninja Badge' }],
+    leaderboard: [
+      { rank:1, name:'ShadowBlade99', avatar:'🥷', score:'148,240' },
+      { rank:2, name:'PhantomStrike', avatar:'👾', score:'142,810' },
+      { rank:3, name:'NightRunner',   avatar:'🌙', score:'138,550' },
+      { rank:4, name:'DarkNinja',     avatar:'🦅', score:'130,200' },
+      { rank:5, name:'SilentWind',    avatar:'💨', score:'125,100' },
+    ],
+  },
+  {
+    id: 'evt-daily-coin',
+    type: 'daily', status: 'active',
+    icon: '🪙', color: 'linear-gradient(135deg,#d97706,#fde68a)',
+    title: 'Daily Coin Rush',
+    desc: 'Earn the most coins today across any game. Bonus multiplier active for all players!',
+    game: 'Any Game', participants: 2340, maxParticipants: 9999,
+    endsIn: NOW + 6 * H,
+    rewards: [{ type:'coins', label:'🪙 +500 Eylux' }, { type:'wins', label:'🏆 +5 Wins' }],
+    leaderboard: [
+      { rank:1, name:'CoinKing',    avatar:'💰', score:'24,800' },
+      { rank:2, name:'GoldHunter', avatar:'🏅', score:'22,400' },
+      { rank:3, name:'RichGamer',  avatar:'💎', score:'21,100' },
+    ],
+  },
+  {
+    id: 'evt-dragon-speed',
+    type: 'speedrun', status: 'active',
+    icon: '🐲', color: 'linear-gradient(135deg,#ef4444,#f97316)',
+    title: 'Dragon Escape Speedrun',
+    desc: 'Fastest completion of Dragon Escape wins. Every millisecond counts!',
+    game: 'Dragon Escape', participants: 413, maxParticipants: 500,
+    endsIn: NOW + 2 * H + 30 * M,
+    rewards: [{ type:'coins', label:'🪙 3,000 Eylux' }, { type:'badge', label:'🐲 Dragon Slayer' }],
+    leaderboard: [
+      { rank:1, name:'SpeedDemon',  avatar:'⚡', score:'0:42.3s' },
+      { rank:2, name:'DragonTamer',avatar:'🐲', score:'0:44.1s' },
+      { rank:3, name:'FlameRunner', avatar:'🔥', score:'0:45.8s' },
+    ],
+  },
+  {
+    id: 'evt-puzzle-weekend',
+    type: 'tournament', status: 'upcoming',
+    icon: '🧩', color: 'linear-gradient(135deg,#0ea5e9,#6366f1)',
+    title: 'Puzzle Palace Weekend',
+    desc: 'A 48-hour puzzle marathon. Solve puzzles, earn points, climb the leaderboard!',
+    game: 'Puzzle Palace', participants: 0, maxParticipants: 500,
+    startsIn: NOW + 4 * H,
+    endsIn: NOW + 52 * H,
+    rewards: [{ type:'coins', label:'🪙 8,000 Eylux' }, { type:'wins', label:'🏆 +50 Wins' }, { type:'badge', label:'🧩 Puzzle Legend' }],
+    leaderboard: [],
+  },
+  {
+    id: 'evt-ocean-daily',
+    type: 'daily', status: 'active',
+    icon: '🌊', color: 'linear-gradient(135deg,#0891b2,#2dd4bf)',
+    title: 'Ocean Quest Dive',
+    desc: 'Collect the most underwater treasures in Ocean Quest. Daily reset at midnight!',
+    game: 'Ocean Quest', participants: 1102, maxParticipants: 5000,
+    endsIn: NOW + 8 * H,
+    rewards: [{ type:'coins', label:'🪙 +300 Eylux' }, { type:'wins', label:'🏆 +3 Wins' }],
+    leaderboard: [
+      { rank:1, name:'OceanKing',   avatar:'🌊', score:'88,400' },
+      { rank:2, name:'TreasureHtr', avatar:'🗺️', score:'82,100' },
+    ],
+  },
+  {
+    id: 'evt-space-blast',
+    type: 'competition', status: 'upcoming',
+    icon: '🚀', color: 'linear-gradient(135deg,#4f46e5,#0ea5e9)',
+    title: 'Space Blaster Invitational',
+    desc: 'Top players compete in Space Blaster. Registration ends in 4 hours. Limited spots!',
+    game: 'Space Blaster', participants: 48, maxParticipants: 64,
+    startsIn: NOW + 12 * H,
+    endsIn: NOW + 36 * H,
+    rewards: [{ type:'coins', label:'🪙 15,000 Eylux' }, { type:'wins', label:'🏆 +100 Wins' }, { type:'badge', label:'🚀 Space Ace' }],
+    leaderboard: [],
+  },
+];
+
+const JOINED_KEY = 'eylox_joined_events';
+function getJoined() { try { return JSON.parse(localStorage.getItem(JOINED_KEY) || '[]'); } catch { return []; } }
+function joinEvent(id) {
+  const j = getJoined();
+  if (!j.includes(id)) { j.push(id); localStorage.setItem(JOINED_KEY, JSON.stringify(j)); }
+}
+function hasJoined(id) { return getJoined().includes(id); }
+
+function formatCountdown(ms) {
+  if (ms <= 0) return 'Ended';
+  const h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000), s = Math.floor((ms % 60000) / 1000);
+  if (h > 24) return `${Math.floor(h/24)}d ${h%24}h`;
+  return `${h}h ${m}m ${s}s`;
+}
+
+let currentFilter = 'all';
+
+function renderGrid() {
+  const q = document.getElementById('evtSearch')?.value.toLowerCase() || '';
+  let list = EVENTS.filter(e => {
+    if (q && !e.title.toLowerCase().includes(q) && !e.game.toLowerCase().includes(q)) return false;
+    if (currentFilter === 'active')     return e.status === 'active';
+    if (currentFilter === 'upcoming')   return e.status === 'upcoming';
+    if (currentFilter === 'daily')      return e.type === 'daily';
+    if (currentFilter === 'tournament') return e.type === 'tournament' || e.type === 'competition';
+    return true;
+  });
+
+  const grid = document.getElementById('evtGrid');
+  if (!list.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--muted)">
+      <div style="font-size:3rem;margin-bottom:12px">🔍</div>
+      <div style="font-family:var(--font-head);font-size:1.1rem;color:var(--text);margin-bottom:6px">No events found</div>
+      <div style="font-size:.83rem;font-weight:700">Try a different filter</div>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map((e, i) => {
+    const joined = hasJoined(e.id);
+    const remaining = e.endsIn - NOW;
+    const pct = Math.round((e.participants / e.maxParticipants) * 100);
+    const startsIn = e.startsIn ? e.startsIn - NOW : null;
+
+    let statusHtml = '';
+    if (e.status === 'active')   statusHtml = `<span class="evt-card-status s-live">● LIVE</span>`;
+    if (e.status === 'upcoming') statusHtml = `<span class="evt-card-status s-upcoming">🕐 SOON</span>`;
+    if (e.type === 'daily')      statusHtml = `<span class="evt-card-status s-daily">📅 DAILY</span>`;
+
+    let btnHtml = '';
+    if (e.status === 'ended')   btnHtml = `<button class="evt-join-btn ended">Event Ended</button>`;
+    else if (joined)            btnHtml = `<button class="evt-join-btn joined">✓ Joined! See you there</button>`;
+    else                        btnHtml = `<button class="evt-join-btn can-join" onclick="doJoin('${e.id}',event)">⚡ Join Event</button>`;
+
+    return `
+    <div class="evt-card" style="animation-delay:${i * 0.07}s" onclick="openModal('${e.id}')">
+      <div class="evt-card-banner" style="background:${e.color}">
+        <div class="evt-card-icon">${e.icon}</div>
+        ${statusHtml}
+      </div>
+      <div class="evt-card-body">
+        <div class="evt-card-type">${e.type.toUpperCase()}</div>
+        <div class="evt-card-title">${e.title}</div>
+        <div class="evt-card-desc">${e.desc}</div>
+        <div class="evt-card-meta">
+          <span class="evt-meta-pill">🎮 ${e.game}</span>
+          <span class="evt-meta-pill">👥 ${e.participants.toLocaleString()}</span>
+          ${e.status === 'active' ? `<span class="evt-meta-pill" data-countdown="${e.endsIn}">⏱ ${formatCountdown(remaining)}</span>` : ''}
+          ${startsIn && startsIn > 0 ? `<span class="evt-meta-pill">🕐 Starts in ${formatCountdown(startsIn)}</span>` : ''}
+        </div>
+        <div class="evt-card-rewards">${e.rewards.map(r => `<span class="evt-reward evt-reward-${r.type}">${r.label}</span>`).join('')}</div>
+        <div class="evt-participants">
+          <div class="evt-part-bar"><div class="evt-part-fill" style="width:${pct}%"></div></div>
+          <span>${pct}% full</span>
+        </div>
+        ${btnHtml}
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('joinedCount').textContent = getJoined().length;
+}
+
+function doJoin(id, ev) {
+  ev.stopPropagation();
+  joinEvent(id);
+  renderGrid();
+  window.EyloxSFX?.join();
+  showEvtToast('⚡ Joined! Good luck!', '#a78bfa');
+  /* Reward the player */
+  try {
+    const u = JSON.parse(localStorage.getItem('eylox_user') || 'null');
+    if (u) { u.coins = (u.coins || 0) + 50; localStorage.setItem('eylox_user', JSON.stringify(u)); }
+  } catch {}
+}
+
+function openModal(id) {
+  const e = EVENTS.find(x => x.id === id);
+  if (!e) return;
+  const joined = hasJoined(e.id);
+  const remaining = e.endsIn - NOW;
+
+  document.getElementById('evtModalBody').innerHTML = `
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+      <div style="font-size:3rem;width:64px;height:64px;border-radius:50%;background:${e.color};display:flex;align-items:center;justify-content:center;flex-shrink:0">${e.icon}</div>
+      <div>
+        <div style="font-size:.65rem;font-weight:900;color:var(--purple);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">${e.type}</div>
+        <div style="font-family:var(--font-head);font-size:1.4rem;line-height:1.2;margin-bottom:6px">${e.title}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">${e.status === 'active' ? '<span class="evt-card-status s-live">● LIVE</span>' : '<span class="evt-card-status s-upcoming">🕐 SOON</span>'}</div>
+      </div>
+    </div>
+    <p style="color:var(--muted);font-size:.88rem;font-weight:700;line-height:1.6;margin-bottom:18px">${e.desc}</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+      <div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.15);border-radius:var(--r-sm);padding:14px;text-align:center">
+        <div style="font-family:var(--font-head);font-size:1.3rem;color:var(--purple)">${e.participants.toLocaleString()}</div>
+        <div style="font-size:.68rem;font-weight:800;color:var(--muted)">PLAYERS JOINED</div>
+      </div>
+      <div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.15);border-radius:var(--r-sm);padding:14px;text-align:center">
+        <div style="font-family:var(--font-head);font-size:1.3rem;color:var(--pink)" data-modal-countdown="${e.endsIn}">${formatCountdown(remaining)}</div>
+        <div style="font-size:.68rem;font-weight:800;color:var(--muted)">${e.status === 'active' ? 'TIME LEFT' : 'STARTS IN'}</div>
+      </div>
+    </div>
+    <div style="margin-bottom:18px">
+      <div style="font-size:.72rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🎁 Rewards</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">${e.rewards.map(r => `<span class="evt-reward evt-reward-${r.type}" style="font-size:.82rem;padding:7px 14px">${r.label}</span>`).join('')}</div>
+    </div>
+    ${e.leaderboard.length ? `
+    <div style="margin-bottom:20px">
+      <div style="font-size:.72rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">🏆 Leaderboard</div>
+      ${e.leaderboard.map(p => `
+        <div class="evt-lb-row">
+          <span class="evt-lb-rank" style="color:${p.rank===1?'#fde68a':p.rank===2?'#c0c0c0':p.rank===3?'#cd7f32':'var(--muted)'}">${p.rank===1?'🥇':p.rank===2?'🥈':p.rank===3?'🥉':'#'+p.rank}</span>
+          <div class="evt-lb-avatar">${p.avatar}</div>
+          <span style="flex:1;font-weight:800;font-size:.88rem">${p.name}</span>
+          <span style="font-family:var(--font-head);color:var(--purple)">${p.score}</span>
+        </div>`).join('')}
+    </div>` : ''}
+    ${joined
+      ? `<div style="text-align:center;padding:14px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:var(--r-sm);color:#4ade80;font-weight:900">✓ You're in! Play ${e.game} to climb the leaderboard.</div>`
+      : e.status !== 'ended' ? `<button class="evt-join-btn can-join" style="margin-top:4px" onclick="doJoin('${e.id}',event);closeModal()">⚡ Join This Event</button>` : ''
+    }`;
+
+  document.getElementById('evtModal').classList.add('show');
+}
+
+function closeModal() { document.getElementById('evtModal').classList.remove('show'); }
+
+function showEvtToast(msg, color) {
+  const t = document.createElement('div');
+  t.className = 'toast green';
+  t.textContent = msg;
+  t.style.borderColor = color;
+  document.getElementById('toastContainer')?.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+/* Countdown ticker */
+setInterval(() => {
+  document.querySelectorAll('[data-countdown]').forEach(el => {
+    el.textContent = '⏱ ' + formatCountdown(parseInt(el.dataset.countdown) - Date.now());
+  });
+  document.querySelectorAll('[data-modal-countdown]').forEach(el => {
+    el.textContent = formatCountdown(parseInt(el.dataset.modalCountdown) - Date.now());
+  });
+}, 1000);
+
+/* Tab switching */
+document.getElementById('evtTabs').addEventListener('click', e => {
+  const btn = e.target.closest('.evt-tab');
+  if (!btn) return;
+  document.querySelectorAll('.evt-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilter = btn.dataset.filter;
+  renderGrid();
+});
+
+document.getElementById('evtSearch').addEventListener('input', renderGrid);
+document.getElementById('evtModalClose').addEventListener('click', closeModal);
+document.getElementById('evtModal').addEventListener('click', e => { if (e.target === document.getElementById('evtModal')) closeModal(); });
+
+document.getElementById('menuBtn').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('show');
+});
+document.getElementById('sidebarOverlay').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderGrid();
+  document.getElementById('liveCount').textContent = EVENTS.filter(e => e.status === 'active').length;
+  document.getElementById('joinedCount').textContent = getJoined().length;
+});
+</script>
+</body>
+</html>
