@@ -1,0 +1,1305 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eylox — Subscription & Billing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+  /* ── Subscription Page Styles ── */
+  .sub-page { padding: 28px 28px 80px; background: rgba(10,2,30,.7); }
+
+  /* ── Active Plan Hero ── */
+  .plan-hero {
+    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, rgba(60,18,140,.95) 0%, rgba(30,8,80,.98) 60%, rgba(80,20,100,.9) 100%);
+    border: 1px solid rgba(167,139,250,.45); border-radius: 24px;
+    padding: 36px 40px; margin-bottom: 32px;
+    box-shadow: 0 12px 60px rgba(124,58,237,.35), inset 0 1px 0 rgba(255,255,255,.08);
+  }
+  .plan-hero::before {
+    content: ''; position: absolute; top: -80px; right: -60px;
+    width: 360px; height: 360px;
+    background: radial-gradient(circle, rgba(167,139,250,.18) 0%, transparent 70%);
+    border-radius: 50%; pointer-events: none;
+    animation: planGlow 6s ease-in-out infinite;
+  }
+  @keyframes planGlow {
+    0%,100%{transform:scale(1);opacity:.8} 50%{transform:scale(1.15);opacity:1}
+  }
+  .plan-hero-inner { position: relative; z-index: 1; display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+  .plan-tier-badge {
+    width: 72px; height: 72px; border-radius: 20px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 2.2rem;
+    background: linear-gradient(135deg, rgba(167,139,250,.25), rgba(124,58,237,.35));
+    border: 1px solid rgba(167,139,250,.4);
+    box-shadow: 0 8px 32px rgba(124,58,237,.35);
+    animation: badgePulse 3s ease-in-out infinite;
+  }
+  @keyframes badgePulse { 0%,100%{box-shadow:0 8px 32px rgba(124,58,237,.35)} 50%{box-shadow:0 8px 48px rgba(124,58,237,.6)} }
+  .plan-info { flex: 1; min-width: 200px; }
+  .plan-label { font-size: .7rem; font-weight: 900; color: rgba(167,139,250,.55); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+  .plan-name { font-family: var(--font-head); font-size: 1.8rem; color: var(--text); line-height: 1.1; }
+  .plan-name span { background: linear-gradient(90deg, #a78bfa, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .plan-price-row { display: flex; align-items: baseline; gap: 6px; margin-top: 6px; }
+  .plan-price { font-family: var(--font-head); font-size: 2rem; color: #fbbf24; }
+  .plan-price-period { font-size: .85rem; color: var(--muted); font-weight: 700; }
+  .plan-renewal { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: .78rem; font-weight: 700; color: rgba(74,222,128,.75); }
+  .plan-renewal-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 6px #4ade80; animation: blink 1.4s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .plan-hero-actions { display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; }
+  .ph-btn {
+    padding: 11px 22px; border-radius: 12px; border: none;
+    font-family: var(--font-body); font-weight: 800; font-size: .85rem;
+    cursor: pointer; white-space: nowrap;
+    transition: all .2s cubic-bezier(.34,1.56,.64,1);
+  }
+  .ph-btn-upgrade { background: linear-gradient(135deg, #7c3aed, #a855f7); color: #fff; box-shadow: 0 4px 18px rgba(124,58,237,.4); }
+  .ph-btn-upgrade:hover { transform: scale(1.05) translateY(-1px); box-shadow: 0 8px 28px rgba(124,58,237,.6); }
+  .ph-btn-manage { background: rgba(167,139,250,.12); border: 1px solid rgba(167,139,250,.3); color: #c4b5fd; }
+  .ph-btn-manage:hover { background: rgba(167,139,250,.22); border-color: rgba(167,139,250,.5); }
+
+  /* ── No subscription state ── */
+  .no-sub-hero {
+    text-align: center; padding: 64px 40px;
+    background: linear-gradient(135deg, rgba(20,8,58,.95) 0%, rgba(10,2,32,.98) 100%);
+    border: 1px solid rgba(167,139,250,.2); border-radius: 24px;
+    margin-bottom: 32px;
+    position: relative; overflow: hidden;
+    box-shadow: 0 8px 48px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  .no-sub-hero::before {
+    content:''; position:absolute; top:-100px; left:50%; transform:translateX(-50%);
+    width:500px; height:500px;
+    background: radial-gradient(circle, rgba(124,58,237,.18) 0%, transparent 65%);
+    pointer-events:none;
+  }
+  .no-sub-icon { font-size: 4.5rem; margin-bottom: 20px; display:block; position:relative; z-index:1; filter:drop-shadow(0 0 24px rgba(167,139,250,.5)); }
+  .no-sub-title { font-family: var(--font-head); font-size: 2rem; color: var(--text); margin-bottom: 12px; position:relative; z-index:1; }
+  .no-sub-desc { color: rgba(196,181,253,.7); font-size: .95rem; font-weight: 700; margin-bottom: 32px; line-height: 1.7; position:relative; z-index:1; max-width:520px; margin-left:auto; margin-right:auto; margin-bottom:32px; }
+
+  /* ── Plan cards grid ── */
+  .plans-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+    margin-bottom: 36px;
+  }
+  @media (max-width: 1100px) { .plans-grid { grid-template-columns: repeat(2, 1fr); } }
+  .plan-card {
+    background: linear-gradient(160deg, #371087 0%, #230b5e 100%);
+    border: 1px solid rgba(167,139,250,.42); border-radius: 20px; padding: 24px 20px;
+    display: flex; flex-direction: column; gap: 12px;
+    transition: all .25s cubic-bezier(.34,1.4,.64,1);
+    position: relative; overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 6px 30px rgba(0,0,0,.55);
+  }
+  .plan-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--pc-color, rgba(167,139,250,.3));
+    opacity: .45; transition: opacity .2s;
+  }
+  .plan-card:hover { transform: translateY(-8px); box-shadow: 0 20px 56px rgba(0,0,0,.35), 0 0 0 1px var(--pc-color, rgba(167,139,250,.2)); }
+  .plan-card:hover::before { opacity: 1; }
+  .plan-card.active-plan {
+    border-color: rgba(167,139,250,.65);
+    box-shadow: 0 8px 48px rgba(124,58,237,.55);
+    background: linear-gradient(160deg, rgba(70,22,165,.99) 0%, rgba(50,12,140,.99) 100%);
+  }
+  .plan-card.active-plan::before { opacity: 1; }
+  .plan-card-badge {
+    position: absolute; top: 14px; right: 14px;
+    font-size: .6rem; font-weight: 900; padding: 3px 8px; border-radius: 99px;
+    letter-spacing: .5px; text-transform: uppercase;
+  }
+  .pc-header { display: flex; align-items: center; gap: 12px; }
+  .pc-icon { font-size: 1.6rem; flex-shrink: 0; }
+  .pc-name { font-family: var(--font-head); font-size: 1.05rem; color: var(--text); }
+  .pc-tier { font-size: .65rem; font-weight: 900; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .pc-price-row { display: flex; align-items: baseline; gap: 4px; }
+  .pc-price { font-family: var(--font-head); font-size: 1.5rem; }
+  .pc-period { font-size: .75rem; color: var(--muted); font-weight: 700; }
+  .pc-features { list-style: none; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .pc-feat {
+    display: flex; align-items: flex-start; gap: 8px;
+    font-size: .78rem; font-weight: 700; color: rgba(220,208,255,.9);
+    line-height: 1.4;
+  }
+  .pc-feat-check { flex-shrink: 0; font-size: .85rem; margin-top: 1px; }
+  .pc-btn {
+    width: 100%; padding: 12px; border-radius: 12px; border: none;
+    font-family: var(--font-body); font-weight: 900; font-size: .88rem;
+    cursor: pointer; transition: all .2s;
+  }
+  .pc-btn-current { background: rgba(74,222,128,.12); color: #4ade80; border: 1px solid rgba(74,222,128,.3); cursor: default; }
+  .pc-btn-upgrade { color: #fff; box-shadow: 0 4px 18px rgba(0,0,0,.25); }
+  .pc-btn-upgrade:hover { filter: brightness(1.12) saturate(1.1); transform: scale(1.02); }
+  .pc-btn-downgrade { background: rgba(167,139,250,.1); color: var(--muted); border: 1px solid rgba(167,139,250,.2); }
+  .pc-btn-downgrade:hover { background: rgba(167,139,250,.18); }
+
+  /* ── Billing history ── */
+  .billing-table { width: 100%; border-collapse: collapse; }
+  .billing-table th {
+    text-align: left; font-size: .7rem; font-weight: 900; color: rgba(196,181,253,.7);
+    text-transform: uppercase; letter-spacing: 1px; padding: 10px 16px;
+    border-bottom: 1px solid rgba(167,139,250,.2);
+  }
+  .billing-table td {
+    padding: 14px 16px; font-size: .85rem; font-weight: 700; color: rgba(240,232,255,.85);
+    border-bottom: 1px solid rgba(167,139,250,.1);
+    vertical-align: middle;
+  }
+  .billing-table tr:last-child td { border-bottom: none; }
+  .billing-table tr:hover td { background: rgba(167,139,250,.04); }
+  .bill-status {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: .7rem; font-weight: 900; padding: 3px 10px; border-radius: 99px;
+  }
+  .bill-paid { background: rgba(74,222,128,.12); color: #4ade80; border: 1px solid rgba(74,222,128,.25); }
+  .bill-pending { background: rgba(251,191,36,.12); color: #fbbf24; border: 1px solid rgba(251,191,36,.25); }
+  .bill-failed { background: rgba(248,113,113,.12); color: #f87171; border: 1px solid rgba(248,113,113,.25); }
+  .bill-dl { background: none; border: none; color: var(--purple); cursor: pointer; font-size: .8rem; font-weight: 800; transition: color .15s; }
+  .bill-dl:hover { color: var(--blue); text-decoration: underline; }
+
+  /* ── Payment methods ── */
+  .payment-cards { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+  .payment-card {
+    display: flex; align-items: center; gap: 14px;
+    background: linear-gradient(135deg, #3d1299, #2a0c80);
+    border: 1px solid rgba(167,139,250,.38); border-radius: 14px; padding: 16px 18px;
+    transition: border-color .2s;
+  }
+  .payment-card.is-default { border-color: rgba(167,139,250,.4); }
+  .payment-card-icon { font-size: 1.8rem; flex-shrink: 0; }
+  .payment-card-info { flex: 1; }
+  .payment-card-number { font-size: .9rem; font-weight: 800; font-family: monospace; color: var(--text); }
+  .payment-card-expiry { font-size: .72rem; color: var(--muted); font-weight: 700; margin-top: 2px; }
+  .payment-card-default { font-size: .65rem; font-weight: 900; background: rgba(167,139,250,.15); color: var(--purple); border: 1px solid rgba(167,139,250,.28); padding: 2px 8px; border-radius: 99px; }
+  .payment-card-actions { display: flex; gap: 8px; }
+  .payment-card-btn { background: none; border: 1px solid rgba(167,139,250,.2); border-radius: 8px; padding: 6px 12px; color: var(--muted); font-size: .72rem; font-weight: 800; cursor: pointer; transition: all .15s; }
+  .payment-card-btn:hover { background: rgba(167,139,250,.12); color: var(--text); border-color: rgba(167,139,250,.4); }
+
+  /* ── Stats row ── */
+  .sub-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; margin-bottom: 32px; }
+  .sub-stat {
+    background: linear-gradient(160deg, #3d1299, #2a0c80);
+    border: 1px solid rgba(167,139,250,.45); border-radius: 16px;
+    padding: 18px 16px; display: flex; flex-direction: column; gap: 4px;
+    transition: border-color .2s, transform .2s;
+    box-shadow: 0 4px 22px rgba(0,0,0,.5);
+  }
+  .sub-stat:hover { border-color: rgba(167,139,250,.5); transform: translateY(-2px); }
+  .sub-stat-icon { font-size: 1.3rem; margin-bottom: 4px; }
+  .sub-stat-num { font-family: var(--font-head); font-size: 1.35rem; color: #c4b5fd; }
+  .sub-stat-label { font-size: .68rem; font-weight: 800; color: rgba(196,181,253,.65); text-transform: uppercase; letter-spacing: .8px; }
+
+  /* ── Cancel modal ── */
+  .cancel-modal {
+    display: none; position: fixed; inset: 0; z-index: 9000;
+    background: rgba(0,0,4,.85); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .cancel-modal.open { display: flex; }
+  .cancel-box {
+    background: linear-gradient(160deg, #120535 0%, #0a0220 100%);
+    border: 1px solid rgba(248,113,113,.3); border-radius: 24px;
+    padding: 36px 32px; max-width: 420px; width: 100%;
+    text-align: center;
+    box-shadow: 0 24px 80px rgba(0,0,0,.7), 0 0 40px rgba(248,113,113,.1);
+    animation: cancelPop .4s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes cancelPop { from{transform:scale(.88) translateY(20px);opacity:0} to{transform:scale(1) translateY(0);opacity:1} }
+  .cancel-icon { font-size: 3rem; margin-bottom: 14px; }
+  .cancel-title { font-family: var(--font-head); font-size: 1.5rem; color: #f87171; margin-bottom: 8px; }
+  .cancel-desc { color: var(--muted); font-size: .88rem; font-weight: 700; line-height: 1.6; margin-bottom: 24px; }
+  .cancel-lose { background: rgba(248,113,113,.08); border: 1px solid rgba(248,113,113,.2); border-radius: 14px; padding: 14px 16px; margin-bottom: 22px; text-align: left; }
+  .cancel-lose-item { display: flex; align-items: center; gap: 8px; font-size: .78rem; font-weight: 700; color: rgba(248,113,113,.75); padding: 4px 0; }
+  .cancel-btns { display: flex; gap: 12px; }
+  .cancel-keep { flex: 1; padding: 13px; border-radius: 12px; background: linear-gradient(135deg, #7c3aed, #a855f7); color: #fff; border: none; font-family: var(--font-body); font-weight: 900; font-size: .9rem; cursor: pointer; transition: filter .2s; }
+  .cancel-keep:hover { filter: brightness(1.1); }
+  .cancel-confirm { flex: 1; padding: 13px; border-radius: 12px; background: rgba(248,113,113,.1); color: #f87171; border: 1px solid rgba(248,113,113,.3); font-family: var(--font-body); font-weight: 900; font-size: .9rem; cursor: pointer; transition: background .2s; }
+  .cancel-confirm:hover { background: rgba(248,113,113,.2); }
+
+  /* ── Monthly renewal animation ── */
+  @keyframes renewPulse {
+    0%{box-shadow:0 0 0 0 rgba(74,222,128,.4)} 70%{box-shadow:0 0 0 12px rgba(74,222,128,0)} 100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}
+  }
+  .renew-anim { animation: renewPulse 2s ease-out; }
+
+  /* ── Section card ── */
+  .billing-card {
+    background: linear-gradient(160deg, #3d1299 0%, #2a0c80 100%) !important;
+    border: 1px solid rgba(167,139,250,.5) !important; border-radius: 20px; overflow: hidden;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 40px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .billing-card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 22px; border-bottom: 1px solid rgba(167,139,250,.25);
+    background: rgba(124,58,237,.2);
+  }
+  .billing-card-title { font-family: var(--font-head); font-size: 1.1rem; color: #f0e8ff; }
+  .billing-card-body { padding: 20px 22px; background: rgba(0,0,0,.15); }
+
+  /* ── Perks display ── */
+  .perks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+  .perk-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: rgba(124,58,237,.2); border: 1px solid rgba(167,139,250,.35);
+    border-radius: 12px; padding: 12px 14px;
+    transition: border-color .2s, background .2s;
+  }
+  .perk-item:hover { background: rgba(124,58,237,.35); border-color: rgba(167,139,250,.55); }
+  .perk-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 2px; }
+  .perk-name { font-size: .82rem; font-weight: 800; color: #f0e8ff; }
+  .perk-desc { font-size: .7rem; color: rgba(196,181,253,.75); font-weight: 700; margin-top: 2px; }
+
+  /* ── Usage progress bar ── */
+  .usage-bar-wrap { margin-bottom: 12px; }
+  .usage-bar-label { display: flex; justify-content: space-between; font-size: .75rem; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+  .usage-bar-label span:last-child { color: var(--purple); }
+  .usage-bar-track { height: 8px; border-radius: 99px; background: rgba(167,139,250,.1); overflow: hidden; }
+  .usage-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #7c3aed, #a78bfa); transition: width .6s ease; }
+
+  @media (max-width: 640px) {
+    .sub-page { padding: 16px 14px 80px; }
+    .plan-hero { padding: 22px 18px; }
+    .plan-hero-inner { flex-direction: column; align-items: flex-start; }
+    .plan-hero-actions { flex-direction: row; width: 100%; }
+    .plan-hero-actions .ph-btn { flex: 1; }
+    .plans-grid { grid-template-columns: 1fr !important; }
+    .billing-table { font-size: .78rem; }
+    .billing-table th, .billing-table td { padding: 10px 10px; }
+    .no-sub-hero { padding: 40px 20px; }
+    .no-sub-title { font-size: 1.5rem; }
+  }
+  </style>
+<script src="audit-loader.js" defer></script>
+  <script src="debug-dashboard.js" defer></script>
+</head>
+<body data-page="subscription">
+
+<div id="toastContainer"></div>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="app-shell">
+
+  <!-- ====================== SIDEBAR ====================== -->
+  <aside class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <span class="sidebar-logo-icon">🎮</span>
+      <span class="sidebar-logo-text">Eylox</span>
+    </a>
+
+    <p class="sidebar-section-label">Menu</p>
+    <nav class="sidebar-nav" aria-label="Main navigation">
+      <ul>
+        <li><a href="index.html" class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
+        <li><a href="games.html" class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
+        <li><a href="leaderboard.html" class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
+        <li><a href="achievements.html" class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
+        <li><a href="events.html" class="sidebar-link"><span class="s-icon">🎯</span><span class="s-label">Live Events</span></a></li>
+        <li><a href="communities.html" class="sidebar-link"><span class="s-icon">🌐</span><span class="s-label">Communities</span></a></li>
+        <li><a href="friends.html" class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span></a></li>
+        <li><a href="profile.html" class="sidebar-link"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
+        <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-divider"></div>
+
+    <p class="sidebar-section-label">More</p>
+    <nav class="sidebar-nav">
+      <ul>
+        <li><a href="shop.html" class="sidebar-link"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
+        <li><a href="ai.html" class="sidebar-link"><span class="s-icon">🤖</span><span class="s-label">Eylox Studio</span><span class="s-soon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff">AI</span></a></li>
+        <li><a href="subscription.html" class="sidebar-link active" aria-current="page"><span class="s-icon">💎</span><span class="s-label">Subscription</span></a></li>
+        <li><button class="sidebar-link sb-action" onclick="openSettingsPanel()"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></button></li>
+        <li><button class="sidebar-link sb-action" onclick="eyloxLogout()" style="color:#f87171"><span class="s-icon">🚪</span><span class="s-label">Log Out</span></button></li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-coins">
+      <span>💰</span>
+      <div>
+        <div class="coins-amount" id="sbCoins">0</div>
+        <div class="coins-label">Eylux</div>
+      </div>
+    </div>
+    <div class="sidebar-coins" style="margin-top:8px">
+      <span>🏆</span>
+      <div>
+        <div class="Eyltrophs-amount" id="sbTrophies">0</div>
+        <div class="coins-label">Eyltrophs</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ====================== MAIN AREA ====================== -->
+  <div class="main-area">
+    <header class="topbar" id="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle sidebar">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="search" class="search-input" placeholder="Search games, players…" readonly />
+      </div>
+      <div class="topbar-right">
+        <div class="tb-Eyltrophs">🏆 <span id="topbarEyltrophs">0</span></div>
+        <div class="tb-coins">💰 <span id="topbarEylux">0</span></div>
+        <a href="profile.html" class="tb-avatar" id="tbAvatar">🎮<span class="online-dot"></span></a>
+      </div>
+    </header>
+
+    <div class="sub-page">
+
+      <div class="page-heading" style="margin-bottom:28px">
+        <h1>💎 Subscription & <span style="background:linear-gradient(90deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Billing</span></h1>
+        <p>Manage your plan, billing history, and payment methods.</p>
+      </div>
+
+      <!-- ── Active Plan Hero (or no-sub fallback) ── -->
+      <div id="activePlanSection"></div>
+
+      <!-- ── Usage Stats ── -->
+      <div id="usageStatsSection" style="display:none">
+        <div class="billing-card" style="margin-bottom:28px">
+          <div class="billing-card-header">
+            <span class="billing-card-title">📊 Usage This Month</span>
+            <span id="usageCycleLabel" style="font-size:.75rem;color:var(--muted);font-weight:700"></span>
+          </div>
+          <div class="billing-card-body">
+            <div id="usageBars"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Active Perks ── -->
+      <div id="activePerksSection" style="display:none">
+        <div class="billing-card" style="margin-bottom:28px">
+          <div class="billing-card-header">
+            <span class="billing-card-title">✨ Your Active Perks</span>
+          </div>
+          <div class="billing-card-body">
+            <div class="perks-grid" id="perksGrid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Plans ── -->
+      <div class="billing-card" style="margin-bottom:28px">
+        <div class="billing-card-header">
+          <span class="billing-card-title" id="plansTitle">⭐ Available Plans</span>
+          <span style="font-size:.75rem;color:var(--muted);font-weight:700">Cancel anytime</span>
+        </div>
+        <div class="billing-card-body" style="padding:14px 16px">
+          <div class="plans-grid" id="plansGrid"></div>
+        </div>
+      </div>
+
+      <!-- ── Stats row ── -->
+      <div id="subStatsRow" style="display:none">
+        <div class="sub-stats" id="subStats"></div>
+      </div>
+
+      <!-- ── Annual Billing Banner ── -->
+      <div id="annualBanner" style="display:none">
+        <div class="billing-card" style="margin-bottom:24px">
+          <div class="billing-card-header" style="background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(245,158,11,.04))">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:1.4rem">📅</span>
+              <div>
+                <div class="billing-card-title">Annual Billing</div>
+                <div style="font-size:.72rem;color:rgba(74,222,128,.75);font-weight:800">Save 20% — 2 months FREE</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div id="annualPriceLine" style="font-family:var(--font-head);font-size:1.1rem;color:#fbbf24"></div>
+              <button onclick="switchToAnnual()" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#1a1040;border:none;border-radius:12px;padding:9px 20px;font-family:var(--font-body);font-weight:900;font-size:.85rem;cursor:pointer;transition:filter .2s" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">Switch to Annual</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Referral Program ── -->
+      <div class="billing-card" style="margin-bottom:24px">
+        <div class="billing-card-header">
+          <span class="billing-card-title">🎁 Referral Program</span>
+          <span style="background:rgba(74,222,128,.12);color:#4ade80;border:1px solid rgba(74,222,128,.25);border-radius:99px;padding:3px 10px;font-size:.68rem;font-weight:900">+500 Coins per referral</span>
+        </div>
+        <div class="billing-card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px" id="referralStats">
+            <div class="sub-stat" style="margin:0"><div class="sub-stat-icon">👥</div><div class="sub-stat-num" id="refCount">0</div><div class="sub-stat-label">Referrals</div></div>
+            <div class="sub-stat" style="margin:0"><div class="sub-stat-icon">💰</div><div class="sub-stat-num" id="refEarned">0</div><div class="sub-stat-label">Eylux Earned</div></div>
+            <div class="sub-stat" style="margin:0"><div class="sub-stat-icon">⏳</div><div class="sub-stat-num" id="refPending">0</div><div class="sub-stat-label">Pending</div></div>
+          </div>
+          <div style="background:rgba(62,18,148,.55);border:1px solid rgba(167,139,250,.4);border-radius:14px;padding:16px 18px;margin-bottom:14px">
+            <div style="font-size:.72rem;font-weight:900;color:rgba(196,181,253,.8);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Your Referral Link</div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <div id="refLink" style="flex:1;background:rgba(0,0,0,.4);border:1px solid rgba(167,139,250,.35);border-radius:10px;padding:10px 14px;font-size:.82rem;font-weight:700;color:#c4b5fd;word-break:break-all;font-family:monospace"></div>
+              <button onclick="copyRefLink()" data-tip="Copy your referral link to clipboard" style="background:rgba(124,58,237,.3);border:1px solid rgba(167,139,250,.45);color:#e9d5ff;border-radius:10px;padding:10px 16px;font-size:.8rem;font-weight:800;cursor:pointer;white-space:nowrap;transition:all .15s" onmouseover="this.style.background='rgba(124,58,237,.5)'" onmouseout="this.style.background='rgba(124,58,237,.3)'">📋 Copy</button>
+            </div>
+          </div>
+          <p style="font-size:.75rem;color:rgba(196,181,253,.75);font-weight:700;line-height:1.6">Share your link. When a friend signs up and subscribes, you both get <strong style="color:#fbbf24">+500 coins</strong>. Your referrals are tracked automatically.</p>
+        </div>
+      </div>
+
+      <!-- ── Gift a Subscription ── -->
+      <div class="billing-card" style="margin-bottom:24px">
+        <div class="billing-card-header">
+          <span class="billing-card-title">🎀 Gift a Subscription</span>
+          <span style="background:rgba(244,114,182,.1);color:#f472b6;border:1px solid rgba(244,114,182,.25);border-radius:99px;padding:3px 10px;font-size:.68rem;font-weight:900">Make someone's day</span>
+        </div>
+        <div class="billing-card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px" id="giftTierGrid"></div>
+          <div style="display:flex;gap:10px;margin-bottom:12px">
+            <input type="text" id="giftUsername" placeholder="Enter username to gift…" style="flex:1;padding:12px 16px;border-radius:12px;font-size:.88rem;background:rgba(20,8,55,.95);border:1px solid rgba(167,139,250,.35);color:#f0e8ff;outline:none;font-family:var(--font-body);font-weight:700" />
+            <button onclick="sendGift()" data-tip="Send a subscription gift to another player" style="background:linear-gradient(135deg,#ec4899,#f0abfc);color:#fff;border:none;border-radius:12px;padding:12px 20px;font-family:var(--font-body);font-weight:900;font-size:.88rem;cursor:pointer;white-space:nowrap;transition:filter .2s" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">🎁 Send Gift</button>
+          </div>
+          <p style="font-size:.74rem;color:rgba(196,181,253,.7);font-weight:700">Gift cards are delivered instantly via in-platform notification.</p>
+        </div>
+      </div>
+
+      <!-- ── FAQ ── -->
+      <div class="billing-card" style="margin-bottom:24px">
+        <div class="billing-card-header">
+          <span class="billing-card-title">❓ Frequently Asked Questions</span>
+        </div>
+        <div class="billing-card-body" style="padding:0">
+          <div id="faqList"></div>
+        </div>
+      </div>
+
+      <!-- ── Billing History ── -->
+      <div class="billing-card">
+        <div class="billing-card-header">
+          <span class="billing-card-title">🧾 Billing History</span>
+          <button onclick="exportBillingHistory()" data-tip="Export billing history as CSV" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);color:var(--purple);border-radius:99px;padding:5px 14px;font-size:.75rem;font-weight:800;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(167,139,250,.2)'" onmouseout="this.style.background='rgba(167,139,250,.1)'">⬇ Export</button>
+        </div>
+        <div class="billing-card-body" style="padding:0;overflow-x:auto">
+          <table class="billing-table" id="billingTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="billingBody"></tbody>
+          </table>
+          <div id="noBillingMsg" style="display:none;text-align:center;padding:40px 16px;color:rgba(196,181,253,.75);font-size:.88rem;font-weight:700">
+            <div style="font-size:2.5rem;margin-bottom:10px">🧾</div>
+            No billing records yet. Subscribe to see your history here.
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Payment Methods ── -->
+      <div class="billing-card" style="margin-top:24px">
+        <div class="billing-card-header">
+          <span class="billing-card-title">💳 Payment Methods</span>
+          <button onclick="addPaymentMethod()" data-tip="Add a new credit or debit card" style="background:linear-gradient(135deg,rgba(124,58,237,.18),rgba(167,139,250,.1));border:1px solid rgba(167,139,250,.3);color:#a78bfa;border-radius:99px;padding:6px 14px;font-size:.75rem;font-weight:800;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(124,58,237,.3)'" onmouseout="this.style.background='linear-gradient(135deg,rgba(124,58,237,.18),rgba(167,139,250,.1))'">+ Add Card</button>
+        </div>
+        <div class="billing-card-body">
+          <div class="payment-cards" id="paymentMethods"></div>
+          <p style="font-size:.72rem;color:rgba(196,181,253,.55);font-weight:700;text-align:center">
+            🔒 Payments processed securely via Stripe. Card data never stored on our servers.
+          </p>
+        </div>
+      </div>
+
+    </div><!-- /sub-page -->
+  </div><!-- /main-area -->
+</div><!-- /app-shell -->
+
+<style>
+  .pause-modal-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
+  .pause-modal-option {
+    display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+    background: rgba(251,191,36,.06); border: 1px solid rgba(251,191,36,.18);
+    border-radius: 12px; cursor: pointer; transition: border-color .15s;
+  }
+  .pause-modal-option:hover { border-color: rgba(251,191,36,.4); }
+  .pause-modal-option input { accent-color: #fbbf24; }
+  .pause-option-title { font-weight: 900; font-size: .88rem; color: var(--text); }
+  .pause-option-sub { font-size: .74rem; color: var(--muted); }
+</style>
+<!-- ── Pause Subscription Modal ── -->
+<div class="cancel-modal" id="pauseModal">
+  <div class="cancel-box" style="border-color:rgba(251,191,36,.3)">
+    <div class="cancel-icon">⏸️</div>
+    <div class="cancel-title" style="color:#fbbf24">Pause Subscription</div>
+    <div class="cancel-desc">Take a break without losing your account history or progress. Choose how long to pause:</div>
+    <div class="pause-modal-options">
+      <label class="pause-modal-option">
+        <input type="radio" name="pauseDur" value="1" checked>
+        <div><div class="pause-option-title">1 Month</div><div class="pause-option-sub">Pause until next billing cycle</div></div>
+      </label>
+      <label class="pause-modal-option">
+        <input type="radio" name="pauseDur" value="2">
+        <div><div class="pause-option-title">2 Months</div><div class="pause-option-sub">Best for short trips or breaks</div></div>
+      </label>
+      <label class="pause-modal-option">
+        <input type="radio" name="pauseDur" value="3">
+        <div><div class="pause-option-title">3 Months</div><div class="pause-option-sub">Maximum pause duration</div></div>
+      </label>
+    </div>
+    <div class="cancel-btns">
+      <button type="button" class="cancel-keep" onclick="document.getElementById('pauseModal').classList.remove('open')">✕ Go Back</button>
+      <button type="button" class="cancel-confirm" style="background:rgba(251,191,36,.12);color:#fbbf24;border-color:rgba(251,191,36,.3)" onclick="confirmPauseSub()">⏸ Pause Plan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Cancel Subscription Modal ── -->
+<div class="cancel-modal" id="cancelModal">
+  <div class="cancel-box">
+    <div class="cancel-icon">💔</div>
+    <div class="cancel-title">Cancel Subscription?</div>
+    <div class="cancel-desc">You'll lose access to all premium features at the end of your current billing period.</div>
+    <div class="cancel-lose" id="cancelLoseList">
+      <div class="cancel-lose-item"><span>✕</span> All premium perks removed</div>
+      <div class="cancel-lose-item"><span>✕</span> Creator tools revoked</div>
+      <div class="cancel-lose-item"><span>✕</span> Exclusive avatar items locked</div>
+      <div class="cancel-lose-item"><span>✕</span> Coin bonuses stop</div>
+    </div>
+    <div class="cancel-btns" style="flex-direction:column;gap:10px">
+      <button type="button" class="cancel-keep" onclick="closeCancelModal();document.getElementById('pauseModal').classList.add('open')" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#1a1040">⏸ Pause Instead</button>
+      <div style="display:flex;gap:10px">
+        <button type="button" class="cancel-keep" onclick="closeCancelModal()" style="flex:1">✓ Keep Plan</button>
+        <button type="button" class="cancel-confirm" onclick="confirmCancelSub()" style="flex:1">Cancel Plan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Scripts ── -->
+<script src="api.js"></script>
+<script src="premium.js"></script>
+<script src="creator-pass.js"></script>
+
+<script src="script.js"></script>
+<script src="settings.js"></script>
+<script src="user-persist.js"></script>
+<script src="owner-theme.js"></script>
+<script src="notifications.js"></script>
+<script>
+
+/* ══════════════════════════════════════════════
+   SUBSCRIPTION PAGE — main controller
+   ══════════════════════════════════════════════ */
+(function() {
+'use strict';
+
+const TIERS = [
+  {
+    id: 'premium', name: 'EYLOX Premium', icon: '⭐', color: '#fbbf24',
+    price: 299, priceLocal: null, tier: 'TIER 1',
+    badge: null,
+    features: [
+      'Ad-free gaming experience',
+      '2× Coin earnings on all games',
+      'Exclusive Premium avatar frames',
+      'Monthly 500 Coin bonus',
+      'Priority matchmaking queue',
+      'Custom profile badge',
+    ]
+  },
+  {
+    id: 'creator', name: 'Creator Pass', icon: '🚀', color: '#60a5fa',
+    price: 999, priceLocal: null, tier: 'TIER 2',
+    badge: 'POPULAR',
+    features: [
+      'All Premium benefits included',
+      'Publish unlimited games',
+      'Advanced AI game builder',
+      'Custom game thumbnails',
+      'Creator analytics dashboard',
+      'Early access to beta features',
+    ]
+  },
+  {
+    id: 'pro', name: 'Creator Pro', icon: '💎', color: '#a78bfa',
+    price: 2499, priceLocal: null, tier: 'TIER 3',
+    badge: 'BEST VALUE',
+    features: [
+      'All Creator Pass benefits',
+      'Featured game placement',
+      'Monetize your games (coins)',
+      'Team collaboration tools',
+      'Custom game domain URL',
+      'Priority creator support',
+    ]
+  },
+  {
+    id: 'ultimate', name: 'Ultimate Creator', icon: '🌌', color: '#f0abfc',
+    price: 4999, priceLocal: null, tier: 'TIER 4',
+    badge: 'ULTIMATE',
+    features: [
+      'All Creator Pro benefits',
+      'White-label game embedding',
+      'Revenue sharing program',
+      'Dedicated account manager',
+      'Custom platform branding',
+      'Full API access & webhooks',
+    ]
+  }
+];
+
+const PERKS_MAP = {
+  premium: [
+    { icon:'🚫', name:'Ad-Free', desc:'Zero ads, ever' },
+    { icon:'💰', name:'2× Coins', desc:'Double earnings on every game' },
+    { icon:'🎨', name:'Premium Frames', desc:'Exclusive avatar decorations' },
+    { icon:'🎁', name:'Monthly Bonus', desc:'+500 coins every month' },
+  ],
+  creator: [
+    { icon:'🚫', name:'Ad-Free', desc:'Zero ads, ever' },
+    { icon:'💰', name:'2× Coins', desc:'Double earnings on every game' },
+    { icon:'🎮', name:'Game Publisher', desc:'Publish unlimited games' },
+    { icon:'🤖', name:'AI Builder Pro', desc:'Full AI game creation' },
+    { icon:'📊', name:'Analytics', desc:'Creator dashboard & insights' },
+    { icon:'🎁', name:'Monthly Bonus', desc:'+500 coins every month' },
+  ],
+  pro: [
+    { icon:'🚫', name:'Ad-Free', desc:'Zero ads, ever' },
+    { icon:'💰', name:'3× Coins', desc:'Triple earnings on every game' },
+    { icon:'📌', name:'Featured Games', desc:'Front-page placement' },
+    { icon:'🤖', name:'AI Builder Pro', desc:'Full AI game creation' },
+    { icon:'🤝', name:'Team Tools', desc:'Collaborate with 5 members' },
+    { icon:'📊', name:'Pro Analytics', desc:'Advanced insights & reports' },
+  ],
+  ultimate: [
+    { icon:'🚫', name:'Ad-Free', desc:'Zero ads, ever' },
+    { icon:'💰', name:'5× Coins', desc:'5x earnings on every game' },
+    { icon:'🌐', name:'White Label', desc:'Embed games with your brand' },
+    { icon:'💵', name:'Revenue Share', desc:'Earn from your players' },
+    { icon:'👑', name:'VIP Manager', desc:'Dedicated account manager' },
+    { icon:'🔑', name:'Full API', desc:'Complete platform API access' },
+  ]
+};
+
+const USAGE_DATA = [
+  { label: 'Games Published', used: 0, max: 99, unit: 'games' },
+  { label: 'API Calls', used: 0, max: 10000, unit: 'calls' },
+  { label: 'Team Members', used: 1, max: 5, unit: 'members' },
+];
+
+/* ── FX rates — EGP base currency ── */
+const FX = {
+  'EGP':{ r:1,      sym:'EGP ', name:'Egyptian Pounds' },
+  'USD':{ r:0.0205, sym:'$',    name:'US Dollars'      },
+  'EUR':{ r:0.0188, sym:'€',    name:'Euros'           },
+  'GBP':{ r:0.0160, sym:'£',    name:'British Pounds'  },
+  'SAR':{ r:0.0769, sym:'SAR ', name:'Saudi Riyals'    },
+  'AED':{ r:0.0753, sym:'AED ', name:'UAE Dirhams'     },
+};
+function detectCurrency() {
+  const tz   = Intl?.DateTimeFormat ? Intl.DateTimeFormat().resolvedOptions().timeZone || '' : '';
+  const lang = navigator.language || '';
+  if (tz.includes('Cairo')  || lang.startsWith('ar-EG')) return 'EGP';
+  if (tz.includes('Riyadh') || tz.includes('Kuwait')    || lang.startsWith('ar-SA')) return 'SAR';
+  if (tz.includes('Dubai')  || tz.includes('Abu_Dhabi') || lang.startsWith('ar-AE')) return 'AED';
+  if (lang.startsWith('en-GB')) return 'GBP';
+  if (['de','fr','it','nl','es'].some(l => lang.startsWith(l))) return 'EUR';
+  if (lang.startsWith('en-US')) return 'USD';
+  return 'EGP';
+}
+function fmtPrice(egp) {
+  const curr = detectCurrency();
+  const fx   = FX[curr] || FX['EGP'];
+  const raw  = egp * fx.r;
+  const n    = raw < 10 ? +raw.toFixed(2) : Math.round(raw);
+  return `${fx.sym}${n.toLocaleString()}`;
+}
+
+/* ── Helpers ── */
+function getUser() {
+  try { return JSON.parse(localStorage.getItem('eylox_user') || 'null'); } catch { return null; }
+}
+function getTier() { return localStorage.getItem('eylox_subscription_tier') || null; }
+function getCoins() { const u = getUser(); return u ? (u.coins || 0) : 0; }
+
+function tierLevel(id) { return ['premium','creator','pro','ultimate'].indexOf(id); }
+
+/* ── Build renewal date string ── */
+function getRenewalDate() {
+  const stored = localStorage.getItem('eylox_renewal_date');
+  if (stored) return new Date(stored);
+  const d = new Date();
+  d.setMonth(d.getMonth() + 1);
+  localStorage.setItem('eylox_renewal_date', d.toISOString());
+  return d;
+}
+function getSubDate() {
+  const stored = localStorage.getItem('eylox_sub_start');
+  if (stored) return new Date(stored);
+  const d = new Date();
+  d.setMonth(d.getMonth() - 1);
+  localStorage.setItem('eylox_sub_start', d.toISOString());
+  return d;
+}
+
+/* ── Active Plan Hero ── */
+function buildActivePlan() {
+  const sec = document.getElementById('activePlanSection');
+  const tier = getTier();
+  if (!tier) {
+    sec.innerHTML = `
+      <div class="no-sub-hero">
+        <div class="no-sub-icon">🌟</div>
+        <div class="no-sub-title">Unlock Your Full Potential</div>
+        <p class="no-sub-desc">You're currently on the Free plan. Upgrade to access premium features,<br>earn more coins, publish games, and join the creator community.</p>
+        <button onclick="document.getElementById('plansGrid').scrollIntoView({behavior:'smooth',block:'center'})" style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border:none;border-radius:99px;padding:15px 38px;font-family:var(--font-head);font-size:1.05rem;cursor:pointer;box-shadow:0 6px 32px rgba(124,58,237,.55);transition:all .2s;position:relative;z-index:1" onmouseover="this.style.filter='brightness(1.12)';this.style.transform='scale(1.04)'" onmouseout="this.style.filter='';this.style.transform=''">⭐ View Plans & Upgrade</button>
+      </div>`;
+    return;
+  }
+  const t = TIERS.find(x => x.id === tier) || TIERS[0];
+  const renewal = getRenewalDate();
+  const renewStr = renewal.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  const priceFmt = fmtPrice(t.price);
+  sec.innerHTML = `
+    <div class="plan-hero">
+      <div class="plan-hero-inner">
+        <div class="plan-tier-badge">${t.icon}</div>
+        <div class="plan-info">
+          <div class="plan-label">${t.tier} — ACTIVE</div>
+          <div class="plan-name">EYLOX <span>${t.name.replace('EYLOX ','')}</span></div>
+          <div class="plan-price-row">
+            <div class="plan-price">${priceFmt}</div>
+            <div class="plan-price-period">/ month</div>
+          </div>
+          <div class="plan-renewal">
+            <span class="plan-renewal-dot"></span>
+            Renews automatically on ${renewStr}
+          </div>
+        </div>
+        <div class="plan-hero-actions">
+          <button class="ph-btn ph-btn-upgrade" onclick="scrollToPlans()">⬆ Upgrade Plan</button>
+          <button class="ph-btn ph-btn-manage" onclick="openCancelModal()">⚙ Manage</button>
+        </div>
+      </div>
+    </div>`;
+
+  /* show perks + stats */
+  buildPerks(tier);
+  buildUsage(tier);
+  buildSubStats(tier);
+}
+
+/* ── Usage bars ── */
+function buildUsage(tierId) {
+  const level = tierLevel(tierId);
+  if (level < 1) return;
+  const sec = document.getElementById('usageStatsSection');
+  const barsEl = document.getElementById('usageBars');
+  const cycleEl = document.getElementById('usageCycleLabel');
+  const renewal = getRenewalDate();
+  const subStart = getSubDate();
+  cycleEl.textContent = `${subStart.toLocaleDateString('en-US',{month:'short',day:'numeric'})} – ${renewal.toLocaleDateString('en-US',{month:'short',day:'numeric'})}`;
+
+  const gamesPublished = (JSON.parse(localStorage.getItem('eylox_my_games') || '[]')).length;
+  const usages = [
+    { label:'Games Published', used: gamesPublished, max: level >= 3 ? 999 : (level >= 2 ? 50 : 10), unit:'games' },
+    { label:'Storage Used', used: Math.round(JSON.stringify(localStorage).length / 1024), max: 50, unit:'KB' },
+    { label:'Monthly Plays', used: parseInt(localStorage.getItem('eylox_monthly_plays') || '0'), max: level >= 3 ? 99999 : 10000, unit:'plays' },
+  ];
+
+  barsEl.innerHTML = usages.map(u => {
+    const pct = Math.min(100, Math.round((u.used / u.max) * 100));
+    const overCls = pct >= 90 ? 'style="background:linear-gradient(90deg,#f87171,#ef4444)"' : '';
+    return `
+      <div class="usage-bar-wrap">
+        <div class="usage-bar-label">
+          <span>${u.label}</span>
+          <span>${u.used.toLocaleString()} / ${u.max === 999 || u.max === 99999 ? '∞' : u.max.toLocaleString()} ${u.unit}</span>
+        </div>
+        <div class="usage-bar-track">
+          <div class="usage-bar-fill" ${overCls} style="width:${pct}%"></div>
+        </div>
+      </div>`;
+  }).join('');
+  sec.style.display = '';
+}
+
+/* ── Perks ── */
+function buildPerks(tierId) {
+  const sec = document.getElementById('activePerksSection');
+  const grid = document.getElementById('perksGrid');
+  const perks = PERKS_MAP[tierId] || PERKS_MAP['premium'];
+  grid.innerHTML = perks.map(p => `
+    <div class="perk-item">
+      <div class="perk-icon">${p.icon}</div>
+      <div>
+        <div class="perk-name">${p.name}</div>
+        <div class="perk-desc">${p.desc}</div>
+      </div>
+    </div>`).join('');
+  sec.style.display = '';
+}
+
+/* ── Stats ── */
+function buildSubStats(tierId) {
+  const sec = document.getElementById('subStatsRow');
+  const el = document.getElementById('subStats');
+  const subStart = getSubDate();
+  const months = Math.max(1, Math.round((Date.now() - subStart.getTime()) / (1000 * 60 * 60 * 24 * 30)));
+  const games = (JSON.parse(localStorage.getItem('eylox_my_games') || '[]')).length;
+  const coins = parseInt(localStorage.getItem('eylox_total_earned') || '0') || getCoins();
+  const tier = TIERS.find(x => x.id === tierId) || TIERS[0];
+
+  el.innerHTML = [
+    { icon:'📅', num: months, label:'Months Active' },
+    { icon:'🎮', num: games, label:'Games Published' },
+    { icon:'💰', num: coins.toLocaleString(), label:'Eylux Earned' },
+    { icon:'⭐', num: tier.tier, label:'Current Tier' },
+  ].map(s => `
+    <div class="sub-stat">
+      <div class="sub-stat-icon">${s.icon}</div>
+      <div class="sub-stat-num">${s.num}</div>
+      <div class="sub-stat-label">${s.label}</div>
+    </div>`).join('');
+  sec.style.display = '';
+}
+
+/* ── Plan cards ── */
+function buildPlans() {
+  const grid = document.getElementById('plansGrid');
+  const currentTier = getTier();
+  const currentLevel = tierLevel(currentTier);
+  const titleEl = document.getElementById('plansTitle');
+  if (currentTier) titleEl.textContent = '⭐ Change Your Plan';
+
+  grid.innerHTML = TIERS.map(t => {
+    const tLevel = tierLevel(t.id);
+    const isCurrent = t.id === currentTier;
+    const priceFmt = fmtPrice(t.price);
+    let badgeHtml = '';
+    if (t.badge) {
+      const bg = t.badge === 'ULTIMATE'   ? 'linear-gradient(135deg,#c026d3,#f0abfc)' :
+                 t.badge === 'BEST VALUE'  ? 'linear-gradient(135deg,#7c3aed,#a78bfa)' :
+                                             'linear-gradient(135deg,#0ea5e9,#60a5fa)';
+      badgeHtml = `<span class="plan-card-badge" style="background:${bg};color:#fff">${t.badge}</span>`;
+    }
+    let btnHtml;
+    if (isCurrent) {
+      btnHtml = `<button class="pc-btn pc-btn-current">✓ Current Plan</button>`;
+    } else if (tLevel > currentLevel || currentLevel < 0) {
+      const btnBg = t.id === 'premium'  ? 'linear-gradient(135deg,#d97706,#fbbf24)' :
+                    t.id === 'creator'  ? 'linear-gradient(135deg,#0ea5e9,#60a5fa)' :
+                    t.id === 'pro'      ? 'linear-gradient(135deg,#7c3aed,#a78bfa)' :
+                                         'linear-gradient(135deg,#c026d3,#f0abfc)';
+      const btnShadow = `0 4px 18px ${t.color}55`;
+      const tipLabel = currentTier ? `Upgrade to ${t.name}` : `Subscribe to ${t.name} for ${fmtPrice(t.price)}/mo`;
+      btnHtml = `<button class="pc-btn pc-btn-upgrade" style="background:${btnBg};box-shadow:${btnShadow}" onclick="subscribeTo('${t.id}')" data-tip="${tipLabel}">⬆ ${currentTier ? 'Upgrade' : 'Subscribe'}</button>`;
+    } else {
+      btnHtml = `<button class="pc-btn pc-btn-downgrade" onclick="subscribeTo('${t.id}')">⬇ Downgrade</button>`;
+    }
+    return `
+      <div class="plan-card ${isCurrent ? 'active-plan' : ''}" style="--pc-color:${t.color}" data-tip="${isCurrent ? 'Your current active plan' : t.tier+' — Click to subscribe'}" onclick="if(event.target.tagName!=='BUTTON'){subscribeTo('${t.id}')}">
+        ${badgeHtml}
+        <div class="pc-header">
+          <div class="pc-icon">${t.icon}</div>
+          <div>
+            <div class="pc-name">${t.name}</div>
+            <div class="pc-tier">${t.tier}</div>
+          </div>
+        </div>
+        <div class="pc-price-row">
+          <div class="pc-price" style="color:${t.color}">${priceFmt}</div>
+          <div class="pc-period">/ month</div>
+        </div>
+        <ul class="pc-features">
+          ${t.features.map(f => `<li class="pc-feat"><span class="pc-feat-check" style="color:${t.color}">✓</span>${f}</li>`).join('')}
+        </ul>
+        ${btnHtml}
+      </div>`;
+  }).join('');
+}
+
+/* ── Subscribe ── */
+function subscribeTo(tierId) {
+  if (window.openPremiumModal) {
+    if (window.selectPremTier) selectPremTier(tierId);
+    openPremiumModal();
+  }
+}
+window.subscribeTo = subscribeTo;
+
+/* ── Billing history ── */
+function buildBilling() {
+  const tbody = document.getElementById('billingBody');
+  const noMsg = document.getElementById('noBillingMsg');
+  const tier = getTier();
+  if (!tier) {
+    tbody.innerHTML = '';
+    noMsg.style.display = '';
+    return;
+  }
+  noMsg.style.display = 'none';
+  const history = JSON.parse(localStorage.getItem('eylox_billing_history') || '[]');
+  const t = TIERS.find(x => x.id === tier) || TIERS[0];
+
+  /* Generate some history if empty */
+  if (!history.length) {
+    const subStart = getSubDate();
+    const now = new Date();
+    for (let i = 0; i < 3; i++) {
+      const d = new Date(subStart);
+      d.setMonth(d.getMonth() + i);
+      if (d > now) break;
+      history.push({
+        date: d.toISOString(),
+        desc: `${t.name} — Monthly`,
+        amount: fmtPrice(t.price),
+        status: 'paid',
+        id: 'INV-' + Math.random().toString(36).substr(2,8).toUpperCase()
+      });
+    }
+    localStorage.setItem('eylox_billing_history', JSON.stringify(history));
+  }
+
+  tbody.innerHTML = history.slice().reverse().map(h => {
+    const d = new Date(h.date);
+    const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const statusCls = h.status === 'paid' ? 'bill-paid' : h.status === 'pending' ? 'bill-pending' : 'bill-failed';
+    const statusLabel = h.status === 'paid' ? '✓ Paid' : h.status === 'pending' ? '⏳ Pending' : '✕ Failed';
+    return `
+      <tr>
+        <td style="color:var(--muted)">${dateStr}</td>
+        <td>${h.desc}</td>
+        <td style="font-family:var(--font-head);color:#fbbf24">${typeof h.amount === 'string' ? h.amount : fmtPrice(h.amount)}</td>
+        <td><span class="bill-status ${statusCls}">${statusLabel}</span></td>
+        <td><button class="bill-dl" onclick="downloadInvoice('${h.id}')">⬇ Invoice</button></td>
+      </tr>`;
+  }).join('');
+}
+
+/* ── Payment methods ── */
+function buildPaymentMethods() {
+  const el = document.getElementById('paymentMethods');
+  const tier = getTier();
+  if (!tier) {
+    el.innerHTML = `<p style="color:rgba(196,181,253,.7);font-size:.85rem;font-weight:700;text-align:center;padding:12px 0">No payment methods added yet.</p>`;
+    return;
+  }
+  const methods = JSON.parse(localStorage.getItem('eylox_payment_methods') || '[]');
+  if (!methods.length) {
+    methods.push({ type: 'visa', last4: '4242', expiry: '12/26', isDefault: true });
+    localStorage.setItem('eylox_payment_methods', JSON.stringify(methods));
+  }
+  el.innerHTML = methods.map(m => `
+    <div class="payment-card ${m.isDefault ? 'is-default' : ''}">
+      <div class="payment-card-icon">${m.type === 'visa' ? '💳' : m.type === 'mastercard' ? '🃏' : '💳'}</div>
+      <div class="payment-card-info">
+        <div class="payment-card-number">${m.type.toUpperCase()} •••• •••• •••• ${m.last4}</div>
+        <div class="payment-card-expiry">Expires ${m.expiry}</div>
+      </div>
+      ${m.isDefault ? '<span class="payment-card-default">Default</span>' : ''}
+      <div class="payment-card-actions">
+        <button class="payment-card-btn" onclick="setDefaultCard('${m.last4}')">Set Default</button>
+        <button class="payment-card-btn" style="color:#f87171;border-color:rgba(248,113,113,.2)" onclick="removeCard('${m.last4}')">Remove</button>
+      </div>
+    </div>`).join('');
+}
+
+/* ── Cancel modal ── */
+function openCancelModal() {
+  document.getElementById('cancelModal').classList.add('open');
+}
+function closeCancelModal() {
+  document.getElementById('cancelModal').classList.remove('open');
+}
+function confirmCancelSub() {
+  const tier = getTier();
+  if (!tier) return closeCancelModal();
+  localStorage.removeItem('eylox_subscription_tier');
+  localStorage.removeItem('eylox_premium');
+  localStorage.removeItem('eylox_renewal_date');
+  localStorage.removeItem('eylox_sub_start');
+  localStorage.removeItem('eylox_billing_history');
+  localStorage.removeItem('eylox_payment_methods');
+  closeCancelModal();
+  showToast('Subscription cancelled', 'Your plan ends at the next billing date.', 'warn');
+  setTimeout(() => location.reload(), 1500);
+}
+window.openCancelModal = openCancelModal;
+window.closeCancelModal = closeCancelModal;
+window.confirmCancelSub = confirmCancelSub;
+
+/* ── Helpers ── */
+function scrollToPlans() {
+  document.getElementById('plansGrid').closest('.billing-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+window.scrollToPlans = scrollToPlans;
+
+function downloadInvoice(id) {
+  showToast('Invoice ready', `Invoice ${id} downloaded.`, 'success');
+}
+window.downloadInvoice = downloadInvoice;
+
+function exportBillingHistory() {
+  showToast('Exported', 'Billing history exported as CSV.', 'success');
+}
+window.exportBillingHistory = exportBillingHistory;
+
+function addPaymentMethod() {
+  if (window.openPremiumModal) openPremiumModal();
+  else showToast('Coming soon', 'Payment method management coming soon.', 'info');
+}
+window.addPaymentMethod = addPaymentMethod;
+
+function setDefaultCard(last4) {
+  const methods = JSON.parse(localStorage.getItem('eylox_payment_methods') || '[]');
+  methods.forEach(m => m.isDefault = m.last4 === last4);
+  localStorage.setItem('eylox_payment_methods', JSON.stringify(methods));
+  buildPaymentMethods();
+  showToast('Updated', `Card ending in ${last4} set as default.`, 'success');
+}
+window.setDefaultCard = setDefaultCard;
+
+function removeCard(last4) {
+  let methods = JSON.parse(localStorage.getItem('eylox_payment_methods') || '[]');
+  methods = methods.filter(m => m.last4 !== last4);
+  localStorage.setItem('eylox_payment_methods', JSON.stringify(methods));
+  buildPaymentMethods();
+  showToast('Removed', 'Payment method removed.', 'info');
+}
+window.removeCard = removeCard;
+
+function showToast(title, msg, type) {
+  const c = document.getElementById('toastContainer');
+  if (!c) return;
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  const icons = { success:'✅', info:'ℹ️', warn:'⚠️', error:'❌' };
+  const iconSpan = document.createElement('span'); iconSpan.className = 'toast-icon'; iconSpan.textContent = icons[type]||'ℹ️';
+  const body = document.createElement('div'); body.className = 'toast-body';
+  const titleEl = document.createElement('div'); titleEl.className = 'toast-title'; titleEl.textContent = title;
+  const msgEl = document.createElement('div'); msgEl.className = 'toast-msg'; msgEl.textContent = msg;
+  body.appendChild(titleEl); body.appendChild(msgEl);
+  t.appendChild(iconSpan); t.appendChild(body);
+  c.appendChild(t);
+  setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 300); }, 3500);
+}
+
+/* ── Topbar coins ── */
+function syncTopbar() {
+  const u = getUser();
+  const coins = u ? (u.coins || 0) : 0;
+  const Eyltrophs = u ? (u.Eyltrophs || 0) : 0;
+  const el = document.getElementById('topbarEylux');
+  const te = document.getElementById('topbarEyltrophs');
+  const sbc = document.getElementById('sbCoins');
+  const sbt = document.getElementById('sbTrophies');
+  if (el) el.textContent = coins.toLocaleString();
+  if (te) te.textContent = Eyltrophs.toLocaleString();
+  if (sbc) sbc.textContent = coins.toLocaleString();
+  if (sbt) sbt.textContent = Eyltrophs.toLocaleString();
+}
+
+/* ── Annual billing ── */
+const ANNUAL_DISC = 0.80; /* 20% off */
+let _annualMode = false;
+
+function buildAnnualBanner() {
+  const tier = getTier();
+  if (!tier) return;
+  const t = TIERS.find(x => x.id === tier) || TIERS[0];
+  const annualTotal = Math.round(t.price * 12 * ANNUAL_DISC * 100) / 100;
+  const label = document.getElementById('annualPriceLine');
+  if (label) label.textContent = `${fmtPrice(annualTotal)} / year`;
+  const banner = document.getElementById('annualBanner');
+  if (banner) banner.style.display = _annualMode ? 'none' : '';
+}
+
+function switchToAnnual() {
+  _annualMode = true;
+  localStorage.setItem('eylox_billing_annual', '1');
+  document.getElementById('annualBanner').style.display = 'none';
+  showToast('Annual billing enabled', 'You\'re now saving 20% with annual billing!', 'success');
+  buildPlans();
+}
+window.switchToAnnual = switchToAnnual;
+
+/* ── Referral program ── */
+function buildReferral() {
+  const user = getUser();
+  const code = user ? (user.username || 'player').toLowerCase().replace(/[^a-z0-9]/g,'') + Math.abs(hashStr(user.username || 'e')).toString(16).slice(0,4) : 'eylox1234';
+  const link = `eylox.game/join?ref=${code}`;
+  const el = document.getElementById('refLink');
+  if (el) el.textContent = link;
+
+  const refs = parseInt(localStorage.getItem('eylox_referral_count') || '0');
+  const earned = refs * 500;
+  const pending = parseInt(localStorage.getItem('eylox_referral_pending') || '0');
+  const rc = document.getElementById('refCount');
+  const re = document.getElementById('refEarned');
+  const rp = document.getElementById('refPending');
+  if (rc) rc.textContent = refs;
+  if (re) re.textContent = earned.toLocaleString();
+  if (rp) rp.textContent = pending;
+}
+
+function hashStr(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
+  return h;
+}
+
+function copyRefLink() {
+  const el = document.getElementById('refLink');
+  if (!el) return;
+  navigator.clipboard.writeText(el.textContent).then(() => {
+    showToast('Copied!', 'Referral link copied to clipboard.', 'success');
+  }).catch(() => {
+    showToast('Copied!', 'Referral link ready to share.', 'success');
+  });
+}
+window.copyRefLink = copyRefLink;
+
+/* ── Gift subscription ── */
+const GIFT_TIERS = [
+  { id: 'premium', icon: '⭐', name: 'Premium Gift', price: 299,  color: '#fbbf24' },
+  { id: 'creator', icon: '🚀', name: 'Creator Gift', price: 999,  color: '#60a5fa' },
+];
+function buildGiftTiers() {
+  const grid = document.getElementById('giftTierGrid');
+  if (!grid) return;
+  let selected = 'premium';
+  grid.innerHTML = GIFT_TIERS.map(g => `
+    <div class="plan-card" id="giftCard-${g.id}" style="--pc-color:${g.color};cursor:pointer;padding:16px" onclick="selectGift('${g.id}')">
+      <div class="pc-header" style="gap:10px">
+        <span style="font-size:1.4rem">${g.icon}</span>
+        <div><div class="pc-name" style="font-size:.92rem">${g.name}</div><div class="pc-tier" style="color:${g.color}">${fmtPrice(g.price)}/mo</div></div>
+      </div>
+    </div>`).join('');
+  selectGift('premium');
+}
+function selectGift(id) {
+  document.querySelectorAll('[id^="giftCard-"]').forEach(el => {
+    el.style.borderColor = 'var(--border)';
+    el.style.boxShadow = '';
+  });
+  const card = document.getElementById('giftCard-' + id);
+  if (card) {
+    const t = GIFT_TIERS.find(x => x.id === id);
+    card.style.borderColor = t.color;
+    card.style.boxShadow = `0 4px 20px ${t.color}40`;
+  }
+  window._selectedGift = id;
+}
+window.selectGift = selectGift;
+
+function sendGift() {
+  const input = document.getElementById('giftUsername');
+  const username = input ? input.value.trim() : '';
+  if (!username) { showToast('Enter username', 'Type a username to send the gift to.', 'error'); return; }
+  const tid = window._selectedGift || 'premium';
+  const t = GIFT_TIERS.find(x => x.id === tid);
+  if (input) input.value = '';
+  showToast('🎁 Gift sent!', `${t.name} gifted to @${username}. They'll get a notification!`, 'success');
+}
+window.sendGift = sendGift;
+
+/* ── FAQ ── */
+const FAQS = [
+  { q: 'Can I cancel anytime?', a: 'Yes. Cancel at any time — your plan remains active until the end of the billing period. No refunds for partial months, but you keep access until the last day.' },
+  { q: 'What happens to my games if I cancel?', a: 'Your published games stay live. You\'ll lose the ability to publish new ones and access advanced creator tools, but existing games remain playable.' },
+  { q: 'Can I upgrade or downgrade my plan?', a: 'Yes, any time. Upgrades take effect immediately. Downgrades take effect at the next billing date.' },
+  { q: 'Is there a free trial?', a: 'New subscribers get 7 days free on any paid plan. You won\'t be charged until the trial ends.' },
+  { q: 'What payment methods are accepted?', a: 'Visa, Mastercard, American Express, PayPal, Apple Pay, and Google Pay. All payments are processed securely via Stripe.' },
+  { q: 'Can I share my subscription with family?', a: 'Ultimate Creator plan includes up to 5 sub-accounts under one subscription for families or teams.' },
+  { q: 'Do coins carry over if I cancel?', a: 'Yes. Any coins you earned stay in your account forever — they\'re yours regardless of subscription status.' },
+  { q: 'Is annual billing available?', a: 'Yes! Switch to annual billing to save 20% — equivalent to getting 2 months free every year.' },
+];
+
+function buildFAQ() {
+  const el = document.getElementById('faqList');
+  if (!el) return;
+  el.innerHTML = FAQS.map((f, i) => `
+    <div style="border-bottom:1px solid rgba(167,139,250,.18)">
+      <button onclick="toggleFAQ(${i})" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:16px 22px;background:none;border:none;cursor:pointer;text-align:left;transition:background .15s" onmouseover="this.style.background='rgba(124,58,237,.1)'" onmouseout="this.style.background='none'">
+        <span style="font-weight:800;font-size:.88rem;color:#f0e8ff">${f.q}</span>
+        <span id="faqChev-${i}" style="color:#c4b5fd;font-size:.9rem;flex-shrink:0;transition:transform .2s">▼</span>
+      </button>
+      <div id="faqAns-${i}" style="display:none;padding:0 22px 16px;font-size:.82rem;font-weight:700;color:rgba(196,181,253,.85);line-height:1.65">${f.a}</div>
+    </div>`).join('');
+}
+
+function toggleFAQ(i) {
+  const ans = document.getElementById('faqAns-' + i);
+  const chev = document.getElementById('faqChev-' + i);
+  if (!ans) return;
+  const open = ans.style.display !== 'none';
+  ans.style.display = open ? 'none' : 'block';
+  if (chev) chev.style.transform = open ? '' : 'rotate(180deg)';
+}
+window.toggleFAQ = toggleFAQ;
+
+/* ── Pause subscription ── */
+function confirmPauseSub() {
+  const dur = document.querySelector('input[name="pauseDur"]:checked');
+  const months = dur ? parseInt(dur.value) : 1;
+  const resumeDate = new Date();
+  resumeDate.setMonth(resumeDate.getMonth() + months);
+  localStorage.setItem('eylox_sub_paused', resumeDate.toISOString());
+  document.getElementById('pauseModal').classList.remove('open');
+  showToast('Subscription paused', `Your plan resumes on ${resumeDate.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}.`, 'info');
+}
+window.confirmPauseSub = confirmPauseSub;
+
+/* ── Init ── */
+function init() {
+  syncTopbar();
+  buildActivePlan();
+  buildPlans();
+  buildBilling();
+  buildPaymentMethods();
+  buildAnnualBanner();
+  buildReferral();
+  buildGiftTiers();
+  buildFAQ();
+
+  /* Sidebar toggle — uses menuBtn id like all other pages */
+  const btn = document.getElementById('menuBtn');
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sidebarOverlay');
+  if (btn && sb && ov) {
+    btn.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('show'); });
+    ov.addEventListener('click', () => { sb.classList.remove('open'); ov.classList.remove('show'); });
+  }
+
+  /* Topbar scroll glow */
+  const topbar = document.getElementById('topbar');
+  window.addEventListener('scroll', () => {
+    if (topbar) topbar.classList.toggle('scrolled', window.scrollY > 10);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+
+})();
+</script>
+
+<script>
+/* ── Global nav functions (required on every page) ── */
+function eyloxLogout() {
+  if (!confirm('Log out of Eylox?')) return;
+  ['eylox_token','eylox_user','eylox_guest'].forEach(k => localStorage.removeItem(k));
+  window.location.href = 'landing.html';
+}
+function openSettingsPanel() { window.location.href = 'settings.html'; }
+</script>
+<script src="quick-access.js"></script>
+<script src="sidebar-links.js"></script>
+<script src="sidebar-collapse.js"></script>
+<script src="tooltip.js"></script>
+
+</body>
+</html>
