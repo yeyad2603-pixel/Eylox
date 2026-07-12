@@ -1,165 +1,1309 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>∞ Eylox — Profile</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Eylox — My Profile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#7c3aed"/>
+  <link rel="stylesheet" href="style.css"/>
+  <script>
+    try {
+      const s = localStorage.getItem('eylox_token')||localStorage.getItem('eylox_guest')||localStorage.getItem('eylox_user');
+      if (!s) window.location.replace('landing.html');
+    } catch {}
+  </script>
+  <style>
+    /* ── Profile Hero ── */
+    .prof-hero {
+      background:#000000;
+      border-bottom: 1px solid rgba(167,139,250,.12);
+      padding: 28px 32px;
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .prof-avatar-wrap {
+      position: relative;
+      width: 90px;
+      height: 90px;
+      flex-shrink: 0;
+    }
+    .prof-avatar-ring {
+      position: absolute;
+      inset: -5px;
+      border-radius: 50%;
+      background: conic-gradient(#f97316,#ec4899,#a78bfa,#38bdf8,#4ade80,#f97316);
+      animation: ring-spin 4s linear infinite;
+    }
+    @keyframes ring-spin { to { transform: rotate(360deg); } }
+    .prof-avatar-inner {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 4px solid var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      overflow: hidden;
+    }
+    .prof-avatar-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .prof-avatar-edit-btn {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      z-index: 3;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg,#a78bfa,#8b5cf6);
+      border: 2px solid var(--bg);
+      color: #fff;
+      font-size: .85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform .18s, background .18s;
+      box-shadow: 0 2px 10px rgba(124,58,237,.5);
+    }
+    .prof-avatar-edit-btn:hover { transform: scale(1.15); background: linear-gradient(135deg,#c084fc,#a855f7); }
+
+    /* ── Upload modal ── */
+    #avatarModal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.75);
+      backdrop-filter: blur(10px);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #avatarModal.hidden { display: none; }
+    .av-modal-card {
+      background: linear-gradient(160deg,#1c0b42,#130838);
+      border: 1px solid rgba(167,139,250,.25);
+      border-radius: 20px;
+      padding: 28px;
+      max-width: 360px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 24px 80px rgba(0,0,0,.7);
+      animation: avModal-in .25s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes avModal-in { from { opacity:0; transform:scale(.88) translateY(12px); } to { opacity:1; transform:none; } }
+    .av-modal-title {
+      font-family: var(--font-head);
+      font-size: 1.3rem;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .av-modal-sub {
+      font-size: .8rem;
+      color: rgba(167,139,250,.55);
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .av-preview-ring {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: conic-gradient(#f97316,#ec4899,#a78bfa,#38bdf8,#4ade80,#f97316);
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      animation: ring-spin 4s linear infinite;
+    }
+    .av-preview-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: #1c0b42;
+      border: 3px solid var(--bg,#0d0520);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.8rem;
+      overflow: hidden;
+    }
+    .av-preview-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .av-upload-zone {
+      border: 2px dashed rgba(167,139,250,.3);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      background: rgba(167,139,250,.04);
+    }
+    .av-upload-zone:hover { border-color: rgba(167,139,250,.6); background: rgba(167,139,250,.08); }
+    .av-upload-zone p { font-size: .82rem; color: rgba(167,139,250,.5); font-weight: 600; margin: 6px 0 0; }
+    .av-upload-icon { font-size: 2rem; }
+    .av-btn-row { display: flex; gap: 10px; }
+    .av-btn-save {
+      flex: 1;
+      background: linear-gradient(135deg,#a78bfa,#8b5cf6);
+      color: #fff;
+      border: none;
+      border-radius: 99px;
+      padding: 11px;
+      font-family: var(--font-body);
+      font-weight: 800;
+      font-size: .9rem;
+      cursor: pointer;
+      transition: opacity .18s;
+    }
+    .av-btn-save:hover { opacity: .85; }
+    .av-btn-save:disabled { opacity: .4; cursor: default; }
+    .av-btn-remove {
+      background: rgba(248,113,113,.12);
+      color: #f87171;
+      border: 1px solid rgba(248,113,113,.25);
+      border-radius: 99px;
+      padding: 11px 18px;
+      font-family: var(--font-body);
+      font-weight: 800;
+      font-size: .85rem;
+      cursor: pointer;
+      transition: background .18s;
+    }
+    .av-btn-remove:hover { background: rgba(248,113,113,.2); }
+    .av-btn-cancel {
+      background: transparent;
+      color: rgba(167,139,250,.5);
+      border: none;
+      font-size: .8rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+      display: block;
+      width: 100%;
+    }
+    .av-btn-cancel:hover { color: rgba(167,139,250,.8); }
+    /* Avatar modal tabs */
+    .av-tab-row { display:flex; gap:6px; margin-bottom:16px; }
+    .av-tab {
+      flex:1; padding:7px; border-radius:10px;
+      background:rgba(167,139,250,.06); border:1px solid rgba(167,139,250,.16);
+      color:rgba(167,139,250,.6); font-size:.82rem; font-weight:800; cursor:pointer; transition:all .18s;
+    }
+    .av-tab.active { background:rgba(167,139,250,.18); border-color:rgba(167,139,250,.4); color:var(--text,#f0e8ff); }
+    /* Emoji builder */
+    .av-emoji-cats { display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin-bottom:12px; }
+    .av-emoji-cat {
+      padding:5px 10px; border-radius:8px; font-size:1rem; cursor:pointer;
+      background:rgba(167,139,250,.06); border:1px solid rgba(167,139,250,.14);
+      transition:all .18s;
+    }
+    .av-emoji-cat:hover { background:rgba(167,139,250,.18); }
+    .av-emoji-cat.active { background:rgba(167,139,250,.25); border-color:rgba(167,139,250,.5); }
+    .av-emoji-grid {
+      display:grid; grid-template-columns:repeat(6,1fr); gap:5px;
+      max-height:200px; overflow-y:auto; padding:4px;
+      background:rgba(167,139,250,.04); border-radius:10px; border:1px solid rgba(167,139,250,.1);
+    }
+    .av-emoji-btn {
+      aspect-ratio:1; border-radius:8px; font-size:1.4rem;
+      background:transparent; border:2px solid transparent; cursor:pointer;
+      display:flex; align-items:center; justify-content:center; transition:all .12s;
+    }
+    .av-emoji-btn:hover { background:rgba(167,139,250,.18); }
+    .av-emoji-btn.selected { background:rgba(167,139,250,.25); border-color:var(--purple,#a78bfa); }
+    /* Bio field */
+    .prof-bio-input {
+      width:100%; background:rgba(167,139,250,.06); border:1px solid rgba(167,139,250,.18);
+      border-radius:10px; padding:10px 14px; color:var(--text,#f0e8ff);
+      font-family:var(--font-body,'Nunito'); font-size:.82rem; font-weight:600;
+      outline:none; resize:none; transition:border-color .2s; margin-top:8px;
+    }
+    .prof-bio-input:focus { border-color:rgba(167,139,250,.4); }
+    .prof-bio-input::placeholder { color:rgba(167,139,250,.35); }
+    .prof-info { flex: 1; min-width: 200px; }
+    .prof-name {
+      font-family: var(--font-head);
+      font-size: 1.9rem;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+    .prof-handle { color: rgba(167,139,250,.6); font-weight: 700; font-size: .85rem; margin-bottom: 10px; }
+    .prof-owner-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: linear-gradient(135deg,#fde68a,#f59e0b);
+      color: #1a1040;
+      font-size: .72rem;
+      font-weight: 900;
+      padding: 4px 12px;
+      border-radius: 99px;
+      margin-bottom: 10px;
+    }
+    .prof-status-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .prof-online-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: .78rem;
+      font-weight: 800;
+      color: #4ade80;
+      background: rgba(74,222,128,.1);
+      border: 1px solid rgba(74,222,128,.25);
+      border-radius: 99px;
+      padding: 4px 10px;
+    }
+    .prof-status-input {
+      background: rgba(167,139,250,.08);
+      border: 1px solid rgba(167,139,250,.18);
+      border-radius: 99px;
+      padding: 4px 14px;
+      font-size: .78rem;
+      color: var(--muted);
+      font-family: var(--font-body);
+      outline: none;
+      min-width: 160px;
+    }
+    .prof-status-input:focus { border-color: rgba(167,139,250,.4); }
+    .prof-xp-bar-wrap { margin-bottom: 10px; max-width: 420px; }
+    .prof-xp-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: .72rem;
+      color: rgba(167,139,250,.55);
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+    .prof-xp-bg {
+      height: 7px;
+      border-radius: 99px;
+      background: rgba(167,139,250,.12);
+      overflow: hidden;
+    }
+    .prof-xp-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg,#a78bfa,#60a5fa);
+      transition: width .5s ease;
+    }
+    .prof-streak-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(251,191,36,.12);
+      border: 1px solid rgba(251,191,36,.3);
+      border-radius: 99px;
+      padding: 5px 14px;
+      font-size: .8rem;
+      font-weight: 800;
+      color: #fbbf24;
+    }
+
+    /* ── Stats Row ── */
+    .prof-stats-row {
+      display: flex;
+      background: rgba(15,5,35,.5);
+      border-bottom: 1px solid rgba(167,139,250,.1);
+    }
+    .prof-stat-box {
+      flex: 1;
+      text-align: center;
+      padding: 18px 12px;
+      border-right: 1px solid rgba(167,139,250,.08);
+    }
+    .prof-stat-box:last-child { border-right: none; }
+    .prof-stat-num {
+      font-family: var(--font-head);
+      font-size: 1.3rem;
+      color: #fbbf24;
+      margin-bottom: 4px;
+    }
+    .prof-stat-lbl {
+      font-size: .65rem;
+      color: rgba(167,139,250,.45);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    /* ── Sections ── */
+    .prof-section {
+      padding: 24px 32px;
+      border-bottom: 1px solid rgba(167,139,250,.08);
+    }
+    .prof-section:last-child { border-bottom: none; }
+    .prof-section-title {
+      font-family: var(--font-head);
+      font-size: 1.2rem;
+      color: #fff;
+      margin-bottom: 3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .prof-section-sub {
+      font-size: .8rem;
+      color: rgba(167,139,250,.5);
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .prof-divider {
+      height: 1px;
+      background: rgba(167,139,250,.1);
+      margin-bottom: 18px;
+    }
+
+    /* ── Profile Completion ── */
+    .prof-completion-bar-bg {
+      height: 8px;
+      border-radius: 99px;
+      background: rgba(167,139,250,.12);
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .prof-completion-bar {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg,#a78bfa,#60a5fa);
+      transition: width .6s ease;
+    }
+    .prof-checklist { display: flex; flex-direction: column; gap: 7px; }
+    .prof-check-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .82rem;
+      font-weight: 600;
+    }
+    .prof-check-item.done { color: rgba(167,139,250,.5); text-decoration: line-through; }
+    .prof-check-item.todo { color: rgba(180,160,220,.8); }
+    .prof-check-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .65rem;
+      flex-shrink: 0;
+    }
+    .prof-check-dot.done { background: rgba(74,222,128,.2); color: #4ade80; border: 1px solid rgba(74,222,128,.3); }
+    .prof-check-dot.todo { background: rgba(167,139,250,.08); color: rgba(167,139,250,.4); border: 1px solid rgba(167,139,250,.15); }
+
+    /* ── Achievements ── */
+    .prof-ach-grid {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .prof-ach-card {
+      background: rgba(167,139,250,.08);
+      border: 1px solid rgba(167,139,250,.18);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .82rem;
+      font-weight: 800;
+      color: var(--text);
+      transition: border-color .2s;
+    }
+    .prof-ach-card:hover { border-color: rgba(167,139,250,.4); }
+
+    /* ── Personal Bests ── */
+    .personal-bests-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill,minmax(200px,1fr));
+      gap: 12px;
+    }
+    .pb-card {
+      background: rgba(167,139,250,.05);
+      border: 1px solid rgba(167,139,250,.12);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: border-color .2s;
+    }
+    .pb-card:hover { border-color: rgba(167,139,250,.3); }
+    .pb-card-icon { font-size: 1.6rem; flex-shrink: 0; }
+    .pb-card-name { font-weight: 800; font-size: .88rem; color: var(--text); margin-bottom: 3px; }
+    .pb-card-score {
+      font-size: .78rem;
+      font-weight: 700;
+    }
+    .pb-card-score.has-score { color: #fbbf24; }
+    .pb-card-score.no-score { color: rgba(167,139,250,.4); font-style: italic; }
+    .pb-card-arrow { margin-left: auto; color: rgba(167,139,250,.3); font-size: .9rem; }
+
+    /* ── Today's Activity ── */
+    .activity-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill,minmax(130px,1fr));
+      gap: 12px;
+    }
+    .activity-box {
+      background: rgba(167,139,250,.05);
+      border: 1px solid rgba(167,139,250,.1);
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+    }
+    .activity-val {
+      font-family: var(--font-head);
+      font-size: 1.3rem;
+      color: #f59e0b;
+      margin-bottom: 4px;
+    }
+    .activity-lbl {
+      font-size: .65rem;
+      color: rgba(167,139,250,.45);
+      font-weight: 900;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+    }
+
+    /* ── Recently Played ── */
+    .recently-empty {
+      text-align: center;
+      padding: 32px;
+      color: rgba(167,139,250,.4);
+      font-size: .88rem;
+      font-weight: 600;
+    }
+    .btn-discover {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg,#38bdf8,#a78bfa);
+      color: #fff;
+      border: none;
+      border-radius: 99px;
+      padding: 11px 28px;
+      font-size: .9rem;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity .2s;
+    }
+    .btn-discover:hover { opacity: .85; }
+
+    /* ── Quick Play float ── */
+    .prof-quick-play {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg,#a78bfa,#8b5cf6);
+      color: #fff;
+      border: none;
+      border-radius: 99px;
+      padding: 12px 24px;
+      font-size: .9rem;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 6px 24px rgba(124,58,237,.4);
+      z-index: 100;
+      transition: opacity .2s;
+    }
+    .prof-quick-play:hover { opacity: .9; }
+
+    @media (max-width:600px) {
+      .prof-hero { padding: 20px; }
+      .prof-section { padding: 18px 20px; }
+      .prof-stats-row { flex-wrap: wrap; }
+      .prof-stat-box { min-width: 80px; }
+      .activity-grid { grid-template-columns: repeat(2,1fr); }
+    }
+  </style>
+<script src="audit-loader.js" defer></script>
+  <script src="debug-dashboard.js" defer></script>
 </head>
 <body data-page="profile">
 <div class="app-shell">
 
+  <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
-    <a href="index.html" class="sidebar-logo"><span class="sidebar-logo-icon">🎮</span><span class="sidebar-logo-text">Eylox</span></a>
+    <a href="index.html" class="sidebar-logo">
+      <span class="sidebar-logo-icon">🎮</span>
+      <span class="sidebar-logo-text">Eylox</span>
+    </a>
+
     <p class="sidebar-section-label">Menu</p>
-    <nav class="sidebar-nav"><ul>
-      <li><a href="index.html"    class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
-      <li><a href="games.html"    class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
-      <li><a href="friends.html"  class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span><span class="s-badge" style="display:none">0</span></a></li>
-      <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
-      <li><a href="profile.html"  class="sidebar-link active"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
-    </ul></nav>
+    <nav class="sidebar-nav" aria-label="Main navigation">
+      <ul>
+        <li><a href="index.html" class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
+        <li><a href="games.html" class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
+        <li><a href="friends.html" class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span><span class="s-badge" id="friendReqBadge" style="display:none">0</span></a></li>
+        <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
+        <li><a href="profile.html" class="sidebar-link active" aria-current="page"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
+      </ul>
+    </nav>
+
     <div class="sidebar-divider"></div>
+
     <p class="sidebar-section-label">More</p>
-    <nav class="sidebar-nav"><ul>
-      <li><a href="leaderboard.html"  class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
-      <li><a href="achievements.html" class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
-      <li><a href="communities.html"  class="sidebar-link"><span class="s-icon">🌍</span><span class="s-label">Communities</span></a></li>
-      <li><a href="live-events.html"  class="sidebar-link"><span class="s-icon">⚡</span><span class="s-label">Live Events</span></a></li>
-      <li><a href="shop.html"         class="sidebar-link"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
-      <li><a href="#" class="sidebar-link" id="settingsBtn"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></a></li>
-      <li><a href="#" class="sidebar-link" id="logoutBtn"><span class="s-icon">🚪</span><span class="s-label">Logout</span></a></li>
-    </ul></nav>
-    <div class="sidebar-coins"><img src="eylux-coin.png" class="coins-icon-img" alt="Eylux" /><div><div class="coins-amount">—</div><div class="coins-label">Eylux</div></div></div>
-    <div class="sidebar-coins sidebar-trophies"><span class="coins-icon">🏆</span><div><div class="trophies-amount">—</div><div class="coins-label">Trophies</div></div></div>
+    <nav class="sidebar-nav" aria-label="Secondary navigation">
+      <ul>
+        <li><a href="leaderboard.html" class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
+        <li><a href="achievements.html" class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
+        <li><a href="events.html" class="sidebar-link"><span class="s-icon">🎯</span><span class="s-label">Live Events</span></a></li>
+        <li><a href="communities.html" class="sidebar-link"><span class="s-icon">🌐</span><span class="s-label">Communities</span></a></li>
+        <li><a href="shop.html" class="sidebar-link"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
+        <li><a href="ai.html" class="sidebar-link"><span class="s-icon">🤖</span><span class="s-label">Eylox Studio</span><span class="s-soon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff">AI</span></a></li>
+        <li><a href="subscription.html" class="sidebar-link"><span class="s-icon">💎</span><span class="s-label">Subscription</span></a></li>
+        <li><button class="sidebar-link sb-action" onclick="openSettingsPanel()"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></button></li>
+        <li><button class="sidebar-link sb-action" onclick="eyloxLogout()" style="color:#f87171"><span class="s-icon">🚪</span><span class="s-label">Log Out</span></button></li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-coins">
+      <span>💰</span>
+      <div>
+        <div class="coins-amount" id="sidebarEylux">0</div>
+        <div class="coins-label">Eylux</div>
+      </div>
+    </div>
+    <div class="sidebar-coins" style="margin-top:8px">
+      <span>🏆</span>
+      <div>
+        <div class="Eyltrophs-amount" id="sidebarEyltrophs">0</div>
+        <div class="coins-label">Eyltrophs</div>
+      </div>
+    </div>
   </aside>
 
+  <!-- MAIN AREA -->
   <div class="main-area">
+
+    <!-- TOPBAR -->
     <header class="topbar">
-      <button class="menu-btn" id="menuBtn" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
-      <div class="search-wrap"><span class="search-icon">🔍</span><input type="search" class="search-input" placeholder="Search games…" aria-label="Search" /></div>
+      <button class="menu-btn" id="sidebarToggle" aria-label="Toggle sidebar">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="search" class="search-input" placeholder="Search games…" aria-label="Search games"/>
+      </div>
       <div class="topbar-right">
-        <button class="tb-btn" aria-label="Notifications">🔔<span class="notif-dot"></span></button>
-        <div class="tb-coins"><img src="eylux-coin.png" class="tb-coin-img" alt="EC"> <span>—</span></div>
-        <a href="profile.html" class="tb-avatar">🎮<span class="online-dot"></span></a>
+        <button class="topbar-icon-btn" id="notifBtn" aria-label="Notifications">🔔<span class="notif-dot"></span></button>
+        <div class="tb-Eyltrophs">🏆 <span id="topbarEyltrophs">0</span></div>
+        <div class="tb-coins">💰 <span id="topbarEylux">0</span></div>
+        <a href="profile.html" class="tb-avatar" aria-label="My profile">🎮<span class="online-dot"></span></a>
       </div>
     </header>
 
-    <!-- Profile hero -->
-    <div class="profile-hero-bar">
-      <div class="ph-avatar-wrap">
-        <div class="ph-ring"></div>
-        <div class="ph-inner" id="avatarPickBtn" title="Click to change avatar" style="cursor:pointer">🎮</div>
-        <div class="ph-level-badge" id="phLevelBadge">Lv.1</div>
-      </div>
-      <div class="ph-info">
-        <h1 class="ph-username">Player</h1>
-        <p class="ph-handle">@player_eylox</p>
-        <span class="ph-badge">⭐ Eylox Gamer</span>
-        <!-- XP bar injected here by script -->
-        <div class="ph-xp-wrap" id="phXpWrap">
-          <div class="ph-xp-bar"><div class="ph-xp-fill" id="phXpFill" style="width:0%"></div></div>
-          <span class="ph-xp-label" id="phXpLabel">0 / 500 XP</span>
+    <!-- PAGE CONTENT -->
+    <main class="page-content" style="padding:0;overflow-y:auto">
+
+      <!-- Hero -->
+      <div class="prof-hero">
+        <div class="prof-avatar-wrap">
+          <div class="prof-avatar-ring" aria-hidden="true"></div>
+          <div class="prof-avatar-inner" id="heroAvatar">🎮</div>
+          <button class="prof-avatar-edit-btn" onclick="openAvatarModal()" aria-label="Change profile picture" title="Change profile picture">📷</button>
+        </div>
+        <div class="prof-info">
+          <div class="prof-name" id="heroName">Player</div>
+          <div class="prof-handle" id="heroHandle">@player_eylox</div>
+          <div id="heroBadgeWrap" style="margin-bottom:10px"></div>
+          <div id="profBioWrap" style="margin-bottom:8px">
+            <textarea class="prof-bio-input" id="bioInput" rows="2" maxlength="120" placeholder="Write a short bio…"></textarea>
+          </div>
+          <div class="prof-status-row">
+            <div class="prof-online-dot">● Online</div>
+            <input class="prof-status-input" id="statusInput" placeholder="What are you up to?" maxlength="60"/>
+          </div>
+          <div class="prof-xp-bar-wrap">
+            <div class="prof-xp-labels">
+              <span id="xpLabel">0 / 500 XP to Level 2</span>
+            </div>
+            <div class="prof-xp-bg">
+              <div class="prof-xp-fill" id="xpFill" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="prof-streak-badge" id="streakBadge">🔥 1 Day Streak</div>
         </div>
       </div>
-    </div>
 
-    <!-- Stats row -->
-    <div class="profile-stats-bar">
-      <div class="ps-box"><div class="ps-num" id="stat-games">—</div><div class="ps-lbl">🎮 Games</div></div>
-      <div class="ps-box"><div class="ps-num" id="stat-friends">—</div><div class="ps-lbl">🤝 Friends</div></div>
-      <div class="ps-box"><div class="ps-num" id="stat-wins">—</div><div class="ps-lbl">🏆 Wins</div></div>
-      <div class="ps-box"><div class="ps-num" id="stat-badges">—</div><div class="ps-lbl">🎖️ Badges</div></div>
-      <div class="ps-box"><div class="ps-num" id="stat-coins">—</div><div class="ps-lbl">💰 Coins</div></div>
-    </div>
+      <!-- Stats Row -->
+      <div class="prof-stats-row">
+        <div class="prof-stat-box">
+          <div class="prof-stat-num" id="statGames">0</div>
+          <div class="prof-stat-lbl">🎮 Games</div>
+        </div>
+        <div class="prof-stat-box">
+          <div class="prof-stat-num" id="statFriends">0</div>
+          <div class="prof-stat-lbl">🤝 Friends</div>
+        </div>
+        <div class="prof-stat-box">
+          <div class="prof-stat-num" id="statWins">0</div>
+          <div class="prof-stat-lbl">⚔️ Wins</div>
+        </div>
+        <div class="prof-stat-box">
+          <div class="prof-stat-num" id="statBadges">0</div>
+          <div class="prof-stat-lbl">🏅 Badges</div>
+        </div>
+        <div class="prof-stat-box">
+          <div class="prof-stat-num" id="statCoins">0</div>
+          <div class="prof-stat-lbl">💰 Coins</div>
+        </div>
+        <div class="prof-stat-box">
+          <div class="prof-stat-num" id="statPlaytime">0m</div>
+          <div class="prof-stat-lbl">⏱️ Playtime</div>
+        </div>
+        <div class="prof-stat-box">
+          <div class="prof-stat-num" id="statAiBattles">0</div>
+          <div class="prof-stat-lbl">🤖 AI Battles</div>
+        </div>
+      </div>
 
-    <main class="page-content">
+      <!-- AI Studio Quick Link -->
+      <div onclick="window.location.href='ai.html'" style="display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,rgba(var(--accent-rgb,167,139,250),.1),rgba(var(--accent-rgb,167,139,250),.03));border:1px solid rgba(var(--accent-rgb,167,139,250),.18);border-radius:14px;padding:14px 18px;margin-bottom:20px;cursor:pointer;transition:border-color .2s" onmouseover="this.style.borderColor='rgba(var(--accent-rgb,167,139,250),.35)'" onmouseout="this.style.borderColor='rgba(var(--accent-rgb,167,139,250),.18)'">
+        <div style="font-size:2rem;flex-shrink:0">🤖</div>
+        <div style="flex:1">
+          <div style="font-weight:900;font-size:.9rem;color:var(--text,#f0e8ff)">AI Studio</div>
+          <div style="font-size:.75rem;color:var(--muted,#9d8ec7);margin-top:2px">Battle AI · Get coached · Earn bonus Eylux</div>
+        </div>
+        <div style="font-size:.8rem;color:var(--purple,#a78bfa);font-weight:800">Open →</div>
+      </div>
+
+      <!-- Profile Completion -->
+      <div class="prof-section">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div class="prof-section-title" style="margin-bottom:0">Profile Completion</div>
+          <div style="font-size:.9rem;font-weight:900;color:#a78bfa" id="completionPct">0%</div>
+        </div>
+        <div class="prof-completion-bar-bg">
+          <div class="prof-completion-bar" id="completionBar" style="width:0%"></div>
+        </div>
+        <div class="prof-checklist" id="completionChecklist"></div>
+      </div>
 
       <!-- Achievements -->
-      <div class="section">
-        <div class="sub-title">🏆 Achievements</div>
-        <div class="sub-note">Badges you've earned on your journey</div>
-        <div class="sub-divider"></div>
-        <!-- Populated by features.js -->
-        <div class="achievements" id="achievements-wrap">
-          <p class="empty-msg">Loading…</p>
+      <div class="prof-section">
+        <div class="prof-section-title">🏆 Achievements</div>
+        <div class="prof-section-sub">Badges you've earned on your journey</div>
+        <div class="prof-divider"></div>
+        <div class="prof-ach-grid" id="profAchievements">
+          <div style="color:rgba(167,139,250,.4);font-size:.85rem;padding:8px">Keep playing to earn achievements!</div>
         </div>
       </div>
 
-      <!-- Recently played -->
-      <div class="section">
-        <div class="sub-title">🎮 Recently Played</div>
-        <div class="sub-note">Jump back into your favourite games</div>
-        <div class="sub-divider"></div>
-        <!-- Populated by features.js -->
-        <div class="games-grid" id="profile-games-grid">
-          <p class="empty-msg">Loading…</p>
+      <!-- Personal Bests -->
+      <div class="prof-section">
+        <div class="prof-section-title">🎮 Personal Bests</div>
+        <div class="prof-section-sub">Your best scores across all 3D games</div>
+        <div class="prof-divider"></div>
+        <div class="personal-bests-grid">
+          <div class="pb-card">
+            <div class="pb-card-icon">🏃</div>
+            <div>
+              <div class="pb-card-name">Obby World</div>
+              <div class="pb-card-score no-score" id="pb-obby">— NOT PLAYED YET</div>
+            </div>
+            <div class="pb-card-arrow">›</div>
+          </div>
+          <div class="pb-card">
+            <div class="pb-card-icon">💎</div>
+            <div>
+              <div class="pb-card-name">Treasure Hunt</div>
+              <div class="pb-card-score" id="pb-treasure">— NOT PLAYED YET</div>
+            </div>
+            <div class="pb-card-arrow">›</div>
+          </div>
+          <div class="pb-card">
+            <div class="pb-card-icon">🏙️</div>
+            <div>
+              <div class="pb-card-name">City Roleplay</div>
+              <div class="pb-card-score no-score" id="pb-city">— NOT PLAYED YET</div>
+            </div>
+            <div class="pb-card-arrow">›</div>
+          </div>
+          <div class="pb-card">
+            <div class="pb-card-icon">🏴‍☠️</div>
+            <div>
+              <div class="pb-card-name">Pirate Bay</div>
+              <div class="pb-card-score no-score" id="pb-pirate">— NOT PLAYED YET</div>
+            </div>
+            <div class="pb-card-arrow">›</div>
+          </div>
         </div>
-        <div style="margin-top:20px;text-align:center">
-          <a href="games.html" class="btn btn-secondary">🕹️ Discover More Games</a>
+      </div>
+
+      <!-- Today's Activity -->
+      <div class="prof-section">
+        <div class="prof-section-title">📅 Today's Activity</div>
+        <div class="prof-section-sub">What you've been up to today</div>
+        <div class="prof-divider"></div>
+        <div class="activity-grid">
+          <div class="activity-box">
+            <div class="activity-val">💰 <span id="actCoins">+0</span></div>
+            <div class="activity-lbl">Coins Today</div>
+          </div>
+          <div class="activity-box">
+            <div class="activity-val">🎮 <span id="actGames">0</span></div>
+            <div class="activity-lbl">Games Played</div>
+          </div>
+          <div class="activity-box">
+            <div class="activity-val">⏱️ <span id="actTime">0m</span></div>
+            <div class="activity-lbl">Time Today</div>
+          </div>
+          <div class="activity-box">
+            <div class="activity-val">🔥 <span id="actStreak">0d</span></div>
+            <div class="activity-lbl">Streak</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recently Played -->
+      <div class="prof-section">
+        <div class="prof-section-title">🎮 Recently Played</div>
+        <div class="prof-section-sub">Jump back into your favourite games</div>
+        <div class="prof-divider"></div>
+        <div id="recentlyPlayed">
+          <div class="recently-empty">
+            Play some games to see them here! 🎮
+            <br><br>
+            <a href="games.html" class="btn-discover">🔭 Discover More Games</a>
+          </div>
         </div>
       </div>
 
     </main>
+
+    <!-- Mobile Bottom Nav -->
+    <nav class="bottom-nav" aria-label="Mobile navigation">
+      <a href="index.html" class="bn-item"><span class="bn-icon">🏠</span>Home</a>
+      <a href="games.html" class="bn-item"><span class="bn-icon">🔭</span>Games</a>
+      <a href="friends.html" class="bn-item"><span class="bn-icon">🤝</span>Friends</a>
+      <a href="profile.html" class="bn-item active"><span class="bn-icon">👤</span>Profile</a>
+    </nav>
+
   </div>
 </div>
+
+<!-- Floating Quick Play -->
+<a href="games.html?random=1" class="prof-quick-play">🚀 Quick Play</a>
+
+<!-- Avatar Upload Modal -->
+<div id="avatarModal" class="hidden" role="dialog" aria-modal="true" aria-label="Change profile picture">
+  <div class="av-modal-card">
+    <div class="av-modal-title">🎭 Customize Avatar</div>
+
+    <!-- Tab switcher -->
+    <div class="av-tab-row">
+      <button class="av-tab active" id="avTabPhoto" onclick="switchAvTab('photo')">📷 Photo</button>
+      <button class="av-tab" id="avTabEmoji" onclick="switchAvTab('emoji')">😀 Emoji Builder</button>
+    </div>
+
+    <!-- Preview ring (shared) -->
+    <div class="av-preview-ring">
+      <div class="av-preview-inner" id="avPreviewInner">🎮</div>
+    </div>
+
+    <!-- ── Photo tab ── -->
+    <div id="avPhotoTab">
+      <div class="av-modal-sub" style="margin-bottom:14px">Upload a photo — stored on your device</div>
+      <input type="file" id="avatarFileInput" accept="image/*" style="display:none">
+      <div class="av-upload-zone" onclick="document.getElementById('avatarFileInput').click()" id="avDropZone">
+        <div class="av-upload-icon">🖼️</div>
+        <p>Click to choose a photo<br><span style="font-size:.72rem">JPG, PNG, GIF, WebP · any size</span></p>
+      </div>
+      <div class="av-btn-row">
+        <button class="av-btn-save" id="avSaveBtn" onclick="saveAvatarPic()" disabled>Save Picture</button>
+        <button class="av-btn-remove" onclick="removeAvatarPic()">Remove Photo</button>
+      </div>
+    </div>
+
+    <!-- ── Emoji Builder tab ── -->
+    <div id="avEmojiTab" style="display:none">
+      <div class="av-modal-sub" style="margin-bottom:12px">Pick an emoji to use as your avatar</div>
+      <div class="av-emoji-cats" id="avEmojiCats"></div>
+      <div class="av-emoji-grid" id="avEmojiGrid"></div>
+      <button class="av-btn-save" id="avEmojiSaveBtn" style="margin-top:12px;width:100%" onclick="saveEmojiAvatar()" disabled>Apply Emoji Avatar</button>
+    </div>
+
+    <button class="av-btn-cancel" onclick="closeAvatarModal()">Cancel</button>
+  </div>
+</div>
+
+
 <script src="security.js"></script>
 <script src="api.js"></script>
 <script src="script.js"></script>
 <script src="features.js"></script>
 <script src="notifications.js"></script>
+<script src="platform-enhancements.js"></script>
+<script src="user-persist.js"></script>
 <script src="polish.js"></script>
 <script src="admin-button.js"></script>
 <script src="studio-button.js"></script>
 <script src="extras.js"></script>
-<style>
-/* ── XP bar ── */
-.ph-xp-wrap { display:flex; align-items:center; gap:10px; margin-top:8px; }
-.ph-xp-bar { flex:1; max-width:220px; height:8px; background:rgba(167,139,250,.15); border-radius:99px; overflow:hidden; border:1px solid rgba(167,139,250,.2); }
-.ph-xp-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,#7c3aed,#a78bfa,#60a5fa); transition:width 1.2s cubic-bezier(.22,.61,.36,1); }
-.ph-xp-label { font-size:.72rem; font-weight:800; color:var(--muted); white-space:nowrap; }
-.ph-level-badge {
-  position:absolute; bottom:-4px; right:-4px;
-  background:linear-gradient(135deg,#7c3aed,#a78bfa); color:#fff;
-  font-size:.62rem; font-weight:900; padding:2px 7px; border-radius:99px;
-  border:2px solid var(--bg); font-family:'Fredoka One',cursive; letter-spacing:.3px;
-  white-space:nowrap;
-}
-/* ── Achievement card flips ── */
-.ach {
-  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-  padding: 14px 16px; font-size: .9rem; font-weight: 800; color: var(--text);
-  text-align: center; transition: transform .2s, box-shadow .2s, border-color .2s;
-  cursor: default;
-}
-.ach:hover { transform: translateY(-4px) scale(1.04); box-shadow: 0 8px 28px rgba(167,139,250,.3); border-color: rgba(167,139,250,.5); }
-/* ── Profile stats bar fancy ── */
-.ps-box { transition: transform .2s; }
-.ps-box:hover { transform: translateY(-3px); }
-.ps-num { background: linear-gradient(135deg,var(--purple),var(--blue)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-</style>
-<script>
-/* XP + level system based on coins */
-(function(){
-  document.addEventListener('DOMContentLoaded', ()=>{
-    const u = Auth?.getUser?.();
-    if (!u) return;
-    const coins = u.coins || 0;
-    const xpPerLevel = 500;
-    const level = Math.floor(coins / xpPerLevel) + 1;
-    const xpInLevel = coins % xpPerLevel;
-    const xpPct = Math.min((xpInLevel / xpPerLevel) * 100, 100);
-    const badge = document.getElementById('phLevelBadge');
-    if (badge) badge.textContent = 'Lv.' + level;
-    const fill = document.getElementById('phXpFill');
-    if (fill) setTimeout(()=>{ fill.style.width = xpPct+'%'; }, 300);
-    const label = document.getElementById('phXpLabel');
-    if (label) label.textContent = xpInLevel.toLocaleString() + ' / ' + xpPerLevel + ' XP';
-  });
-})();
-</script>
 <script src="effects.js"></script>
 <script src="sound.js"></script>
 <script src="settings.js"></script>
+<script src="quick-access.js"></script>
+<script src="sidebar-links.js"></script>
+<script src="sidebar-collapse.js"></script>
+<script src="friends-local.js"></script>
+<script src="theme-switcher.js"></script>
+<script>
+'use strict';
+
+function escHtml(str) {
+  return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function getUser() {
+  try { return JSON.parse(localStorage.getItem('eylox_user') || '{}') || {}; } catch { return {}; }
+}
+function saveUser(u) {
+  localStorage.setItem('eylox_user', JSON.stringify(u));
+}
+
+const ACHIEVEMENTS = [
+  { id:'first_game',   name:'First Steps',    icon:'🎮', check: u => (u.gamesPlayed||0) >= 1 },
+  { id:'new_player',   name:'New Player',     icon:'🆕', check: u => true },
+  { id:'first_win',    name:'First Victory',  icon:'🏆', check: u => (u.wins||0) >= 1 },
+  { id:'coins100',     name:'Pocket Change',  icon:'💰', check: u => (u.coins||0) >= 100 },
+  { id:'first_friend', name:'First Friend',   icon:'🤝', check: u => (u.friendCount||0) >= 1 },
+  { id:'early_adopt',  name:'Early Adopter',  icon:'🚀', check: u => true },
+  { id:'streak7',      name:'On Fire',        icon:'🔥', check: u => (u.loginStreak||0) >= 7 },
+  { id:'profile_set',  name:'Identity',       icon:'🎭', check: u => !!(u.avatar && u.avatar !== '🎮') },
+];
+
+const COMPLETION_CHECKS = [
+  { label: 'Account created',   check: u => true },
+  { label: 'Set an avatar',     check: u => !!(u.avatar && u.avatar !== '🎮') },
+  { label: 'Earn 100 coins',    check: u => (u.coins||0) >= 100 },
+  { label: 'Add a friend',      check: u => (u.friendCount||0) >= 1 },
+  { label: 'Set a status',      check: u => !!(u.status) },
+  { label: 'Claim daily reward',check: u => !!(u.lastReward) },
+  { label: 'Rate a game',       check: u => !!(u.ratedGames) },
+];
+
+function loadProfile() {
+  const u = getUser();
+
+  /* Avatar & name */
+  const avatar = u.avatar || '🎮';
+  /* renderProfilePic() will override with image if one is stored */
+  if (!getProfPic()) document.getElementById('heroAvatar').textContent = avatar;
+  document.getElementById('heroName').textContent = u.username || 'Player';
+  document.getElementById('heroHandle').textContent = '@' + (u.username || 'player').toLowerCase() + '_eylox';
+
+  /* Badge */
+  const badgeWrap = document.getElementById('heroBadgeWrap');
+  const isOwner = u.username?.toLowerCase() === 'eylox';
+  const isAdmin = u.isAdmin;
+  if (isOwner) {
+    badgeWrap.innerHTML = `<div class="prof-owner-badge">👑 Owner</div>`;
+  } else if (isAdmin) {
+    badgeWrap.innerHTML = `<div class="prof-owner-badge" style="background:linear-gradient(135deg,#a78bfa,#8b5cf6);color:#fff">⚡ Admin</div>`;
+  } else {
+    const level = Math.floor((u.coins||0)/500) + 1;
+    const labels = ['Newcomer','Gamer','Expert','Master','Legend'];
+    badgeWrap.innerHTML = `<div class="prof-owner-badge" style="background:linear-gradient(135deg,#4ade80,#22d3ee);color:#0d3020">⭐ ${labels[Math.min(Math.floor(level/5),4)]}</div>`;
+  }
+
+  /* Status */
+  const si = document.getElementById('statusInput');
+  if (si && u.status) si.value = u.status;
+  si?.addEventListener('blur', () => {
+    const u2 = getUser();
+    u2.status = si.value.trim();
+    saveUser(u2);
+  });
+
+  /* XP / Level */
+  const level = u.level || Math.floor((u.coins||0)/500) + 1;
+  const xpInLevel = (u.coins||0) % 500;
+  const xpPct = Math.min(100, (xpInLevel / 500) * 100);
+  document.getElementById('xpLabel').textContent = `${xpInLevel} / 500 XP to Level ${level + 1}`;
+  document.getElementById('xpFill').style.width = xpPct + '%';
+
+  /* Streak */
+  const streak = u.loginStreak || 1;
+  document.getElementById('streakBadge').textContent = `🔥 ${streak} Day Streak`;
+
+  /* Stats */
+  document.getElementById('statGames').textContent   = (u.gamesPlayed||0).toLocaleString();
+  document.getElementById('statFriends').textContent = (u.friendCount||0).toLocaleString();
+  document.getElementById('statWins').textContent    = (u.wins||0).toLocaleString();
+  const unlockedAchs = ACHIEVEMENTS.filter(a => a.check(u)).length;
+  document.getElementById('statBadges').textContent  = unlockedAchs.toLocaleString();
+  document.getElementById('statCoins').textContent   = (u.coins||0).toLocaleString();
+  const playtime = u.totalPlaytime || 0;
+  document.getElementById('statPlaytime').textContent = playtime >= 60 ? Math.floor(playtime/60)+'h' : playtime+'m';
+  try { const ai = JSON.parse(localStorage.getItem('eylox_ai_data')||'{}'); document.getElementById('statAiBattles').textContent = ((ai.wins||0)+(ai.losses||0)).toLocaleString(); } catch {}
+
+  /* Sidebar/topbar */
+  ['sidebarEylux','topbarEylux'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = (u.coins||0).toLocaleString();
+  });
+  ['sidebarEyltrophs','topbarEyltrophs'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = (u.Eyltrophs||0).toLocaleString();
+  });
+
+  /* Profile Completion */
+  const checks = COMPLETION_CHECKS;
+  const done = checks.filter(c => c.check(u)).length;
+  const pct = Math.round((done / checks.length) * 100);
+  document.getElementById('completionPct').textContent = pct + '%';
+  document.getElementById('completionBar').style.width = pct + '%';
+  document.getElementById('completionChecklist').innerHTML = checks.map(c => {
+    const ok = c.check(u);
+    return `<div class="prof-check-item ${ok ? 'done' : 'todo'}">
+      <div class="prof-check-dot ${ok ? 'done' : 'todo'}">${ok ? '✓' : '○'}</div>
+      ${c.label}
+    </div>`;
+  }).join('');
+
+  /* Achievements */
+  const unlocked = ACHIEVEMENTS.filter(a => a.check(u));
+  document.getElementById('profAchievements').innerHTML = unlocked.length
+    ? unlocked.map(a => `<div class="prof-ach-card"><span>${a.icon}</span><span>${a.name}</span></div>`).join('')
+    : '<div style="color:rgba(167,139,250,.4);font-size:.85rem;padding:8px">Keep playing to earn achievements!</div>';
+
+  /* Personal bests */
+  try {
+    const pb = JSON.parse(localStorage.getItem('eylox_personal_bests') || '{}');
+    const bests = [
+      { id:'pb-treasure', key:'treasure', label:'💰 %v coins' },
+    ];
+    bests.forEach(b => {
+      const el = document.getElementById(b.id);
+      if (!el) return;
+      if (pb[b.key]) {
+        el.textContent = b.label.replace('%v', pb[b.key].toLocaleString());
+        el.className = 'pb-card-score has-score';
+      }
+    });
+  } catch {}
+
+  /* Today's Activity */
+  document.getElementById('actCoins').textContent  = '+' + (u.coinsToday||0).toLocaleString();
+  document.getElementById('actGames').textContent  = (u.gamesToday||0).toLocaleString();
+  const mins = u.timeOnPlatform ? Math.floor(u.timeOnPlatform / 60) : 0;
+  document.getElementById('actTime').textContent   = mins > 0 ? mins + 'm' : '0m';
+  document.getElementById('actStreak').textContent = (u.loginStreak||0) + 'd';
+
+  /* Recently played */
+  try {
+    const recent = JSON.parse(localStorage.getItem('eylox_recently_played') || '[]');
+    const rp = document.getElementById('recentlyPlayed');
+    if (recent.length) {
+      rp.innerHTML = `<div class="games-grid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">${
+        recent.slice(0,6).map(g => `
+          <div class="game-card" data-game-id="${escHtml(g.id||'')}">
+            <div class="card-thumb t-purple">${escHtml(g.icon||'🎮')}<div class="card-play-overlay">▶</div></div>
+            <div class="card-body">
+              <span class="card-badge b-action">${escHtml(g.genre||'Game')}</span>
+              <h3 class="card-title">${escHtml(g.name)}</h3>
+              <div class="card-meta">${escHtml(g.time||'')}</div>
+              <button class="btn-play" onclick="window.location.href='game.html?id=${encodeURIComponent(g.id||'game')}&title=${encodeURIComponent(g.name)}&thumb=${encodeURIComponent(g.icon||'🎮')}&genre=${encodeURIComponent(g.genre||'action')}'" >▶ Play Now</button>
+            </div>
+          </div>`).join('')
+      }</div>`;
+    }
+  } catch {}
+}
+
+/* ── Bio field ── */
+document.addEventListener('DOMContentLoaded', () => {
+  const u = getUser();
+  const bi = document.getElementById('bioInput');
+  if (bi) {
+    if (u.bio) bi.value = u.bio;
+    bi.addEventListener('blur', () => {
+      const u2 = getUser();
+      u2.bio = bi.value.trim();
+      saveUser(u2);
+    });
+  }
+  loadProfile();
+});
+window.addEventListener('storage', loadProfile);
+
+/* ══════════════════════════════════════
+   PROFILE PICTURE SYSTEM
+══════════════════════════════════════ */
+const PROF_PIC_KEY = 'eylox_profile_pic';
+let _pendingDataUrl = null;
+
+function getProfPic() {
+  return localStorage.getItem(PROF_PIC_KEY) || null;
+}
+
+/* Compress image to max 240×240 JPEG via canvas */
+function compressToDataUrl(file, callback) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 240;
+      let w = img.width, h = img.height;
+      if (w > h) { if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; } }
+      else        { if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; } }
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      callback(c.toDataURL('image/jpeg', 0.78));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* Apply a data URL (or null) to a display element */
+function applyPicToEl(el, dataUrl, fallbackEmoji) {
+  if (!el) return;
+  if (dataUrl) {
+    el.innerHTML = `<img src="${dataUrl}" alt="Profile picture" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">`;
+  } else {
+    el.innerHTML = '';
+    el.textContent = fallbackEmoji || '🎮';
+  }
+}
+
+/* Render current pic on hero avatar + topbar */
+function renderProfilePic() {
+  const dataUrl = getProfPic();
+  const u = getUser();
+  const emoji = u.avatar || '🎮';
+  applyPicToEl(document.getElementById('heroAvatar'), dataUrl, emoji);
+  /* Topbar avatar */
+  const tbA = document.querySelector('.tb-avatar');
+  if (tbA) {
+    const dot = tbA.querySelector('.online-dot');
+    if (dataUrl) {
+      tbA.innerHTML = `<img src="${dataUrl}" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+      if (dot) tbA.appendChild(dot);
+    } else {
+      tbA.innerHTML = emoji;
+      if (dot) tbA.appendChild(dot);
+    }
+  }
+}
+
+/* ── Modal open / close ── */
+function openAvatarModal() {
+  _pendingDataUrl = null;
+  const modal = document.getElementById('avatarModal');
+  modal.classList.remove('hidden');
+  /* Show current pic or emoji in preview */
+  const u = getUser();
+  applyPicToEl(document.getElementById('avPreviewInner'), getProfPic(), u.avatar || '🎮');
+  document.getElementById('avSaveBtn').disabled = true;
+}
+
+function closeAvatarModal() {
+  document.getElementById('avatarModal').classList.add('hidden');
+  _pendingDataUrl = null;
+}
+
+/* Close modal on backdrop click */
+document.getElementById('avatarModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('avatarModal')) closeAvatarModal();
+});
+
+/* ── File input handler ── */
+document.getElementById('avatarFileInput').addEventListener('change', function() {
+  const file = this.files[0];
+  if (!file) return;
+  compressToDataUrl(file, dataUrl => {
+    _pendingDataUrl = dataUrl;
+    applyPicToEl(document.getElementById('avPreviewInner'), dataUrl, '🎮');
+    document.getElementById('avSaveBtn').disabled = false;
+  });
+  this.value = ''; /* allow re-selecting same file */
+});
+
+/* ── Drag & drop on upload zone ── */
+const dropZone = document.getElementById('avDropZone');
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.borderColor = 'rgba(167,139,250,.8)'; });
+dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = ''; });
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.style.borderColor = '';
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    compressToDataUrl(file, dataUrl => {
+      _pendingDataUrl = dataUrl;
+      applyPicToEl(document.getElementById('avPreviewInner'), dataUrl, '🎮');
+      document.getElementById('avSaveBtn').disabled = false;
+    });
+  }
+});
+
+/* ── Save / Remove ── */
+function saveAvatarPic() {
+  if (!_pendingDataUrl) return;
+  try {
+    localStorage.setItem(PROF_PIC_KEY, _pendingDataUrl);
+    /* Also persist per-username so it survives re-login */
+    const u = getUser();
+    if (u.username) localStorage.setItem('eylox_save_pic_' + u.username.toLowerCase(), _pendingDataUrl);
+  } catch(e) {
+    alert('Storage full — try a smaller image.');
+    return;
+  }
+  renderProfilePic();
+  closeAvatarModal();
+}
+
+function removeAvatarPic() {
+  localStorage.removeItem(PROF_PIC_KEY);
+  const u = getUser();
+  if (u.username) localStorage.removeItem('eylox_save_pic_' + u.username.toLowerCase());
+  const emoji = u.avatar || '🎮';
+  applyPicToEl(document.getElementById('avPreviewInner'), null, emoji);
+  _pendingDataUrl = null;
+  document.getElementById('avSaveBtn').disabled = true;
+  renderProfilePic();
+}
+
+/* Run on load */
+document.addEventListener('DOMContentLoaded', renderProfilePic);
+
+/* ══════════════════════════════════════
+   EMOJI AVATAR BUILDER
+══════════════════════════════════════ */
+const EMOJI_CATS = {
+  '😀 Faces':  ['😀','🥳','😎','🤩','🥸','😏','🤗','😈','👻','💀','🤡','🎃','🤯','😤','🥶','🥵','😵','🤠','🧐','🤓'],
+  '🐱 Animals':['🐶','🐱','🦊','🦁','🐯','🐺','🐻','🐼','🐸','🐰','🐨','🦝','🦄','🐲','🐉','🦅','🦉','🦋','🦈','🐬'],
+  '🦸 Heroes': ['🧙','🧝','🧛','🧟','🦸','🦹','🥷','💂','🕵️','👮','🧑‍🚀','🧑‍🔬','🧑‍🎨','🧑‍🎤','🧑‍💻','🧑‍🏫','🧑‍⚕️','🧑‍🍳','🧑‍🔧','🤴'],
+  '🎮 Gaming': ['🎮','🕹️','👾','🤖','🎯','⚔️','🛡️','🏹','🔮','🎲','🃏','🎰','🏆','🥊','🎳','🎸','🎻','🎺','🥁','🪗'],
+  '✨ Special': ['👑','💎','⭐','🌟','💫','🔥','❄️','🌈','🎆','🚀','🛸','🌙','☀️','⚡','🌊','🌪️','🎭','🃏','🦋','🍀'],
+};
+let _selectedEmoji = null;
+let _currentEmojiCat = Object.keys(EMOJI_CATS)[0];
+
+function switchAvTab(tab) {
+  document.getElementById('avTabPhoto').classList.toggle('active', tab === 'photo');
+  document.getElementById('avTabEmoji').classList.toggle('active', tab === 'emoji');
+  document.getElementById('avPhotoTab').style.display  = tab === 'photo' ? '' : 'none';
+  document.getElementById('avEmojiTab').style.display  = tab === 'emoji' ? '' : 'none';
+  if (tab === 'emoji') buildEmojiGrid(_currentEmojiCat);
+}
+
+function buildEmojiCats() {
+  const catsEl = document.getElementById('avEmojiCats');
+  if (!catsEl) return;
+  catsEl.innerHTML = Object.keys(EMOJI_CATS).map((cat, i) => `
+    <button class="av-emoji-cat ${i === 0 ? 'active' : ''}" onclick="setEmojiCat(${i}, this)">${cat.split(' ')[0]}</button>
+  `).join('');
+}
+
+function setEmojiCat(idx, btn) {
+  _currentEmojiCat = Object.keys(EMOJI_CATS)[idx];
+  document.querySelectorAll('.av-emoji-cat').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  buildEmojiGrid(_currentEmojiCat);
+}
+
+function buildEmojiGrid(catName) {
+  const grid = document.getElementById('avEmojiGrid');
+  if (!grid) return;
+  const emojis = EMOJI_CATS[catName] || [];
+  grid.innerHTML = emojis.map(e => `
+    <button class="av-emoji-btn ${e === _selectedEmoji ? 'selected' : ''}" onclick="selectEmoji('${e}', this)">${e}</button>
+  `).join('');
+}
+
+function selectEmoji(emoji, btn) {
+  _selectedEmoji = emoji;
+  document.querySelectorAll('.av-emoji-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  const prev = document.getElementById('avPreviewInner');
+  if (prev) { prev.innerHTML = ''; prev.textContent = emoji; }
+  const saveBtn = document.getElementById('avEmojiSaveBtn');
+  if (saveBtn) saveBtn.disabled = false;
+}
+
+function saveEmojiAvatar() {
+  if (!_selectedEmoji) return;
+  const u = getUser();
+  u.avatar = _selectedEmoji;
+  saveUser(u);
+  /* Clear photo pic so emoji shows */
+  localStorage.removeItem(PROF_PIC_KEY);
+  if (u.username) localStorage.removeItem('eylox_save_pic_' + u.username.toLowerCase());
+  renderProfilePic();
+  loadProfile();
+  closeAvatarModal();
+  _selectedEmoji = null;
+  /* Show toast */
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(17,3,48,.95);border:1px solid rgba(167,139,250,.3);color:#fff;padding:10px 22px;border-radius:12px;font-size:.84rem;font-weight:800;z-index:9999;pointer-events:none;animation:avModal-in .3s ease;white-space:nowrap';
+  t.textContent = '✅ Avatar updated!';
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2200);
+}
+
+/* Initialize emoji builder on modal open */
+const _origOpenAvatarModal = openAvatarModal;
+openAvatarModal = function() {
+  _origOpenAvatarModal();
+  _selectedEmoji = null;
+  buildEmojiCats();
+  buildEmojiGrid(_currentEmojiCat);
+  switchAvTab('photo');
+};
+</script>
+<script>
+function eyloxLogout() {
+  if (!confirm('Log out of Eylox?')) return;
+  ['eylox_token','eylox_user','eylox_guest'].forEach(k => localStorage.removeItem(k));
+  window.location.href = 'landing.html';
+}
+function openSettingsPanel() { window.location.href = 'settings.html'; }
+</script>
+<script src="premium.js"></script>
+<script src="creator-pass.js"></script>
+<script src="floating-actions.js"></script>
+  <script src="tooltip.js"></script>
+<script src="sw-register.js"></script>
+<!-- v2.0 Improvements -->
+<script src="currencies.js"></script>
+  <script src="platform-improvements.js"></script>
+<script src="clan-system.js"></script>
+<script src="season-pass.js"></script>
+<script src="video-call.js"></script>
+<script src="offline.js" defer></script>
 </body>
 </html>

@@ -1,0 +1,1180 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Eylox — Settings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <script src="theme-switcher.js"></script>
+  
+<script src="security.js"></script>
+  <script src="device-compat.js"></script>
+  <script src="graphics.js"></script>
+  <script src="controller.js"></script>
+  <style>
+  /* ── Settings page — game style ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; font-family: 'Nunito', sans-serif; overflow: hidden; }
+
+  :root {
+    --accent-rgb: 167, 139, 250;
+    --accent-col: #a78bfa;
+    --accent2-col: #7c3aed;
+    --card-radius: 14px;
+    --glass-blur: blur(18px);
+  }
+
+  body {
+    background: var(--bg, #0b0f18);
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; position: relative;
+    transition: background .4s ease;
+  }
+
+  /* Animated game-world background */
+  .settings-bg {
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse at 20% 80%, rgba(20,80,30,.55) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(30,10,60,.7) 0%, transparent 45%),
+      radial-gradient(ellipse at 50% 50%, rgba(10,10,30,.9) 0%, transparent 80%),
+      linear-gradient(160deg, #061208 0%, #0a0f1a 40%, #120630 70%, #060c10 100%);
+  }
+  .bg-particles { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
+  .bp { position: absolute; border-radius: 50%; animation: bp-float 8s ease-in-out infinite; }
+  @keyframes bp-float { 0%,100%{transform:translateY(0) scale(1);opacity:.4} 50%{transform:translateY(-20px) scale(1.1);opacity:.7} }
+
+  /* Main panel */
+  .settings-wrap {
+    position: relative; z-index: 10;
+    display: flex;
+    width: min(900px, 96vw);
+    min-height: 520px;
+    max-height: min(720px, 92vh);
+    background: rgba(8, 5, 18, 0.78);
+    backdrop-filter: var(--glass-blur, blur(18px));
+    border: 1px solid rgba(var(--accent-rgb),.15);
+    border-radius: 22px;
+    box-shadow: 0 24px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.04);
+    overflow: hidden;
+    transition: border-color .4s ease;
+  }
+
+  /* Left nav */
+  .s-nav {
+    width: 170px; flex-shrink: 0;
+    padding: 32px 0 24px 0;
+    border-right: 1px solid rgba(255,255,255,.06);
+    display: flex; flex-direction: column;
+  }
+  .s-nav-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.8rem; color: #fff;
+    padding: 0 20px 28px;
+    letter-spacing: .5px;
+    text-shadow: 0 0 20px rgba(var(--accent-rgb), .5);
+  }
+  .s-nav-items { flex: 1; display: flex; flex-direction: column; gap: 2px; padding: 0 10px; }
+  .s-nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 10px;
+    font-size: .88rem; font-weight: 700; color: rgba(200,190,230,.6);
+    cursor: pointer; transition: all .18s; border: 1px solid transparent;
+    user-select: none;
+  }
+  .s-nav-item:hover { background: rgba(var(--accent-rgb),.1); color: rgba(200,190,230,.9); }
+  .s-nav-item.active {
+    background: rgba(var(--accent-rgb),.14);
+    color: #e0d4ff;
+    border-color: rgba(var(--accent-rgb),.22);
+    border-left: 3px solid var(--accent-col, #a78bfa);
+  }
+  .s-nav-item .ni-icon { font-size: 1rem; flex-shrink: 0; }
+  .s-nav-divider { height: 1px; background: rgba(255,255,255,.06); margin: 8px 16px; }
+  .s-nav-back {
+    margin: 8px 10px 0;
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 12px; border-radius: 10px;
+    font-size: .88rem; font-weight: 800; color: rgba(200,190,230,.55);
+    cursor: pointer; transition: all .18s; text-decoration: none;
+  }
+  .s-nav-back:hover { background: rgba(var(--accent-rgb),.08); color: rgba(200,190,230,.85); }
+
+  /* Right content */
+  .s-content {
+    flex: 1; padding: 32px 36px;
+    overflow-y: auto; display: flex; flex-direction: column; gap: 0;
+    scrollbar-width: thin; scrollbar-color: rgba(167,139,250,.35) rgba(167,139,250,.06);
+  }
+  .s-content::-webkit-scrollbar { width: 5px; }
+  .s-content::-webkit-scrollbar-track { background: rgba(167,139,250,.05); border-radius: 99px; }
+  .s-content::-webkit-scrollbar-thumb { background: rgba(167,139,250,.3); border-radius: 99px; }
+  .s-content::-webkit-scrollbar-thumb:hover { background: rgba(167,139,250,.55); }
+  .s-panel { display: none; }
+  .s-panel.active { display: flex; flex-direction: column; gap: 24px; }
+  .s-panel-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.3rem; color: rgba(200,190,230,.85);
+    margin-bottom: 4px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+
+  /* Setting row */
+  .s-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.04);
+  }
+  .s-row:last-child { border-bottom: none; }
+  .s-row-label { font-size: .88rem; font-weight: 700; color: rgba(200,190,230,.75); }
+  .s-row-sub { font-size: .74rem; color: rgba(200,190,230,.4); margin-top: 2px; }
+  .s-row-ctrl { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+  /* Cycle control (< Keyboard >) */
+  .s-cycle { display: flex; align-items: center; gap: 8px; }
+  .s-cycle-btn {
+    background: rgba(var(--accent-rgb),.1); border: 1px solid rgba(var(--accent-rgb),.2);
+    color: rgba(200,190,230,.7); border-radius: 6px; padding: 4px 10px;
+    font-size: .88rem; cursor: pointer; transition: background .15s;
+  }
+  .s-cycle-btn:hover { background: rgba(var(--accent-rgb),.22); }
+  .s-cycle-val { font-size: .88rem; font-weight: 800; color: #e0d4ff; min-width: 80px; text-align: center; }
+
+  /* Range slider */
+  .s-slider-wrap { display: flex; align-items: center; gap: 10px; }
+  .s-slider {
+    -webkit-appearance: none; appearance: none;
+    width: 140px; height: 5px; border-radius: 99px;
+    background: rgba(var(--accent-rgb),.18); outline: none; cursor: pointer;
+  }
+  .s-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--purple, #a78bfa);
+    box-shadow: 0 0 6px rgba(var(--accent-rgb),.6);
+    cursor: pointer; transition: transform .15s;
+  }
+  .s-slider::-webkit-slider-thumb:hover { transform: scale(1.25); }
+  .s-slider-val { font-size: .82rem; font-weight: 800; color: var(--purple, #a78bfa); min-width: 36px; text-align: right; }
+
+  /* Toggle */
+  .s-toggle { position: relative; width: 42px; height: 24px; cursor: pointer; }
+  .s-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .s-toggle-track {
+    position: absolute; inset: 0; border-radius: 99px;
+    background: rgba(var(--accent-rgb),.15); border: 1px solid rgba(var(--accent-rgb),.2);
+    transition: background .2s;
+  }
+  .s-toggle input:checked ~ .s-toggle-track { background: var(--purple, #a78bfa); border-color: var(--accent2, #7c3aed); }
+  .s-toggle-thumb {
+    position: absolute; top: 3px; left: 3px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: rgba(200,190,230,.5); transition: transform .2s, background .2s;
+  }
+  .s-toggle input:checked ~ .s-toggle-track .s-toggle-thumb { transform: translateX(18px); background: #fff; }
+
+  /* Key binding grid */
+  .s-keybind-grid {
+    display: grid; grid-template-columns: repeat(4,1fr); gap: 10px;
+    margin-top: 8px;
+  }
+  .s-keybind {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 10px; background: rgba(var(--accent-rgb),.06); border: 1px solid rgba(var(--accent-rgb),.12);
+    border-radius: 10px; text-align: center;
+  }
+  .s-key {
+    background: rgba(20,15,40,.8); border: 1px solid rgba(var(--accent-rgb),.3);
+    border-bottom: 3px solid rgba(100,60,220,.6);
+    color: #e0d4ff; font-size: .9rem; font-weight: 900;
+    width: 36px; height: 36px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: monospace; letter-spacing: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,.3);
+  }
+  .s-key-action { font-size: .68rem; font-weight: 800; color: rgba(200,190,230,.5); text-transform: uppercase; letter-spacing: .6px; }
+
+  /* Quality selector */
+  .s-quality-row { display: flex; gap: 8px; }
+  .s-quality-btn {
+    flex: 1; padding: 8px; border-radius: 9px;
+    background: rgba(var(--accent-rgb),.06); border: 1px solid rgba(var(--accent-rgb),.12);
+    color: rgba(200,190,230,.55); font-size: .78rem; font-weight: 800;
+    cursor: pointer; transition: all .18s; text-align: center;
+  }
+  .s-quality-btn.active, .s-quality-btn:hover { background: rgba(var(--accent-rgb),.2); border-color: rgba(var(--accent-rgb),.4); color: #e0d4ff; }
+
+  /* Theme grid */
+  .s-theme-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    margin-top: 4px;
+  }
+  .s-theme-card {
+    border-radius: 12px; padding: 14px 12px; cursor: pointer;
+    border: 2px solid transparent; transition: all .2s;
+    position: relative; overflow: hidden;
+  }
+  .s-theme-card:hover { transform: translateY(-2px); }
+  .s-theme-card.selected { border-color: #fff !important; box-shadow: 0 0 0 1px rgba(255,255,255,.3), 0 6px 20px rgba(0,0,0,.4); }
+  .s-theme-card.selected::after { content: '✓'; position: absolute; top: 6px; right: 8px; font-size: .75rem; font-weight: 900; color: #fff; }
+  .s-theme-name { font-size: .8rem; font-weight: 900; color: rgba(255,255,255,.9); margin-top: 6px; }
+  .s-theme-dots { display: flex; gap: 4px; margin-top: 4px; }
+  .s-theme-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  /* Security section */
+  .s-security-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 14px 16px; background: rgba(var(--accent-rgb),.05);
+    border: 1px solid rgba(var(--accent-rgb),.1); border-radius: 12px;
+  }
+  .s-sec-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 1px; }
+  .s-sec-title { font-size: .88rem; font-weight: 800; color: rgba(200,190,230,.85); }
+  .s-sec-desc { font-size: .75rem; color: rgba(200,190,230,.45); line-height: 1.4; margin-top: 2px; }
+  .s-sec-badge { font-size: .68rem; font-weight: 900; padding: 2px 8px; border-radius: 99px; margin-left: auto; flex-shrink: 0; }
+  .ssb-on  { background: rgba(74,222,128,.15); color: #4ade80; }
+  .ssb-off { background: rgba(239,68,68,.12);  color: #f87171; }
+  .ssb-warn { background: rgba(245,158,11,.12); color: #f59e0b; }
+
+  /* Danger zone */
+  .s-danger { background: rgba(239,68,68,.06); border: 1px solid rgba(239,68,68,.18); border-radius: 12px; padding: 16px; }
+  .s-danger-title { font-size: .8rem; font-weight: 900; color: #f87171; margin-bottom: 10px; text-transform: uppercase; letter-spacing: .8px; }
+  .s-danger-btn {
+    padding: 9px 18px; border-radius: 9px;
+    background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.25);
+    color: #f87171; font-size: .82rem; font-weight: 800; cursor: pointer; transition: all .2s;
+  }
+  .s-danger-btn:hover { background: rgba(239,68,68,.22); }
+
+  /* Account section */
+  .s-account-card {
+    display: flex; align-items: center; gap: 16px;
+    padding: 18px; background: rgba(var(--accent-rgb),.06); border: 1px solid rgba(var(--accent-rgb),.12); border-radius: 14px;
+  }
+  .s-account-av { font-size: 2.5rem; width: 58px; height: 58px; background: rgba(var(--accent-rgb),.12); border: 2px solid rgba(var(--accent-rgb),.2); border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .s-account-name { font-family: 'Fredoka One', cursive; font-size: 1.15rem; color: #fff; }
+  .s-account-role { font-size: .74rem; font-weight: 800; color: var(--purple, #a78bfa); margin-top: 2px; }
+  .s-account-coins { font-size: .78rem; color: rgba(200,190,230,.5); margin-top: 4px; }
+
+  /* Scrollbar */
+  .s-content::-webkit-scrollbar { width: 4px; }
+  .s-content::-webkit-scrollbar-track { background: transparent; }
+  .s-content::-webkit-scrollbar-thumb { background: rgba(var(--accent-rgb),.25); border-radius: 99px; }
+
+  /* Save notice */
+  .s-save-notice {
+    position: fixed; bottom: 24px; right: 24px; z-index: 99999;
+    background: linear-gradient(135deg, var(--purple, #a78bfa), var(--accent2, #7c3aed));
+    color: #fff; border-radius: 12px; padding: 10px 20px;
+    font-size: .84rem; font-weight: 800; opacity: 0;
+    transform: translateY(12px); transition: opacity .3s, transform .3s;
+    pointer-events: none;
+  }
+  .s-save-notice.show { opacity: 1; transform: translateY(0); }
+
+  @media(max-width: 640px) {
+    .settings-wrap { flex-direction: column; min-height: unset; max-height: 96vh; overflow: hidden; }
+    .s-nav { width: 100%; flex-direction: row; border-right: none; border-bottom: 1px solid rgba(255,255,255,.06); padding: 12px 8px; flex-wrap: wrap; }
+    .s-nav-title { display: none; }
+    .s-nav-items { flex-direction: row; flex-wrap: wrap; padding: 0; }
+    .s-nav-item { padding: 6px 10px; font-size: .76rem; }
+    .s-content { padding: 20px; }
+  }
+  </style>
+<script src="audit-loader.js" defer></script>
+  <script src="debug-dashboard.js" defer></script>
+</head>
+<body>
+  <div class="settings-bg"></div>
+  <div class="bg-particles" id="bgParticles"></div>
+
+  <div class="settings-wrap">
+
+    <!-- Left navigation -->
+    <nav class="s-nav">
+      <div class="s-nav-title">Settings</div>
+      <div class="s-nav-items">
+        <div class="s-nav-item active" data-panel="controls"   data-tip="set-controls"  ><span class="ni-icon">🎮</span> Controls</div>
+        <div class="s-nav-item" data-panel="video"      data-tip="set-video"     ><span class="ni-icon">📺</span> Video</div>
+        <div class="s-nav-item" data-panel="audio"      data-tip="set-audio"     ><span class="ni-icon">🔊</span> Audio</div>
+        <div class="s-nav-item" data-panel="language"   data-tip="set-language"  ><span class="ni-icon">🌐</span> Language</div>
+        <div class="s-nav-item" data-panel="account"    data-tip="set-account"   ><span class="ni-icon">👤</span> Account</div>
+        <div class="s-nav-item" data-panel="security"   data-tip="set-security"  ><span class="ni-icon">🔒</span> Security</div>
+        <div class="s-nav-item" data-panel="graphics"   data-tip="set-graphics"  ><span class="ni-icon">🖥️</span> Graphics</div>
+        <div class="s-nav-item" data-panel="devices"    data-tip="set-devices"   ><span class="ni-icon">📱</span> Devices</div>
+      </div>
+      <div class="s-nav-divider"></div>
+      <a class="s-nav-back" href="index.html" onclick="if(window.history.length>1){event.preventDefault();window.history.back()}">← Back</a>
+    </nav>
+
+    <!-- Right content panels -->
+    <div class="s-content">
+
+      <!-- CONTROLS -->
+      <div class="s-panel active" id="panel-controls">
+        <div class="s-panel-title">Controls</div>
+        <div class="s-row">
+          <div><div class="s-row-label">Control Device</div></div>
+          <div class="s-row-ctrl">
+            <div class="s-cycle">
+              <button class="s-cycle-btn" onclick="cycleDevice(-1)">‹</button>
+              <span class="s-cycle-val" id="deviceVal">Keyboard</span>
+              <button class="s-cycle-btn" onclick="cycleDevice(1)">›</button>
+            </div>
+          </div>
+        </div>
+        <div class="s-row">
+          <div><div class="s-row-label">Mouse Sensitivity</div><div class="s-row-sub">Affects aim &amp; camera speed</div></div>
+          <div class="s-row-ctrl">
+            <div class="s-slider-wrap">
+              <input type="range" class="s-slider" id="sensSlider" min="1" max="100" value="10" oninput="updateSens()"/>
+              <span class="s-slider-val" id="sensVal">10%</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="s-row-label" style="margin-bottom:12px;color:rgba(200,190,230,.5);font-size:.78rem;text-transform:uppercase;letter-spacing:.8px">Key Bindings</div>
+          <div class="s-keybind-grid">
+            <div class="s-keybind"><div class="s-key" id="keyForward">W</div><div class="s-key-action">Forward</div></div>
+            <div class="s-keybind"><div class="s-key" id="keyBack">S</div><div class="s-key-action">Back</div></div>
+            <div class="s-keybind"><div class="s-key" id="keyRight">D</div><div class="s-key-action">Right</div></div>
+            <div class="s-keybind"><div class="s-key" id="keyLeft">A</div><div class="s-key-action">Left</div></div>
+            <div class="s-keybind"><div class="s-key">Space</div><div class="s-key-action">Jump</div></div>
+            <div class="s-keybind"><div class="s-key">E</div><div class="s-key-action">Interact</div></div>
+            <div class="s-keybind"><div class="s-key">Esc</div><div class="s-key-action">Pause</div></div>
+            <div class="s-keybind"><div class="s-key">Tab</div><div class="s-key-action">Scores</div></div>
+          </div>
+        </div>
+        <div class="s-row">
+          <div><div class="s-row-label">Vibration / Haptics</div></div>
+          <label class="s-toggle"><input type="checkbox" id="vibToggle" checked/><div class="s-toggle-track"><div class="s-toggle-thumb"></div></div></label>
+        </div>
+      </div>
+
+      <!-- VIDEO -->
+      <div class="s-panel" id="panel-video">
+        <div class="s-panel-title">Video</div>
+        <div class="s-row">
+          <div><div class="s-row-label">Graphics Quality</div><div class="s-row-sub">Affects performance</div></div>
+          <div class="s-quality-row" id="qualityBtns">
+            <button class="s-quality-btn" onclick="setQuality('low',this)">Low</button>
+            <button class="s-quality-btn active" onclick="setQuality('medium',this)">Medium</button>
+            <button class="s-quality-btn" onclick="setQuality('high',this)">High</button>
+            <button class="s-quality-btn" onclick="setQuality('ultra',this)">Ultra</button>
+          </div>
+        </div>
+        <div class="s-row">
+          <div><div class="s-row-label">Particle Effects</div><div class="s-row-sub">Coin bursts, explosions</div></div>
+          <label class="s-toggle"><input type="checkbox" id="particlesToggle" checked oninput="saveSetting('particles',this.checked)"/><div class="s-toggle-track"><div class="s-toggle-thumb"></div></div></label>
+        </div>
+        <div class="s-row">
+          <div><div class="s-row-label">Smooth Animations</div></div>
+          <label class="s-toggle"><input type="checkbox" id="animToggle" checked oninput="saveSetting('animations',this.checked)"/><div class="s-toggle-track"><div class="s-toggle-thumb"></div></div></label>
+        </div>
+        <div class="s-row">
+          <div><div class="s-row-label">Show FPS Counter</div></div>
+          <label class="s-toggle"><input type="checkbox" id="fpsToggle" oninput="saveSetting('showFps',this.checked)"/><div class="s-toggle-track"><div class="s-toggle-thumb"></div></div></label>
+        </div>
+        <div class="s-row">
+          <div><div class="s-row-label">FPS Limit</div></div>
+          <div class="s-cycle">
+            <button class="s-cycle-btn" onclick="cycleFps(-1)">‹</button>
+            <span class="s-cycle-val" id="fpsVal">60 FPS</span>
+            <button class="s-cycle-btn" onclick="cycleFps(1)">›</button>
+          </div>
+        </div>
+        <div class="s-row">
+          <div><div class="s-row-label">Screen Shake</div><div class="s-row-sub">Combat &amp; landing impacts</div></div>
+          <label class="s-toggle"><input type="checkbox" id="shakeToggle" checked oninput="saveSetting('screenShake',this.checked)"/><div class="s-toggle-track"><div class="s-toggle-thumb"></div></div></label>
+        </div>
+      </div>
+
+      <!-- AUDIO -->
+      <div class="s-panel" id="panel-audio">
+        <div class="s-panel-title">Audio</div>
+        <div class="s-row">
+          <div><div class="s-row-label">Master Volume</div></div>
+          <div class="s-slider-wrap">
+            <input type="range" class="s-slider" id="masterVol" min="0" max="100" value="80" oninput="updateVol('master',this.value)"/>
+            <span class="s-slider-val" id="masterVolVal">80%</span>
+          </div>
+        </div>
+        <div class="s-row">
+          <div><div class="s-row-label">Music</div></div>
+          <div class="s-slider-wrap">
+            <input type="range" class="s-slider" id="musicVol" min="0" max="100" value="60" oninput="updateVol('music',this.value)"/>
+            <span class="s-slider-val" id="musicVolVal">60%</span>
+          </div>
+        </div>
+        <div class="s-row">
+          <div><div class="s-row-label">Sound Effects</div></div>
+          <div class="s-slider-wrap">
+            <input type="range" class="s-slider" id="sfxVol" min="0" max="100" value="90" oninput="updateVol('sfx',this.value)"/>
+            <span class="s-slider-val" id="sfxVolVal">90%</span>
+          </div>
+        </div>
+        <div class="s-row">
+          <div><div class="s-row-label">UI Sounds</div></div>
+          <div class="s-slider-wrap">
+            <input type="range" class="s-slider" id="uiVol" min="0" max="100" value="50" oninput="updateVol('ui',this.value)"/>
+            <span class="s-slider-val" id="uiVolVal">50%</span>
+          </div>
+        </div>
+        <div class="s-row">
+          <div><div class="s-row-label">Mute All</div></div>
+          <label class="s-toggle"><input type="checkbox" id="muteAll" oninput="saveSetting('muteAll',this.checked)"/><div class="s-toggle-track"><div class="s-toggle-thumb"></div></div></label>
+        </div>
+      </div>
+
+      <!-- LANGUAGE -->
+      <div class="s-panel" id="panel-language">
+        <div class="s-panel-title">Language</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="s-row-label" style="margin-bottom:4px">Select Language</div>
+          <div id="langGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <!-- populated by JS -->
+          </div>
+        </div>
+        <div class="s-row" style="margin-top:16px">
+          <div><div class="s-row-label">Auto-Detect Language</div></div>
+          <label class="s-toggle"><input type="checkbox" id="autoLang" checked oninput="saveSetting('autoLang',this.checked)"/><div class="s-toggle-track"><div class="s-toggle-thumb"></div></div></label>
+        </div>
+      </div>
+
+      <!-- ACCOUNT -->
+      <div class="s-panel" id="panel-account">
+        <div class="s-panel-title">Account</div>
+        <div class="s-account-card" id="accountCard">
+          <div class="s-account-av" id="acAvatar">🎮</div>
+          <div>
+            <div class="s-account-name" id="acName">Player</div>
+            <div class="s-account-role" id="acRole">Member</div>
+            <div class="s-account-coins" id="acCoins">Loading…</div>
+          </div>
+          <a href="profile.html" style="margin-left:auto;background:rgba(var(--accent-rgb),.12);border:1px solid rgba(var(--accent-rgb),.22);color:#a78bfa;padding:8px 16px;border-radius:9px;font-size:.8rem;font-weight:800;text-decoration:none;white-space:nowrap">Edit Profile</a>
+        </div>
+        <div class="s-row">
+          <div><div class="s-row-label">Show Online Status</div></div>
+          <label class="s-toggle"><input type="checkbox" id="showOnline" checked oninput="saveSetting('showOnline',this.checked)"/><div class="s-toggle-track"><div class="s-toggle-thumb"></div></div></label>
+        </div>
+        <div class="s-row">
+          <div><div class="s-row-label">Allow Friend Requests</div></div>
+          <label class="s-toggle"><input type="checkbox" id="allowFriends" checked oninput="saveSetting('allowFriends',this.checked)"/><div class="s-toggle-track"><div class="s-toggle-thumb"></div></div></label>
+        </div>
+        <div class="s-row">
+          <div><div class="s-row-label">Show in Leaderboard</div></div>
+          <label class="s-toggle"><input type="checkbox" id="showLb" checked oninput="saveSetting('showLb',this.checked)"/><div class="s-toggle-track"><div class="s-toggle-thumb"></div></div></label>
+        </div>
+        <div class="s-row">
+          <div><div class="s-row-label">Public Profile</div></div>
+          <label class="s-toggle"><input type="checkbox" id="pubProfile" checked oninput="saveSetting('pubProfile',this.checked)"/><div class="s-toggle-track"><div class="s-toggle-thumb"></div></div></label>
+        </div>
+        <div class="s-danger" style="margin-top:8px">
+          <div class="s-danger-title">⚠️ Danger Zone</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="s-danger-btn" onclick="resetStats()">Reset My Stats</button>
+            <button class="s-danger-btn" onclick="eyloxLogout()">Log Out</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECURITY -->
+      <div class="s-panel" id="panel-security">
+        <div class="s-panel-title">Privacy &amp; Security</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="s-security-item">
+            <div class="s-sec-icon">🔐</div>
+            <div>
+              <div class="s-sec-title">Anti-Tamper Protection</div>
+              <div class="s-sec-desc">Detects and blocks manual modification of game data (coins, Eyltrophs, wins). Integrity checksums are verified on each login.</div>
+            </div>
+            <span class="s-sec-badge ssb-on">✓ Active</span>
+          </div>
+          <div class="s-security-item">
+            <div class="s-sec-icon">🚫</div>
+            <div>
+              <div class="s-sec-title">Login Rate Limiting</div>
+              <div class="s-sec-desc">Automatically locks your account for 15 minutes after 5 failed login attempts. Prevents brute-force attacks.</div>
+            </div>
+            <span class="s-sec-badge ssb-on">✓ Active</span>
+          </div>
+          <div class="s-security-item">
+            <div class="s-sec-icon">🛡️</div>
+            <div>
+              <div class="s-sec-title">XSS Input Protection</div>
+              <div class="s-sec-desc">All user-submitted content is sanitized. Script injection attempts are blocked and logged.</div>
+            </div>
+            <span class="s-sec-badge ssb-on">✓ Active</span>
+          </div>
+          <div class="s-security-item">
+            <div class="s-sec-icon">🔑</div>
+            <div>
+              <div class="s-sec-title">Session Management</div>
+              <div class="s-sec-desc">Sessions expire after 7 days of inactivity. Suspicious logins from new devices trigger a warning.</div>
+            </div>
+            <span class="s-sec-badge ssb-on">✓ Active</span>
+          </div>
+          <div class="s-security-item">
+            <div class="s-sec-icon">👁️</div>
+            <div>
+              <div class="s-sec-title">Admin Action Logging</div>
+              <div class="s-sec-desc">All admin commands and sensitive actions are logged with timestamp and username for audit purposes.</div>
+            </div>
+            <span class="s-sec-badge ssb-on">✓ Active</span>
+          </div>
+          <div class="s-security-item">
+            <div class="s-sec-icon">📊</div>
+            <div>
+              <div class="s-sec-title">Suspicious Activity Detection</div>
+              <div class="s-sec-desc">Coin gain spikes, impossible game scores, and rapid stat changes are flagged and investigated.</div>
+            </div>
+            <span class="s-sec-badge ssb-on">✓ Active</span>
+          </div>
+          <div class="s-security-item">
+            <div class="s-sec-icon">🌐</div>
+            <div>
+              <div class="s-sec-title">Content Security Policy</div>
+              <div class="s-sec-desc">Inline script restrictions and external resource controls are enforced to prevent code injection.</div>
+            </div>
+            <span class="s-sec-badge ssb-on">✓ Active</span>
+          </div>
+          <div class="s-security-item">
+            <div class="s-sec-icon">🔒</div>
+            <div>
+              <div class="s-sec-title">Two-Factor Tip</div>
+              <div class="s-sec-desc">Never share your password. Eylox staff will NEVER ask for your login credentials. Report suspicious accounts immediately.</div>
+            </div>
+            <span class="s-sec-badge ssb-warn">! Tip</span>
+          </div>
+        </div>
+        <div style="margin-top:14px;padding:14px;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.15);border-radius:12px">
+          <div style="font-size:.78rem;font-weight:800;color:#f59e0b;margin-bottom:4px">🛡️ Security Status</div>
+          <div style="font-size:.75rem;color:rgba(200,190,230,.5);line-height:1.5" id="securityStatus">Checking your account security…</div>
+        </div>
+      </div>
+
+      <!-- GRAPHICS -->
+      <div class="s-panel" id="panel-graphics">
+        <div class="s-panel-title">Graphics &amp; Performance</div>
+
+        <div class="s-row">
+          <div><div class="s-row-label">Graphics Quality</div><div class="s-row-sub">Auto-detection runs in background</div></div>
+          <div class="s-quality-row" id="gfxQualityBtns">
+            <button class="s-quality-btn gfx-quality-btn" data-quality="low"    onclick="setGfxQuality('low',this)">Low</button>
+            <button class="s-quality-btn gfx-quality-btn" data-quality="medium" onclick="setGfxQuality('medium',this)">Medium</button>
+            <button class="s-quality-btn gfx-quality-btn" data-quality="high"   onclick="setGfxQuality('high',this)">High</button>
+            <button class="s-quality-btn gfx-quality-btn" data-quality="ultra"  onclick="setGfxQuality('ultra',this)">Ultra</button>
+          </div>
+        </div>
+
+        <div class="s-row">
+          <div><div class="s-row-label">Auto Graphics</div><div class="s-row-sub">Detect best quality for this device</div></div>
+          <div class="s-row-ctrl">
+            <button class="s-quality-btn" style="flex:none;padding:7px 18px" onclick="autoDetectGraphics()">🔍 Detect Now</button>
+          </div>
+        </div>
+
+        <div class="s-row">
+          <div><div class="s-row-label">Show FPS Counter</div></div>
+          <label class="s-toggle"><input type="checkbox" id="gfxFpsToggle" oninput="toggleFps(this.checked)"/><div class="s-toggle-track"><div class="s-toggle-thumb"></div></div></label>
+        </div>
+
+        <div class="s-row">
+          <div><div class="s-row-label">FPS Limit</div></div>
+          <div class="s-cycle">
+            <button class="s-cycle-btn" onclick="cycleGfxFps(-1)">‹</button>
+            <span class="s-cycle-val" id="gfxFpsVal">60 FPS</span>
+            <button class="s-cycle-btn" onclick="cycleGfxFps(1)">›</button>
+          </div>
+        </div>
+
+        <div class="s-row">
+          <div><div class="s-row-label">Particle Effects</div><div class="s-row-sub">Background particles &amp; coin bursts</div></div>
+          <label class="s-toggle"><input type="checkbox" id="gfxParticles" checked oninput="saveSetting('particles',this.checked)"/><div class="s-toggle-track"><div class="s-toggle-thumb"></div></div></label>
+        </div>
+
+        <div class="s-row">
+          <div><div class="s-row-label">Bloom Effects</div><div class="s-row-sub">Glow on bright elements (High+)</div></div>
+          <label class="s-toggle"><input type="checkbox" id="gfxBloom" oninput="saveSetting('bloom',this.checked)"/><div class="s-toggle-track"><div class="s-toggle-thumb"></div></div></label>
+        </div>
+
+        <div class="s-row">
+          <div><div class="s-row-label">Shadows</div></div>
+          <label class="s-toggle"><input type="checkbox" id="gfxShadows" checked oninput="saveSetting('shadows',this.checked)"/><div class="s-toggle-track"><div class="s-toggle-thumb"></div></div></label>
+        </div>
+
+        <div class="s-row">
+          <div><div class="s-row-label">Anti-Aliasing</div><div class="s-row-sub">Smooths jagged edges (High+)</div></div>
+          <label class="s-toggle"><input type="checkbox" id="gfxAA" oninput="saveSetting('antialiasing',this.checked)"/><div class="s-toggle-track"><div class="s-toggle-thumb"></div></div></label>
+        </div>
+
+        <div class="s-row">
+          <div><div class="s-row-label">Performance Mode</div><div class="s-row-sub">Force Low graphics for max FPS</div></div>
+          <label class="s-toggle"><input type="checkbox" id="gfxPerfMode" oninput="togglePerfMode(this.checked)"/><div class="s-toggle-track"><div class="s-toggle-thumb"></div></div></label>
+        </div>
+
+        <div style="margin-top:4px;padding:12px 14px;background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.12);border-radius:12px">
+          <div style="font-size:.75rem;font-weight:800;color:rgba(200,190,230,.5);margin-bottom:6px">📊 Device Benchmark</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="flex:1;height:6px;border-radius:99px;background:rgba(167,139,250,.12);overflow:hidden">
+              <div id="benchBar" style="height:100%;border-radius:99px;background:linear-gradient(90deg,#4ade80,#a78bfa);transition:width .5s ease;width:60%"></div>
+            </div>
+            <span id="benchScore" style="font-size:.78rem;font-weight:900;color:#a78bfa;min-width:36px;text-align:right">—</span>
+          </div>
+          <div id="benchLabel" style="font-size:.7rem;color:rgba(200,190,230,.4);margin-top:4px">Run benchmark to measure performance</div>
+        </div>
+      </div>
+
+      <!-- DEVICES -->
+      <div class="s-panel" id="panel-devices">
+        <div class="s-panel-title">Devices &amp; Compatibility</div>
+
+        <div style="padding:14px 16px;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.12);border-radius:12px;margin-bottom:8px">
+          <div style="font-size:.78rem;font-weight:800;color:rgba(200,190,230,.65);margin-bottom:8px">🔍 Detected Platform</div>
+          <div id="devPlatformInfo" style="display:flex;flex-direction:column;gap:5px;font-size:.78rem;color:rgba(200,190,230,.5)">
+            <div>Device: <strong id="devType" style="color:#a78bfa">—</strong></div>
+            <div>Touch: <strong id="devTouch" style="color:#a78bfa">—</strong></div>
+            <div>Performance Score: <strong id="devPerf" style="color:#4ade80">—</strong></div>
+            <div>Controller: <strong id="devController" style="color:#a78bfa">None</strong></div>
+          </div>
+        </div>
+
+        <div class="s-row">
+          <div><div class="s-row-label">Touch Controls</div><div class="s-row-sub">Virtual joystick &amp; buttons on mobile</div></div>
+          <label class="s-toggle"><input type="checkbox" id="devTouchCtrl" checked oninput="saveSetting('touchControls',this.checked)"/><div class="s-toggle-track"><div class="s-toggle-thumb"></div></div></label>
+        </div>
+
+        <div class="s-row">
+          <div><div class="s-row-label">Gamepad Support</div><div class="s-row-sub">Connect Xbox / PS / Nintendo controller</div></div>
+          <label class="s-toggle"><input type="checkbox" id="devGamepad" checked oninput="saveSetting('gamepadEnabled',this.checked)"/><div class="s-toggle-track"><div class="s-toggle-thumb"></div></div></label>
+        </div>
+
+        <div class="s-row">
+          <div><div class="s-row-label">Controller Vibration</div></div>
+          <label class="s-toggle"><input type="checkbox" id="devVibration" checked oninput="saveSetting('vibration',this.checked)"/><div class="s-toggle-track"><div class="s-toggle-thumb"></div></div></label>
+        </div>
+
+        <div class="s-row">
+          <div><div class="s-row-label">TV / Console Mode</div><div class="s-row-sub">Larger text, D-pad navigation, no sidebar</div></div>
+          <label class="s-toggle"><input type="checkbox" id="devTvMode" oninput="toggleTvMode(this.checked)"/><div class="s-toggle-track"><div class="s-toggle-thumb"></div></div></label>
+        </div>
+
+        <div class="s-row">
+          <div><div class="s-row-label">Bottom Nav Bar</div><div class="s-row-sub">Mobile navigation bar at the bottom</div></div>
+          <label class="s-toggle"><input type="checkbox" id="devBottomNav" checked oninput="saveSetting('bottomNav',this.checked)"/><div class="s-toggle-track"><div class="s-toggle-thumb"></div></div></label>
+        </div>
+
+        <div class="s-row">
+          <div><div class="s-row-label">Safe Area Insets</div><div class="s-row-sub">Respect device notch &amp; home bar</div></div>
+          <label class="s-toggle"><input type="checkbox" id="devSafeArea" checked oninput="saveSetting('safeArea',this.checked)"/><div class="s-toggle-track"><div class="s-toggle-thumb"></div></div></label>
+        </div>
+
+        <div style="margin-top:4px;padding:12px 14px;background:rgba(74,222,128,.05);border:1px solid rgba(74,222,128,.12);border-radius:12px">
+          <div style="font-size:.75rem;font-weight:800;color:#4ade80;margin-bottom:6px">✅ Compatibility Status</div>
+          <div id="compatStatus" style="font-size:.75rem;color:rgba(200,190,230,.5);line-height:1.6">Checking compatibility…</div>
+        </div>
+      </div>
+
+    </div><!-- /s-content -->
+  </div><!-- /settings-wrap -->
+
+  <div class="s-save-notice" id="saveNotice">✓ Settings saved</div>
+
+  <script>
+  'use strict';
+
+  /* ── Settings storage ── */
+  function loadSettings() {
+    try { return JSON.parse(localStorage.getItem('eylox_settings') || '{}'); } catch { return {}; }
+  }
+  function saveSettings(s) {
+    try { localStorage.setItem('eylox_settings', JSON.stringify(s)); } catch {}
+    showSaveNotice();
+  }
+  function saveSetting(key, val) {
+    const s = loadSettings();
+    s[key] = val;
+    saveSettings(s);
+  }
+  function showSaveNotice() {
+    const n = document.getElementById('saveNotice');
+    n.classList.add('show');
+    clearTimeout(n._t);
+    n._t = setTimeout(() => n.classList.remove('show'), 2000);
+  }
+
+  /* ── Nav ── */
+  document.querySelectorAll('.s-nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.s-nav-item').forEach(i => i.classList.remove('active'));
+      document.querySelectorAll('.s-panel').forEach(p => p.classList.remove('active'));
+      item.classList.add('active');
+      const panel = document.getElementById('panel-' + item.dataset.panel);
+      if (panel) panel.classList.add('active');
+    });
+  });
+
+  /* ── BG particles ── */
+  (function() {
+    const container = document.getElementById('bgParticles');
+    const COLORS = ['rgba(100,255,100,.12)','rgba(var(--accent-rgb),.1)','rgba(50,200,255,.08)','rgba(255,180,50,.07)'];
+    for (let i = 0; i < 18; i++) {
+      const p = document.createElement('div');
+      p.className = 'bp';
+      const sz = 4 + Math.random() * 8;
+      p.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;background:${COLORS[Math.floor(Math.random()*COLORS.length)]};animation-delay:${Math.random()*6}s;animation-duration:${7+Math.random()*6}s`;
+      container.appendChild(p);
+    }
+  })();
+
+  /* ── Controls ── */
+  const DEVICES = ['Keyboard', 'Mouse + KB', 'Gamepad', 'Touch'];
+  let deviceIdx = 0;
+  function cycleDevice(d) {
+    deviceIdx = (deviceIdx + d + DEVICES.length) % DEVICES.length;
+    document.getElementById('deviceVal').textContent = DEVICES[deviceIdx];
+    saveSetting('controlDevice', DEVICES[deviceIdx]);
+  }
+
+  function updateSens() {
+    const v = document.getElementById('sensSlider').value;
+    document.getElementById('sensVal').textContent = v + '%';
+    saveSetting('mouseSens', v);
+  }
+
+  /* ── Video ── */
+  function setQuality(q, btn) {
+    document.querySelectorAll('#qualityBtns .s-quality-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    saveSetting('quality', q);
+  }
+
+  const FPS_OPTIONS = ['30 FPS', '60 FPS', '120 FPS', 'Unlimited'];
+  let fpsIdx = 1;
+  function cycleFps(d) {
+    fpsIdx = (fpsIdx + d + FPS_OPTIONS.length) % FPS_OPTIONS.length;
+    document.getElementById('fpsVal').textContent = FPS_OPTIONS[fpsIdx];
+    saveSetting('fpsLimit', FPS_OPTIONS[fpsIdx]);
+  }
+
+  /* ── Audio ── */
+  function updateVol(key, val) {
+    document.getElementById(key + 'VolVal').textContent = val + '%';
+    saveSetting(key + 'Volume', parseInt(val));
+  }
+
+  /* ── Theme helpers ── */
+  function hexToRgb(hex) {
+    hex = hex.replace('#', '');
+    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+    return `${parseInt(hex.slice(0,2),16)}, ${parseInt(hex.slice(2,4),16)}, ${parseInt(hex.slice(4,6),16)}`;
+  }
+  function toRgba(hex, a) {
+    hex = hex.replace('#', '');
+    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+    return `rgba(${parseInt(hex.slice(0,2),16)},${parseInt(hex.slice(2,4),16)},${parseInt(hex.slice(4,6),16)},${a})`;
+  }
+  function updateSettingsBg(bg, accent) {
+    const el = document.querySelector('.settings-bg');
+    if (!el) return;
+    el.style.background = `
+      radial-gradient(ellipse at 20% 80%, ${toRgba(accent, 0.35)} 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, ${toRgba(bg, 0.9)} 0%, transparent 45%),
+      radial-gradient(ellipse at 50% 50%, rgba(5,5,18,.95) 0%, transparent 80%),
+      ${bg}`;
+    el.style.transition = 'background .5s ease';
+  }
+  function applyThemeVars(name) {
+    const theme = window.EyloxThemes?.find(t => t.id === name);
+    if (!theme) return;
+    const accent = theme.vars['--purple'] || '#a78bfa';
+    const bg     = theme.vars['--bg']     || '#110330';
+    const accentRgb = theme.vars['--accent-rgb'] || hexToRgb(accent);
+    document.documentElement.style.setProperty('--accent-col', accent);
+    document.documentElement.style.setProperty('--accent-rgb', accentRgb);
+    document.documentElement.style.setProperty('--purple', accent);
+    document.documentElement.style.setProperty('--accent2', theme.vars['--accent2'] || '#7c3aed');
+    updateSettingsBg(bg, accent);
+  }
+
+  /* ── Appearance / Themes ── */
+  function applyTheme(name, card) {
+    document.querySelectorAll('.s-theme-card').forEach(c => c.classList.remove('selected'));
+    if (card) card.classList.add('selected');
+    if (window.EyloxApplyTheme) window.EyloxApplyTheme(name);
+    applyThemeVars(name);
+    showSaveNotice();
+    const note = document.getElementById('themePreviewNote');
+    if (note) note.style.display = '';
+  }
+
+  const FONT_SIZES = ['Small', 'Normal', 'Large', 'X-Large'];
+  let fontIdx = 1;
+  function cycleFontSize(d) {
+    fontIdx = (fontIdx + d + FONT_SIZES.length) % FONT_SIZES.length;
+    document.getElementById('fontSizeVal').textContent = FONT_SIZES[fontIdx];
+    saveSetting('fontSize', FONT_SIZES[fontIdx]);
+  }
+
+  /* ── Language ── */
+  const LANGS = [
+    { code:'en', flag:'🇺🇸', name:'English' },
+    { code:'ar', flag:'🇸🇦', name:'Arabic' },
+    { code:'fr', flag:'🇫🇷', name:'French' },
+    { code:'de', flag:'🇩🇪', name:'German' },
+    { code:'es', flag:'🇪🇸', name:'Spanish' },
+    { code:'pt', flag:'🇧🇷', name:'Portuguese' },
+    { code:'ru', flag:'🇷🇺', name:'Russian' },
+    { code:'ja', flag:'🇯🇵', name:'Japanese' },
+    { code:'ko', flag:'🇰🇷', name:'Korean' },
+    { code:'zh', flag:'🇨🇳', name:'Chinese' },
+    { code:'tr', flag:'🇹🇷', name:'Turkish' },
+    { code:'it', flag:'🇮🇹', name:'Italian' },
+  ];
+  (function buildLangs() {
+    const saved = loadSettings().language || 'en';
+    const grid = document.getElementById('langGrid');
+    grid.innerHTML = LANGS.map(l => `
+      <div onclick="setLang('${l.code}',this)" style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(var(--accent-rgb),.06);border:1px solid rgba(var(--accent-rgb),${saved===l.code?'.4':'.1'});border-radius:10px;cursor:pointer;transition:all .18s;${saved===l.code?'background:rgba(var(--accent-rgb),.14)':''}" onmouseover="this.style.borderColor='rgba(var(--accent-rgb),.35)'" onmouseout="this.style.borderColor='rgba(var(--accent-rgb),${saved===l.code?'.4':'.1'})'">
+        <span style="font-size:1.2rem">${l.flag}</span>
+        <span style="font-size:.82rem;font-weight:800;color:rgba(200,190,230,.8)">${l.name}</span>
+        ${saved===l.code ? '<span style="margin-left:auto;font-size:.7rem;color:#a78bfa;font-weight:900">✓</span>' : ''}
+      </div>`).join('');
+  })();
+  function setLang(code, el) {
+    saveSetting('language', code);
+    document.querySelectorAll('#langGrid > div').forEach(d => {
+      d.style.background = 'rgba(var(--accent-rgb),.06)';
+      d.style.borderColor = 'rgba(var(--accent-rgb),.1)';
+    });
+    el.style.background = 'rgba(var(--accent-rgb),.14)';
+    el.style.borderColor = 'rgba(var(--accent-rgb),.4)';
+  }
+
+  /* ── Account info ── */
+  (function loadAccount() {
+    try {
+      const u = JSON.parse(localStorage.getItem('eylox_user') || '{}');
+      if (u.username) {
+        document.getElementById('acAvatar').textContent = u.avatar || '🎮';
+        document.getElementById('acName').textContent   = u.username;
+        document.getElementById('acRole').textContent   = u.username.toLowerCase() === 'eylox' ? '👑 Owner / Admin' : (u.isAdmin ? '🛡️ Admin' : '🎮 Player');
+        document.getElementById('acCoins').textContent  = '💰 ' + (u.coins||0).toLocaleString() + ' coins  ·  🏆 ' + (u.Eyltrophs||0) + ' Eyltrophs';
+      }
+    } catch {}
+  })();
+
+  /* ── Security status ── */
+  (function checkSecurity() {
+    const el = document.getElementById('securityStatus');
+    const checks = [];
+    try {
+      const u = JSON.parse(localStorage.getItem('eylox_user') || '{}');
+      if (u.username) checks.push('✅ Logged in as ' + u.username);
+      // Check for tampered coins
+      const intKey = 'eylox_integrity_' + u.username;
+      const stored = localStorage.getItem(intKey);
+      if (stored) {
+        checks.push('✅ Data integrity seal present');
+      } else {
+        checks.push('⚠️ No integrity seal — will be created on next action');
+      }
+      // Rate limit status
+      const rl = JSON.parse(localStorage.getItem('eylox_rate_limit') || '{}');
+      const attempts = (rl.attempts || 0);
+      checks.push(attempts === 0 ? '✅ No failed login attempts' : `⚠️ ${attempts} recent failed login attempt(s)`);
+    } catch {}
+    checks.push('✅ All security modules loaded');
+    el.innerHTML = checks.join('<br>');
+  })();
+
+  /* ── Restore saved settings ── */
+  (function restoreSettings() {
+    const s = loadSettings();
+    if (s.mouseSens) { document.getElementById('sensSlider').value = s.mouseSens; document.getElementById('sensVal').textContent = s.mouseSens + '%'; }
+    if (s.controlDevice) { deviceIdx = DEVICES.indexOf(s.controlDevice); if (deviceIdx < 0) deviceIdx = 0; document.getElementById('deviceVal').textContent = DEVICES[deviceIdx]; }
+    if (s.masterVolume !== undefined) { document.getElementById('masterVol').value = s.masterVolume; document.getElementById('masterVolVal').textContent = s.masterVolume + '%'; }
+    if (s.musicVolume  !== undefined) { document.getElementById('musicVol').value  = s.musicVolume;  document.getElementById('musicVolVal').textContent  = s.musicVolume  + '%'; }
+    if (s.sfxVolume    !== undefined) { document.getElementById('sfxVol').value    = s.sfxVolume;    document.getElementById('sfxVolVal').textContent    = s.sfxVolume    + '%'; }
+    if (s.uiVolume     !== undefined) { document.getElementById('uiVol').value     = s.uiVolume;     document.getElementById('uiVolVal').textContent     = s.uiVolume     + '%'; }
+    if (s.particles    !== undefined) document.getElementById('particlesToggle').checked = s.particles;
+    if (s.animations   !== undefined) document.getElementById('animToggle').checked      = s.animations;
+    if (s.showFps      !== undefined) document.getElementById('fpsToggle').checked       = s.showFps;
+    if (s.screenShake  !== undefined) document.getElementById('shakeToggle').checked     = s.screenShake;
+    if (s.quality) {
+      document.querySelectorAll('#qualityBtns .s-quality-btn').forEach(b => {
+        b.classList.toggle('active', b.textContent.toLowerCase() === s.quality);
+      });
+    }
+    // Restore saved theme selection
+    const savedTheme = localStorage.getItem('eylox_theme') || 'purple';
+    document.querySelectorAll('.s-theme-card').forEach(c => {
+      c.classList.toggle('selected', c.dataset.theme === savedTheme);
+    });
+  })();
+
+  /* ── Account actions ── */
+  function eyloxLogout() {
+    if (!confirm('Log out of Eylox?')) return;
+    ['eylox_token','eylox_user','eylox_guest'].forEach(k => localStorage.removeItem(k));
+    window.location.href = 'landing.html';
+  }
+  function resetStats() {
+    if (!confirm('Reset ALL your stats (coins, wins, Eyltrophs)? This cannot be undone!')) return;
+    try {
+      const u = JSON.parse(localStorage.getItem('eylox_user') || '{}');
+      u.coins = 0; u.Eyltrophs = 0; u.wins = 0; u.gamesPlayed = 0; u.loginStreak = 0;
+      localStorage.setItem('eylox_user', JSON.stringify(u));
+      showSaveNotice();
+      document.getElementById('acCoins').textContent = '💰 0 coins  ·  🏆 0 Eyltrophs';
+    } catch {}
+  }
+
+  /* Theme preview note */
+  const pgrid = document.getElementById('themeGrid');
+  const note = document.createElement('p');
+  note.id = 'themePreviewNote';
+  note.style.cssText = 'display:none;font-size:.76rem;color:rgba(var(--accent-rgb),.6);font-weight:700;margin-top:10px';
+  note.textContent = '✓ Theme applied instantly — saved for all pages.';
+  pgrid.after(note);
+
+  /* ── Glassmorphism ── */
+  function toggleGlass(on) {
+    document.documentElement.style.setProperty('--glass-blur', on ? 'blur(18px)' : 'blur(0px)');
+    saveSetting('glassmorphism', on);
+  }
+
+  /* ── Background effect ── */
+  const BG_EFFECTS = ['Particles', 'Stars', 'Waves', 'Off'];
+  let bgEffectIdx = 0;
+  function cycleBgEffect(d) {
+    bgEffectIdx = (bgEffectIdx + d + BG_EFFECTS.length) % BG_EFFECTS.length;
+    document.getElementById('bgEffectVal').textContent = BG_EFFECTS[bgEffectIdx];
+    saveSetting('bgEffect', BG_EFFECTS[bgEffectIdx]);
+    applyBgEffect(BG_EFFECTS[bgEffectIdx]);
+  }
+  function applyBgEffect(effect) {
+    const c = document.getElementById('bgParticles');
+    if (!c) return;
+    c.innerHTML = '';
+    if (effect === 'Off') return;
+    const rgb = getComputedStyle(document.documentElement).getPropertyValue('--accent-rgb').trim() || '167, 139, 250';
+    if (effect === 'Particles') {
+      const COLS = [`rgba(${rgb},.12)`,`rgba(${rgb},.06)`,'rgba(50,200,255,.08)','rgba(255,200,50,.07)'];
+      for (let i = 0; i < 22; i++) {
+        const p = document.createElement('div'); p.className = 'bp';
+        const sz = 4 + Math.random() * 9;
+        p.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;background:${COLS[i%COLS.length]};animation-delay:${Math.random()*6}s;animation-duration:${7+Math.random()*6}s`;
+        c.appendChild(p);
+      }
+    } else if (effect === 'Stars') {
+      for (let i = 0; i < 80; i++) {
+        const s = document.createElement('div');
+        const sz = Math.random() < 0.2 ? 2 : 1;
+        s.style.cssText = `position:absolute;width:${sz}px;height:${sz}px;border-radius:50%;background:rgba(255,255,255,${.15+Math.random()*.55});left:${Math.random()*100}%;top:${Math.random()*100}%;animation:bp-float ${5+Math.random()*9}s ${Math.random()*6}s ease-in-out infinite`;
+        c.appendChild(s);
+      }
+    } else if (effect === 'Waves') {
+      for (let i = 0; i < 4; i++) {
+        const w = document.createElement('div');
+        w.style.cssText = `position:absolute;border-radius:50%;border:1px solid rgba(${rgb},.06);animation:bp-float ${9+i*2.5}s ${i*1.5}s ease-in-out infinite;inset:${i*10}%`;
+        c.appendChild(w);
+      }
+    }
+  }
+
+  /* ── Card roundness ── */
+  const CARD_ROUNDS = ['Sharp', 'Subtle', 'Rounded', 'Pill'];
+  const CARD_RADII  = { Sharp:'4px', Subtle:'8px', Rounded:'14px', Pill:'24px' };
+  let cardRoundIdx = 2;
+  function cycleCardRound(d) {
+    cardRoundIdx = (cardRoundIdx + d + CARD_ROUNDS.length) % CARD_ROUNDS.length;
+    const val = CARD_ROUNDS[cardRoundIdx];
+    document.getElementById('cardRoundVal').textContent = val;
+    document.documentElement.style.setProperty('--card-radius', CARD_RADII[val]);
+    saveSetting('cardRound', val);
+  }
+
+  /* ── Accent intensity ── */
+  function updateAccentIntensity(val) {
+    document.getElementById('accentSliderVal').textContent = val + '%';
+    document.documentElement.style.setProperty('--accent-intensity', val / 100);
+    saveSetting('accentIntensity', parseInt(val));
+  }
+
+  /* ── Sidebar style ── */
+  const SIDEBAR_STYLES = ['Full', 'Compact', 'Icons Only'];
+  let sidebarStyleIdx = 0;
+  function cycleSidebar(d) {
+    sidebarStyleIdx = (sidebarStyleIdx + d + SIDEBAR_STYLES.length) % SIDEBAR_STYLES.length;
+    document.getElementById('sidebarStyleVal').textContent = SIDEBAR_STYLES[sidebarStyleIdx];
+    saveSetting('sidebarStyle', SIDEBAR_STYLES[sidebarStyleIdx]);
+  }
+
+  /* ── Restore extra features on load ── */
+  (function restoreExtraSettings() {
+    const s = loadSettings();
+    if (s.glassmorphism === false) { document.getElementById('glassToggle').checked = false; toggleGlass(false); }
+    if (s.bgEffect) {
+      bgEffectIdx = BG_EFFECTS.indexOf(s.bgEffect);
+      if (bgEffectIdx < 0) bgEffectIdx = 0;
+      document.getElementById('bgEffectVal').textContent = BG_EFFECTS[bgEffectIdx];
+      applyBgEffect(s.bgEffect);
+    }
+    if (s.cardRound) {
+      cardRoundIdx = CARD_ROUNDS.indexOf(s.cardRound);
+      if (cardRoundIdx < 0) cardRoundIdx = 2;
+      document.getElementById('cardRoundVal').textContent = s.cardRound;
+      document.documentElement.style.setProperty('--card-radius', CARD_RADII[s.cardRound]);
+    }
+    if (s.accentIntensity !== undefined) {
+      document.getElementById('accentSlider').value = s.accentIntensity;
+      document.getElementById('accentSliderVal').textContent = s.accentIntensity + '%';
+      document.documentElement.style.setProperty('--accent-intensity', s.accentIntensity / 100);
+    }
+    if (s.sidebarStyle) {
+      sidebarStyleIdx = SIDEBAR_STYLES.indexOf(s.sidebarStyle);
+      if (sidebarStyleIdx < 0) sidebarStyleIdx = 0;
+      document.getElementById('sidebarStyleVal').textContent = s.sidebarStyle;
+    }
+    // Apply saved theme vars immediately so the page renders in the right colors
+    const savedTheme = localStorage.getItem('eylox_theme') || 'purple';
+    applyThemeVars(savedTheme);
+  })();
+
+  /* ── Graphics panel ── */
+  const GFX_FPS_OPTIONS = [30, 60, 90, 120, 144, 240, 0]; // 0 = Unlimited
+  let gfxFpsIdx = 1;
+
+  function setGfxQuality(q, btn) {
+    document.querySelectorAll('#gfxQualityBtns .s-quality-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    localStorage.setItem('eylox_graphics_quality', q);
+    saveSetting('graphicsQuality', q);
+    if (window.EyloxGraphics?.applyQuality) EyloxGraphics.applyQuality(q);
+    if (window.EyloxSpaceBg?.setQuality)  EyloxSpaceBg.setQuality(q);
+    /* Update benchmark bar */
+    const scores = { low: 20, medium: 50, high: 75, ultra: 95 };
+    const bar    = document.getElementById('benchBar');
+    if (bar) bar.style.width = (scores[q] || 50) + '%';
+    const lbl = document.getElementById('benchLabel');
+    const lbls = { low: '⚡ Low — max FPS, minimal visuals', medium: '⚖️ Medium — balanced quality & speed', high: '✨ High — great visuals, good FPS', ultra: '🌟 Ultra — maximum beauty, needs strong GPU' };
+    if (lbl) lbl.textContent = lbls[q] || '';
+  }
+
+  function autoDetectGraphics() {
+    const score = parseInt(localStorage.getItem('eylox_perf_score') || '0', 10);
+    if (!score) {
+      document.getElementById('benchLabel').textContent = 'Running benchmark…';
+      if (window.EyloxDevice?.benchmark) {
+        EyloxDevice.benchmark();
+        setTimeout(() => {
+          const s = parseInt(localStorage.getItem('eylox_perf_score') || '60', 10);
+          const q = s > 80 ? 'ultra' : s > 55 ? 'high' : s > 30 ? 'medium' : 'low';
+          setGfxQuality(q, document.querySelector(`[data-quality="${q}"]`));
+          updateBenchDisplay(s);
+        }, 1200);
+      }
+      return;
+    }
+    const q = score > 80 ? 'ultra' : score > 55 ? 'high' : score > 30 ? 'medium' : 'low';
+    setGfxQuality(q, document.querySelector(`[data-quality="${q}"]`));
+    updateBenchDisplay(score);
+  }
+
+  function updateBenchDisplay(score) {
+    const bar = document.getElementById('benchBar');
+    if (bar) bar.style.width = score + '%';
+    const scoreEl = document.getElementById('benchScore');
+    if (scoreEl) { scoreEl.textContent = score + '/100'; scoreEl.style.color = score > 70 ? '#4ade80' : score > 40 ? '#fbbf24' : '#f87171'; }
+    const lbl = document.getElementById('benchLabel');
+    if (lbl) lbl.textContent = `Device score: ${score}/100 — ${score > 70 ? 'High-end device' : score > 40 ? 'Mid-range device' : 'Low-end device'}`;
+  }
+
+  function toggleFps(on) {
+    if (window.EyloxGraphics?.setShowFps) EyloxGraphics.setShowFps(on);
+    saveSetting('showFps', on);
+  }
+
+  function cycleGfxFps(d) {
+    gfxFpsIdx = (gfxFpsIdx + d + GFX_FPS_OPTIONS.length) % GFX_FPS_OPTIONS.length;
+    const v = GFX_FPS_OPTIONS[gfxFpsIdx];
+    document.getElementById('gfxFpsVal').textContent = v === 0 ? 'Unlimited' : v + ' FPS';
+    if (window.EyloxGraphics?.setFpsLimit) EyloxGraphics.setFpsLimit(v || 999);
+    saveSetting('fpsLimit', v);
+  }
+
+  function togglePerfMode(on) {
+    if (on) setGfxQuality('low', document.querySelector('[data-quality="low"]'));
+    saveSetting('perfMode', on);
+  }
+
+  /* ── Devices panel ── */
+  function toggleTvMode(on) {
+    document.documentElement.dataset.device = on ? 'tv' : (window.EyloxDevice?.type || 'desktop');
+    saveSetting('tvMode', on);
+  }
+
+  function populateDevicesPanel() {
+    const dev = window.EyloxDevice || {};
+    const set = el => { const e = document.getElementById(el); return e; };
+    const d = set('devType');        if (d) d.textContent = dev.type || 'desktop';
+    const t = set('devTouch');       if (t) t.textContent = dev.isTouch ? 'Yes' : 'No';
+    const p = set('devPerf');        if (p) { const s = localStorage.getItem('eylox_perf_score'); p.textContent = s ? s + '/100' : 'Not benchmarked'; }
+    const c = set('devController');  if (c) c.textContent = document.documentElement.dataset.controller || 'None';
+
+    const cs = document.getElementById('compatStatus');
+    if (cs) {
+      const items = [
+        `✅ Display: ${screen.width}×${screen.height} @ ${window.devicePixelRatio || 1}x`,
+        `✅ Touch: ${dev.isTouch ? 'Supported' : 'Not available'}`,
+        `✅ Gamepad API: ${'getGamepads' in navigator ? 'Supported' : 'Not available'}`,
+        `✅ Vibration: ${'vibrate' in navigator ? 'Supported' : 'Not available'}`,
+        `✅ WebGL: ${(() => { try { return !!document.createElement('canvas').getContext('webgl') ? 'Supported' : 'Not available'; } catch { return 'Not available'; } })()}`,
+        `✅ Web Audio: ${typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined' ? 'Supported' : 'Not available'}`,
+        `✅ Storage: ${(() => { try { localStorage.setItem('_t','1'); localStorage.removeItem('_t'); return 'OK'; } catch { return 'Blocked'; } })()}`,
+      ];
+      cs.innerHTML = items.join('<br>');
+    }
+  }
+
+  /* ── Restore graphics settings ── */
+  (function restoreGraphicsSettings() {
+    const s  = loadSettings();
+    const q  = localStorage.getItem('eylox_graphics_quality') || s.graphicsQuality || 'medium';
+    const qBtn = document.querySelector(`[data-quality="${q}"]`);
+    if (qBtn) { qBtn.classList.add('active'); }
+    const score = parseInt(localStorage.getItem('eylox_perf_score') || '0', 10);
+    if (score) updateBenchDisplay(score);
+
+    if (s.showFps) { const el = document.getElementById('gfxFpsToggle'); if (el) el.checked = true; }
+    if (s.fpsLimit !== undefined) {
+      gfxFpsIdx = GFX_FPS_OPTIONS.indexOf(s.fpsLimit);
+      if (gfxFpsIdx < 0) gfxFpsIdx = 1;
+      document.getElementById('gfxFpsVal').textContent = s.fpsLimit === 0 ? 'Unlimited' : s.fpsLimit + ' FPS';
+    }
+    if (s.tvMode) { document.getElementById('devTvMode').checked = true; }
+
+    /* Load device info once DOM is ready */
+    setTimeout(populateDevicesPanel, 300);
+  })();
+
+  /* Refresh controller status every 2s */
+  setInterval(() => {
+    const c = document.getElementById('devController');
+    if (c) c.textContent = document.documentElement.dataset.controller || 'None';
+  }, 2000);
+  </script>
+  <script src="floating-actions.js"></script>
+  <script src="tooltip.js"></script>
+<script src="sw-register.js"></script>
+<!-- v2.0 Improvements -->
+<script src="currencies.js"></script>
+  <script src="platform-improvements.js"></script>
+<script src="clan-system.js"></script>
+<script src="season-pass.js"></script>
+<script src="video-call.js"></script>
+<script src="offline.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pricing — Eylox</title>
+<meta name="description" content="Simple, transparent pricing for Eylox — Free, Premium, and Creator Pass plans, plus Eylux coin packages." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#7c3aed" />
+<link rel="stylesheet" href="pricing.css" />
+</head>
+<body data-page="pricing">
+
+<div class="site-orb site-orb-a" aria-hidden="true"></div>
+<div class="site-orb site-orb-b" aria-hidden="true"></div>
+
+<!-- ══════════════════ NAV ══════════════════ -->
+<nav class="site-nav" aria-label="Primary">
+  <div class="site-nav-inner">
+    <a href="landing.html" class="site-logo">
+      <span class="site-logo-icon">🎮</span>
+      <span class="site-logo-text">Eylox</span>
+    </a>
+
+    <input type="checkbox" id="navToggleCheck" class="nav-toggle-check" />
+    <label for="navToggleCheck" class="nav-toggle-label" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </label>
+
+    <div class="nav-links">
+      <a href="landing.html">Home</a>
+      <a href="games.html">Games</a>
+      <a href="pricing.html" class="active" aria-current="page">Pricing</a>
+      <a href="help.html">Help</a>
+      <a href="safety.html">Safety</a>
+    </div>
+
+    <div class="nav-actions">
+      <a href="landing.html" class="btn-nav btn-nav-ghost">Log In</a>
+      <a href="landing.html" class="btn-nav btn-nav-solid">Get Started</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+  <!-- ══════════════════ HERO ══════════════════ -->
+  <section class="pr-hero">
+    <div class="pr-badge">💎 SIMPLE, HONEST PRICING</div>
+    <h1 class="pr-title">Pick Your <span>Power-Up</span></h1>
+    <p class="pr-sub">Play free forever, or level up with Premium and Creator Pass. Cancel anytime — no hidden fees, no surprises.</p>
+
+    <div class="pr-toggle-wrap">
+      <span class="pr-toggle-label active" id="billingMonthlyLabel">Monthly</span>
+      <button class="pr-switch" id="billingSwitch" type="button" role="switch" aria-checked="false" aria-label="Toggle annual billing"><span class="pr-switch-knob"></span></button>
+      <span class="pr-toggle-label" id="billingAnnualLabel">Annual</span>
+      <span class="pr-save-chip">Save 20%</span>
+    </div>
+  </section>
+
+  <!-- ══════════════════ PLAN CARDS ══════════════════ -->
+  <section class="pr-plans" aria-label="Plans">
+
+    <!-- Free -->
+    <div class="pr-card" data-animate>
+      <div class="pr-card-icon">🕹️</div>
+      <div class="pr-card-name">Free</div>
+      <div class="pr-card-tagline">Everything you need to jump in and play.</div>
+      <div class="pr-price-row">
+        <span class="pr-price">EGP 0</span>
+      </div>
+      <div class="pr-price-annual-note">Free forever</div>
+      <ul class="pr-features">
+        <li><span class="fi">✓</span> Access to all 16+ games</li>
+        <li><span class="fi">✓</span> Leaderboards &amp; achievements</li>
+        <li><span class="fi">✓</span> Friends, clans &amp; communities</li>
+        <li><span class="fi">✓</span> Standard matchmaking</li>
+        <li class="disabled"><span class="fi">✕</span> Ads between games</li>
+        <li class="disabled"><span class="fi">✕</span> Publish your own games</li>
+      </ul>
+      <button class="pr-buy-btn pr-buy-free" data-demo-buy="Free plan">Play Free</button>
+    </div>
+
+    <!-- EYLOX Premium -->
+    <div class="pr-card popular" data-animate>
+      <div class="pr-card-badge">POPULAR</div>
+      <div class="pr-card-icon">⭐</div>
+      <div class="pr-card-name">EYLOX Premium</div>
+      <div class="pr-card-tagline">Ad-free play with faster coin earning.</div>
+      <div class="pr-price-row">
+        <span class="pr-price" data-plan-price="premium">EGP 299</span>
+        <span class="pr-price-period" data-plan-period>/ month</span>
+      </div>
+      <div class="pr-price-annual-note" data-plan-annual-note="premium"></div>
+      <ul class="pr-features">
+        <li><span class="fi">✓</span> Everything in Free</li>
+        <li><span class="fi">✓</span> Ad-free gaming experience</li>
+        <li><span class="fi">✓</span> 2× coin earnings on all games</li>
+        <li><span class="fi">✓</span> Exclusive Premium avatar frames</li>
+        <li><span class="fi">✓</span> Monthly 500 Eylux bonus</li>
+        <li><span class="fi">✓</span> Priority matchmaking queue</li>
+      </ul>
+      <button class="pr-buy-btn pr-buy-solid" data-demo-buy="EYLOX Premium">Get Premium</button>
+    </div>
+
+    <!-- Creator Pass -->
+    <div class="pr-card" data-animate>
+      <div class="pr-card-icon">🚀</div>
+      <div class="pr-card-name">Creator Pass</div>
+      <div class="pr-card-tagline">Publish and grow your own games.</div>
+      <div class="pr-price-row">
+        <span class="pr-price" data-plan-price="creator">EGP 999</span>
+        <span class="pr-price-period" data-plan-period>/ month</span>
+      </div>
+      <div class="pr-price-annual-note" data-plan-annual-note="creator"></div>
+      <ul class="pr-features">
+        <li><span class="fi">✓</span> Everything in Premium</li>
+        <li><span class="fi">✓</span> Publish unlimited games</li>
+        <li><span class="fi">✓</span> Advanced AI game builder</li>
+        <li><span class="fi">✓</span> Custom game thumbnails</li>
+        <li><span class="fi">✓</span> Creator analytics dashboard</li>
+        <li><span class="fi">✓</span> Early access to beta features</li>
+      </ul>
+      <button class="pr-buy-btn pr-buy-blue" data-demo-buy="Creator Pass">Get Creator Pass</button>
+    </div>
+
+  </section>
+
+  <!-- ══════════════════ EYLUX CURRENCY PACKAGES ══════════════════ -->
+  <div class="section-head">
+    <div class="section-eyebrow">💰 VIRTUAL CURRENCY</div>
+    <h2 class="section-title">Eylux Coin Packages</h2>
+    <p class="section-sub">Top up your Eylux balance to unlock cosmetics, perks, and marketplace items. Larger packs include bonus coins.</p>
+  </div>
+  <section class="eylux-grid" id="eyluxGrid" aria-label="Eylux currency packages">
+    <!-- Rendered by pricing.js -->
+  </section>
+
+  <!-- ══════════════════ COMPARISON TABLE ══════════════════ -->
+  <div class="section-head">
+    <div class="section-eyebrow">🔍 COMPARE PLANS</div>
+    <h2 class="section-title">Every Feature, Side by Side</h2>
+    <p class="section-sub">Not sure which plan fits? Here's the full breakdown.</p>
+  </div>
+  <div class="compare-wrap">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Free</th>
+          <th class="hl">Premium</th>
+          <th class="hl">Creator Pass</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Access to all games</td><td class="compare-yes">✓</td><td class="compare-yes">✓</td><td class="compare-yes">✓</td></tr>
+        <tr><td>Ad-free experience</td><td class="compare-no">—</td><td class="compare-yes">✓</td><td class="compare-yes">✓</td></tr>
+        <tr><td>Coin earning multiplier</td><td>1×</td><td>2×</td><td>2×</td></tr>
+        <tr><td>Monthly Eylux bonus</td><td class="compare-no">—</td><td>500</td><td>500</td></tr>
+        <tr><td>Custom avatar frames</td><td class="compare-no">—</td><td class="compare-yes">✓</td><td class="compare-yes">✓</td></tr>
+        <tr><td>Priority matchmaking</td><td class="compare-no">—</td><td class="compare-yes">✓</td><td class="compare-yes">✓</td></tr>
+        <tr><td>Publish games</td><td class="compare-no">—</td><td class="compare-no">—</td><td class="compare-yes">✓</td></tr>
+        <tr><td>AI game builder access</td><td class="compare-no">—</td><td class="compare-no">—</td><td class="compare-yes">✓</td></tr>
+        <tr><td>Creator analytics dashboard</td><td class="compare-no">—</td><td class="compare-no">—</td><td class="compare-yes">✓</td></tr>
+        <tr><td>Early access to beta features</td><td class="compare-no">—</td><td class="compare-no">—</td><td class="compare-yes">✓</td></tr>
+        <tr><td>Support response time</td><td>Standard</td><td>Priority</td><td>Priority</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══════════════════ FAQ ══════════════════ -->
+  <div class="section-head">
+    <div class="section-eyebrow">❓ FAQ</div>
+    <h2 class="section-title">Frequently Asked Questions</h2>
+  </div>
+  <section class="faq-wrap" aria-label="Frequently asked questions">
+    <div class="faq-item open">
+      <div class="faq-q">Can I cancel my subscription anytime?</div>
+      <div class="faq-a"><p>Yes. Premium and Creator Pass are billed monthly (or annually if you choose that option) and can be cancelled anytime from your Subscription settings. You'll keep your benefits until the end of the current billing period.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Is Eylux refundable?</div>
+      <div class="faq-a"><p>Eylux coin purchases are generally final once the coins are delivered to your account, since they can be spent immediately. See our <a class="inline-link" href="refunds.html">Refund Policy</a> for the exceptions we do make.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What happens if I upgrade or downgrade mid-cycle?</div>
+      <div class="faq-a"><p>Upgrading takes effect immediately and we prorate the difference for the remainder of your billing cycle. Downgrading takes effect at the start of your next billing cycle so you keep what you already paid for.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Which payment methods are supported?</div>
+      <div class="faq-a"><p>We support major credit/debit cards and popular regional payment methods at checkout. Available options depend on your country.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Does cancelling Premium delete my progress?</div>
+      <div class="faq-a"><p>No. Your account, coins, achievements, and game progress are always kept. Cancelling only removes the Premium-only perks (ad-free play, coin multiplier, etc.) going forward.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Can I gift Premium or Creator Pass to a friend?</div>
+      <div class="faq-a"><p>Yes — gifting is available from the in-app Subscription page once you're signed in.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Are prices shown in my local currency?</div>
+      <div class="faq-a"><p>We display an estimated price in your local currency based on your device settings. The exact amount charged, including any taxes, is confirmed at checkout.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Do the buttons on this page charge my card?</div>
+      <div class="faq-a"><p>Not on this page — the buttons here are a demo preview of the purchase flow. Real purchases happen inside the app after you sign in.</p></div>
+    </div>
+  </section>
+
+  <!-- ══════════════════ FINAL CTA ══════════════════ -->
+  <section class="pr-cta" data-animate>
+    <h2>Still have questions?</h2>
+    <p>Our Help Center covers billing, accounts, and more — or reach out directly.</p>
+    <div class="pr-cta-btns">
+      <a href="help.html" class="btn-nav btn-nav-ghost">Visit Help Center</a>
+      <a href="mailto:support@eylox.com" class="btn-nav btn-nav-solid">Contact Support</a>
+    </div>
+  </section>
+
+</main>
+
+<!-- ══════════════════ FOOTER ══════════════════ -->
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-col">
+      <a href="landing.html" class="site-logo"><span class="site-logo-icon">🎮</span><span class="site-logo-text">Eylox</span></a>
+      <p class="footer-brand-blurb">The browser gaming platform built for players and creators. No downloads, no friction — just play.</p>
+      <div class="footer-social">
+        <!-- Placeholder social links — replace with real profiles -->
+        <a href="#" aria-label="Twitter / X">🐦</a>
+        <a href="#" aria-label="Discord">💬</a>
+        <a href="#" aria-label="YouTube">▶️</a>
+        <a href="#" aria-label="Instagram">📸</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h3 class="footer-col-title">Platform</h3>
+      <ul>
+        <li><a href="games.html">Games</a></li>
+        <li><a href="leaderboard.html">Leaderboards</a></li>
+        <li><a href="communities.html">Communities</a></li>
+        <li><a href="ai.html">Eylox Studio</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h3 class="footer-col-title">Company</h3>
+      <ul>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Press Kit</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h3 class="footer-col-title">Support</h3>
+      <ul>
+        <li><a href="help.html">Help Center</a></li>
+        <li><a href="safety.html">Safety Center</a></li>
+        <li><a href="mailto:support@eylox.com">Contact Us</a></li>
+        <li><a href="#">System Status</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h3 class="footer-col-title">Legal</h3>
+      <ul>
+        <li><a href="terms.html">Terms of Service</a></li>
+        <li><a href="privacy.html">Privacy Policy</a></li>
+        <li><a href="refunds.html">Refund Policy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2026 Eylox. All rights reserved.</span>
+    <div class="footer-legal-row">
+      <a href="terms.html">Terms</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="refunds.html">Refunds</a>
+    </div>
+  </div>
+</footer>
+
+<div id="pricingToast" role="status" aria-live="polite"></div>
+
+<script src="pricing.js"></script>
+</body>
+</html>

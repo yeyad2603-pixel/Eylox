@@ -1,606 +1,877 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>∞ Eylox — Shop</title>
+  <title>Eylox — Shop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#7c3aed"/>
   <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="ads.css"/>
   <script>
     try {
       const s = localStorage.getItem('eylox_token')||localStorage.getItem('eylox_guest')||localStorage.getItem('eylox_user');
       if (!s) window.location.replace('landing.html');
     } catch {}
   </script>
+  <style>
+    /* ── Shop Hero ── */
+    .sh-hero {
+      background: linear-gradient(160deg,#1a0030 0%,#3d0060 50%,#1a1040 100%);
+      border: 1px solid rgba(167,139,250,.2);
+      border-radius: 20px; padding: 28px 32px; margin-bottom: 20px;
+      position: relative; overflow: hidden;
+      display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+    }
+    .sh-hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 80% 50%,rgba(167,139,250,.15) 0%,transparent 65%);
+      pointer-events: none;
+    }
+    .sh-hero-left { flex: 1; min-width: 200px; position: relative; z-index: 1; }
+    .sh-hero-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: .68rem; font-weight: 900; color: rgba(245,158,11,.8);
+      letter-spacing: 1.5px; margin-bottom: 8px; text-transform: uppercase;
+    }
+    .sh-hero h1 { font-family:'Fredoka One',cursive; font-size: clamp(1.6rem,3.5vw,2.4rem); color:#fff; margin-bottom:6px; }
+    .sh-hero p  { color: rgba(180,160,220,.65); font-size:.88rem; font-weight:600; }
+    .sh-balance-row {
+      display: flex; gap: 10px; flex-wrap: wrap; position: relative; z-index: 1;
+    }
+    .sh-bal-box {
+      background: rgba(0,0,0,.35); border: 1px solid rgba(167,139,250,.2);
+      border-radius: 14px; padding: 12px 20px; min-width: 110px; text-align: center;
+    }
+    .sh-bal-val {
+      font-family:'Fredoka One',cursive; font-size: 1.25rem;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .sh-bal-lbl { font-size: .62rem; font-weight: 900; color: rgba(167,139,250,.5); letter-spacing: 1px; margin-top: 3px; }
+
+    /* ── Sale Banner ── */
+    .sh-sale-banner {
+      background: linear-gradient(135deg,rgba(245,158,11,.12),rgba(239,68,68,.08));
+      border: 1px solid rgba(245,158,11,.3); border-radius: 14px;
+      padding: 14px 20px; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    }
+
+    /* ── Category Tabs ── */
+    .sh-tabs {
+      display: flex; gap: 8px; margin-bottom: 24px;
+      overflow-x: auto; padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+    .sh-tabs::-webkit-scrollbar { display: none; }
+    .sh-tab {
+      padding: 9px 20px; border-radius: 20px; white-space: nowrap;
+      background: rgba(167,139,250,.08); border: 1px solid rgba(167,139,250,.18);
+      color: rgba(180,160,220,.6); cursor: pointer; font-weight: 800; font-size: .85rem;
+      transition: all .18s; display: flex; align-items: center; gap: 6px;
+      flex-shrink: 0;
+    }
+    .sh-tab:hover:not(.active) { border-color: rgba(167,139,250,.35); color: #f0e8ff; }
+    .sh-tab.active {
+      background: linear-gradient(135deg,#a78bfa,#8b5cf6);
+      border-color: transparent; color: #fff;
+      box-shadow: 0 4px 14px rgba(124,58,237,.35);
+    }
+    .sh-panel { display: none; }
+    .sh-panel.active { display: block; }
+
+    /* ── Section headers ── */
+    .sh-section { margin-bottom: 28px; }
+    .sh-section-title {
+      font-size: .72rem; font-weight: 900; letter-spacing: 1.5px;
+      color: rgba(167,139,250,.55); margin-bottom: 14px;
+      display: flex; align-items: center; gap: 10px;
+      text-transform: uppercase;
+    }
+    .sh-section-title::after { content:''; flex:1; height:1px; background:rgba(167,139,250,.1); }
+
+    /* ── Item Grid ── */
+    .sh-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill,minmax(155px,1fr));
+      gap: 12px;
+    }
+    .sh-card {
+      background: rgba(20,10,40,.85);
+      border: 1px solid rgba(167,139,250,.15);
+      border-radius: 16px; padding: 18px 12px 14px;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      position: relative; transition: all .2s; cursor: default;
+    }
+    .sh-card:hover { border-color: rgba(167,139,250,.38); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(124,58,237,.2); }
+    .sh-card.owned  { border-color: rgba(74,222,128,.3); }
+    .sh-card.equipped { border-color: rgba(251,191,36,.45); background: rgba(40,28,5,.8); }
+    .sh-card.limited { border-color: rgba(239,68,68,.35); }
+
+    /* Rarity tag */
+    .sh-rarity {
+      position: absolute; top: 9px; left: 9px;
+      font-size: .58rem; font-weight: 900; letter-spacing: .8px;
+      padding: 3px 8px; border-radius: 6px; text-transform: uppercase;
+    }
+    .sh-r-common    { background:rgba(100,116,139,.25); color:#94a3b8; border:1px solid rgba(100,116,139,.3); }
+    .sh-r-rare      { background:rgba(59,130,246,.2);   color:#60a5fa; border:1px solid rgba(59,130,246,.3); }
+    .sh-r-epic      { background:rgba(168,85,247,.22);  color:#c084fc; border:1px solid rgba(168,85,247,.3); }
+    .sh-r-legendary { background:rgba(251,191,36,.2);   color:#fbbf24; border:1px solid rgba(251,191,36,.35); }
+    .sh-r-limited   { background:rgba(239,68,68,.2);    color:#f87171; border:1px solid rgba(239,68,68,.3); }
+
+    /* Sale tag */
+    .sh-sale-tag {
+      position: absolute; top: 9px; right: 9px;
+      background: linear-gradient(135deg,#ef4444,#dc2626);
+      color: #fff; font-size: .6rem; font-weight: 900;
+      padding: 3px 7px; border-radius: 6px;
+    }
+
+    .sh-item-emoji { font-size: 2.6rem; line-height: 1; margin-top: 6px; }
+    .sh-item-name  { font-weight: 800; font-size: .85rem; color: var(--text,#f0e8ff); text-align: center; }
+    .sh-item-desc  { font-size: .68rem; color: rgba(167,139,250,.5); text-align: center; line-height: 1.35; }
+
+    /* Price row */
+    .sh-price-row { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; width: 100%; margin-top: 2px; }
+    .sh-price-coin, .sh-price-win {
+      flex: 1; padding: 7px 6px; border-radius: 10px;
+      font-size: .75rem; font-weight: 800; cursor: pointer;
+      border: none; transition: all .18s; min-width: 60px;
+    }
+    .sh-price-coin {
+      background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.3);
+      color: #f59e0b;
+    }
+    .sh-price-coin:hover { background: rgba(245,158,11,.22); transform: scale(1.04); }
+    .sh-price-win {
+      background: rgba(59,130,246,.1); border: 1px solid rgba(59,130,246,.3);
+      color: #60a5fa;
+    }
+    .sh-price-win:hover { background: rgba(59,130,246,.2); transform: scale(1.04); }
+    .sh-btn-owned {
+      width: 100%; padding: 7px; border-radius: 10px;
+      background: rgba(74,222,128,.1); border: 1px solid rgba(74,222,128,.3);
+      color: #4ade80; font-weight: 800; font-size: .78rem; cursor: default;
+    }
+    .sh-btn-equip {
+      width: 100%; padding: 7px; border-radius: 10px;
+      background: rgba(167,139,250,.12); border: 1px solid rgba(167,139,250,.3);
+      color: #a78bfa; font-weight: 800; font-size: .78rem; cursor: pointer;
+      transition: all .18s;
+    }
+    .sh-btn-equip:hover { background: rgba(167,139,250,.25); }
+    .sh-btn-equipped {
+      width: 100%; padding: 7px; border-radius: 10px;
+      background: linear-gradient(135deg,#f59e0b,#d97706);
+      border: none; color: #1a1040; font-weight: 900; font-size: .78rem; cursor: default;
+    }
+
+    /* ── List card (for passes / rewards) ── */
+    .sh-list { display: flex; flex-direction: column; gap: 10px; }
+    .sh-list-card {
+      background: rgba(20,10,40,.85); border: 1px solid rgba(167,139,250,.15);
+      border-radius: 14px; padding: 16px 18px;
+      display: flex; align-items: center; gap: 16px;
+      transition: all .2s;
+    }
+    .sh-list-card:hover { border-color: rgba(167,139,250,.32); transform: translateY(-1px); }
+    .sh-list-card.owned { border-color: rgba(74,222,128,.3); }
+    .sh-list-icon { font-size: 2rem; flex-shrink: 0; }
+    .sh-list-info { flex: 1; min-width: 0; }
+    .sh-list-name { font-weight: 800; font-size: .9rem; color: #f0e8ff; margin-bottom: 2px; }
+    .sh-list-desc { font-size: .75rem; color: rgba(167,139,250,.55); font-weight: 600; line-height: 1.4; }
+    .sh-list-price { display: flex; flex-direction: column; gap: 5px; align-items: flex-end; flex-shrink: 0; }
+    .sh-list-btn {
+      padding: 7px 16px; border-radius: 10px; font-size: .78rem; font-weight: 800;
+      cursor: pointer; border: none; white-space: nowrap; transition: all .18s;
+    }
+    .sh-list-btn.coin { background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:#f59e0b; }
+    .sh-list-btn.coin:hover { background:rgba(245,158,11,.28); }
+    .sh-list-btn.win  { background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);color:#60a5fa; }
+    .sh-list-btn.win:hover  { background:rgba(59,130,246,.22); }
+    .sh-list-btn.owned { background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);color:#4ade80;cursor:default; }
+
+    /* ── Buy animation overlay ── */
+    @keyframes buyPop { 0%{transform:scale(0) rotate(-20deg);opacity:0} 60%{transform:scale(1.3) rotate(5deg)} 100%{transform:scale(1) rotate(0);opacity:1} }
+    @keyframes buyFloat { 0%{opacity:1;transform:translateY(0) scale(1)} 100%{opacity:0;transform:translateY(-80px) scale(.6)} }
+    .buy-float {
+      position: fixed; pointer-events: none; z-index: 99999;
+      font-size: 2rem; animation: buyFloat .9s ease-out forwards;
+    }
+
+    @media (max-width:600px) {
+      .sh-grid { grid-template-columns: repeat(auto-fill,minmax(130px,1fr)); }
+      .sh-hero { padding: 20px; }
+    }
+  </style>
+<script src="audit-loader.js" defer></script>
+  <script src="debug-dashboard.js" defer></script>
 </head>
 <body data-page="shop">
 <div class="app-shell">
 
-  <!-- ── Sidebar ── -->
+  <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <a href="index.html" class="sidebar-logo">
       <span class="sidebar-logo-icon">🎮</span>
       <span class="sidebar-logo-text">Eylox</span>
     </a>
     <p class="sidebar-section-label">Menu</p>
-    <nav class="sidebar-nav"><ul>
-      <li><a href="index.html"    class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
-      <li><a href="games.html"    class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
-      <li><a href="friends.html"  class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span><span class="s-badge" style="display:none">0</span></a></li>
-      <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
-      <li><a href="profile.html"  class="sidebar-link"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
-    </ul></nav>
+    <nav class="sidebar-nav" aria-label="Main navigation">
+      <ul>
+        <li><a href="index.html" class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
+        <li><a href="games.html" class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
+        <li><a href="leaderboard.html" class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
+        <li><a href="achievements.html" class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
+        <li><a href="events.html" class="sidebar-link"><span class="s-icon">🎯</span><span class="s-label">Live Events</span></a></li>
+        <li><a href="communities.html" class="sidebar-link"><span class="s-icon">🌐</span><span class="s-label">Communities</span></a></li>
+        <li><a href="friends.html" class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span><span class="s-badge" id="friendReqBadge" style="display:none">0</span></a></li>
+        <li><a href="profile.html" class="sidebar-link"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
+        <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
+      </ul>
+    </nav>
     <div class="sidebar-divider"></div>
     <p class="sidebar-section-label">More</p>
-    <nav class="sidebar-nav"><ul>
-      <li><a href="leaderboard.html"  class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
-      <li><a href="achievements.html" class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
-      <li><a href="communities.html"  class="sidebar-link"><span class="s-icon">🌍</span><span class="s-label">Communities</span></a></li>
-      <li><a href="live-events.html"  class="sidebar-link"><span class="s-icon">⚡</span><span class="s-label">Live Events</span></a></li>
-      <li><a href="shop.html"         class="sidebar-link active"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
-      <li><a href="#" class="sidebar-link" id="settingsBtn"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></a></li>
-      <li><a href="#" class="sidebar-link" id="logoutBtn"><span class="s-icon">🚪</span><span class="s-label">Logout</span></a></li>
-    </ul></nav>
+    <nav class="sidebar-nav" aria-label="Secondary navigation">
+      <ul>
+        <li><a href="shop.html" class="sidebar-link active" aria-current="page"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
+        <li><a href="ai.html" class="sidebar-link"><span class="s-icon">🤖</span><span class="s-label">Eylox Studio</span><span class="s-soon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff">AI</span></a></li>
+        <li><a href="subscription.html" class="sidebar-link"><span class="s-icon">💎</span><span class="s-label">Subscription</span></a></li>
+        <li><button class="sidebar-link sb-action" onclick="openSettingsPanel()"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></button></li>
+        <li><button class="sidebar-link sb-action" onclick="eyloxLogout()" style="color:#f87171"><span class="s-icon">🚪</span><span class="s-label">Log Out</span></button></li>
+      </ul>
+    </nav>
     <div class="sidebar-coins">
-      <img src="eylux-coin.png" class="coins-icon-img" alt="Eylux" />
-      <div><div class="coins-amount" id="sidebarCoins">—</div><div class="coins-label">Eylux</div></div>
+      <span>💰</span>
+      <div>
+        <div class="coins-amount" id="sidebarEylux">0</div>
+        <div class="coins-label">Eylux</div>
+      </div>
     </div>
-    <div class="sidebar-coins sidebar-trophies">
-      <span class="coins-icon">🏆</span>
-      <div><div class="trophies-amount">—</div><div class="coins-label">Trophies</div></div>
+    <div class="sidebar-coins" style="margin-top:8px">
+      <span>🏆</span>
+      <div>
+        <div class="Eyltrophs-amount" id="sidebarEyltrophs">0</div>
+        <div class="coins-label">Eyltrophs</div>
+      </div>
     </div>
   </aside>
-  <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
+  <!-- MAIN -->
   <div class="main-area">
-    <!-- ── Topbar ── -->
     <header class="topbar">
-      <button class="menu-btn" id="menuBtn" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
-      <div class="search-wrap"><span class="search-icon">🛒</span><input type="search" class="search-input" placeholder="Search items…" id="shopSearch" aria-label="Search shop"/></div>
+      <button class="menu-btn" id="sidebarToggle" aria-label="Toggle sidebar"><span></span><span></span><span></span></button>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="search" class="search-input" id="shopSearch" placeholder="Search shop…" aria-label="Search"/>
+      </div>
       <div class="topbar-right">
-        <button class="tb-btn" aria-label="Notifications">🔔<span class="notif-dot"></span></button>
-        <div class="tb-coins"><img src="eylux-coin.png" class="tb-coin-img" alt="EC"> <span id="topbarCoins">—</span></div>
-        <a href="profile.html" class="tb-avatar" aria-label="My Profile">🎮<span class="online-dot"></span></a>
+        <button class="topbar-icon-btn" id="notifBtn" aria-label="Notifications">🔔<span class="notif-dot"></span></button>
+        <div class="tb-Eyltrophs">🏆 <span id="topbarEyltrophs">0</span></div>
+        <div class="tb-coins">💰 <span id="topbarEylux">0</span></div>
+        <a href="profile.html" class="tb-avatar" aria-label="My profile">🎮<span class="online-dot"></span></a>
       </div>
     </header>
 
     <main class="page-content">
 
-      <!-- Shop Hero -->
-      <div style="background:linear-gradient(135deg,rgba(124,58,237,.22),rgba(236,72,153,.18));border:1px solid rgba(167,139,250,.2);border-radius:var(--r-lg);padding:28px 32px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
-        <div>
-          <div style="font-size:.72rem;font-weight:900;letter-spacing:1.5px;color:var(--purple);text-transform:uppercase;margin-bottom:6px">🛒 EYLOX MARKETPLACE</div>
-          <h1 style="font-family:var(--font-head);font-size:2rem;margin-bottom:6px">Spend your coins wisely!</h1>
-          <p style="color:var(--muted);font-size:.88rem;font-weight:700">Buy avatar emojis, badges, effects and boosts. Items are yours forever.</p>
+      <!-- Sale Banner -->
+      <div class="sh-sale-banner">
+        <div style="font-size:1.5rem;flex-shrink:0">🔥</div>
+        <div style="flex:1;min-width:140px">
+          <div style="font-family:'Fredoka One',cursive;font-size:.95rem;color:#fbbf24">Daily Flash Sale — 40% Off!</div>
+          <div style="font-size:.72rem;color:rgba(251,191,36,.6);font-weight:700;margin-top:2px">Selected items discounted today only. Check the Featured tab!</div>
         </div>
-        <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;flex-wrap:wrap">
-          <div style="background:rgba(253,230,138,.12);border:1px solid rgba(253,230,138,.3);border-radius:var(--r-md);padding:14px 22px;text-align:center">
-            <div style="font-family:var(--font-head);font-size:1.6rem;color:var(--yellow);display:flex;align-items:center;justify-content:center;gap:6px"><img src="eylux-coin.png" style="width:28px;height:28px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(255,180,0,.5))"><span id="heroCoins">—</span></div>
-            <div style="font-size:.7rem;font-weight:900;color:var(--muted);letter-spacing:.5px">YOUR EYLUX</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <span style="font-size:.68rem;font-weight:900;color:rgba(251,191,36,.7);text-transform:uppercase">Ends in</span>
+          <span id="dealTimer" style="font-family:'Fredoka One',cursive;font-size:1.05rem;color:#fbbf24;background:rgba(245,158,11,.15);padding:4px 12px;border-radius:8px;min-width:76px;text-align:center">--:--:--</span>
+        </div>
+      </div>
+
+      <!-- Hero -->
+      <div class="sh-hero">
+        <div class="sh-hero-left">
+          <div class="sh-hero-tag">🛒 EYLOX SHOP</div>
+          <h1>Customize your game!</h1>
+          <p>Spend Coins and Wins to unlock avatars, effects, game passes, and more.</p>
+        </div>
+        <div class="sh-balance-row">
+          <div class="sh-bal-box">
+            <div class="sh-bal-val" style="color:#f59e0b">💰 <span id="heroCoins">0</span></div>
+            <div class="sh-bal-lbl">COINS</div>
           </div>
-          <div style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);border-radius:var(--r-md);padding:14px 22px;text-align:center">
-            <div style="font-family:var(--font-head);font-size:1.6rem;color:#fbbf24;display:flex;align-items:center;justify-content:center;gap:6px">🏆 <span id="heroWins">—</span></div>
-            <div style="font-size:.7rem;font-weight:900;color:var(--muted);letter-spacing:.5px">YOUR WINS</div>
+          <div class="sh-bal-box">
+            <div class="sh-bal-val" style="color:#60a5fa">🏆 <span id="heroWins">0</span></div>
+            <div class="sh-bal-lbl">WINS</div>
           </div>
-          <div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:var(--r-md);padding:14px 22px;text-align:center">
-            <div style="font-family:var(--font-head);font-size:1.6rem;color:var(--green)" id="heroOwned">0</div>
-            <div style="font-size:.7rem;font-weight:900;color:var(--muted);letter-spacing:.5px">ITEMS OWNED</div>
+          <div class="sh-bal-box">
+            <div class="sh-bal-val" style="color:#a78bfa"><span id="heroItems">0</span></div>
+            <div class="sh-bal-lbl">OWNED</div>
           </div>
         </div>
       </div>
 
-      <!-- Category Tabs -->
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px" id="catTabs">
-        <button class="shop-tab active" data-cat="avatars">🎭 Avatars</button>
-        <button class="shop-tab" data-cat="badges">🏅 Badges</button>
-        <button class="shop-tab" data-cat="effects">✨ Effects</button>
-        <button class="shop-tab" data-cat="boosts">⚡ Boosts</button>
+      <!-- Tabs -->
+      <div class="sh-tabs" id="shopTabs">
+        <button class="sh-tab active" data-tab="featured" data-tip="tab-featured">⭐ Featured</button>
+        <button class="sh-tab" data-tab="popular"  data-tip="tab-popular" >🔥 Popular</button>
+        <button class="sh-tab" data-tab="limited"  data-tip="tab-limited" >⏰ Limited</button>
+        <button class="sh-tab" data-tab="avatars"  data-tip="tab-avatars" >🐱 Avatars</button>
+        <button class="sh-tab" data-tab="effects"  data-tip="tab-effects" >✨ Effects</button>
+        <button class="sh-tab" data-tab="passes"   data-tip="tab-passes"  >🎟️ Game Passes</button>
+        <button class="sh-tab" data-tab="rewards"  data-tip="tab-rewards" >🎁 Rewards</button>
+        <button class="sh-tab" data-tab="boosts"   data-tip="tab-boosts"  >⚡ Boosts</button>
       </div>
 
-      <!-- Items Grid -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px" id="shopGrid"></div>
+      <!-- FEATURED -->
+      <div class="sh-panel active" id="panel-featured">
+        <div class="sh-section">
+          <div class="sh-section-title">🌟 Today's Picks</div>
+          <div class="sh-grid" id="grid-featured"></div>
+        </div>
+        <div class="sh-section">
+          <div class="sh-section-title">💰 Coin Deals</div>
+          <div class="sh-grid" id="grid-coin-deals"></div>
+        </div>
+        <div class="sh-section">
+          <div class="sh-section-title">🏆 Win Exclusives</div>
+          <div class="sh-grid" id="grid-win-exclusives"></div>
+        </div>
+      </div>
+
+      <!-- POPULAR -->
+      <div class="sh-panel" id="panel-popular">
+        <div class="sh-section">
+          <div class="sh-section-title">🔥 Most Purchased</div>
+          <div class="sh-grid" id="grid-popular"></div>
+        </div>
+      </div>
+
+      <!-- LIMITED -->
+      <div class="sh-panel" id="panel-limited">
+        <div class="sh-section">
+          <div class="sh-section-title">⏰ Limited Time — Get Them Before They're Gone!</div>
+          <div class="sh-grid" id="grid-limited"></div>
+        </div>
+      </div>
+
+      <!-- AVATARS -->
+      <div class="sh-panel" id="panel-avatars">
+        <div class="sh-section">
+          <div class="sh-section-title">🆓 Free Avatars</div>
+          <div class="sh-grid" id="grid-av-free"></div>
+        </div>
+        <div class="sh-section">
+          <div class="sh-section-title">🔵 Rare</div>
+          <div class="sh-grid" id="grid-av-rare"></div>
+        </div>
+        <div class="sh-section">
+          <div class="sh-section-title">💜 Epic</div>
+          <div class="sh-grid" id="grid-av-epic"></div>
+        </div>
+        <div class="sh-section">
+          <div class="sh-section-title">🌟 Legendary</div>
+          <div class="sh-grid" id="grid-av-legendary"></div>
+        </div>
+      </div>
+
+      <!-- EFFECTS -->
+      <div class="sh-panel" id="panel-effects">
+        <div class="sh-section">
+          <div class="sh-section-title">✨ Profile Effects</div>
+          <div class="sh-list" id="list-effects"></div>
+        </div>
+      </div>
+
+      <!-- GAME PASSES -->
+      <div class="sh-panel" id="panel-passes">
+        <div class="sh-section">
+          <div class="sh-section-title">🎟️ Game Passes — Unlock permanent perks!</div>
+          <div class="sh-list" id="list-passes"></div>
+        </div>
+      </div>
+
+      <!-- REWARDS -->
+      <div class="sh-panel" id="panel-rewards">
+        <div class="sh-section">
+          <div class="sh-section-title">🎁 Claim Rewards</div>
+          <div class="sh-list" id="list-rewards"></div>
+        </div>
+      </div>
+
+      <!-- BOOSTS -->
+      <div class="sh-panel" id="panel-boosts">
+        <div class="sh-section">
+          <div class="sh-section-title">⚡ Active Boosts</div>
+          <div class="sh-list" id="list-boosts"></div>
+        </div>
+      </div>
 
     </main>
+    <nav class="bottom-nav" aria-label="Mobile navigation">
+      <a href="index.html" class="bn-item"><span class="bn-icon">🏠</span>Home</a>
+      <a href="games.html" class="bn-item"><span class="bn-icon">🎮</span>Games</a>
+      <a href="shop.html" class="bn-item active"><span class="bn-icon">🛒</span>Shop</a>
+      <a href="achievements.html" class="bn-item"><span class="bn-icon">🎖️</span>Achiev.</a>
+      <a href="profile.html" class="bn-item"><span class="bn-icon">👤</span>Profile</a>
+    </nav>
   </div>
 </div>
 
-<!-- Toast container -->
-<div id="toastContainer"></div>
-
-<style>
-/* ── Shop tab pills ── */
-.shop-tab {
-  padding: 10px 20px; border-radius: 99px; border: 1px solid var(--border);
-  background: var(--card); color: var(--muted); font-family: var(--font-body);
-  font-weight: 800; font-size: .85rem; cursor: pointer;
-  transition: background .18s, color .18s, border-color .18s;
-}
-.shop-tab.active, .shop-tab:hover {
-  background: rgba(167,139,250,.18); color: var(--purple); border-color: rgba(167,139,250,.4);
-}
-
-/* ── Item card ── */
-.shop-card {
-  background: var(--card); border: 1px solid var(--border); border-radius: var(--r-md);
-  padding: 20px 16px; display: flex; flex-direction: column; align-items: center;
-  gap: 10px; text-align: center; transition: transform .2s, border-color .2s;
-  position: relative;
-}
-.shop-card:hover { transform: translateY(-3px); border-color: rgba(167,139,250,.4); }
-.shop-card.owned { border-color: rgba(74,222,128,.35); }
-.shop-card.equipped { border-color: rgba(253,230,138,.6); box-shadow: 0 0 18px rgba(253,230,138,.18); }
-
-.shop-emoji { font-size: 2.8rem; line-height: 1; }
-.shop-name  { font-family: var(--font-head); font-size: 1rem; color: var(--text); }
-.shop-price { font-weight: 900; font-size: .88rem; color: var(--yellow); }
-
-.rarity-badge {
-  position: absolute; top: 10px; right: 10px;
-  font-size: .58rem; font-weight: 900; padding: 2px 7px; border-radius: 99px;
-  letter-spacing: .5px; text-transform: uppercase;
-}
-.rarity-common    { background: rgba(157,142,199,.15); color: var(--muted); border: 1px solid rgba(157,142,199,.2); }
-.rarity-rare      { background: rgba(79,195,247,.12); color: #4fc3f7; border: 1px solid rgba(79,195,247,.25); }
-.rarity-epic      { background: rgba(167,139,250,.15); color: var(--purple); border: 1px solid rgba(167,139,250,.3); }
-.rarity-legendary { background: rgba(253,230,138,.18); color: var(--yellow); border: 1px solid rgba(253,230,138,.35); }
-
-.shop-btn {
-  width: 100%; padding: 9px; border-radius: var(--r-sm); border: none;
-  font-family: var(--font-body); font-weight: 800; font-size: .82rem;
-  cursor: pointer; transition: transform .15s, opacity .15s;
-}
-.shop-btn:active { transform: scale(.96); }
-.shop-btn-buy    { background: linear-gradient(135deg,#7c3aed,#a78bfa); color: #fff; }
-.shop-btn-own    { background: rgba(74,222,128,.15); color: var(--green); border: 1px solid rgba(74,222,128,.3); cursor: default; }
-.shop-btn-equip  { background: rgba(253,230,138,.15); color: var(--yellow); border: 1px solid rgba(253,230,138,.3); }
-.shop-btn-equipped { background: linear-gradient(135deg,#b45309,#fde68a); color: #1a0800; cursor: default; }
-
-/* Equipped glow on owned-active */
-.shop-card.equipped .shop-emoji { filter: drop-shadow(0 0 8px var(--yellow)); }
-
-/* Can't afford label */
-.cant-buy-label {
-  color: #f87171;
-  font-weight: 900;
-  font-size: .82rem;
-  text-align: center;
-  padding: 7px 10px;
-  border-radius: var(--r-sm);
-  background: rgba(248,113,113,.1);
-  border: 1px solid rgba(248,113,113,.28);
-  width: 100%;
-  line-height: 1.3;
-}
-</style>
 
 <script src="security.js"></script>
 <script src="api.js"></script>
+<script src="script.js"></script>
 <script src="features.js"></script>
 <script src="notifications.js"></script>
+<script src="platform-enhancements.js"></script>
+<script src="user-persist.js"></script>
 <script src="polish.js"></script>
 <script src="admin-button.js"></script>
 <script src="studio-button.js"></script>
-<script>
-/* ══════════════════════════════════════════════════
-   SHOP CATALOG
-══════════════════════════════════════════════════ */
-const CATALOG = {
-  avatars: [
-    { id:'av-cat',     emoji:'🐱', name:'Cat',          price:100,  rarity:'common' },
-    { id:'av-lion',    emoji:'🦁', name:'Lion',         price:200,  rarity:'common' },
-    { id:'av-fox',     emoji:'🦊', name:'Fox',          price:250,  rarity:'common' },
-    { id:'av-panda',   emoji:'🐼', name:'Panda',        price:300,  rarity:'common' },
-    { id:'av-wolf',    emoji:'🐺', name:'Wolf',         price:300,  rarity:'common' },
-    { id:'av-tiger',   emoji:'🐯', name:'Tiger',        price:350,  rarity:'rare' },
-    { id:'av-ghost',   emoji:'👻', name:'Ghost',        price:350,  rarity:'rare' },
-    { id:'av-alien',   emoji:'👾', name:'Alien',        price:400,  rarity:'rare' },
-    { id:'av-robot',   emoji:'🤖', name:'Robot',        price:400,  rarity:'rare' },
-    { id:'av-ninja',   emoji:'🥷', name:'Ninja',        price:450,  rarity:'rare' },
-    { id:'av-wizard',  emoji:'🧙', name:'Wizard',       price:500,  rarity:'rare' },
-    { id:'av-dragon',  emoji:'🐲', name:'Dragon',       price:500,  rarity:'rare' },
-    { id:'av-fire',    emoji:'🔥', name:'Flame',        price:600,  rarity:'epic' },
-    { id:'av-unicorn', emoji:'🦄', name:'Unicorn',      price:600,  rarity:'epic' },
-    { id:'av-diamond', emoji:'💎', name:'Diamond',      price:800,  rarity:'epic' },
-    { id:'av-crown',   emoji:'👑', name:'Crown',        price:1000, rarity:'legendary' },
-  ],
-  badges: [
-    { id:'bg-gamer',   emoji:'🎮', name:'Gamer',        price:300,  rarity:'common' },
-    { id:'bg-star',    emoji:'🌟', name:'Star Player',  price:500,  rarity:'common' },
-    { id:'bg-rocket',  emoji:'🚀', name:'Sky High',     price:450,  rarity:'rare' },
-    { id:'bg-target',  emoji:'🎯', name:'Sharpshooter', price:600,  rarity:'rare' },
-    { id:'bg-fire',    emoji:'🔥', name:'Fire Streak',  price:750,  rarity:'rare' },
-    { id:'bg-brain',   emoji:'🧠', name:'Big Brain',    price:500,  rarity:'rare' },
-    { id:'bg-rainbow', emoji:'🌈', name:'Rainbow',      price:600,  rarity:'rare' },
-    { id:'bg-skull',   emoji:'💀', name:'Survivor',     price:700,  rarity:'epic' },
-    { id:'bg-bolt',    emoji:'⚡', name:'Speed Demon',  price:800,  rarity:'epic' },
-    { id:'bg-diamond', emoji:'💎', name:'Elite',        price:1000, rarity:'epic' },
-    { id:'bg-trophy',  emoji:'🏆', name:'Champion',     price:1200, rarity:'legendary' },
-    { id:'bg-royalty', emoji:'👑', name:'Royalty',      price:1500, rarity:'legendary' },
-  ],
-  effects: [
-    { id:'ef-sparkle',  emoji:'✨', name:'Sparkle',       price:5,  rarity:'common', winsPrice:true },
-    { id:'ef-blossom',  emoji:'🌸', name:'Blossom',       price:8,  rarity:'rare',   winsPrice:true },
-    { id:'ef-wave',     emoji:'🌊', name:'Ocean Wave',    price:8,  rarity:'rare',   winsPrice:true },
-    { id:'ef-frost',    emoji:'❄️', name:'Frost Aura',   price:10, rarity:'rare',   winsPrice:true },
-    { id:'ef-toxic',    emoji:'☣️', name:'Toxic',        price:10, rarity:'rare',   winsPrice:true },
-    { id:'ef-electric', emoji:'⚡', name:'Electric',     price:15, rarity:'epic',   winsPrice:true },
-    { id:'ef-firework', emoji:'🎆', name:'Fireworks',    price:15, rarity:'epic',   winsPrice:true },
-    { id:'ef-rainbow',  emoji:'🌈', name:'Rainbow Trail', price:20, rarity:'epic',   winsPrice:true },
-  ],
-  boosts: [
-    { id:'bo-luck',    emoji:'🍀', name:'Lucky Charm',     price:2,  rarity:'common', consumable:true, winsPrice:true },
-    { id:'bo-spin',    emoji:'🎡', name:'Extra Spin',      price:2,  rarity:'common', consumable:true, winsPrice:true },
-    { id:'bo-shield',  emoji:'🛡️', name:'Shield (1 game)',price:3,  rarity:'common', consumable:true, winsPrice:true },
-    { id:'bo-2x',      emoji:'⚡', name:'2× Coins (1hr)', price:5,  rarity:'rare',   consumable:true, winsPrice:true },
-    { id:'bo-magnet',  emoji:'🧲', name:'Coin Magnet',     price:7,  rarity:'rare',   consumable:true, winsPrice:true },
-    { id:'bo-5x',      emoji:'💥', name:'5× Coins (30m)', price:10, rarity:'epic',   consumable:true, winsPrice:true },
-  ],
-};
-
-/* ── State helpers ── */
-function getUser() {
-  try { return JSON.parse(localStorage.getItem('eylox_user')); } catch { return null; }
-}
-function saveUser(u) { localStorage.setItem('eylox_user', JSON.stringify(u)); }
-function getOwned()    { try { return JSON.parse(localStorage.getItem('eylox_owned_items') || '[]'); } catch { return []; } }
-function getEquipped() { try { return JSON.parse(localStorage.getItem('eylox_equipped')    || '{}'); } catch { return {}; } }
-
-/* ── Persist shop state under a per-user key so it survives re-login ── */
-function saveShopSnapshot() {
-  try {
-    const u = getUser();
-    if (!u?.username) return;
-    const snapshot = {
-      owned:     JSON.parse(localStorage.getItem('eylox_owned_items') || '[]'),
-      equipped:  JSON.parse(localStorage.getItem('eylox_equipped')    || '{}'),
-      inventory: JSON.parse(localStorage.getItem('eylox_inventory')   || '{}'),
-    };
-    localStorage.setItem('eylox_shopdata_' + u.username, JSON.stringify(snapshot));
-  } catch {}
-}
-
-const MAX_COINS = 1_000_000_000; // 1 billion cap
-
-function getCoins() {
-  const u = getUser();
-  return Math.min(u?.coins ?? 100, MAX_COINS);
-}
-function deductCoins(n) {
-  const u = getUser();
-  if (!u) return false;
-  const current = Math.min(u.coins || 0, MAX_COINS);
-  if (current < n) return false;
-  u.coins = current - n;
-  saveUser(u);
-  return true;
-}
-function addCoins(n) {
-  const u = getUser();
-  if (!u) return;
-  u.coins = Math.min((u.coins || 0) + n, MAX_COINS);
-  saveUser(u);
-  refreshCoins();
-}
-
-function getWins() {
-  const u = getUser();
-  return Math.max(0, Math.floor(u?.wins ?? 0));
-}
-function deductWins(n) {
-  const u = getUser();
-  if (!u) return false;
-  const current = Math.max(0, Math.floor(u.wins || 0));
-  if (current < n) return false;
-  u.wins = current - n;
-  saveUser(u);
-  return true;
-}
-
-/* ══════════════════════════════════════════════
-   BOOST ACTIVATION SYSTEM
-══════════════════════════════════════════════ */
-const BOOST_EFFECTS = {
-  'bo-luck':   { label:'Lucky Charm',   duration: 0,        effect: 'luck',      desc:'Your next game gives +50% wins chance!', icon:'🍀', oneShot: true },
-  'bo-spin':   { label:'Extra Spin',    duration: 0,        effect: 'spin',      desc:'Instantly awarded 100 bonus Eylux!',    icon:'🎡', oneShot: true },
-  'bo-shield': { label:'Shield',        duration: 0,        effect: 'shield',    desc:'You\'re protected from coin loss next game!', icon:'🛡️', oneShot: true },
-  'bo-2x':     { label:'2× Coins',      duration: 3600000,  effect: 'coins_2x',  desc:'2× coins earned for 1 hour!',           icon:'⚡', multiplier: 2 },
-  'bo-magnet': { label:'Coin Magnet',   duration: 3600000,  effect: 'magnet',    desc:'Auto-collecting coins for 1 hour!',     icon:'🧲' },
-  'bo-5x':     { label:'5× Coins',      duration: 1800000,  effect: 'coins_5x',  desc:'5× coins earned for 30 minutes!',       icon:'💥', multiplier: 5 },
-};
-
-function getActiveBoosts() {
-  try {
-    const raw = JSON.parse(localStorage.getItem('eylox_active_boosts') || '{}');
-    const now = Date.now();
-    const clean = {};
-    Object.entries(raw).forEach(([k, v]) => {
-      if (v.expiresAt === 0 || v.expiresAt > now) clean[k] = v;
-    });
-    if (JSON.stringify(clean) !== JSON.stringify(raw)) localStorage.setItem('eylox_active_boosts', JSON.stringify(clean));
-    return clean;
-  } catch { return {}; }
-}
-function isBoostActive(id) { return !!getActiveBoosts()[id]; }
-
-function activateBoost(id, emoji, name) {
-  const inv = JSON.parse(localStorage.getItem('eylox_inventory') || '{}');
-  if (!inv[id] || inv[id] < 1) { toast('❌ You don\'t have this boost!', 'pink'); return; }
-
-  const effect = BOOST_EFFECTS[id];
-  if (!effect) return;
-
-  /* Deduct from inventory */
-  inv[id]--;
-  if (inv[id] <= 0) delete inv[id];
-  localStorage.setItem('eylox_inventory', JSON.stringify(inv));
-
-  /* One-shot effects */
-  if (effect.oneShot) {
-    if (effect.effect === 'spin') {
-      localStorage.setItem('eylox_pending_spin', '1');
-      toast(`🎡 Extra Spin unlocked! Redirecting to spin wheel…`, 'green');
-      setTimeout(() => { window.location.href = 'index.html#spin'; }, 900);
-      return;
-    } else if (effect.effect === 'luck') {
-      const active = getActiveBoosts();
-      active[id] = { expiresAt: 0, effect: effect.effect, oneShot: true };
-      localStorage.setItem('eylox_active_boosts', JSON.stringify(active));
-      toast(`🍀 Lucky Charm active! Next game is lucky!`, 'green');
-    } else if (effect.effect === 'shield') {
-      const active = getActiveBoosts();
-      active[id] = { expiresAt: 0, effect: effect.effect, oneShot: true };
-      localStorage.setItem('eylox_active_boosts', JSON.stringify(active));
-      toast(`🛡️ Shield active! You're protected next game!`, 'green');
-    }
-  } else {
-    /* Timed boost */
-    const active = getActiveBoosts();
-    active[id] = { expiresAt: Date.now() + effect.duration, effect: effect.effect, multiplier: effect.multiplier || 1 };
-    localStorage.setItem('eylox_active_boosts', JSON.stringify(active));
-    toast(`${emoji} ${name} activated! ${effect.desc}`, 'green');
-  }
-
-  window.EyloxSFX?.boost();
-  renderActiveBoostsBanner();
-  renderGrid(currentCat);
-  refreshOwned();
-}
-
-function renderActiveBoostsBanner() {
-  const active = getActiveBoosts();
-  const ids = Object.keys(active);
-  let banner = document.getElementById('activeBoostsBanner');
-  if (!ids.length) { if (banner) banner.style.display = 'none'; return; }
-  if (!banner) {
-    banner = document.createElement('div');
-    banner.id = 'activeBoostsBanner';
-    banner.style.cssText = 'background:linear-gradient(135deg,rgba(74,222,128,.12),rgba(45,212,191,.08));border:1px solid rgba(74,222,128,.25);border-radius:var(--r-md);padding:12px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap';
-    document.querySelector('.page-content main, .page-content')?.prepend(banner);
-  }
-  banner.style.display = 'flex';
-  banner.innerHTML = `<span style="font-size:.7rem;font-weight:900;color:#4ade80;text-transform:uppercase;letter-spacing:.8px;white-space:nowrap">⚡ Active Boosts</span>` +
-    ids.map(id => {
-      const b = active[id];
-      const e = BOOST_EFFECTS[id];
-      const timeLeft = b.expiresAt > 0 ? Math.ceil((b.expiresAt - Date.now()) / 60000) + 'm left' : 'Active';
-      return `<span style="background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.3);color:#4ade80;padding:5px 12px;border-radius:99px;font-size:.75rem;font-weight:800">${e?.icon || '⚡'} ${e?.label || id} · ${timeLeft}</span>`;
-    }).join('');
-}
-
-/* ── Toast ── */
-function toast(msg, type = 'green') {
-  const c = document.getElementById('toastContainer');
-  if (!c) return;
-  const t = document.createElement('div');
-  t.className = 'toast ' + type;
-  t.textContent = msg;
-  c.appendChild(t);
-  setTimeout(() => t.remove(), 3200);
-}
-
-/* ── Refresh coin displays ── */
-function refreshCoins() {
-  const c = getCoins();
-  const fmt = Number(c).toLocaleString();
-  document.getElementById('heroCoins').textContent = fmt;
-  document.getElementById('topbarCoins').textContent = fmt;
-  document.getElementById('sidebarCoins').textContent = fmt;
-  const tbAll = document.querySelectorAll('.tb-coins span, .coins-amount');
-  tbAll.forEach(el => { if (el.id !== 'topbarCoins' && el.id !== 'sidebarCoins') el.textContent = fmt; });
-}
-
-/* ── Refresh wins display ── */
-function refreshWins() {
-  const w = getWins();
-  const fmt = Number(w).toLocaleString();
-  document.getElementById('heroWins').textContent = fmt;
-  document.querySelectorAll('.trophies-amount').forEach(el => el.textContent = fmt);
-  const topT = document.getElementById('topbarTrophies');
-  if (topT) topT.textContent = fmt;
-}
-
-/* ── Refresh owned count ── */
-function refreshOwned() {
-  document.getElementById('heroOwned').textContent = getOwned().length;
-}
-
-/* ── Render shop grid ── */
-let currentCat = 'avatars';
-function renderGrid(cat) {
-  currentCat = cat;
-  const items = CATALOG[cat] || [];
-  const owned = getOwned();
-  const equipped = getEquipped();
-  const q = document.getElementById('shopSearch')?.value.toLowerCase() || '';
-
-  const filtered = q ? items.filter(i => i.name.toLowerCase().includes(q) || i.emoji.includes(q)) : items;
-
-  document.getElementById('shopGrid').innerHTML = filtered.map(item => {
-    const isOwned    = owned.includes(item.id);
-    const isEquipped = equipped[cat] === item.id;
-    const useWins    = !!item.winsPrice;
-    const canAfford  = useWins ? getWins() >= item.price : getCoins() >= item.price;
-    const priceIcon  = useWins
-      ? `<span style="font-size:1rem;vertical-align:middle">🏆</span>`
-      : `<img src="eylux-coin.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;margin-right:2px">`;
-    const priceIconSm = useWins
-      ? `<span style="font-size:.85rem;vertical-align:middle">🏆</span>`
-      : `<img src="eylux-coin.png" style="width:13px;height:13px;object-fit:contain;vertical-align:middle">`;
-    const currencyLabel = useWins ? 'Wins' : 'Eylux';
-
-    let btnHtml = '';
-    const inv = JSON.parse(localStorage.getItem('eylox_inventory') || '{}');
-    const invQty = inv[item.id] || 0;
-    const isActive = isBoostActive(item.id);
-
-    if (isEquipped) {
-      btnHtml = `<button class="shop-btn shop-btn-equipped" disabled>✓ Equipped</button>`;
-    } else if (cat === 'boosts' && invQty > 0) {
-      const boostLabel = isActive ? '⚡ Active!' : `Use ×${invQty}`;
-      btnHtml = `<button class="shop-btn ${isActive ? 'shop-btn-equipped' : 'shop-btn-equip'}" ${isActive ? 'disabled' : `onclick="activateBoost('${item.id}','${item.emoji}','${item.name}')"`}>${boostLabel}</button>
-        <button class="shop-btn shop-btn-buy" style="margin-top:4px" onclick="buyItem('${cat}','${item.id}',${item.price},'${item.emoji}','${item.name}')">${priceIcon} ${item.price.toLocaleString()}</button>`;
-    } else if (isOwned && cat !== 'boosts') {
-      btnHtml = `<button class="shop-btn shop-btn-equip" onclick="equipItem('${cat}','${item.id}','${item.emoji}')">Equip →</button>`;
-    } else if (!canAfford) {
-      btnHtml = `
-        <div class="cant-buy-label">Not enough ${currencyLabel}!</div>
-        <div style="font-size:.72rem;color:var(--muted);font-weight:700;margin-top:2px">${priceIconSm} ${item.price.toLocaleString()} ${currencyLabel}</div>`;
-    } else {
-      btnHtml = `<button class="shop-btn shop-btn-buy" onclick="buyItem('${cat}','${item.id}',${item.price},'${item.emoji}','${item.name}')">${priceIcon} ${item.price.toLocaleString()} ${currencyLabel}</button>`;
-    }
-
-    return `
-    <div class="shop-card${isOwned||invQty>0?' owned':''}${isEquipped?' equipped':''}${isActive?' active-boost':''}">
-      <span class="rarity-badge rarity-${item.rarity}">${item.rarity}</span>
-      ${item.consumable ? `<span style="position:absolute;top:10px;left:10px;font-size:.58rem;font-weight:900;color:var(--teal);background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.25);padding:2px 7px;border-radius:99px;text-transform:uppercase;letter-spacing:.5px">×${invQty||0}</span>` : ''}
-      <div class="shop-emoji">${item.emoji}</div>
-      <div class="shop-name">${item.name}</div>
-      ${isActive ? `<div style="font-size:.68rem;font-weight:900;color:#4ade80;margin-bottom:2px" data-boost-timer="${item.id}"></div>` : ''}
-      ${btnHtml}
-    </div>`;
-  }).join('') || `<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--muted);font-weight:800">No items found 🔍</div>`;
-}
-
-/* ── Buy item ── */
-function buyItem(cat, id, price, emoji, name) {
-  const item = CATALOG[cat].find(i => i.id === id);
-  const useWins = !!item?.winsPrice;
-
-  if (useWins) {
-    if (getWins() < price) {
-      toast(`❌ Not enough wins! Need ${price} 🏆`, 'pink');
-      return;
-    }
-    if (!deductWins(price)) { toast('❌ Purchase failed', 'pink'); return; }
-  } else {
-    if (getCoins() < price) {
-      toast(`❌ Not enough Eylux! Need ${price.toLocaleString()} 🪙`, 'pink');
-      return;
-    }
-    if (!deductCoins(price)) { toast('❌ Purchase failed', 'pink'); return; }
-  }
-
-  /* Add to owned (unless consumable boost) */
-  if (!item?.consumable) {
-    const owned = getOwned();
-    if (!owned.includes(id)) owned.push(id);
-    localStorage.setItem('eylox_owned_items', JSON.stringify(owned));
-    /* Auto-equip if it's an avatar */
-    if (cat === 'avatars') equipItem(cat, id, emoji, true);
-  } else {
-    /* consumable: add to inventory */
-    const inv = JSON.parse(localStorage.getItem('eylox_inventory') || '{}');
-    inv[id] = (inv[id] || 0) + 1;
-    localStorage.setItem('eylox_inventory', JSON.stringify(inv));
-  }
-
-  refreshCoins();
-  refreshWins();
-  refreshOwned();
-  saveShopSnapshot();                    /* ← persist so re-login keeps purchases */
-  renderGrid(currentCat);
-  window.EyloxSFX?.purchase();
-  const currencyStr = useWins ? `${price} 🏆 wins` : `🪙 ${price.toLocaleString()} Eylux`;
-  toast(`✅ Bought ${emoji} ${name}!`, 'green');
-  Notifs.push('🛒 Purchase Complete', `You bought ${emoji} ${name} for ${currencyStr}!`, 'shop');
-
-  /* Burst animation on the spent currency display */
-  const heroNum = document.getElementById(useWins ? 'heroWins' : 'heroCoins');
-  if (heroNum) { heroNum.style.transform = 'scale(1.35)'; setTimeout(() => { heroNum.style.transform = ''; }, 220); }
-}
-
-/* ── Equip item ── */
-function equipItem(cat, id, emoji, silent = false) {
-  const equipped = getEquipped();
-  equipped[cat] = id;
-  localStorage.setItem('eylox_equipped', JSON.stringify(equipped));
-
-  /* Apply avatar immediately to user profile */
-  if (cat === 'avatars') {
-    const u = getUser();
-    if (u) { u.avatar = emoji; saveUser(u); }
-    document.querySelectorAll('.tb-avatar').forEach(el => {
-      const dot = el.querySelector('.online-dot');
-      el.textContent = emoji;
-      if (dot) el.appendChild(dot);
-    });
-  }
-
-  /* Apply visual effect immediately */
-  if (cat === 'effects') {
-    window.EyloxApplyEffect?.(id);
-  }
-
-  saveShopSnapshot();                    /* ← persist equipped state too */
-  renderGrid(currentCat);
-  if (!silent) { window.EyloxSFX?.equip(); toast(`✅ ${emoji} equipped!`, 'yellow'); }
-}
-
-/* ── Tab switching ── */
-document.getElementById('catTabs').addEventListener('click', e => {
-  const btn = e.target.closest('.shop-tab');
-  if (!btn) return;
-  document.querySelectorAll('.shop-tab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderGrid(btn.dataset.cat);
-});
-
-/* ── Search ── */
-document.getElementById('shopSearch').addEventListener('input', () => renderGrid(currentCat));
-
-/* ── Menu button ── */
-document.getElementById('menuBtn').addEventListener('click', () => {
-  const s = document.getElementById('sidebar');
-  const o = document.getElementById('sidebarOverlay');
-  s.classList.toggle('open');
-  o.classList.toggle('show');
-});
-document.getElementById('sidebarOverlay').addEventListener('click', () => {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarOverlay').classList.remove('show');
-});
-
-/* ── Boot ── */
-document.addEventListener('DOMContentLoaded', () => {
-  refreshCoins();
-  refreshWins();
-  refreshOwned();
-  renderGrid('avatars');
-  renderActiveBoostsBanner();
-  /* Live countdown on boost timers */
-  setInterval(() => {
-    document.querySelectorAll('[data-boost-timer]').forEach(el => {
-      const id = el.dataset.boostTimer;
-      const b = getActiveBoosts()[id];
-      if (!b) { el.textContent = ''; return; }
-      if (b.expiresAt === 0) { el.textContent = '● Active'; return; }
-      const mins = Math.ceil((b.expiresAt - Date.now()) / 60000);
-      el.textContent = mins > 0 ? `⏱ ${mins}m left` : 'Expired';
-    });
-  }, 5000);
-});
-</script>
+<script src="extras.js"></script>
 <script src="effects.js"></script>
 <script src="sound.js"></script>
 <script src="settings.js"></script>
+<script src="quick-access.js"></script>
+<script src="sidebar-links.js"></script>
+<script src="sidebar-collapse.js"></script>
+<script src="friends-local.js"></script>
+<script src="theme-switcher.js"></script>
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════
+   SHOP DATA
+══════════════════════════════════════════ */
+
+const AVATARS = [
+  /* Free */
+  { id:'cat',      emoji:'🐱', name:'Cat',         rarity:'common',    coinPrice:0,    winPrice:0 },
+  { id:'lion',     emoji:'🦁', name:'Lion',        rarity:'common',    coinPrice:0,    winPrice:0 },
+  { id:'fox',      emoji:'🦊', name:'Fox',         rarity:'common',    coinPrice:0,    winPrice:0 },
+  { id:'panda',    emoji:'🐼', name:'Panda',       rarity:'common',    coinPrice:0,    winPrice:0 },
+  { id:'wolf',     emoji:'🐺', name:'Wolf',        rarity:'common',    coinPrice:0,    winPrice:0 },
+  { id:'penguin',  emoji:'🐧', name:'Penguin',     rarity:'common',    coinPrice:0,    winPrice:0 },
+  { id:'frog',     emoji:'🐸', name:'Frog',        rarity:'common',    coinPrice:0,    winPrice:0 },
+  { id:'bear',     emoji:'🐻', name:'Bear',        rarity:'common',    coinPrice:0,    winPrice:0 },
+  /* Rare */
+  { id:'tiger',    emoji:'🐯', name:'Tiger',       rarity:'rare',      coinPrice:500,  winPrice:5 },
+  { id:'ghost',    emoji:'👻', name:'Ghost',       rarity:'rare',      coinPrice:500,  winPrice:5 },
+  { id:'alien',    emoji:'👾', name:'Alien',       rarity:'rare',      coinPrice:600,  winPrice:6 },
+  { id:'robot',    emoji:'🤖', name:'Robot',       rarity:'rare',      coinPrice:600,  winPrice:6 },
+  { id:'ninja',    emoji:'🥷', name:'Ninja',       rarity:'rare',      coinPrice:750,  winPrice:7 },
+  { id:'wizard',   emoji:'🧙', name:'Wizard',      rarity:'rare',      coinPrice:750,  winPrice:7 },
+  { id:'dragon',   emoji:'🐉', name:'Dragon',      rarity:'rare',      coinPrice:800,  winPrice:8 },
+  { id:'shark',    emoji:'🦈', name:'Shark',       rarity:'rare',      coinPrice:700,  winPrice:7 },
+  { id:'owl',      emoji:'🦉', name:'Wise Owl',    rarity:'rare',      coinPrice:650,  winPrice:6 },
+  { id:'phoenix',  emoji:'🦅', name:'Phoenix',     rarity:'rare',      coinPrice:800,  winPrice:8 },
+  /* Epic */
+  { id:'flame',    emoji:'🔥', name:'Flame God',   rarity:'epic',      coinPrice:1500, winPrice:15 },
+  { id:'unicorn',  emoji:'🦄', name:'Unicorn',     rarity:'epic',      coinPrice:1500, winPrice:15 },
+  { id:'diamond',  emoji:'💎', name:'Diamond',     rarity:'epic',      coinPrice:2000, winPrice:20 },
+  { id:'storm',    emoji:'⚡', name:'Storm',       rarity:'epic',      coinPrice:1800, winPrice:18 },
+  { id:'angel',    emoji:'😇', name:'Angel',       rarity:'epic',      coinPrice:1600, winPrice:16 },
+  { id:'demon',    emoji:'😈', name:'Demon',       rarity:'epic',      coinPrice:1700, winPrice:17 },
+  { id:'crystal',  emoji:'🔮', name:'Crystal',     rarity:'epic',      coinPrice:2000, winPrice:20 },
+  /* Legendary */
+  { id:'crown',    emoji:'👑', name:'Royal Crown', rarity:'legendary', coinPrice:5000, winPrice:50 },
+  { id:'galaxy',   emoji:'🌌', name:'Galaxy',      rarity:'legendary', coinPrice:6000, winPrice:60 },
+  { id:'godmode',  emoji:'☀️', name:'God Mode',    rarity:'legendary', coinPrice:8000, winPrice:80 },
+  { id:'eylox_ex', emoji:'💠', name:'Eylox Elite', rarity:'legendary', coinPrice:10000,winPrice:100 },
+];
+
+const EFFECTS = [
+  { id:'fx_sparkle',  emoji:'✨', name:'Sparkle Trail',  desc:'Leaves a trail of sparkles as you move.',        coinPrice:800,  winPrice:8 },
+  { id:'fx_fire',     emoji:'🔥', name:'Fire Aura',      desc:'Surround yourself with blazing fire effects.',    coinPrice:1200, winPrice:12 },
+  { id:'fx_rainbow',  emoji:'🌈', name:'Rainbow Glow',   desc:'A rainbow glow radiates from your avatar.',      coinPrice:2500, winPrice:25 },
+  { id:'fx_lightning',emoji:'⚡', name:'Lightning Ring', desc:'Electric sparks crackle around you.',            coinPrice:1800, winPrice:18 },
+  { id:'fx_snow',     emoji:'❄️', name:'Frost Halo',    desc:'A frosty halo of snow and ice.',                 coinPrice:1400, winPrice:14 },
+  { id:'fx_star',     emoji:'⭐', name:'Star Burst',     desc:'Stars explode around you with every action.',    coinPrice:1600, winPrice:16 },
+  { id:'fx_dark',     emoji:'🌑', name:'Dark Matter',    desc:'Mysterious dark energy swirls around you.',      coinPrice:3000, winPrice:30 },
+  { id:'fx_gold',     emoji:'🌟', name:'Golden Aura',    desc:'You shine with a divine golden light.',           coinPrice:4000, winPrice:40 },
+  { id:'fx_neon',     emoji:'💜', name:'Neon Wave',      desc:'Animated neon waves pulse around your avatar.',  coinPrice:2200, winPrice:22 },
+  { id:'fx_bubble',   emoji:'🫧', name:'Bubble Shield',  desc:'Protective translucent bubbles float around you.',coinPrice:1000, winPrice:10 },
+];
+
+const GAME_PASSES = [
+  { id:'gp_xp2x',    emoji:'⚡', name:'XP Booster Pass',       desc:'Earn 2× XP in every game, permanently. Perfect for leveling up fast!', coinPrice:3000, winPrice:30, tag:'2× XP Forever' },
+  { id:'gp_coinrain', emoji:'💰', name:'Coin Magnet Pass',      desc:'Earn 25% more coins from every game you play. Stack up your wealth!',  coinPrice:2500, winPrice:25, tag:'+25% Coins' },
+  { id:'gp_vip',     emoji:'💎', name:'VIP Pass',              desc:'VIP badge, exclusive chat color, and priority matchmaking.',           coinPrice:5000, winPrice:50, tag:'VIP Status' },
+  { id:'gp_creator', emoji:'🛠️', name:'Creator Pass',          desc:'Unlock all Studio features, unlimited game publishing, and analytics.', coinPrice:2000, winPrice:20, tag:'Studio Unlock' },
+  { id:'gp_squad',   emoji:'👥', name:'Squad Leader Pass',     desc:'Create squads with up to 20 members instead of 10. Lead bigger teams!',coinPrice:1500, winPrice:15, tag:'20-Member Squads' },
+  { id:'gp_events',  emoji:'🎟️', name:'Event Priority Pass',  desc:'Join events 10 minutes early and get bonus rewards when you win.',    coinPrice:2800, winPrice:28, tag:'Early Access' },
+  { id:'gp_respawn', emoji:'❤️', name:'Extra Life Pass',       desc:'Get 3 extra respawns in 3D games before being knocked out.',          coinPrice:1800, winPrice:18, tag:'+3 Lives' },
+  { id:'gp_speed',   emoji:'🚀', name:'Speed Demon Pass',      desc:'Move 15% faster than other players in 3D worlds. They can\'t catch you!',coinPrice:3500, winPrice:35, tag:'+15% Speed' },
+];
+
+const REWARDS = [
+  { id:'rw_starter',  emoji:'🎁', name:'Starter Pack',     desc:'100 Coins + Sparkle effect + Cat avatar.', coinPrice:0, winPrice:0, claimable:true, oneTime:true },
+  { id:'rw_levelup',  emoji:'🏅', name:'Level Up Reward',  desc:'Claim 150 coins for reaching Level 5.',    coinPrice:0, winPrice:0, claimable:true, oneTime:true, reqLevel:5 },
+  { id:'rw_winner',   emoji:'🏆', name:'First Win Pack',   desc:'Claim 200 💰 + 2 🏆 Wins for your first 3D Win!', coinPrice:0, winPrice:0, claimable:true, oneTime:true, reqWins:1 },
+  { id:'rw_gamer',    emoji:'🎮', name:'Gamer Pack',        desc:'Claim Dragon avatar + 300 coins for playing 10 games.', coinPrice:0, winPrice:0, claimable:true, oneTime:true, reqGames:10 },
+  { id:'rw_loyal',    emoji:'📅', name:'Loyalty Reward',   desc:'Claim 500 💰 + 3 🏆 Wins for a 7-day login streak!', coinPrice:0, winPrice:0, claimable:true, oneTime:true, reqStreak:7 },
+  { id:'rw_veteran',  emoji:'⚔️', name:'Veteran Pack',     desc:'Claim Crown avatar + 1000 💰 + 10 🏆 Wins for 50 wins!', coinPrice:0, winPrice:0, claimable:true, oneTime:true, reqWins:50 },
+];
+
+const BOOSTS = [
+  { id:'boost_luck',    emoji:'🍀', name:'Lucky Charm',      desc:'Double coin drops for 24 hours. Roll in the money!',       coinPrice:200, winPrice:2, duration:'24h' },
+  { id:'boost_shield',  emoji:'🛡️', name:'Streak Shield',    desc:'Protect your win streak from breaking for 24 hours.',      coinPrice:300, winPrice:3, duration:'24h' },
+  { id:'boost_xp',      emoji:'⚡', name:'XP Rush',          desc:'Earn 2× XP from all games for 1 hour. Grind hard!',        coinPrice:400, winPrice:4, duration:'1h' },
+  { id:'boost_coin2x',  emoji:'💰', name:'Coin Rush',        desc:'Double coins from 2D games for 2 hours.',                  coinPrice:350, winPrice:3, duration:'2h' },
+  { id:'boost_speed',   emoji:'🚀', name:'Speed Boost',      desc:'Move 20% faster in 3D worlds for 30 minutes.',             coinPrice:250, winPrice:2, duration:'30m' },
+  { id:'boost_magnet',  emoji:'🧲', name:'Coin Magnet',      desc:'Automatically pull nearby coins in 3D games. 1 hour.',     coinPrice:300, winPrice:3, duration:'1h' },
+  { id:'boost_vision',  emoji:'👁️', name:'Eagle Eye',        desc:'See enemies and hazards earlier in all games. 1 hour.',   coinPrice:450, winPrice:4, duration:'1h' },
+  { id:'boost_respawn', emoji:'❤️', name:'Respawn Token',    desc:'1 free respawn in any 3D game. Single use.',               coinPrice:150, winPrice:1, duration:'1 use' },
+];
+
+const LIMITED_ITEMS = [
+  { id:'lim_halloween', emoji:'🎃', name:'Halloween Ghost',   rarity:'limited', desc:'Spooky limited avatar!',    coinPrice:1200, winPrice:12, endsIn:'3 days' },
+  { id:'lim_champion',  emoji:'🏆', name:'Champion Eyltroph',   rarity:'limited', desc:'Win 10 games to earn this.', coinPrice:0,    winPrice:10, endsIn:'5 days' },
+  { id:'lim_cosmic',    emoji:'🌠', name:'Cosmic Drift',      rarity:'limited', desc:'Rare cosmic effect.',        coinPrice:3500, winPrice:35, endsIn:'2 days' },
+  { id:'lim_neon_kit',  emoji:'🌃', name:'Neon City Kit',     rarity:'limited', desc:'Full neon cosmetic bundle.', coinPrice:4000, winPrice:40, endsIn:'Today' },
+  { id:'lim_golden',    emoji:'🌟', name:'Golden Wings',      rarity:'limited', desc:'Exclusive golden effect.',   coinPrice:2800, winPrice:28, endsIn:'4 days' },
+  { id:'lim_shadow',    emoji:'🌑', name:'Shadow Master',     rarity:'limited', desc:'Dark shadow avatar pack.',   coinPrice:2200, winPrice:22, endsIn:'1 day' },
+];
+
+/* ══════════════════════════════════════════
+   STATE & HELPERS
+══════════════════════════════════════════ */
+function getUser()     { try { return JSON.parse(localStorage.getItem('eylox_user')||'{}'); } catch { return {}; } }
+function saveUser(u)   { localStorage.setItem('eylox_user', JSON.stringify(u)); window.dispatchEvent(new StorageEvent('storage',{key:'eylox_user'})); }
+function getInventory(){ try { return JSON.parse(localStorage.getItem('eylox_inventory')||'[]'); } catch { return []; } }
+function saveInventory(inv){ localStorage.setItem('eylox_inventory', JSON.stringify(inv)); }
+function getClaimed()  { try { return JSON.parse(localStorage.getItem('eylox_claimed_rewards')||'[]'); } catch { return []; } }
+function saveClaimed(c){ localStorage.setItem('eylox_claimed_rewards', JSON.stringify(c)); }
+
+function isOwned(id) {
+  const u = getUser();
+  if (u.username?.toLowerCase() === 'eylox') return true;
+  const av = AVATARS.find(a => a.id === id);
+  if (av && av.rarity === 'common') return true;
+  return getInventory().includes(id);
+}
+function isEquipped(id) {
+  const u = getUser(); const av = AVATARS.find(a => a.id === id);
+  return av ? u.avatar === av.emoji : false;
+}
+
+function buyWithCoins(id) {
+  const u = getUser();
+  const allItems = [...AVATARS, ...EFFECTS, ...GAME_PASSES, ...BOOSTS, ...LIMITED_ITEMS];
+  const item = allItems.find(i => i.id === id);
+  if (!item || !item.coinPrice) return;
+  if ((u.coins||0) < item.coinPrice) {
+    showToast(`Need ${item.coinPrice.toLocaleString()} 💰 coins! You have ${(u.coins||0).toLocaleString()}.`, 'warn'); return;
+  }
+  u.coins = (u.coins||0) - item.coinPrice;
+  saveUser(u); addToInventory(id);
+  spawnBuyEffect(item.emoji || '🛍️', item.coinPrice + ' coins');
+  showToast(`✅ Bought: ${item.name}!`, 'success');
+}
+
+function buyWithWins(id) {
+  const u = getUser();
+  const allItems = [...AVATARS, ...EFFECTS, ...GAME_PASSES, ...BOOSTS, ...LIMITED_ITEMS];
+  const item = allItems.find(i => i.id === id);
+  if (!item || !item.winPrice) return;
+  if ((u.wins||0) < item.winPrice) {
+    showToast(`Need ${item.winPrice} 🏆 wins! You have ${(u.wins||0)}.`, 'warn'); return;
+  }
+  u.wins = (u.wins||0) - item.winPrice;
+  saveUser(u); addToInventory(id);
+  spawnBuyEffect(item.emoji || '🏆', item.winPrice + ' wins');
+  showToast(`✅ Bought: ${item.name} with Wins!`, 'success');
+}
+
+function addToInventory(id) {
+  const inv = getInventory();
+  if (!inv.includes(id)) inv.push(id);
+  saveInventory(inv);
+  render();
+}
+
+function equipAvatar(id) {
+  const av = AVATARS.find(a => a.id === id);
+  if (!av) return;
+  const u = getUser(); u.avatar = av.emoji; saveUser(u);
+  showToast(`${av.emoji} ${av.name} equipped!`, 'success');
+  render();
+}
+
+function claimReward(id) {
+  const reward = REWARDS.find(r => r.id === id);
+  if (!reward) return;
+  const claimed = getClaimed();
+  if (claimed.includes(id)) { showToast('Already claimed!', 'info'); return; }
+  const u = getUser();
+  /* Check requirements */
+  if (reward.reqLevel  && (u.level||1) < reward.reqLevel)  { showToast(`Reach Level ${reward.reqLevel} first!`, 'warn'); return; }
+  if (reward.reqWins   && (u.wins||0)  < reward.reqWins)   { showToast(`Get ${reward.reqWins} win(s) first!`, 'warn'); return; }
+  if (reward.reqGames  && (u.gamesPlayed||0) < reward.reqGames) { showToast(`Play ${reward.reqGames} games first!`, 'warn'); return; }
+  if (reward.reqStreak && (u.loginStreak||0) < reward.reqStreak) { showToast(`Login ${reward.reqStreak} days in a row first!`, 'warn'); return; }
+  /* Grant */
+  if (id === 'rw_starter') { u.coins=(u.coins||0)+100; addToInventory('cat'); addToInventory('fx_sparkle'); }
+  if (id === 'rw_levelup') { u.coins=(u.coins||0)+150; }
+  if (id === 'rw_winner')  { u.coins=(u.coins||0)+200; u.wins=(u.wins||0)+2; }
+  if (id === 'rw_gamer')   { u.coins=(u.coins||0)+300; addToInventory('dragon'); }
+  if (id === 'rw_loyal')   { u.coins=(u.coins||0)+500; u.wins=(u.wins||0)+3; }
+  if (id === 'rw_veteran') { u.coins=(u.coins||0)+1000; u.wins=(u.wins||0)+10; addToInventory('crown'); }
+  saveUser(u);
+  claimed.push(id); saveClaimed(claimed);
+  spawnBuyEffect('🎁', 'Reward!');
+  /* Announce wins/coins gained */
+  const winsGained = { rw_winner:2, rw_loyal:3, rw_veteran:10 }[id] || 0;
+  const coinsGained = { rw_starter:100, rw_levelup:150, rw_winner:200, rw_gamer:300, rw_loyal:500, rw_veteran:1000 }[id] || 0;
+  const rewardMsg = [coinsGained ? `+${coinsGained} 💰` : '', winsGained ? `+${winsGained} 🏆` : ''].filter(Boolean).join(' · ');
+  showToast(`🎁 ${reward.name}! ${rewardMsg}`, 'success');
+  render();
+}
+
+/* ══════════════════════════════════════════
+   RENDER HELPERS
+══════════════════════════════════════════ */
+function cardHTML(item, showSale) {
+  const owned    = isOwned(item.id);
+  const equipped = isEquipped(item.id);
+  const sale     = showSale;
+  const coinP    = sale ? Math.floor(item.coinPrice * .6) : item.coinPrice;
+  const winP     = item.winPrice || 0;
+  return `
+    <div class="sh-card${owned?' owned':''}${equipped?' equipped':''}${item.rarity==='limited'?' limited':''}">
+      <span class="sh-rarity sh-r-${item.rarity}">${item.rarity}</span>
+      ${sale && item.coinPrice > 0 ? '<span class="sh-sale-tag">-40%</span>' : ''}
+      <div class="sh-item-emoji">${item.emoji}</div>
+      <div class="sh-item-name">${item.name}</div>
+      ${item.desc ? `<div class="sh-item-desc">${item.desc}</div>` : ''}
+      ${item.endsIn ? `<div style="font-size:.62rem;color:#f87171;font-weight:800">⏰ ${item.endsIn}</div>` : ''}
+      ${equipped
+        ? `<button class="sh-btn-equipped">✓ Equipped</button>`
+        : owned
+          ? `<button class="sh-btn-equip" onclick="equipAvatar('${item.id}')">Equip →</button>
+             <button class="sh-btn-owned">✓ Owned</button>`
+          : `<div class="sh-price-row">
+              ${coinP > 0 ? `<button class="sh-price-coin" onclick="buyWithCoins('${item.id}')">💰 ${coinP.toLocaleString()}</button>` : ''}
+              ${winP  > 0 ? `<button class="sh-price-win"  onclick="buyWithWins('${item.id}')">🏆 ${winP}</button>` : ''}
+              ${coinP === 0 && winP === 0 ? '<button class="sh-btn-owned">FREE</button>' : ''}
+            </div>`
+      }
+    </div>`;
+}
+
+function renderGrid(containerId, items, showSale) {
+  const el = document.getElementById(containerId);
+  if (el) el.innerHTML = items.map(i => cardHTML(i, showSale)).join('');
+}
+
+function listCardHTML(item) {
+  const owned = isOwned(item.id);
+  return `
+    <div class="sh-list-card${owned?' owned':''}">
+      <div class="sh-list-icon">${item.emoji}</div>
+      <div class="sh-list-info">
+        <div class="sh-list-name">${item.name}${item.tag ? ` <span style="font-size:.65rem;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:99px;padding:2px 8px;color:#a78bfa;margin-left:6px">${item.tag}</span>` : ''}</div>
+        <div class="sh-list-desc">${item.desc}</div>
+        ${item.duration ? `<div style="font-size:.62rem;color:#60a5fa;font-weight:800;margin-top:3px">⏱ Duration: ${item.duration}</div>` : ''}
+      </div>
+      <div class="sh-list-price">
+        ${owned
+          ? `<button class="sh-list-btn owned">✓ Owned</button>`
+          : `${item.coinPrice > 0 ? `<button class="sh-list-btn coin" onclick="buyWithCoins('${item.id}')">💰 ${item.coinPrice.toLocaleString()}</button>` : ''}
+             ${item.winPrice  > 0 ? `<button class="sh-list-btn win"  onclick="buyWithWins('${item.id}')">🏆 ${item.winPrice}</button>` : ''}`
+        }
+      </div>
+    </div>`;
+}
+
+function rewardCardHTML(item) {
+  const claimed = getClaimed().includes(item.id);
+  const u = getUser();
+  const canClaim = !claimed && !item.reqLevel && !item.reqWins && !item.reqGames && !item.reqStreak
+    || (!claimed && item.reqLevel  && (u.level||1) >= item.reqLevel)
+    || (!claimed && item.reqWins   && (u.wins||0)  >= item.reqWins)
+    || (!claimed && item.reqGames  && (u.gamesPlayed||0) >= item.reqGames)
+    || (!claimed && item.reqStreak && (u.loginStreak||0) >= item.reqStreak);
+  const locked = claimed || (!claimed && (
+    (item.reqLevel  && (u.level||1) < item.reqLevel) ||
+    (item.reqWins   && (u.wins||0)  < item.reqWins) ||
+    (item.reqGames  && (u.gamesPlayed||0) < item.reqGames) ||
+    (item.reqStreak && (u.loginStreak||0) < item.reqStreak)
+  ));
+  const req = item.reqLevel ? `Reach Level ${item.reqLevel}` : item.reqWins ? `Get ${item.reqWins} win(s)` : item.reqGames ? `Play ${item.reqGames} games` : item.reqStreak ? `${item.reqStreak}-day streak` : 'Free to claim!';
+  return `
+    <div class="sh-list-card${claimed?' owned':''}">
+      <div class="sh-list-icon">${item.emoji}</div>
+      <div class="sh-list-info">
+        <div class="sh-list-name">${item.name}</div>
+        <div class="sh-list-desc">${item.desc}</div>
+        <div style="font-size:.65rem;color:${locked?'rgba(167,139,250,.4)':'#4ade80'};font-weight:800;margin-top:4px">${claimed?'✓ Already claimed':req}</div>
+      </div>
+      <div class="sh-list-price">
+        ${claimed
+          ? `<button class="sh-list-btn owned">✓ Claimed</button>`
+          : locked
+            ? `<button class="sh-list-btn" style="opacity:.45;cursor:not-allowed;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.15);color:rgba(167,139,250,.4);padding:7px 16px;border-radius:10px;font-size:.78rem;font-weight:800">🔒 Locked</button>`
+            : `<button class="sh-list-btn coin" onclick="claimReward('${item.id}')" style="background:rgba(74,222,128,.12);border-color:rgba(74,222,128,.3);color:#4ade80">🎁 Claim!</button>`
+        }
+      </div>
+    </div>`;
+}
+
+/* ══════════════════════════════════════════
+   FULL RENDER
+══════════════════════════════════════════ */
+function render() {
+  const u = getUser();
+  /* Hero balances */
+  document.getElementById('heroCoins').textContent = (u.coins||0).toLocaleString();
+  document.getElementById('heroWins').textContent  = (u.wins||0).toLocaleString();
+  const inv = getInventory();
+  const ownedCount = AVATARS.filter(a=>isOwned(a.id)).length + EFFECTS.filter(e=>isOwned(e.id)).length + inv.length;
+  document.getElementById('heroItems').textContent = ownedCount;
+  const sc = document.getElementById('sidebarEylux');  if(sc) sc.textContent = (u.coins||0).toLocaleString();
+  const st = document.getElementById('sidebarEyltrophs');if(st) st.textContent = (u.wins||0).toLocaleString();
+  const tc = document.getElementById('topbarEylux');   if(tc) tc.textContent = (u.coins||0).toLocaleString();
+  const tt = document.getElementById('topbarEyltrophs');if(tt) tt.textContent = (u.wins||0).toLocaleString();
+
+  /* Featured tab */
+  renderGrid('grid-featured', AVATARS.filter(a=>a.rarity==='legendary' || a.rarity==='epic').slice(0,6), true);
+  renderGrid('grid-coin-deals', BOOSTS.slice(0,4), false);
+  renderGrid('grid-win-exclusives', AVATARS.filter(a=>a.winPrice>=15).slice(0,4), false);
+
+  /* Popular */
+  const popular = [...AVATARS.filter(a=>a.rarity==='rare'), ...BOOSTS.slice(0,2)];
+  renderGrid('grid-popular', popular.slice(0,12), false);
+
+  /* Limited */
+  renderGrid('grid-limited', LIMITED_ITEMS, false);
+
+  /* Avatars by rarity */
+  renderGrid('grid-av-free',      AVATARS.filter(a=>a.rarity==='common'),    false);
+  renderGrid('grid-av-rare',      AVATARS.filter(a=>a.rarity==='rare'),      false);
+  renderGrid('grid-av-epic',      AVATARS.filter(a=>a.rarity==='epic'),      false);
+  renderGrid('grid-av-legendary', AVATARS.filter(a=>a.rarity==='legendary'), false);
+
+  /* Effects, Passes, Boosts (list cards) */
+  const el = document.getElementById('list-effects'); if(el) el.innerHTML = EFFECTS.map(listCardHTML).join('');
+  const pl = document.getElementById('list-passes');  if(pl) pl.innerHTML = GAME_PASSES.map(listCardHTML).join('');
+  const bl = document.getElementById('list-boosts');  if(bl) bl.innerHTML = BOOSTS.map(listCardHTML).join('');
+  const rl = document.getElementById('list-rewards'); if(rl) rl.innerHTML = REWARDS.map(rewardCardHTML).join('');
+}
+
+/* ══════════════════════════════════════════
+   TAB SWITCHING
+══════════════════════════════════════════ */
+document.querySelectorAll('.sh-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.sh-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.sh-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.tab)?.classList.add('active');
+  });
+});
+
+/* Search */
+document.getElementById('shopSearch')?.addEventListener('input', function() {
+  const q = this.value.trim().toLowerCase();
+  document.querySelectorAll('.sh-card, .sh-list-card').forEach(card => {
+    const name = card.querySelector('.sh-item-name, .sh-list-name')?.textContent.toLowerCase() || '';
+    card.style.display = (!q || name.includes(q)) ? '' : 'none';
+    if (q && name.includes(q)) {
+      /* Show the panel that contains this card */
+      const panel = card.closest('.sh-panel');
+      if (panel) {
+        document.querySelectorAll('.sh-panel').forEach(p=>p.classList.remove('active'));
+        document.querySelectorAll('.sh-tab').forEach(t=>t.classList.remove('active'));
+        panel.classList.add('active');
+        document.querySelector(`[data-tab="${panel.id.replace('panel-','')}"]`)?.classList.add('active');
+      }
+    }
+  });
+  if (!q) render();
+});
+
+/* ══════════════════════════════════════════
+   BUY EFFECT + TOAST
+══════════════════════════════════════════ */
+function spawnBuyEffect(emoji, label) {
+  const el = document.createElement('div');
+  el.className = 'buy-float';
+  el.textContent = emoji;
+  el.style.left  = (30 + Math.random()*60) + '%';
+  el.style.top   = (30 + Math.random()*40) + '%';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1000);
+}
+function showToast(msg, type) {
+  if (window.EyloxToast) { EyloxToast(msg, type, 2500); return; }
+  const t = document.createElement('div');
+  t.style.cssText = `position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#000000;border:1px solid rgba(167,139,250,.3);border-radius:12px;padding:10px 20px;color:#fff;font-weight:800;font-size:.85rem;z-index:99999;pointer-events:none;`;
+  t.textContent = msg; document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+/* ══════════════════════════════════════════
+   COUNTDOWN TIMER
+══════════════════════════════════════════ */
+(function() {
+  const el = document.getElementById('dealTimer');
+  if (!el) return;
+  function tick() {
+    const now = new Date(); const midnight = new Date(); midnight.setHours(24,0,0,0);
+    const diff = midnight - now;
+    const h = String(Math.floor(diff/3600000)).padStart(2,'0');
+    const m = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+    const s = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+    el.textContent = `${h}:${m}:${s}`;
+  }
+  tick(); setInterval(tick, 1000);
+})();
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  render();
+  const toggle = document.getElementById('sidebarToggle');
+  const sidebar = document.getElementById('sidebar');
+  if (toggle && sidebar) {
+    toggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+    document.addEventListener('click', e => {
+      if (window.innerWidth <= 900 && !sidebar.contains(e.target) && !toggle.contains(e.target))
+        sidebar.classList.remove('open');
+    });
+  }
+});
+window.addEventListener('storage', render);
+
+function eyloxLogout() {
+  if (!confirm('Log out of Eylox?')) return;
+  ['eylox_token','eylox_user','eylox_guest'].forEach(k => localStorage.removeItem(k));
+  window.location.href = 'landing.html';
+}
+function openSettingsPanel() { window.location.href = 'settings.html'; }
+</script>
+<script src="game-rewards.js"></script>
+<script src="ai-core.js"></script>
+<script src="tutorial-robot.js"></script>
+<script src="platform-polish.js"></script>
+<script src="premium.js"></script>
+<script src="creator-pass.js"></script>
+<script src="floating-actions.js"></script>
+  <script src="tooltip.js"></script>
+<script src="ads.js" defer></script>
+<script src="sw-register.js"></script>
+<!-- v2.0 Improvements -->
+<script src="currencies.js"></script>
+  <script src="platform-improvements.js"></script>
+<script src="clan-system.js"></script>
+<script src="season-pass.js"></script>
+<script src="video-call.js"></script>
+<script src="offline.js" defer></script>
 </body>
 </html>

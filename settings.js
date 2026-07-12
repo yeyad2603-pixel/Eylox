@@ -18,7 +18,7 @@
 
     /* Sound */
     soundEnabled:       true,
-    musicEnabled:       false,
+    musicEnabled:       true,
     volumeLevel:        0.8,        // 0.0 – 1.0
 
     /* Notifications */
@@ -59,6 +59,272 @@
   }
   function saveSettings(s) { localStorage.setItem('eylox_settings', JSON.stringify(s)); window.dispatchEvent(new Event('eylox-settings-changed')); }
   window.EyloxGetSettings = getSettings;
+
+  /* ── Translations ── */
+  const TRANSLATIONS = {
+    en: {
+      /* sidebar */
+      home:'Home', games:'Discover', friends:'Friends', profile:'Profile',
+      leaderboard:'Leaderboard', messages:'Messages', achievements:'Achievements',
+      communities:'Communities', liveEvents:'Live Events', shop:'Shop',
+      youtube:'YouTube', ai:'AI Gaming', avatar:'Avatar',
+      settings:'Settings', menu:'Menu', more:'More', logout:'Log Out',
+      /* page headings */
+      pageHome:'Home', pageGames:'Discover Games', pageFriends:'Friends Hub',
+      pageProfile:'My Profile', pageLeaderboard:'Leaderboard', pageMessages:'Messages',
+      pageAchievements:'Achievements', pageCommunities:'Communities',
+      pageLiveEvents:'Live Events', pageShop:'Shop',
+      /* section titles */
+      trendingNow:'Trending Now', featuredGames:'Featured Games',
+      recentlyPlayed:'Recently Played', newGames:'New Games',
+      topRated:'Top Rated', myFriends:'My Friends',
+      friendRequests:'Friend Requests', discoverPlayers:'People You May Know',
+      yourActivity:'Your Activity', myAchievements:'My Achievements',
+      /* buttons & labels */
+      playNow:'Play Now', addFriend:'Add Friend', sendMsg:'Send',
+      searchGames:'Search games…', searchFriends:'Search friends…',
+      claimReward:'Claim Now', viewAll:'View All',
+      dailyReward:'Daily Reward', online:'Online', offline:'Offline',
+      coins:'Coins', Eyltrophs:'Eyltrophs', level:'Level',
+      /* welcome */
+      welcomeBack:'Welcome back', connectedCrew:'Stay connected with your gaming crew',
+      findFriend:'Find a Friend', addByUsername:'Add friends by their username to see them here',
+    },
+    ar: {
+      home:'الرئيسية', games:'استكشاف', friends:'أصدقاء', profile:'ملفي',
+      leaderboard:'لوحة الصدارة', messages:'الرسائل', achievements:'الإنجازات',
+      communities:'المجتمعات', liveEvents:'أحداث حية', shop:'المتجر',
+      youtube:'يوتيوب', ai:'ذكاء اصطناعي', avatar:'شخصيتي',
+      settings:'الإعدادات', menu:'القائمة', more:'المزيد', logout:'خروج',
+      pageHome:'الرئيسية', pageGames:'اكتشاف الألعاب', pageFriends:'الأصدقاء',
+      pageProfile:'ملفي الشخصي', pageLeaderboard:'لوحة الصدارة', pageMessages:'الرسائل',
+      pageAchievements:'الإنجازات', pageCommunities:'المجتمعات',
+      pageLiveEvents:'الأحداث المباشرة', pageShop:'المتجر',
+      trendingNow:'رائج الآن', featuredGames:'ألعاب مميزة',
+      recentlyPlayed:'ألعبت مؤخراً', newGames:'ألعاب جديدة',
+      topRated:'الأعلى تقييماً', myFriends:'أصدقائي',
+      friendRequests:'طلبات الصداقة', discoverPlayers:'أشخاص قد تعرفهم',
+      yourActivity:'نشاطك', myAchievements:'إنجازاتي',
+      playNow:'العب الآن', addFriend:'إضافة صديق', sendMsg:'إرسال',
+      searchGames:'ابحث عن ألعاب…', searchFriends:'ابحث عن أصدقاء…',
+      claimReward:'احصل عليه', viewAll:'عرض الكل',
+      dailyReward:'مكافأة يومية', online:'متصل', offline:'غير متصل',
+      coins:'عملات', Eyltrophs:'كؤوس', level:'المستوى',
+      welcomeBack:'مرحباً بعودتك', connectedCrew:'ابق على تواصل مع فريق الألعاب',
+      findFriend:'ابحث عن صديق', addByUsername:'أضف أصدقاء باسم المستخدم',
+    },
+    fr: {
+      home:'Accueil', games:'Découvrir', friends:'Amis', profile:'Profil',
+      leaderboard:'Classement', messages:'Messages', achievements:'Succès',
+      communities:'Communautés', liveEvents:'Événements', shop:'Boutique',
+      youtube:'YouTube', ai:'IA Gaming', avatar:'Avatar',
+      settings:'Paramètres', menu:'Menu', more:'Plus', logout:'Déconnexion',
+      pageHome:'Accueil', pageGames:'Découvrir des jeux', pageFriends:'Mes amis',
+      pageProfile:'Mon profil', pageLeaderboard:'Classement', pageMessages:'Messages',
+      pageAchievements:'Succès', pageCommunities:'Communautés',
+      pageLiveEvents:'Événements en direct', pageShop:'Boutique',
+      trendingNow:'Tendances', featuredGames:'Jeux en vedette',
+      recentlyPlayed:'Joués récemment', newGames:'Nouveaux jeux',
+      topRated:'Les mieux notés', myFriends:'Mes amis',
+      friendRequests:'Demandes d\'amis', discoverPlayers:'Vous les connaissez peut-être',
+      yourActivity:'Votre activité', myAchievements:'Mes succès',
+      playNow:'Jouer', addFriend:'Ajouter', sendMsg:'Envoyer',
+      searchGames:'Rechercher des jeux…', searchFriends:'Rechercher des amis…',
+      claimReward:'Réclamer', viewAll:'Voir tout',
+      dailyReward:'Récompense quotidienne', online:'En ligne', offline:'Hors ligne',
+      coins:'Pièces', Eyltrophs:'Trophées', level:'Niveau',
+      welcomeBack:'Bon retour', connectedCrew:'Restez connecté avec votre équipe',
+      findFriend:'Trouver un ami', addByUsername:'Ajoutez des amis par leur nom',
+    },
+    es: {
+      home:'Inicio', games:'Descubrir', friends:'Amigos', profile:'Perfil',
+      leaderboard:'Clasificación', messages:'Mensajes', achievements:'Logros',
+      communities:'Comunidades', liveEvents:'Eventos en vivo', shop:'Tienda',
+      youtube:'YouTube', ai:'IA Gaming', avatar:'Avatar',
+      settings:'Ajustes', menu:'Menú', more:'Más', logout:'Salir',
+      pageHome:'Inicio', pageGames:'Descubrir juegos', pageFriends:'Mis amigos',
+      pageProfile:'Mi perfil', pageLeaderboard:'Clasificación', pageMessages:'Mensajes',
+      pageAchievements:'Logros', pageCommunities:'Comunidades',
+      pageLiveEvents:'Eventos en vivo', pageShop:'Tienda',
+      trendingNow:'Tendencias', featuredGames:'Juegos destacados',
+      recentlyPlayed:'Jugados recientemente', newGames:'Nuevos juegos',
+      topRated:'Mejor valorados', myFriends:'Mis amigos',
+      friendRequests:'Solicitudes de amistad', discoverPlayers:'Personas que quizás conozcas',
+      yourActivity:'Tu actividad', myAchievements:'Mis logros',
+      playNow:'Jugar', addFriend:'Añadir amigo', sendMsg:'Enviar',
+      searchGames:'Buscar juegos…', searchFriends:'Buscar amigos…',
+      claimReward:'Reclamar', viewAll:'Ver todo',
+      dailyReward:'Recompensa diaria', online:'En línea', offline:'Desconectado',
+      coins:'Monedas', Eyltrophs:'Trofeos', level:'Nivel',
+      welcomeBack:'Bienvenido de nuevo', connectedCrew:'Conecta con tu equipo de juego',
+      findFriend:'Buscar un amigo', addByUsername:'Agrega amigos por su nombre de usuario',
+    },
+    de: {
+      home:'Startseite', games:'Entdecken', friends:'Freunde', profile:'Profil',
+      leaderboard:'Bestenliste', messages:'Nachrichten', achievements:'Errungenschaften',
+      communities:'Communitys', liveEvents:'Live-Events', shop:'Shop',
+      youtube:'YouTube', ai:'KI-Gaming', avatar:'Avatar',
+      settings:'Einstellungen', menu:'Menü', more:'Mehr', logout:'Abmelden',
+      pageHome:'Startseite', pageGames:'Spiele entdecken', pageFriends:'Freunde',
+      pageProfile:'Mein Profil', pageLeaderboard:'Bestenliste', pageMessages:'Nachrichten',
+      pageAchievements:'Errungenschaften', pageCommunities:'Communitys',
+      pageLiveEvents:'Live-Events', pageShop:'Shop',
+      trendingNow:'Im Trend', featuredGames:'Empfohlene Spiele',
+      recentlyPlayed:'Zuletzt gespielt', newGames:'Neue Spiele',
+      topRated:'Bestbewertet', myFriends:'Meine Freunde',
+      friendRequests:'Freundschaftsanfragen', discoverPlayers:'Vielleicht kennst du diese',
+      yourActivity:'Deine Aktivität', myAchievements:'Meine Errungenschaften',
+      playNow:'Spielen', addFriend:'Hinzufügen', sendMsg:'Senden',
+      searchGames:'Spiele suchen…', searchFriends:'Freunde suchen…',
+      claimReward:'Abholen', viewAll:'Alle anzeigen',
+      dailyReward:'Tägliche Belohnung', online:'Online', offline:'Offline',
+      coins:'Münzen', Eyltrophs:'Trophäen', level:'Level',
+      welcomeBack:'Willkommen zurück', connectedCrew:'Bleib mit deinem Team verbunden',
+      findFriend:'Freund finden', addByUsername:'Füge Freunde per Benutzername hinzu',
+    },
+    ja: {
+      home:'ホーム', games:'ゲーム発見', friends:'フレンド', profile:'プロフィール',
+      leaderboard:'ランキング', messages:'メッセージ', achievements:'実績',
+      communities:'コミュニティ', liveEvents:'ライブ', shop:'ショップ',
+      youtube:'YouTube', ai:'AIゲーム', avatar:'アバター',
+      settings:'設定', menu:'メニュー', more:'もっと', logout:'ログアウト',
+      pageHome:'ホーム', pageGames:'ゲーム発見', pageFriends:'フレンド',
+      pageProfile:'プロフィール', pageLeaderboard:'ランキング', pageMessages:'メッセージ',
+      pageAchievements:'実績', pageCommunities:'コミュニティ',
+      pageLiveEvents:'ライブイベント', pageShop:'ショップ',
+      trendingNow:'トレンド', featuredGames:'注目ゲーム',
+      recentlyPlayed:'最近プレイ', newGames:'新着ゲーム',
+      topRated:'高評価', myFriends:'フレンド一覧',
+      friendRequests:'フレンド申請', discoverPlayers:'知り合いかも',
+      yourActivity:'アクティビティ', myAchievements:'実績一覧',
+      playNow:'プレイ', addFriend:'追加', sendMsg:'送信',
+      searchGames:'ゲームを検索…', searchFriends:'フレンドを検索…',
+      claimReward:'受け取る', viewAll:'すべて表示',
+      dailyReward:'デイリー報酬', online:'オンライン', offline:'オフライン',
+      coins:'コイン', Eyltrophs:'トロフィー', level:'レベル',
+      welcomeBack:'おかえりなさい', connectedCrew:'ゲーム仲間とつながろう',
+      findFriend:'フレンドを探す', addByUsername:'ユーザー名でフレンドを追加',
+    },
+  };
+
+  /* Text-content map: English string → translation key (for elements without data-i18n) */
+  const TEXT_MAP = {
+    'Trending Now':'trendingNow', 'Featured Games':'featuredGames',
+    'Recently Played':'recentlyPlayed', 'New Games':'newGames', 'Top Rated':'topRated',
+    'My Friends':'myFriends', 'Friend Requests':'friendRequests',
+    'People You May Know':'discoverPlayers', 'Your Activity':'yourActivity',
+    'My Achievements':'myAchievements', 'Friends Hub':'pageFriends',
+    'Stay connected with your gaming crew':'connectedCrew',
+    'Find a Friend':'findFriend',
+  };
+
+  /* Map href filename → translation key */
+  const HREF_KEY = {
+    'index.html':'home', 'games.html':'games', 'friends.html':'friends',
+    'profile.html':'profile', 'leaderboard.html':'leaderboard', 'messages.html':'messages',
+    'achievements.html':'achievements', 'communities.html':'communities',
+    'live-events.html':'liveEvents', 'shop.html':'shop', 'youtube.html':'youtube',
+    'ai.html':'ai', 'avatar.html':'avatar',
+  };
+
+  function applyLanguage(lang) {
+    const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
+
+    document.documentElement.lang = lang;
+    const isRTL = lang === 'ar';
+    document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+
+    // RTL layout overrides
+    let rtlStyle = document.getElementById('eylox-rtl-style');
+    if (isRTL && !rtlStyle) {
+      rtlStyle = document.createElement('style');
+      rtlStyle.id = 'eylox-rtl-style';
+      rtlStyle.textContent = `
+        [dir="rtl"] .sidebar { right:0;left:auto;border-right:none;border-left:1px solid rgba(167,139,250,.12); }
+        [dir="rtl"] .main-content,[dir="rtl"] .content { margin-left:0;margin-right:256px; }
+        [dir="rtl"] .hdr { flex-direction:row-reverse; }
+        [dir="rtl"] .sidebar-link { justify-content:flex-end; }
+        [dir="rtl"] .sidebar-section-label { text-align:right; }
+      `;
+      document.head.appendChild(rtlStyle);
+    } else if (!isRTL && rtlStyle) {
+      rtlStyle.remove();
+    }
+
+    // Translate sidebar links — target .s-label span, look up key by href
+    document.querySelectorAll('.sidebar-link').forEach(a => {
+      const href = a.getAttribute('href') || '';
+      const file = href.split('/').pop().split('?')[0].split('#')[0] || '';
+      let key = HREF_KEY[file];
+      if (!key && a.id === 'settingsBtn') key = 'settings';
+      if (!key && a.id === 'logoutBtn')   key = 'logout';
+      const val = key ? t[key] : null;
+      if (!val) return;
+      const label = a.querySelector('.s-label');
+      if (label) label.textContent = val;
+    });
+
+    // Translate section labels (Menu / More headings)
+    document.querySelectorAll('.sidebar-section-label').forEach(el => {
+      if (!el.dataset.i18nOrig) el.dataset.i18nOrig = el.textContent.trim().toLowerCase();
+      const orig = el.dataset.i18nOrig;
+      if (orig === 'menu') el.textContent = t.menu || 'Menu';
+      else if (orig === 'more') el.textContent = t.more || 'More';
+    });
+
+    // Translate any element with data-i18n attribute
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key]) el.textContent = t[key];
+    });
+
+    // Translate data-i18n-placeholder attributes
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if (t[key]) el.placeholder = t[key];
+    });
+
+    // Translate search inputs by placeholder
+    document.querySelectorAll('input[type="search"], input[type="text"]').forEach(el => {
+      const ph = el.placeholder;
+      if (ph === 'Search games…' || ph === 'Search games...') el.placeholder = t.searchGames || ph;
+      else if (ph === 'Search friends…' || ph === 'Search friends...') el.placeholder = t.searchFriends || ph;
+    });
+
+    // Translate section titles (.section-title, .sub-title) and page description paragraphs
+    // by storing original English text on first run, then mapping via TEXT_MAP
+    document.querySelectorAll('.section-title, .sub-title, .page-content h2, .page-heading h1').forEach(el => {
+      if (!el.dataset.i18nOrig) {
+        // Store the text without emoji prefix — grab inner text of first text node
+        const raw = Array.from(el.childNodes)
+          .filter(n => n.nodeType === Node.TEXT_NODE)
+          .map(n => n.textContent.trim())
+          .join(' ').trim();
+        if (raw) el.dataset.i18nOrig = raw;
+        else el.dataset.i18nOrig = el.textContent.replace(/[^\w\s]/g, '').trim();
+      }
+      const orig = el.dataset.i18nOrig;
+      const key = TEXT_MAP[orig];
+      if (key && t[key]) {
+        // Replace first text node (keep emoji prefix if present)
+        for (const node of el.childNodes) {
+          if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+            const prefix = node.textContent.match(/^[\s\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}]+/u);
+            node.textContent = (prefix ? prefix[0] : '') + t[key];
+            break;
+          }
+        }
+      }
+    });
+
+    // Translate plain paragraph descriptions under .page-heading
+    document.querySelectorAll('.page-heading p, .afh-text p').forEach(el => {
+      if (!el.dataset.i18nOrig) el.dataset.i18nOrig = el.textContent.trim();
+      const orig = el.dataset.i18nOrig;
+      const key = TEXT_MAP[orig];
+      if (key && t[key]) el.textContent = t[key];
+    });
+  }
 
   /* ── Apply theme ── */
   function applyTheme(theme) {
@@ -130,6 +396,7 @@
     applyFontSize(s.fontSize);
     applyHighContrast(s.highContrast);
     applyStarfield(s.starfieldEnabled);
+    applyLanguage(s.language);
     if (!s.glowEnabled) applyGlow(false); else applyGlow(true);
 
     if (!s.animationsEnabled || s.reduceMotion) {
@@ -576,6 +843,7 @@
     /* ── Language select ── */
     modal.querySelector('#languageSelect')?.addEventListener('change', e => {
       const s2 = getSettings(); s2.language = e.target.value; saveSettings(s2);
+      applyLanguage(e.target.value);
     });
 
     /* ── Data buttons ── */

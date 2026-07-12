@@ -18,7 +18,7 @@
   const MAX_CMDS_PER_MIN  = 60;
   const MAX_LOGIN_ATTEMPTS = 5;
   const LOGIN_LOCKOUT_MS  = 5 * 60 * 1000; // 5 minutes
-  const VALID_GAME_IDS    = ['ninja-dash','sky-riders','dragon-escape','puzzle-palace','ocean-quest','block-kingdom','farm-friends','space-blaster','haunted-house','race-city','jungle-run','candy-chaos','ice-fortress','logic-lab','pirate-bay','treasure-hunt'];
+  const VALID_GAME_IDS    = ['ninja-dash','sky-riders','dragon-escape','puzzle-palace','ocean-quest','block-kingdom','farm-friends','space-blaster','haunted-house','race-city','jungle-run','candy-chaos','ice-fortress','logic-lab','pirate-bay','treasure-hunt','obby-world-3d','treasure-hunt-3d','city-roleplay-3d','pirate-bay-3d'];
 
   /* ── XSS sanitiser ── */
   function sanitize(str) {
@@ -126,12 +126,17 @@
     } catch {}
   }
 
+  function getStoredUser() {
+    try { return JSON.parse(localStorage.getItem('eylox_user') || 'null'); } catch { return null; }
+  }
+
   /* ── Tamper detection via storage event ── */
   window.addEventListener('storage', e => {
     if (e.key === 'eylox_user') clampUser();
     if (e.key === 'eylox_is_owner') {
-      const user = (() => { try { return JSON.parse(localStorage.getItem('eylox_user') || 'null'); } catch { return null; } })();
-      if (!user || user.username !== OWNER_USER) localStorage.removeItem('eylox_is_owner');
+      /* The flag must match the server-set isOwner field in the user object */
+      const user = getStoredUser();
+      if (!user || user.isOwner !== true) localStorage.removeItem('eylox_is_owner');
     }
   });
 
@@ -139,8 +144,9 @@
   setInterval(() => {
     clampUser();
     if (localStorage.getItem('eylox_is_owner') === 'true') {
-      const user = (() => { try { return JSON.parse(localStorage.getItem('eylox_user') || 'null'); } catch { return null; } })();
-      if (!user || user.username !== OWNER_USER) {
+      const user = getStoredUser();
+      /* Remove the flag if the stored user doesn't have server-granted isOwner */
+      if (!user || user.isOwner !== true) {
         localStorage.removeItem('eylox_is_owner');
         if (window.location.pathname.includes('admin')) window.location.href = 'index.html';
       }
@@ -160,6 +166,22 @@
   }
   window.EyloxRateLimit = checkRateLimit;
 
+  /* ── Fix corrupted username in localStorage ── */
+  function cleanupUsername() {
+    try {
+      const raw = localStorage.getItem('eylox_user');
+      if (!raw) return;
+      const u = JSON.parse(raw);
+      if (!u?.username) return;
+      const valid = /^[a-zA-Z0-9_.\-]{1,64}$/.test(u.username);
+      if (!valid) {
+        /* Preserve as much identity as possible — fall back to 'Player' */
+        u.username = 'Player';
+        localStorage.setItem('eylox_user', JSON.stringify(u));
+      }
+    } catch {}
+  }
+
   /* ── Protect forms & run startup checks ── */
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('input[type="search"], input[type="text"]').forEach(el => {
@@ -171,6 +193,7 @@
     if (window.location.hash && /<|javascript:/i.test(decodeURIComponent(window.location.hash)))
       window.location.hash = '';
 
+    cleanupUsername();
     clampUser();
     checkShopSession();
     cleanRecentlyPlayed();

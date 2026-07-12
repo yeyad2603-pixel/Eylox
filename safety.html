@@ -1,0 +1,270 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>∞ Eylox — Safety & Privacy</title>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#7c3aed"/>
+  <link rel="stylesheet" href="style.css"/>
+  <script>
+    try {
+      const s = localStorage.getItem('eylox_token')||localStorage.getItem('eylox_guest')||localStorage.getItem('eylox_user');
+      if (!s) window.location.replace('landing.html');
+    } catch {}
+  </script>
+  <style>
+    .safety-container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    .safety-header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    .safety-header h1 {
+      font-family: var(--font-head);
+      font-size: 2.5rem;
+      margin: 0 0 10px;
+      color: #f0e8ff;
+    }
+    .safety-header p {
+      color: rgba(180,160,220,.6);
+      font-size: .95rem;
+    }
+    .policy-section {
+      margin-bottom: 40px;
+    }
+    .policy-section h2 {
+      font-size: 1.3rem;
+      color: var(--blue);
+      font-weight: 800;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .policy-content {
+      background: rgba(167,139,250,.05);
+      border: 1px solid rgba(167,139,250,.15);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .policy-content p {
+      color: rgba(180,160,220,.7);
+      line-height: 1.7;
+      margin: 0 0 12px;
+      font-size: .9rem;
+    }
+    .policy-content p:last-child {
+      margin-bottom: 0;
+    }
+    .policy-content ul {
+      color: rgba(180,160,220,.7);
+      line-height: 1.7;
+      font-size: .9rem;
+      margin: 12px 0;
+      padding-left: 20px;
+    }
+    .policy-content li {
+      margin-bottom: 8px;
+    }
+    .highlight {
+      color: var(--blue);
+      font-weight: 700;
+    }
+  </style>
+<script src="audit-loader.js" defer></script>
+  <script src="debug-dashboard.js" defer></script>
+</head>
+<body data-page="safety">
+<div class="app-wrapper">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <span class="sidebar-logo-icon">🎮</span>
+      <span class="sidebar-logo-text">Eylox</span>
+    </a>
+
+    <p class="sidebar-section-label">Menu</p>
+    <nav class="sidebar-nav" aria-label="Main navigation">
+      <ul>
+        <li><a href="index.html" class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
+        <li><a href="games.html" class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
+        <li><a href="leaderboard.html" class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
+        <li><a href="achievements.html" class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
+        <li><a href="events.html" class="sidebar-link"><span class="s-icon">🎯</span><span class="s-label">Live Events</span></a></li>
+        <li><a href="communities.html" class="sidebar-link"><span class="s-icon">🌐</span><span class="s-label">Communities</span></a></li>
+        <li><a href="friends.html" class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span></a></li>
+        <li><a href="profile.html" class="sidebar-link"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
+        <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-divider"></div>
+
+    <p class="sidebar-section-label">More</p>
+    <nav class="sidebar-nav" aria-label="Secondary navigation">
+      <ul>
+        <li><a href="shop.html" class="sidebar-link"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
+        <li><a href="ai.html" class="sidebar-link"><span class="s-icon">🤖</span><span class="s-label">Eylox Studio</span><span class="s-soon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff">AI</span></a></li>
+        <li><a href="subscription.html" class="sidebar-link"><span class="s-icon">💎</span><span class="s-label">Subscription</span></a></li>
+        <li><a href="help.html" class="sidebar-link"><span class="s-icon">❓</span><span class="s-label">Help Center</span></a></li>
+        <li><a href="safety.html" class="sidebar-link active" aria-current="page"><span class="s-icon">🛡️</span><span class="s-label">Safety</span></a></li>
+        <li><button class="sidebar-link sb-action" onclick="openSettingsPanel()"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></button></li>
+        <li><button class="sidebar-link sb-action" onclick="eyloxLogout()" style="color:#f87171"><span class="s-icon">🚪</span><span class="s-label">Log Out</span></button></li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-coins">
+      <span>💰</span>
+      <div>
+        <div class="coins-amount" id="sidebarEylux">0</div>
+        <div class="coins-label">Eylux</div>
+      </div>
+    </div>
+    <div class="sidebar-coins" style="margin-top:8px">
+      <span>🏆</span>
+      <div>
+        <div class="Eyltrophs-amount" id="sidebarEyltrophs">0</div>
+        <div class="coins-label">Eyltrophs</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN AREA ── -->
+  <div class="main-area">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="menu-btn" id="sidebarToggle" aria-label="Toggle sidebar">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="topbar-brand" style="font-family:'Fredoka One',cursive;font-size:1.1rem;color:#a78bfa;letter-spacing:.5px">🛡️ Safety & Privacy</div>
+      <div class="topbar-right">
+        <div class="tb-Eyltrophs">🏆 <span id="topbarEyltrophs">0</span></div>
+        <div class="tb-coins">💰 <span id="topbarEylux">0</span></div>
+        <a href="profile.html" class="tb-avatar" aria-label="My profile">🎮<span class="online-dot"></span></a>
+      </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <main class="page-content">
+      <div class="safety-container">
+      <div class="safety-header">
+        <h1>🛡️ Safety & Privacy</h1>
+        <p>Your safety and privacy are our top priority</p>
+      </div>
+
+      <div class="policy-section">
+        <h2>Privacy Policy</h2>
+        <div class="policy-content">
+          <p><span class="highlight">Last Updated: May 2026</span></p>
+          <p>Eylox ("we," "us," "our," or "Company") operates the Eylox gaming platform. This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service and the choices you have associated with that data.</p>
+          <p><span class="highlight">Information Collection and Use:</span></p>
+          <ul>
+            <li>Account Information: username, password (encrypted), email address</li>
+            <li>Profile Data: avatar, coins, wins, games played</li>
+            <li>Game Progress: scores, achievements, session data</li>
+            <li>Usage Data: gameplay analytics, feature usage</li>
+          </ul>
+          <p>We use this information to provide and improve our gaming services, personalize your experience, and maintain platform security.</p>
+        </div>
+      </div>
+
+      <div class="policy-section">
+        <h2>Data Security</h2>
+        <div class="policy-content">
+          <p>We implement industry-standard security measures to protect your personal data against unauthorized access, alteration, disclosure, or destruction.</p>
+          <ul>
+            <li>Encrypted password storage using bcrypt</li>
+            <li>Secure local storage of user preferences and game progress</li>
+            <li>HTTPS encryption for all data transmission</li>
+            <li>Regular security audits and updates</li>
+          </ul>
+          <p>However, no method of transmission over the Internet is 100% secure. While we strive to protect your personal data, we cannot guarantee its absolute security.</p>
+        </div>
+      </div>
+
+      <div class="policy-section">
+        <h2>User Rights & Control</h2>
+        <div class="policy-content">
+          <p>You have the right to:</p>
+          <ul>
+            <li>Access your personal data anytime in your profile</li>
+            <li>Update or correct your information</li>
+            <li>Delete your account and associated data</li>
+            <li>Opt-out of optional data collection features</li>
+            <li>Request an export of your game progress</li>
+          </ul>
+          <p>To exercise these rights, visit your account settings or contact our support team.</p>
+        </div>
+      </div>
+
+      <div class="policy-section">
+        <h2>Community Guidelines</h2>
+        <div class="policy-content">
+          <p>To maintain a safe and enjoyable gaming environment, all players must:</p>
+          <ul>
+            <li>Treat other players with respect</li>
+            <li>Avoid harassment, hate speech, or discriminatory behavior</li>
+            <li>Not share personal information with other players</li>
+            <li>Not attempt to hack, cheat, or exploit game systems</li>
+            <li>Not spam or engage in commercial solicitation</li>
+          </ul>
+          <p>Violations of these guidelines may result in account suspension or permanent ban.</p>
+        </div>
+      </div>
+
+      <div class="policy-section">
+        <h2>Age Restrictions</h2>
+        <div class="policy-content">
+          <p>Eylox is intended for users age 13 and older. We do not knowingly collect personal data from children under 13. If we learn that we have collected personal data from a child under 13, we will delete such data and terminate the child's account.</p>
+        </div>
+      </div>
+
+      <div class="policy-section">
+        <h2>Changes to This Policy</h2>
+        <div class="policy-content">
+          <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last Updated" date.</p>
+        </div>
+      </div>
+
+      <div class="policy-section">
+        <h2>Contact Us</h2>
+        <div class="policy-content">
+          <p>If you have questions about this Privacy Policy or our practices, please contact us through the Help Center or email our support team.</p>
+        </div>
+      </div>
+    </div>
+    </main>
+  </div>
+</div><!-- /app-wrapper -->
+
+<script src="security.js"></script>
+<script src="api.js"></script>
+<script src="script.js"></script>
+<script src="features.js"></script>
+<script src="notifications.js"></script>
+<script src="polish.js"></script>
+<script src="admin-button.js"></script>
+<script src="studio-button.js"></script>
+<script src="extras.js"></script>
+<script src="effects.js"></script>
+<script src="sound.js"></script>
+<script src="settings.js"></script>
+<script src="quick-access.js"></script>
+<script src="sidebar-links.js"></script>
+<script src="sidebar-collapse.js"></script>
+<script src="floating-actions.js"></script>
+<script src="tooltip.js"></script>
+<script>
+  document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+    document.getElementById('sidebar')?.classList.toggle('open');
+  });
+</script>
+<script src="sw-register.js"></script>
+<script src="offline.js" defer></script>
+</body>
+</html>

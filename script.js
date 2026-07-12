@@ -16,7 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
   statCounters();
   loginValidation();
   searchUX();
+  injectPremiumCTA();
+  injectCreatorPassCTA();
 });
+
+/* ── Premium/Creator Pass CTAs removed ── */
+function injectPremiumCTA() {}
+function injectCreatorPassCTA() {}
 
 /* ── 1. SIDEBAR TOGGLE ── */
 function sidebarToggle() {
@@ -118,6 +124,8 @@ function playModal() {
     })();
     const launchEmoji = equippedAvatar || thumb;
     openModal(launchEmoji, title, { id, title, genre, thumb });
+    /* Notify party system which game is being launched */
+    if (window.EyloxParty?.isInParty()) window.EyloxParty.setGame(title);
   });
 }
 
@@ -349,3 +357,54 @@ function searchUX() {
   input.addEventListener('focus', () => { input.placeholder = 'Type to search… (Esc to clear)'; });
   input.addEventListener('blur',  () => { input.placeholder = 'Search games…'; });
 }
+
+/* ── 11. GLOBAL RIPPLE EFFECT ── */
+document.addEventListener('click', e => {
+  const btn = e.target.closest('button:not(.spin-close-btn):not(.menu-btn):not(.sb-action), .game-card, .shop-card');
+  if (!btn) return;
+  const rect = btn.getBoundingClientRect();
+  const d = Math.max(rect.width, rect.height) * 1.2;
+  const r = document.createElement('span');
+  r.className = 'ripple-fx';
+  r.style.cssText = `
+    position:absolute;border-radius:50%;
+    width:${d}px;height:${d}px;
+    left:${e.clientX - rect.left - d/2}px;
+    top:${e.clientY - rect.top - d/2}px;
+    background:rgba(255,255,255,.13);
+    transform:scale(0);pointer-events:none;z-index:20;
+    animation:ripple-expand .55s linear forwards;
+  `;
+  if (getComputedStyle(btn).position === 'static') btn.style.position = 'relative';
+  btn.style.overflow = 'hidden';
+  btn.appendChild(r);
+  setTimeout(() => r.remove(), 600);
+});
+
+/* ── 12. TOPBAR SCROLL GLASS EFFECT ── */
+(function() {
+  const tb = document.querySelector('.topbar');
+  if (!tb) return;
+  window.addEventListener('scroll', () => {
+    tb.classList.toggle('scrolled', window.scrollY > 10);
+  }, { passive: true });
+})();
+
+/* ── 13. COIN/TROPHY LIVE UPDATE ── */
+(function() {
+  function updateTopbarCoins() {
+    try {
+      const u = JSON.parse(localStorage.getItem('eylox_user') || 'null');
+      if (!u) return;
+      ['topbarCoins','sidebarCoins'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el && el.textContent !== String(u.coins ?? 0)) {
+          el.textContent = (u.coins || 0).toLocaleString();
+          el.closest('.tb-coins, .sidebar-coins')?.classList.add('pop');
+          setTimeout(() => el.closest('.tb-coins, .sidebar-coins')?.classList.remove('pop'), 450);
+        }
+      });
+    } catch {}
+  }
+  setInterval(updateTopbarCoins, 3000);
+})();

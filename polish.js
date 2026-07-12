@@ -16,61 +16,244 @@ document.documentElement.style.transition = 'opacity .3s ease';
 window.addEventListener('load', () => { document.documentElement.style.opacity = '1'; });
 
 /* ══════════════════════════════════════════════════
-   2. ANIMATED STARFIELD
+   2. SOLAR SYSTEM + STARFIELD BACKGROUND
+   (space-bg.js provides the enhanced version; this
+   function is kept as a lightweight fallback only)
 ══════════════════════════════════════════════════ */
 function initStars() {
+  /* Defer to space-bg.js if already running */
+  if (document.getElementById('eylox-space-bg')) return;
   const canvas = document.createElement('canvas');
   canvas.id = 'starsCanvas';
   canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0';
   document.body.insertBefore(canvas, document.body.firstChild);
 
   const ctx = canvas.getContext('2d');
-  let stars = [];
+  let W, H, stars = [], shootingStars = [], nebulae = [];
 
-  function buildStars() {
-    stars = Array.from({ length: 130 }, () => ({
-      x:   Math.random() * canvas.width,
-      y:   Math.random() * canvas.height,
-      r:   Math.random() * 1.5 + 0.2,
-      a:   Math.random(),
-      da:  (Math.random() * 0.005 + 0.001) * (Math.random() < .5 ? 1 : -1),
-      spd: Math.random() * 0.18 + 0.04,
+  /* ── Planet definitions ── */
+  const PLANETS = [
+    { name:'Mercury', dist:0.10, r:3,  color:'#a0a0b0', speed:4.15,  angle:Math.random()*Math.PI*2, rings:false },
+    { name:'Venus',   dist:0.15, r:5,  color:'#e8c97a', speed:1.62,  angle:Math.random()*Math.PI*2, rings:false },
+    { name:'Earth',   dist:0.21, r:6,  color:'#4a9eff', speed:1.00,  angle:Math.random()*Math.PI*2, rings:false, moon:true },
+    { name:'Mars',    dist:0.29, r:4,  color:'#c1440e', speed:0.53,  angle:Math.random()*Math.PI*2, rings:false },
+    { name:'Jupiter', dist:0.40, r:13, color:'#c88b4a', speed:0.084, angle:Math.random()*Math.PI*2, rings:false, stripes:true },
+    { name:'Saturn',  dist:0.53, r:10, color:'#e4c97e', speed:0.034, angle:Math.random()*Math.PI*2, rings:true },
+    { name:'Uranus',  dist:0.65, r:7,  color:'#7de8e8', speed:0.012, angle:Math.random()*Math.PI*2, rings:false },
+    { name:'Neptune', dist:0.76, r:6,  color:'#3060ff', speed:0.006, angle:Math.random()*Math.PI*2, rings:false },
+  ];
+
+  function buildScene() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+
+    /* Background stars */
+    stars = Array.from({ length: 220 }, () => ({
+      x:  Math.random() * W,
+      y:  Math.random() * H,
+      r:  Math.random() * 1.6 + 0.3,
+      a:  Math.random(),
+      da: (Math.random() * 0.006 + 0.001) * (Math.random() < .5 ? 1 : -1),
     }));
+
+    /* Nebula blobs */
+    nebulae = [
+      { x: W * 0.15, y: H * 0.2,  r: W * 0.18, hue:260 },
+      { x: W * 0.85, y: H * 0.75, r: W * 0.14, hue:220 },
+      { x: W * 0.55, y: H * 0.15, r: W * 0.12, hue:200 },
+    ];
   }
 
-  function resize() {
-    canvas.width  = window.innerWidth;
-    canvas.height = window.innerHeight;
-    buildStars();
+  /* Center of solar system — slight offset for aesthetics */
+  function sunXY() {
+    return { sx: W * 0.5, sy: H * 0.5 };
   }
 
-  let raf;
+  let t = 0;
   function tick() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const isLight = document.documentElement.dataset.theme === 'light';
-    const baseAlpha = isLight ? 0.18 : 0.65;
+    t += 0.008;
+    ctx.clearRect(0, 0, W, H);
 
+    /* Deep space gradient */
+    const grad = ctx.createRadialGradient(W*.5,H*.5,0, W*.5,H*.5,Math.max(W,H)*.75);
+    grad.addColorStop(0,   'rgba(10,5,30,0)');
+    grad.addColorStop(0.5, 'rgba(5,2,18,.55)');
+    grad.addColorStop(1,   'rgba(2,0,10,.85)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0,0,W,H);
+
+    /* Nebula */
+    for (const nb of nebulae) {
+      const ng = ctx.createRadialGradient(nb.x,nb.y,0, nb.x,nb.y,nb.r);
+      ng.addColorStop(0,   `hsla(${nb.hue},80%,55%,.05)`);
+      ng.addColorStop(0.5, `hsla(${nb.hue},70%,45%,.03)`);
+      ng.addColorStop(1,   'transparent');
+      ctx.fillStyle = ng;
+      ctx.fillRect(0,0,W,H);
+    }
+
+    /* Twinkling stars */
     for (const s of stars) {
-      s.a  = Math.max(0.05, Math.min(1, s.a + s.da));
-      if (s.a <= 0.05 || s.a >= 1) s.da *= -1;
-      s.y  = (s.y + s.spd) % canvas.height;
+      s.a = Math.max(0.06, Math.min(1, s.a + s.da));
+      if (s.a <= 0.06 || s.a >= 1) s.da *= -1;
       ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      ctx.fillStyle = isLight
-        ? `rgba(130,80,220,${s.a * baseAlpha})`
-        : `rgba(210,190,255,${s.a * baseAlpha})`;
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(210,200,255,${s.a * 0.7})`;
       ctx.fill();
     }
-    raf = requestAnimationFrame(tick);
+
+    /* Shooting stars (random chance) */
+    if (Math.random() < 0.003) {
+      shootingStars.push({ x: Math.random()*W, y: Math.random()*H*0.5, vx:8+Math.random()*6, vy:3+Math.random()*4, life:1 });
+    }
+    for (let i = shootingStars.length-1; i >= 0; i--) {
+      const ss = shootingStars[i];
+      ss.x += ss.vx; ss.y += ss.vy; ss.life -= 0.03;
+      if (ss.life <= 0 || ss.x > W || ss.y > H) { shootingStars.splice(i,1); continue; }
+      ctx.save();
+      ctx.globalAlpha = ss.life * 0.8;
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(ss.x, ss.y);
+      ctx.lineTo(ss.x - ss.vx*6, ss.y - ss.vy*6);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    const { sx, sy } = sunXY();
+    const maxOrbit = Math.min(W, H) * 0.48;
+
+    /* Orbit rings */
+    ctx.save();
+    for (const p of PLANETS) {
+      const orb = maxOrbit * p.dist;
+      ctx.beginPath();
+      ctx.arc(sx, sy, orb, 0, Math.PI*2);
+      ctx.strokeStyle = 'rgba(167,139,250,.07)';
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    /* Sun */
+    const sunR = Math.min(W,H) * 0.038;
+    /* Corona glow layers */
+    for (let i = 4; i >= 1; i--) {
+      const cg = ctx.createRadialGradient(sx,sy,sunR*0.5, sx,sy,sunR*(1.5+i*0.8));
+      cg.addColorStop(0, `rgba(255,200,60,${0.06/i})`);
+      cg.addColorStop(1, 'transparent');
+      ctx.fillStyle = cg;
+      ctx.beginPath();
+      ctx.arc(sx, sy, sunR*(1.5+i*0.8), 0, Math.PI*2);
+      ctx.fill();
+    }
+    /* Sun body */
+    const sunG = ctx.createRadialGradient(sx-sunR*.3,sy-sunR*.3,0, sx,sy,sunR);
+    sunG.addColorStop(0,   '#fff7e0');
+    sunG.addColorStop(0.3, '#ffe066');
+    sunG.addColorStop(0.7, '#ff9f20');
+    sunG.addColorStop(1,   '#c84000');
+    ctx.beginPath();
+    ctx.arc(sx, sy, sunR, 0, Math.PI*2);
+    ctx.fillStyle = sunG;
+    ctx.fill();
+
+    /* Animated sun surface spots */
+    ctx.save();
+    ctx.clip();
+    for (let i = 0; i < 5; i++) {
+      const sa = t * (0.3 + i * 0.1) + i * 1.2;
+      const sdist = sunR * (0.2 + i * 0.12);
+      const spx = sx + Math.cos(sa) * sdist;
+      const spy = sy + Math.sin(sa) * sdist;
+      ctx.beginPath();
+      ctx.arc(spx, spy, sunR*0.06, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(150,40,0,.35)';
+      ctx.fill();
+    }
+    ctx.restore();
+
+    /* Planets */
+    for (const p of PLANETS) {
+      p.angle += p.speed * 0.001;
+      const orb = maxOrbit * p.dist;
+      const px = sx + Math.cos(p.angle) * orb;
+      const py = sy + Math.sin(p.angle) * orb;
+
+      /* Saturn rings (behind planet) */
+      if (p.rings) {
+        ctx.save();
+        ctx.translate(px, py);
+        ctx.scale(1, 0.3);
+        for (let ri = 0; ri < 3; ri++) {
+          const rr = p.r * (1.6 + ri * 0.5);
+          ctx.beginPath();
+          ctx.arc(0, 0, rr, 0, Math.PI*2);
+          ctx.strokeStyle = `rgba(228,201,126,${0.35 - ri*0.08})`;
+          ctx.lineWidth = p.r * 0.55;
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      /* Planet body */
+      const pg = ctx.createRadialGradient(px - p.r*0.35, py - p.r*0.35, 0, px, py, p.r);
+      pg.addColorStop(0, lighten(p.color, 60));
+      pg.addColorStop(0.5, p.color);
+      pg.addColorStop(1, darken(p.color, 60));
+      ctx.beginPath();
+      ctx.arc(px, py, p.r, 0, Math.PI*2);
+      ctx.fillStyle = pg;
+      ctx.fill();
+
+      /* Jupiter cloud stripes */
+      if (p.stripes) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(px, py, p.r, 0, Math.PI*2);
+        ctx.clip();
+        for (let si = -2; si <= 2; si++) {
+          ctx.fillStyle = si%2===0 ? 'rgba(180,120,60,.3)' : 'rgba(220,160,90,.18)';
+          ctx.fillRect(px - p.r, py + si * p.r*0.35 - p.r*0.17, p.r*2, p.r*0.32);
+        }
+        ctx.restore();
+      }
+
+      /* Earth moon */
+      if (p.moon) {
+        const ma = p.angle * 13;
+        const md = p.r * 2.4;
+        const mx = px + Math.cos(ma) * md;
+        const my = py + Math.sin(ma) * md;
+        ctx.beginPath();
+        ctx.arc(mx, my, p.r * 0.32, 0, Math.PI*2);
+        ctx.fillStyle = '#c8c8d8';
+        ctx.fill();
+      }
+    }
+
+    requestAnimationFrame(tick);
   }
 
-  resize();
-  window.addEventListener('resize', resize);
+  function lighten(hex, amt) {
+    const n = parseInt(hex.replace('#',''), 16);
+    const r = Math.min(255,(n>>16)+amt), g = Math.min(255,((n>>8)&0xff)+amt), b = Math.min(255,(n&0xff)+amt);
+    return `rgb(${r},${g},${b})`;
+  }
+  function darken(hex, amt) {
+    const n = parseInt(hex.replace('#',''), 16);
+    const r = Math.max(0,(n>>16)-amt), g = Math.max(0,((n>>8)&0xff)-amt), b = Math.max(0,(n&0xff)-amt);
+    return `rgb(${r},${g},${b})`;
+  }
+
+  buildScene();
+  window.addEventListener('resize', buildScene);
   tick();
 }
 
 /* ══════════════════════════════════════════════════
-   3. LIGHT / DARK THEME TOGGLE
+   3. THEME APPLY (no toggle button)
 ══════════════════════════════════════════════════ */
 function applyTheme(theme) {
   if (theme === 'light') {
@@ -83,25 +266,14 @@ function applyTheme(theme) {
 function initThemeToggle() {
   const saved = localStorage.getItem('eylox_theme') || 'dark';
   applyTheme(saved);
-
-  const topbarRight = document.querySelector('.topbar-right');
-  if (!topbarRight) return;
-
-  const btn = document.createElement('button');
-  btn.id = 'themeToggleBtn';
-  btn.className = 'tb-btn';
-  btn.setAttribute('aria-label', 'Toggle light/dark theme');
-  btn.title = 'Toggle theme';
-  btn.textContent = saved === 'light' ? '🌙' : '☀️';
-  topbarRight.insertBefore(btn, topbarRight.firstChild);
-
-  btn.addEventListener('click', () => {
+  /* Theme toggle button removed — theme is controlled via Settings */
+  const _unused = () => {
     const current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
     const next = current === 'light' ? 'dark' : 'light';
     applyTheme(next);
     btn.textContent = next === 'light' ? '🌙' : '☀️';
     localStorage.setItem('eylox_theme', next);
-  });
+  };
 }
 
 /* ══════════════════════════════════════════════════
@@ -276,7 +448,7 @@ function initCardTilt() {
     card.style.transition = 'transform .08s, box-shadow .25s, border-color .25s';
   });
   document.addEventListener('mouseleave', e => {
-    const card = e.target?.closest?.('.game-card');
+    const card = e.target && typeof e.target.closest === 'function' ? e.target.closest('.game-card') : null;
     if (card) {
       card.style.transform = '';
       card.style.transition = 'transform .3s, box-shadow .25s, border-color .25s';

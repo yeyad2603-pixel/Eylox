@@ -6,11 +6,11 @@
 'use strict';
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (localStorage.getItem('eylox_is_owner') !== 'true') return;
-  injectStudioLink();
+  // Studio button removed
 });
 
 function injectStudioLink() {
+  return;
   if (document.getElementById('studioSidebarLink')) return;
 
   /* Find the "More" section label, then its sibling nav > ul */

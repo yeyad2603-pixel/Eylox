@@ -11,8 +11,8 @@
   /* ── Audio element for background music ── */
   /* Primary track: user-supplied music from the MUSIC folder.
      Falls back to the legacy bg-music.mp4 if the primary can't load. */
-  const PRIMARY_TRACK  = '/MUSIC/WhatsApp%20Video%202026-04-15%20at%2011.41.59%20PM.mp4';
-  const FALLBACK_TRACK = 'bg-music.mp4';
+  const PRIMARY_TRACK  = '../MUSIC/eylox-music.mp3';
+  const FALLBACK_TRACK = '../MUSIC/WhatsApp%20Video%202026-04-15%20at%2011.41.59%20PM.mp4';
 
   const musicAudio = new Audio(PRIMARY_TRACK);
   musicAudio.loop   = true;
@@ -118,6 +118,7 @@
     start:  startMusic,
     stop:   stopMusic,
     toggle() { musicPlaying ? stopMusic() : startMusic(); },
+    isPlaying() { return musicPlaying; },
     setVolume(v) {
       if (musicPlaying) fadeTo(v * 0.55, 400);
     },
