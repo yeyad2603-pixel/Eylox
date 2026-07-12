@@ -1,0 +1,2858 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Eylox Studio</title>
+<style>
+:root{
+  --purple:#a78bfa;--blue:#4fc3f7;--green:#4ade80;--red:#f87171;--yellow:#fbbf24;
+  --bg:#5c0b99;--card:#0d0620;--card2:#120830;--border:#2a1a4a;
+  --text:#e2d9f3;--muted:#7c6fa0;--hover:#1a0d35;
+  --toolbar-h:42px;--menubar-h:32px;--bottom-h:130px;
+  --left-w:240px;--right-w:260px;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif;}
+body{background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+
+/* ── LOADING ── */
+#loading{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;}
+#loading h1{font-size:2.2rem;background:linear-gradient(135deg,var(--purple),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+#loading p{color:var(--muted);font-size:.9rem;}
+.prog-bar{width:280px;height:6px;background:var(--card2);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--purple),var(--blue));border-radius:3px;transition:width .3s ease;}
+
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 40%,#1a0545 0%,var(--bg) 70%);z-index:8888;display:none;align-items:center;justify-content:center;}
+.login-box{background:rgba(13,6,32,.85);border:1px solid var(--border);border-radius:16px;padding:36px 40px;width:360px;backdrop-filter:blur(20px);box-shadow:0 0 60px rgba(167,139,250,.15);}
+.login-box h2{font-size:1.5rem;margin-bottom:6px;background:linear-gradient(135deg,var(--purple),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.login-box p{color:var(--muted);font-size:.82rem;margin-bottom:24px;}
+.login-box label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:4px;margin-top:14px;}
+.login-box input{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:.9rem;outline:none;transition:border-color .2s;}
+.login-box input:focus{border-color:var(--purple);}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 18px;border:none;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .2s;}
+.btn-primary{background:linear-gradient(135deg,var(--purple),#7c3aed);color:#fff;}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 4px 20px rgba(167,139,250,.35);}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover{border-color:var(--purple);color:var(--purple);}
+.login-actions{display:flex;gap:10px;margin-top:20px;}
+.login-error{color:var(--red);font-size:.8rem;margin-top:8px;min-height:18px;}
+
+/* ── STUDIO LAYOUT ── */
+#studio{display:none;flex-direction:column;height:100vh;}
+#studio.visible{display:flex;}
+
+/* menubar */
+#menubar{height:var(--menubar-h);background:rgba(13,6,32,.95);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 8px;gap:2px;backdrop-filter:blur(10px);flex-shrink:0;z-index:100;}
+.menu-logo{font-size:.85rem;font-weight:700;background:linear-gradient(135deg,var(--purple),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;padding:0 10px;margin-right:4px;white-space:nowrap;}
+.menu-item{position:relative;}
+.menu-btn{background:none;border:none;color:var(--text);font-size:.78rem;padding:4px 10px;border-radius:5px;cursor:pointer;white-space:nowrap;}
+.menu-btn:hover{background:var(--hover);color:var(--purple);}
+.dropdown{position:absolute;top:100%;left:0;background:rgba(18,8,48,.97);border:1px solid var(--border);border-radius:8px;min-width:190px;padding:4px;z-index:500;display:none;box-shadow:0 8px 32px rgba(0,0,0,.5);backdrop-filter:blur(16px);}
+.dropdown.open{display:block;}
+.dd-item{display:block;width:100%;background:none;border:none;color:var(--text);font-size:.78rem;padding:6px 12px;border-radius:5px;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;}
+.dd-item:hover{background:var(--hover);color:var(--purple);}
+.dd-sep{height:1px;background:var(--border);margin:3px 6px;}
+.dd-kbd{color:var(--muted);font-size:.7rem;}
+.menu-spacer{flex:1;}
+.menu-user{font-size:.75rem;color:var(--muted);padding:0 10px;}
+.menu-back{font-size:.75rem;color:var(--muted);padding:4px 10px;border-radius:5px;cursor:pointer;text-decoration:none;border:1px solid var(--border);}
+.menu-back:hover{border-color:var(--purple);color:var(--purple);}
+
+/* toolbar */
+#toolbar{height:var(--toolbar-h);background:rgba(13,6,32,.9);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 10px;gap:6px;flex-shrink:0;}
+.tb-group{display:flex;align-items:center;gap:3px;padding:0 6px;border-right:1px solid var(--border);}
+.tb-group:last-child{border-right:none;}
+.tb-btn{background:none;border:1px solid transparent;color:var(--muted);font-size:.78rem;padding:5px 10px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;transition:all .15s;}
+.tb-btn:hover{border-color:var(--border);color:var(--text);background:var(--hover);}
+.tb-btn.active{background:rgba(167,139,250,.15);border-color:var(--purple);color:var(--purple);}
+.tb-sep{width:1px;height:22px;background:var(--border);}
+.tb-label{font-size:.7rem;color:var(--muted);}
+#play-btn{background:linear-gradient(135deg,var(--green),#16a34a);color:#000;border:none;font-weight:700;padding:5px 16px;}
+#play-btn:hover{opacity:.9;}
+#stop-btn{background:linear-gradient(135deg,var(--red),#dc2626);color:#fff;border:none;font-weight:700;padding:5px 16px;display:none;}
+
+/* main area */
+#main{flex:1;display:flex;overflow:hidden;}
+
+/* left panel */
+#left-panel{width:var(--left-w);background:rgba(13,6,32,.85);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;backdrop-filter:blur(8px);}
+.panel-tabs{display:flex;border-bottom:1px solid var(--border);}
+.panel-tab{flex:1;background:none;border:none;color:var(--muted);font-size:.75rem;padding:8px;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;}
+.panel-tab.active{color:var(--purple);border-bottom-color:var(--purple);}
+.panel-tab:hover:not(.active){color:var(--text);}
+.panel-content{flex:1;overflow-y:auto;padding:6px;}
+.panel-content::-webkit-scrollbar{width:4px;}
+.panel-content::-webkit-scrollbar-track{background:transparent;}
+.panel-content::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.panel-section{margin-bottom:4px;}
+.panel-section-header{font-size:.7rem;color:var(--muted);padding:4px 6px;text-transform:uppercase;letter-spacing:.05em;}
+
+/* explorer tree */
+.tree-item{display:flex;align-items:center;gap:5px;padding:3px 6px;border-radius:5px;cursor:pointer;font-size:.78rem;user-select:none;}
+.tree-item:hover{background:var(--hover);}
+.tree-item.selected{background:rgba(167,139,250,.15);color:var(--purple);}
+.tree-icon{font-size:.85rem;flex-shrink:0;}
+.tree-arrow{font-size:.6rem;color:var(--muted);flex-shrink:0;width:12px;}
+.tree-children{padding-left:14px;}
+
+/* toolbox */
+.toolbox-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:4px;}
+.tool-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:all .15s;font-size:.68rem;color:var(--muted);text-align:center;}
+.tool-card:hover{border-color:var(--purple);color:var(--purple);background:rgba(167,139,250,.08);transform:translateY(-1px);}
+.tool-icon{font-size:1.4rem;}
+
+/* viewport */
+#viewport-wrap{flex:1;display:flex;flex-direction:column;position:relative;}
+#viewport{flex:1;position:relative;overflow:hidden;background:#000;}
+#viewport canvas{display:block;width:100%!important;height:100%!important;}
+.viewport-overlay{position:absolute;top:8px;right:8px;display:flex;gap:6px;z-index:10;}
+.vp-info{position:absolute;bottom:8px;left:8px;font-size:.7rem;color:rgba(255,255,255,.4);z-index:10;pointer-events:none;}
+.vp-mode-badge{position:absolute;top:8px;left:50%;transform:translateX(-50%);background:rgba(74,222,128,.2);border:1px solid var(--green);color:var(--green);font-size:.75rem;padding:3px 14px;border-radius:20px;z-index:10;display:none;}
+
+/* right panel */
+#right-panel{width:var(--right-w);background:rgba(13,6,32,.85);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;backdrop-filter:blur(8px);}
+#right-panel .panel-tabs{border-bottom:1px solid var(--border);}
+.props-section{margin-bottom:10px;}
+.props-title{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:6px 8px 3px;border-bottom:1px solid var(--border);margin-bottom:6px;}
+.prop-row{display:flex;align-items:center;padding:3px 8px;gap:6px;}
+.prop-label{font-size:.73rem;color:var(--muted);flex:0 0 60px;}
+.prop-val{flex:1;display:flex;gap:3px;}
+.prop-input{background:var(--card2);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:.75rem;padding:3px 6px;width:100%;outline:none;}
+.prop-input:focus{border-color:var(--purple);}
+.prop-input[type=number]{-moz-appearance:textfield;}
+.prop-input[type=number]::-webkit-outer-spin-button,
+.prop-input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
+.prop-color{width:36px;height:24px;border:1px solid var(--border);border-radius:5px;padding:1px;background:var(--card2);cursor:pointer;}
+.prop-toggle{position:relative;display:inline-block;width:32px;height:17px;}
+.prop-toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:var(--card2);border:1px solid var(--border);border-radius:17px;cursor:pointer;transition:.2s;}
+.toggle-slider:before{content:'';position:absolute;width:11px;height:11px;left:2px;top:2px;background:var(--muted);border-radius:50%;transition:.2s;}
+.prop-toggle input:checked+.toggle-slider{background:rgba(167,139,250,.3);border-color:var(--purple);}
+.prop-toggle input:checked+.toggle-slider:before{transform:translateX(15px);background:var(--purple);}
+.slider-wrap{flex:1;display:flex;align-items:center;gap:6px;}
+.prop-slider{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;background:var(--card2);outline:none;cursor:pointer;}
+.prop-slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--purple);cursor:pointer;}
+.prop-select{background:var(--card2);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:.75rem;padding:3px 6px;width:100%;outline:none;}
+.no-select{color:var(--muted);font-size:.78rem;text-align:center;padding:30px 10px;}
+
+/* script editor */
+#script-editor{display:none;flex-direction:column;height:100%;}
+.script-header{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--border);background:var(--card2);}
+.script-name{font-size:.8rem;color:var(--purple);}
+.script-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;margin-left:auto;}
+.script-close:hover{color:var(--red);}
+#script-area{flex:1;display:flex;overflow:hidden;}
+#line-numbers{background:var(--card2);color:var(--muted);font-family:monospace;font-size:.8rem;padding:8px 6px;text-align:right;user-select:none;min-width:36px;border-right:1px solid var(--border);overflow:hidden;}
+#code-input{flex:1;background:#0a0520;color:#c9d1d9;font-family:'Cascadia Code','Fira Code',monospace;font-size:.8rem;padding:8px;border:none;outline:none;resize:none;line-height:1.5;tab-size:2;}
+
+/* bottom console */
+#bottom{height:var(--bottom-h);background:rgba(13,6,32,.9);border-top:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+.bottom-tabs{display:flex;border-bottom:1px solid var(--border);}
+.bottom-tab{background:none;border:none;color:var(--muted);font-size:.73rem;padding:5px 14px;cursor:pointer;border-bottom:2px solid transparent;}
+.bottom-tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+#console-output{flex:1;overflow-y:auto;padding:4px 8px;font-family:monospace;font-size:.75rem;}
+.con-line{padding:1px 0;border-bottom:1px solid rgba(255,255,255,.03);}
+.con-info{color:var(--blue);}
+.con-warn{color:var(--yellow);}
+.con-err,.con-error{color:var(--red);}
+.con-ok,.con-success{color:var(--green);}
+
+/* context menu */
+#ctx-menu{position:fixed;background:rgba(18,8,48,.97);border:1px solid var(--border);border-radius:8px;min-width:170px;padding:4px;z-index:600;display:none;box-shadow:0 8px 32px rgba(0,0,0,.5);backdrop-filter:blur(16px);}
+.ctx-item{display:block;width:100%;background:none;border:none;color:var(--text);font-size:.78rem;padding:6px 12px;border-radius:5px;cursor:pointer;text-align:left;}
+.ctx-item:hover{background:var(--hover);color:var(--purple);}
+.ctx-sep{height:1px;background:var(--border);margin:3px 6px;}
+
+/* resize handle */
+.resize-h{cursor:row-resize;height:4px;background:var(--border);transition:background .15s;}
+.resize-h:hover{background:var(--purple);}
+
+/* scrollbars global */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+/* util */
+.hidden{display:none!important;}
+.flex-center{display:flex;align-items:center;justify-content:center;}
+
+/* ── Studio Modals ─────────────────────── */
+.studio-modal{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;display:flex;align-items:center;justify-content:center;}
+.smodal-box{background:var(--panel,#120929);border:1px solid var(--border,#2a1a4a);border-radius:10px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.6);max-height:90vh;display:flex;flex-direction:column;}
+.smodal-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--menubar,#0d0620);border-bottom:1px solid var(--border,#2a1a4a);font-size:14px;font-weight:600;color:var(--text,#e2d8f0);}
+.smodal-close{background:none;border:none;color:var(--text,#e2d8f0);font-size:16px;cursor:pointer;opacity:.7;padding:0 4px;}
+.smodal-close:hover{opacity:1;}
+.smodal-tabs{display:flex;border-bottom:1px solid var(--border,#2a1a4a);background:var(--menubar,#0d0620);}
+.modal-tab{flex:1;padding:7px 10px;background:none;border:none;color:var(--text,#e2d8f0);font-size:12px;cursor:pointer;opacity:.6;border-bottom:2px solid transparent;}
+.modal-tab.active{opacity:1;border-bottom-color:var(--purple,#a78bfa);color:var(--purple,#a78bfa);}
+.smodal-body{padding:16px;overflow-y:auto;flex:1;}
+.sfield{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:13px;color:var(--text,#e2d8f0);}
+.sfield label{min-width:120px;color:#aaa;}
+.sfield input[type=text],.sfield input[type=number],.sfield select{flex:1;background:var(--bg,#06010f);color:var(--text,#e2d8f0);border:1px solid var(--border,#2a1a4a);border-radius:4px;padding:5px 8px;font-size:13px;}
+.sfield input[type=range]{flex:1;}
+.sfield input[type=color]{width:42px;height:28px;border:none;border-radius:4px;cursor:pointer;background:none;}
+.sfield input[type=checkbox]{width:16px;height:16px;accent-color:var(--purple,#a78bfa);}
+.smodal-btn{padding:8px 18px;background:var(--purple,#a78bfa);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;}
+.smodal-btn:hover{filter:brightness(1.15);}
+.smodal-cancel{background:var(--border,#2a1a4a);color:var(--text,#e2d8f0);}
+.settings-section{font-size:11px;font-weight:700;color:var(--purple,#a78bfa);text-transform:uppercase;letter-spacing:.08em;margin:14px 0 6px;border-bottom:1px solid var(--border,#2a1a4a);padding-bottom:4px;}
+.theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.theme-card{background:var(--bg,#06010f);border:1px solid var(--border,#2a1a4a);border-radius:8px;padding:12px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px;color:var(--text,#e2d8f0);transition:border-color .15s,transform .1s;}
+.theme-card:hover{border-color:var(--tc,#a78bfa);transform:scale(1.04);}
+.theme-preview{width:56px;height:36px;border-radius:6px;border:2px solid;}
+
+/* ── Autosave Badge ── */
+#autosave-badge{position:absolute;top:46px;left:8px;background:rgba(74,222,128,.15);border:1px solid var(--green);color:var(--green);font-size:.65rem;padding:2px 10px;border-radius:20px;z-index:10;display:none;pointer-events:none;}
+
+/* ── Day/Night Slider ── */
+#dn-slider{width:80px;height:4px;-webkit-appearance:none;background:linear-gradient(90deg,#0d1b3e,#87ceeb);border-radius:2px;outline:none;cursor:pointer;vertical-align:middle;}
+#dn-slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--yellow);cursor:pointer;box-shadow:0 0 5px rgba(251,191,36,.5);}
+
+/* ── Toolbox Enhancements ── */
+.tbx-top{padding:6px 6px 2px;}
+.tbx-search{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.72rem;padding:5px 8px;outline:none;margin-bottom:5px;box-sizing:border-box;}
+.tbx-search:focus{border-color:var(--purple);}
+.tbx-cats{display:flex;flex-wrap:wrap;gap:3px;padding:0 2px 4px;}
+.tbx-cat{background:var(--card2);border:1px solid var(--border);border-radius:20px;color:var(--muted);font-size:.6rem;padding:2px 7px;cursor:pointer;white-space:nowrap;transition:all .15s;}
+.tbx-cat.active,.tbx-cat:hover{background:rgba(167,139,250,.15);border-color:var(--purple);color:var(--purple);}
+
+/* ── AI Assistant Panel ── */
+.ai-panel{display:flex;flex-direction:column;height:100%;overflow:hidden;}
+.ai-header{padding:8px 10px;border-bottom:1px solid var(--border);font-size:.72rem;color:var(--purple);font-weight:600;display:flex;align-items:center;gap:5px;flex-shrink:0;}
+.ai-msgs{flex:1;overflow-y:auto;padding:6px;display:flex;flex-direction:column;gap:5px;min-height:0;}
+.ai-msg{font-size:.72rem;line-height:1.5;padding:7px 9px;border-radius:8px;word-break:break-word;}
+.ai-msg.user-msg{background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.2);color:var(--text);align-self:flex-end;max-width:92%;}
+.ai-msg.bot-msg{background:var(--card2);border:1px solid var(--border);color:var(--text);align-self:flex-start;max-width:96%;}
+.ai-msg code{background:rgba(0,0,0,.35);padding:1px 5px;border-radius:3px;font-family:monospace;font-size:.67rem;color:var(--blue);}
+.ai-chips{display:flex;flex-wrap:wrap;gap:3px;padding:4px 6px 2px;flex-shrink:0;}
+.ai-chip{background:var(--card2);border:1px solid var(--border);border-radius:20px;color:var(--muted);font-size:.6rem;padding:2px 7px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.ai-chip:hover{border-color:var(--purple);color:var(--purple);}
+.ai-input-row{display:flex;gap:4px;padding:6px;border-top:1px solid var(--border);flex-shrink:0;}
+.ai-input{flex:1;background:var(--card2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.72rem;padding:5px 7px;outline:none;}
+.ai-input:focus{border-color:var(--purple);}
+.ai-send{background:var(--purple);border:none;border-radius:6px;color:#fff;font-size:.72rem;padding:5px 9px;cursor:pointer;}
+.ai-send:hover{filter:brightness(1.15);}
+
+/* ── Marketplace Modal ── */
+.mkt-top-bar{display:flex;gap:6px;align-items:center;margin-bottom:10px;}
+.mkt-top-bar input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:5px 10px;outline:none;}
+.mkt-top-bar input:focus{border-color:var(--purple);}
+.mkt-top-bar select{background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;padding:5px 8px;}
+.mkt-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.mkt-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;overflow:hidden;cursor:pointer;transition:all .15s;}
+.mkt-card:hover{border-color:var(--purple);transform:translateY(-2px);box-shadow:0 4px 14px rgba(167,139,250,.2);}
+.mkt-thumb{height:64px;display:flex;align-items:center;justify-content:center;font-size:2rem;background:var(--card2);}
+.mkt-info{padding:8px;}
+.mkt-name{font-size:.75rem;font-weight:600;color:var(--text);margin-bottom:2px;}
+.mkt-meta{display:flex;justify-content:space-between;align-items:center;margin-top:3px;}
+.mkt-price{font-size:.68rem;color:var(--green);}
+.mkt-stars{color:var(--yellow);font-size:.62rem;}
+
+/* ── NPC Generator ── */
+.npc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px;}
+.npc-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;transition:all .15s;text-align:center;}
+.npc-card:hover,.npc-card.npc-selected{border-color:var(--purple);background:rgba(167,139,250,.08);}
+.npc-icon{font-size:1.7rem;display:block;margin-bottom:3px;}
+.npc-name{font-size:.75rem;font-weight:600;color:var(--text);}
+.npc-desc{font-size:.62rem;color:var(--muted);margin-top:2px;}
+
+/* ── Animation Editor ── */
+.anim-controls{display:flex;gap:5px;align-items:center;margin-bottom:10px;flex-wrap:wrap;}
+.anim-controls button{background:var(--card2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.7rem;padding:4px 10px;cursor:pointer;}
+.anim-controls button:hover{border-color:var(--purple);color:var(--purple);}
+.anim-timeline{background:var(--bg);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:8px;}
+.anim-track-row{display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.04);}
+.anim-track-label{width:72px;padding:5px 8px;font-size:.65rem;color:var(--muted);border-right:1px solid var(--border);flex-shrink:0;}
+.anim-track-bar{flex:1;height:26px;position:relative;cursor:pointer;}
+.anim-kf{position:absolute;width:10px;height:10px;background:var(--purple);border-radius:50%;top:50%;transform:translate(-50%,-50%);cursor:grab;}
+.anim-kf:hover{background:var(--blue);box-shadow:0 0 5px var(--blue);}
+
+/* ── Plugins Modal ── */
+.plugin-list{display:flex;flex-direction:column;gap:8px;}
+.plugin-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;display:flex;align-items:center;gap:10px;}
+.plugin-icon{font-size:1.4rem;flex-shrink:0;}
+.plugin-info{flex:1;}
+.plugin-name{font-size:.78rem;font-weight:600;color:var(--text);}
+.plugin-desc{font-size:.65rem;color:var(--muted);}
+.plugin-toggle{background:rgba(167,139,250,.15);border:1px solid var(--purple);color:var(--purple);border-radius:5px;padding:3px 10px;font-size:.68rem;cursor:pointer;white-space:nowrap;}
+
+/* ── Shortcuts Modal ── */
+.shortcuts-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.sc-row{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;background:var(--bg);border:1px solid var(--border);border-radius:5px;font-size:.72rem;gap:8px;}
+.sc-key{background:var(--card2);border:1px solid var(--border);border-radius:4px;padding:1px 7px;font-family:monospace;font-size:.68rem;color:var(--purple);white-space:nowrap;}
+.sc-action{color:var(--muted);font-size:.68rem;}
+</style>
+<script src="audit-loader.js" defer></script>
+  <script src="debug-dashboard.js" defer></script>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loading">
+  <h1>&#x2B22; EYLOX STUDIO</h1>
+  <p>Initializing workspace...</p>
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+  <p id="prog-label" style="font-size:.75rem;color:var(--muted)">Loading engine...</p>
+</div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <h2>&#x2B22; Eylox Studio</h2>
+    <p>Sign in to start building</p>
+    <label>Username</label>
+    <input type="text" id="li-user" placeholder="Username" autocomplete="username"/>
+    <label>Password</label>
+    <input type="password" id="li-pass" placeholder="Password" autocomplete="current-password"/>
+    <div class="login-error" id="li-err"></div>
+    <div class="login-actions">
+      <button class="btn btn-primary" onclick="doLogin()">Sign In</button>
+      <button class="btn btn-ghost" onclick="doGuest()">Continue as Guest</button>
+    </div>
+  </div>
+</div>
+
+<!-- STUDIO -->
+<div id="studio">
+
+  <!-- MENUBAR -->
+  <div id="menubar">
+    <span class="menu-logo">&#x2B22; EYLOX</span>
+    <!-- File -->
+    <div class="menu-item">
+      <button class="menu-btn" onclick="toggleMenu('m-file')">File</button>
+      <div class="dropdown" id="m-file">
+        <button class="dd-item" onclick="newScene();closeMenus()">New Scene <span class="dd-kbd">Ctrl+N</span></button>
+        <button class="dd-item" onclick="saveScene();closeMenus()">Save <span class="dd-kbd">Ctrl+S</span></button>
+        <div class="dd-sep"></div>
+        <button class="dd-item" onclick="exportHTML();closeMenus()">Export as HTML</button>
+        <div class="dd-sep"></div>
+        <button class="dd-item" onclick="closeMenus();window.location.href='index.html'">Back to Home</button>
+      </div>
+    </div>
+    <!-- Edit -->
+    <div class="menu-item">
+      <button class="menu-btn" onclick="toggleMenu('m-edit')">Edit</button>
+      <div class="dropdown" id="m-edit">
+        <button class="dd-item" onclick="undo();closeMenus()">Undo <span class="dd-kbd">Ctrl+Z</span></button>
+        <button class="dd-item" onclick="redo();closeMenus()">Redo <span class="dd-kbd">Ctrl+Y</span></button>
+        <div class="dd-sep"></div>
+        <button class="dd-item" onclick="cutObj();closeMenus()">Cut <span class="dd-kbd">Ctrl+X</span></button>
+        <button class="dd-item" onclick="copyObj();closeMenus()">Copy <span class="dd-kbd">Ctrl+C</span></button>
+        <button class="dd-item" onclick="pasteObj();closeMenus()">Paste <span class="dd-kbd">Ctrl+V</span></button>
+        <button class="dd-item" onclick="duplicateObj();closeMenus()">Duplicate <span class="dd-kbd">Ctrl+D</span></button>
+        <div class="dd-sep"></div>
+        <button class="dd-item" onclick="deleteSelected();closeMenus()">Delete <span class="dd-kbd">Del</span></button>
+      </div>
+    </div>
+    <!-- View -->
+    <div class="menu-item">
+      <button class="menu-btn" onclick="toggleMenu('m-view')">View</button>
+      <div class="dropdown" id="m-view">
+        <button class="dd-item" onclick="togglePanel('left-panel');closeMenus()">Explorer Panel</button>
+        <button class="dd-item" onclick="togglePanel('right-panel');closeMenus()">Properties Panel</button>
+        <div class="dd-sep"></div>
+        <button class="dd-item" onclick="toggleGrid();closeMenus()">Toggle Grid <span class="dd-kbd">G</span></button>
+        <button class="dd-item" onclick="toggleWireframe();closeMenus()">Toggle Wireframe</button>
+        <button class="dd-item" onclick="resetCamera();closeMenus()">Reset Camera</button>
+      </div>
+    </div>
+    <!-- Insert -->
+    <div class="menu-item">
+      <button class="menu-btn" onclick="toggleMenu('m-insert')">Insert</button>
+      <div class="dropdown" id="m-insert">
+        <button class="dd-item" onclick="insertObject('Part');closeMenus()">Part (Box)</button>
+        <button class="dd-item" onclick="insertObject('Sphere');closeMenus()">Sphere</button>
+        <button class="dd-item" onclick="insertObject('Cylinder');closeMenus()">Cylinder</button>
+        <button class="dd-item" onclick="insertObject('Wedge');closeMenus()">Wedge (Cone)</button>
+        <button class="dd-item" onclick="insertObject('Torus');closeMenus()">Torus</button>
+        <button class="dd-item" onclick="insertObject('Cone');closeMenus()">Cone</button>
+        <div class="dd-sep"></div>
+        <button class="dd-item" onclick="insertObject('Spawn');closeMenus()">Spawn Point</button>
+        <button class="dd-item" onclick="insertObject('PointLight');closeMenus()">Point Light</button>
+        <button class="dd-item" onclick="insertObject('SpotLight');closeMenus()">Spot Light</button>
+        <div class="dd-sep"></div>
+        <button class="dd-item" onclick="insertObject('Script');closeMenus()">Script</button>
+        <button class="dd-item" onclick="insertObject('Model');closeMenus()">Model Group</button>
+      </div>
+    </div>
+    <!-- Terrain -->
+    <div class="menu-item">
+      <button class="menu-btn" onclick="toggleMenu('m-terrain')">Terrain</button>
+      <div class="dropdown" id="m-terrain">
+        <button class="dd-item" onclick="openTerrainModal('generate');closeMenus()">🌍 Generate Terrain</button>
+        <button class="dd-item" onclick="openTerrainModal('paint');closeMenus()">🎨 Paint Terrain</button>
+        <button class="dd-item" onclick="openTerrainModal('sculpt');closeMenus()">🏔️ Sculpt / Smooth</button>
+        <div class="dd-sep"></div>
+        <button class="dd-item" onclick="addWater();closeMenus()">💧 Add Water Plane</button>
+        <button class="dd-item" onclick="clearTerrain();closeMenus()">🗑️ Clear Terrain</button>
+      </div>
+    </div>
+    <!-- Test -->
+    <div class="menu-item">
+      <button class="menu-btn" onclick="toggleMenu('m-test')">Test</button>
+      <div class="dropdown" id="m-test">
+        <button class="dd-item" onclick="startPlay();closeMenus()">Play <span class="dd-kbd">F5</span></button>
+        <button class="dd-item" onclick="stopPlay();closeMenus()">Stop <span class="dd-kbd">F6</span></button>
+      </div>
+    </div>
+    <!-- Publish -->
+    <div class="menu-item">
+      <button class="menu-btn" onclick="openPublishModal();closeMenus()">Publish</button>
+    </div>
+    <!-- Plugins -->
+    <div class="menu-item">
+      <button class="menu-btn" onclick="toggleMenu('m-plugins')">Plugins</button>
+      <div class="dropdown" id="m-plugins">
+        <button class="dd-item" onclick="openNPCModal();closeMenus()">🤖 NPC Generator</button>
+        <button class="dd-item" onclick="openAnimEditor();closeMenus()">🎬 Animation Editor</button>
+        <button class="dd-item" onclick="openMarketplace();closeMenus()">🛒 Asset Marketplace</button>
+        <div class="dd-sep"></div>
+        <button class="dd-item" onclick="openPluginsModal();closeMenus()">🧩 Manage Plugins</button>
+        <button class="dd-item" onclick="insertObject('Vehicle');closeMenus()">🚗 Insert Vehicle</button>
+      </div>
+    </div>
+    <!-- Help -->
+    <div class="menu-item">
+      <button class="menu-btn" onclick="toggleMenu('m-help')">Help</button>
+      <div class="dropdown" id="m-help">
+        <button class="dd-item" onclick="openShortcutsModal();closeMenus()">⌨️ Keyboard Shortcuts</button>
+        <button class="dd-item" onclick="openAITab();closeMenus()">🤖 AI Assistant</button>
+        <div class="dd-sep"></div>
+        <button class="dd-item" onclick="conLog('Eylox Studio v2.1 — Powered by Three.js','ok');closeMenus()">ℹ️ About Studio</button>
+      </div>
+    </div>
+    <!-- Settings -->
+    <div class="menu-item">
+      <button class="menu-btn" onclick="toggleMenu('m-settings')">Settings</button>
+      <div class="dropdown" id="m-settings">
+        <button class="dd-item" onclick="openSettingsModal();closeMenus()">⚙️ Studio Settings</button>
+        <button class="dd-item" onclick="openThemeModal();closeMenus()">🎨 Theme</button>
+      </div>
+    </div>
+    <div class="menu-spacer"></div>
+    <span class="menu-user" id="menu-user-label">Guest</span>
+    <a class="menu-back" href="index.html">&#8592; Home</a>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div id="toolbar">
+    <div class="tb-group">
+      <button class="tb-btn active" id="tb-select" onclick="setTool('select')" title="Select (Q)">&#9654; Select</button>
+      <button class="tb-btn" id="tb-move" onclick="setTool('move')" title="Move (W)">&#10021; Move</button>
+      <button class="tb-btn" id="tb-scale" onclick="setTool('scale')" title="Scale (E)">&#11020; Scale</button>
+      <button class="tb-btn" id="tb-rotate" onclick="setTool('rotate')" title="Rotate (R)">&#8635; Rotate</button>
+    </div>
+    <div class="tb-group">
+      <button class="tb-btn" onclick="insertObject('Part')" title="Insert Part">&#9646; Part</button>
+      <button class="tb-btn" onclick="insertObject('Sphere')">&#9711; Sphere</button>
+      <button class="tb-btn" onclick="insertObject('PointLight')">&#9728; Light</button>
+    </div>
+    <div class="tb-group">
+      <span class="tb-label">Snap:</span>
+      <select id="snap-val" class="prop-select" style="width:70px;font-size:.72rem;" onchange="updateSnap()">
+        <option value="0">Off</option>
+        <option value="0.5">0.5</option>
+        <option value="1" selected>1</option>
+        <option value="2">2</option>
+        <option value="4">4</option>
+      </select>
+    </div>
+    <div class="tb-group">
+      <span class="tb-label">🌙</span>
+      <input type="range" id="dn-slider" min="0" max="1" step="0.01" value="0.6" oninput="setDayNight(this.value)" title="Day/Night Cycle">
+      <span class="tb-label">☀️</span>
+    </div>
+    <div class="tb-group">
+      <button class="tb-btn" onclick="openMarketplace()" title="Asset Marketplace" style="font-size:.72rem;">🛒 Market</button>
+      <button class="tb-btn" onclick="openNPCModal()" title="NPC Generator" style="font-size:.72rem;">🤖 NPC</button>
+    </div>
+    <div class="tb-group" style="margin-left:auto;">
+      <span id="fps-label" class="tb-label" style="font-family:monospace;color:var(--green);min-width:48px;">-- FPS</span>
+      <button class="tb-btn" id="play-btn" onclick="startPlay()" title="Play (F5)">&#9654; Play</button>
+      <button class="tb-btn" id="stop-btn" onclick="stopPlay()" title="Stop (F6)">&#9646;&#9646; Stop</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div id="main">
+
+    <!-- LEFT PANEL -->
+    <div id="left-panel">
+      <div class="panel-tabs">
+        <button class="panel-tab active" onclick="switchLeftTab('explorer',this)">Explorer</button>
+        <button class="panel-tab" onclick="switchLeftTab('toolbox',this)">Toolbox</button>
+        <button class="panel-tab" onclick="switchLeftTab('ai',this)" title="AI Assistant">AI ✨</button>
+      </div>
+      <!-- Explorer -->
+      <div class="panel-content" id="tab-explorer">
+        <div id="scene-tree"></div>
+      </div>
+      <!-- Toolbox -->
+      <div class="panel-content hidden" id="tab-toolbox" style="padding:0;display:flex;flex-direction:column;">
+        <div class="tbx-top">
+          <input class="tbx-search" id="tbx-search" type="text" placeholder="🔍 Search assets..." oninput="filterToolbox(this.value)">
+          <div class="tbx-cats" id="tbx-cats"></div>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:0 4px 6px;">
+          <div class="toolbox-grid" id="toolbox-grid"></div>
+        </div>
+      </div>
+      <!-- AI Assistant -->
+      <div class="hidden" id="tab-ai" style="flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden;">
+        <div class="ai-panel">
+          <div class="ai-header">🤖 Eylox AI Assistant</div>
+          <div class="ai-msgs" id="ai-msgs">
+            <div class="ai-msg bot-msg">👋 Hi! I'm your AI game dev assistant. Ask me anything about scripting, objects, or game design!</div>
+          </div>
+          <div class="ai-chips">
+            <span class="ai-chip" onclick="aiChip('How do I make an NPC move?')">NPC movement</span>
+            <span class="ai-chip" onclick="aiChip('How do I track score?')">Score system</span>
+            <span class="ai-chip" onclick="aiChip('How do I add sound?')">Add sound</span>
+            <span class="ai-chip" onclick="aiChip('How do I make a jump?')">Jump logic</span>
+            <span class="ai-chip" onclick="aiChip('How do I publish my game?')">Publish game</span>
+            <span class="ai-chip" onclick="aiChip('How do I use the camera?')">Camera tips</span>
+          </div>
+          <div class="ai-input-row">
+            <input class="ai-input" id="ai-input" type="text" placeholder="Ask the AI..." onkeydown="if(event.key==='Enter')aiSend()">
+            <button class="ai-send" onclick="aiSend()">↑</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEWPORT WRAP -->
+    <div id="viewport-wrap">
+      <div id="viewport">
+        <div id="autosave-badge">✓ Autosaved</div>
+        <div class="viewport-overlay">
+          <button class="tb-btn" style="font-size:.7rem;padding:3px 8px;" onclick="resetCamera()">&#8635; Reset</button>
+          <button class="tb-btn" style="font-size:.7rem;padding:3px 8px;" onclick="openMarketplace()" title="Marketplace">🛒</button>
+          <button class="tb-btn" style="font-size:.7rem;padding:3px 8px;" onclick="openNPCModal()" title="NPC Generator">🤖</button>
+        </div>
+        <div class="vp-info" id="vp-info">Eylox Studio | Ctrl+Z Undo | Q/W/E/R Tools | F5 Play</div>
+        <div class="vp-mode-badge" id="vp-badge">&#9654; PLAY MODE</div>
+      </div>
+      <div id="bottom">
+        <div class="bottom-tabs">
+          <button class="bottom-tab active" onclick="switchBottomTab('console',this)">Output</button>
+          <button class="bottom-tab" onclick="switchBottomTab('errors',this)">Errors</button>
+        </div>
+        <div id="console-output"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div id="right-panel">
+      <div class="panel-tabs">
+        <button class="panel-tab active" onclick="switchRightTab('props',this)">Properties</button>
+        <button class="panel-tab" onclick="switchRightTab('script',this)">Script</button>
+      </div>
+      <!-- Properties -->
+      <div class="panel-content" id="tab-props" style="padding:0;">
+        <div id="props-body"><div class="no-select">Select an object to edit its properties.</div></div>
+      </div>
+      <!-- Script editor -->
+      <div id="script-editor" style="flex:1;">
+        <div class="script-header">
+          <span class="tree-icon">&#128196;</span>
+          <span class="script-name" id="script-editor-name">Script</span>
+          <button class="script-close" onclick="closeScriptEditor()">&#x2715;</button>
+        </div>
+        <div id="script-area">
+          <div id="line-numbers">1</div>
+          <textarea id="code-input" spellcheck="false" placeholder="-- Eylox Script&#10;-- Write your game logic here"></textarea>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /studio -->
+
+<!-- CONTEXT MENU -->
+<div id="ctx-menu">
+  <button class="ctx-item" onclick="insertObject('Part');closeCtx()">&#9646; Insert Part</button>
+  <button class="ctx-item" onclick="insertObject('Sphere');closeCtx()">&#9711; Insert Sphere</button>
+  <button class="ctx-item" onclick="insertObject('PointLight');closeCtx()">&#9728; Insert Light</button>
+  <div class="ctx-sep"></div>
+  <button class="ctx-item" onclick="duplicateObj();closeCtx()">&#10064; Duplicate</button>
+  <button class="ctx-item" onclick="focusSelected();closeCtx()">&#9654; Focus (F)</button>
+  <div class="ctx-sep"></div>
+  <button class="ctx-item" onclick="deleteSelected();closeCtx()" style="color:var(--red)">&#128465; Delete</button>
+</div>
+
+<!-- THREE.JS -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/TransformControls.js"></script>
+
+<script>
+'use strict';
+// ═══════════════════════════════════════
+//  EYLOX STUDIO — Main Script
+// ═══════════════════════════════════════
+
+// ── Auth ──────────────────────────────
+function checkAuth(){
+  const t=localStorage.getItem('eylox_token');
+  const g=localStorage.getItem('eylox_guest');
+  const u=localStorage.getItem('eylox_user');
+  if(t||g||u) return true;
+  return false;
+}
+function doLogin(){
+  const u=document.getElementById('li-user').value.trim();
+  const p=document.getElementById('li-pass').value;
+  const err=document.getElementById('li-err');
+  if(!u){err.textContent='Please enter a username.';return;}
+  // Merge with existing user data if it exists, otherwise create fresh
+  let existing={};
+  try{ existing=JSON.parse(localStorage.getItem('eylox_user')||'{}'); if(typeof existing!=='object'||existing===null) existing={}; }catch{}
+  if(u==='Eylox'&&p==='EyadYasser'){
+    const userData=Object.assign({username:'Eylox',coins:existing.coins||1000000,wins:existing.wins||0,gamesPlayed:existing.gamesPlayed||0,avatar:'👑',rank:'Owner'},existing,{username:'Eylox'});
+    localStorage.setItem('eylox_user',JSON.stringify(userData));
+    localStorage.setItem('eylox_token','owner-token-eylox');
+    localStorage.setItem('eylox_is_owner','true');
+    initStudio();
+  } else if(u&&p){
+    const userData=Object.assign({username:u,coins:existing.coins||500,wins:existing.wins||0,gamesPlayed:existing.gamesPlayed||0,avatar:'🎮'},existing,{username:u});
+    localStorage.setItem('eylox_user',JSON.stringify(userData));
+    localStorage.setItem('eylox_token','user-token-'+Date.now());
+    initStudio();
+  } else {
+    err.textContent='Please enter both username and password.';
+  }
+}
+function doGuest(){
+  localStorage.setItem('eylox_guest','1');
+  initStudio();
+}
+document.getElementById('li-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+// ── Loading & Init ────────────────────
+const progFill=document.getElementById('prog-fill');
+const progLabel=document.getElementById('prog-label');
+function setProgress(pct,msg){
+  progFill.style.width=pct+'%';
+  if(msg)progLabel.textContent=msg;
+}
+
+function beginLoading(){
+  setProgress(5,'Checking session...');
+  setTimeout(()=>setProgress(20,'Loading Three.js engine...'),100);
+  setTimeout(()=>setProgress(45,'Building 3D scene...'),400);
+  setTimeout(()=>setProgress(70,'Initializing UI...'),700);
+  setTimeout(()=>setProgress(90,'Ready...'),1000);
+  setTimeout(()=>{
+    setProgress(100,'');
+    if(!checkAuth()){
+      document.getElementById('loading').style.display='none';
+      const ls=document.getElementById('login-screen');
+      ls.style.display='flex';
+    } else {
+      initStudio();
+    }
+  },1300);
+}
+
+function getStudioUser(){
+  const raw=localStorage.getItem('eylox_user')||'Guest';
+  try{ const p=JSON.parse(raw); return p.username||p||'Guest'; }catch{ return raw; }
+}
+function initStudio(){
+  document.getElementById('loading').style.display='none';
+  document.getElementById('login-screen').style.display='none';
+  const studio=document.getElementById('studio');
+  studio.classList.add('visible');
+  const u=getStudioUser();
+  document.getElementById('menu-user-label').textContent=u;
+  initThree();
+  buildToolbox();
+  buildExplorer();
+  conLog('Eylox Studio loaded. Welcome, '+u+'!','ok');
+  conLog('Ctrl+S to save · F5 to test · Q/W/E/R tools · Plugins menu for NPCs & more','info');
+}
+
+beginLoading();
+
+// ── Three.js Core ─────────────────────
+let scene,camera,renderer,orbitControls,transformControls;
+let raycaster,mouse;
+let gridHelper,axesHelper,fogEnabled=true,ambientLight;
+let wireframeMode=false;
+let snapValue=1;
+
+// Scene objects registry
+let sceneObjects=[]; // {id,name,type,mesh,children,script,props}
+let selected=null;
+let clipboard=null;
+
+// Undo/Redo
+const undoStack=[];
+const redoStack=[];
+const MAX_UNDO=50;
+
+// Play mode
+let playMode=false;
+let playerObj=null;
+let playerVel=new THREE.Vector3();
+let playerOnGround=false;
+let keysHeld={};
+let playerPitch=0,playerYaw=0;
+let editCamPos=new THREE.Vector3();
+let editCamTarget=new THREE.Vector3();
+let pointerLocked=false;
+
+function initThree(){
+  const vp=document.getElementById('viewport');
+  // Renderer
+  renderer=new THREE.WebGLRenderer({antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.shadowMap.enabled=true;
+  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=0.9;
+  renderer.outputEncoding=THREE.sRGBEncoding;
+  vp.appendChild(renderer.domElement);
+  resizeRenderer();
+
+  // Scene
+  scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x0a0318);
+  scene.fog=new THREE.Fog(0x0a0318,50,200);
+
+  // Camera
+  camera=new THREE.PerspectiveCamera(60,1,0.1,2000);
+  camera.position.set(18,14,22);
+  camera.lookAt(0,0,0);
+
+  // Sky sphere
+  const skyGeo=new THREE.SphereGeometry(400,32,32);
+  const skyMat=new THREE.MeshBasicMaterial({
+    color:0x0a0318,side:THREE.BackSide
+  });
+  const sky=new THREE.Mesh(skyGeo,skyMat);
+  scene.add(sky);
+
+  // Lighting
+  ambientLight=new THREE.AmbientLight(0x8060d0,0.4);
+  scene.add(ambientLight);
+  const dirLight=new THREE.DirectionalLight(0xffffff,1.1);
+  dirLight.position.set(20,30,20);
+  dirLight.castShadow=true;
+  dirLight.shadow.mapSize.set(2048,2048);
+  dirLight.shadow.camera.near=0.5;
+  dirLight.shadow.camera.far=200;
+  dirLight.shadow.camera.left=-40;
+  dirLight.shadow.camera.right=40;
+  dirLight.shadow.camera.top=40;
+  dirLight.shadow.camera.bottom=-40;
+  scene.add(dirLight);
+  const hemi=new THREE.HemisphereLight(0x4fc3f7,0x2d1b69,0.35);
+  scene.add(hemi);
+
+  // Baseplate
+  const bpGeo=new THREE.BoxGeometry(100,1,100);
+  const bpMat=new THREE.MeshStandardMaterial({
+    color:0x2a1a5a,roughness:.85,metalness:.1,
+  });
+  const bp=new THREE.Mesh(bpGeo,bpMat);
+  bp.position.y=-0.5;
+  bp.receiveShadow=true;
+  scene.add(bp);
+  const bpEntry={id:genId(),name:'Baseplate',type:'Baseplate',mesh:bp,isBasePlate:true,props:{color:'#2a1a5a',roughness:.85,metalness:.1,anchored:true,canCollide:true,visible:true}};
+  sceneObjects.push(bpEntry);
+  bp.userData.studioId=bpEntry.id;
+
+  // Grid
+  gridHelper=new THREE.GridHelper(100,50,0x3b1e7a,0x1e0e3a);
+  scene.add(gridHelper);
+
+  // Axes
+  axesHelper=new THREE.AxesHelper(5);
+  axesHelper.position.y=0.01;
+  scene.add(axesHelper);
+
+  // OrbitControls
+  orbitControls=new THREE.OrbitControls(camera,renderer.domElement);
+  orbitControls.enableDamping=true;
+  orbitControls.dampingFactor=0.08;
+  orbitControls.minDistance=2;
+  orbitControls.maxDistance=500;
+  orbitControls.maxPolarAngle=Math.PI*0.9;
+
+  // TransformControls
+  transformControls=new THREE.TransformControls(camera,renderer.domElement);
+  transformControls.setSpace('world');
+  transformControls.setTranslationSnap(snapValue||null);
+  transformControls.setRotationSnap(THREE.MathUtils.degToRad(15));
+  transformControls.setScaleSnap(0.25);
+  scene.add(transformControls);
+  transformControls.addEventListener('dragging-changed',e=>{
+    orbitControls.enabled=!e.value;
+  });
+  transformControls.addEventListener('objectChange',()=>{
+    if(selected) updatePropsFromMesh();
+  });
+  transformControls.addEventListener('mouseUp',()=>{
+    pushUndo();
+  });
+
+  // Raycaster
+  raycaster=new THREE.Raycaster();
+  mouse=new THREE.Vector2();
+
+  // Events
+  renderer.domElement.addEventListener('click',onViewportClick);
+  renderer.domElement.addEventListener('contextmenu',onViewportRightClick);
+  window.addEventListener('keydown',onKeyDown);
+  window.addEventListener('keyup',e=>{keysHeld[e.code]=false;});
+  window.addEventListener('resize',resizeRenderer);
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('.menu-item')) closeMenus();
+    if(!e.target.closest('#ctx-menu')) closeCtx();
+  });
+  document.addEventListener('mousemove',onMouseMove);
+  document.addEventListener('pointerlockchange',()=>{
+    pointerLocked=document.pointerLockElement===renderer.domElement;
+  });
+
+  // Render loop
+  animate();
+  resizeRenderer();
+}
+
+function resizeRenderer(){
+  const vp=document.getElementById('viewport');
+  const w=vp.clientWidth,h=vp.clientHeight;
+  if(w===0||h===0)return;
+  renderer.setSize(w,h,false);
+  camera.aspect=w/h;
+  camera.updateProjectionMatrix();
+}
+
+let clock=new THREE.Clock();
+let _fpsFrames=0,_fpsLast=performance.now();
+function animate(){
+  requestAnimationFrame(animate);
+  const dt=clock.getDelta();
+  if(playMode) updatePlayer(dt);
+  else orbitControls.update();
+  renderer.render(scene,camera);
+  // FPS counter
+  _fpsFrames++;
+  const _now=performance.now();
+  if(_now-_fpsLast>=1000){
+    const fps=Math.round(_fpsFrames*1000/(_now-_fpsLast));
+    const lbl=document.getElementById('fps-label');
+    if(lbl){lbl.textContent=fps+' FPS';lbl.style.color=fps>=50?'var(--green)':fps>=30?'var(--yellow)':'var(--red)';}
+    _fpsFrames=0;_fpsLast=_now;
+  }
+}
+
+// ── Tool Management ───────────────────
+let currentTool='select';
+function setTool(t){
+  currentTool=t;
+  ['select','move','scale','rotate'].forEach(n=>{
+    document.getElementById('tb-'+n).classList.toggle('active',n===t);
+  });
+  if(!selected){return;}
+  if(t==='move'){transformControls.setMode('translate');transformControls.attach(selected.mesh);}
+  else if(t==='scale'){transformControls.setMode('scale');transformControls.attach(selected.mesh);}
+  else if(t==='rotate'){transformControls.setMode('rotate');transformControls.attach(selected.mesh);}
+  else{transformControls.detach();}
+}
+function updateSnap(){
+  snapValue=parseFloat(document.getElementById('snap-val').value)||0;
+  if(transformControls){
+    transformControls.setTranslationSnap(snapValue>0?snapValue:null);
+  }
+}
+
+// ── Object IDs ────────────────────────
+let _idCtr=100;
+function genId(){return 'obj_'+(++_idCtr);}
+let _nameCounters={};
+function uniqueName(base){
+  _nameCounters[base]=(_nameCounters[base]||0)+1;
+  return _nameCounters[base]===1?base:base+_nameCounters[base];
+}
+
+// ── Insert Objects ────────────────────
+const TYPE_ICONS={
+  Part:'&#9646;',Sphere:'&#9711;',Cylinder:'&#11618;',Wedge:'&#11176;',
+  Torus:'&#9737;',Cone:'&#9651;',Rock:'🪨',Spawn:'&#9654;',PointLight:'&#9728;',
+  SpotLight:'&#9681;',Script:'&#128196;',Model:'&#128194;',Baseplate:'&#9644;',
+  NPC:'🤖',Vehicle:'🚗',Tree:'🌲',House:'🏠'
+};
+
+function insertObject(type,pos){
+  pos=pos||new THREE.Vector3(0,1,0);
+  let mesh,geo,mat;
+  const color=randomColor();
+  mat=new THREE.MeshStandardMaterial({color:new THREE.Color(color),roughness:.7,metalness:.05,shadowSide:THREE.FrontSide});
+
+  switch(type){
+    case'Part':
+      geo=new THREE.BoxGeometry(2,2,2);
+      mesh=new THREE.Mesh(geo,mat);
+      break;
+    case'Sphere':
+      geo=new THREE.SphereGeometry(1,32,32);
+      mesh=new THREE.Mesh(geo,mat);
+      break;
+    case'Cylinder':
+      geo=new THREE.CylinderGeometry(1,1,2,32);
+      mesh=new THREE.Mesh(geo,mat);
+      break;
+    case'Wedge':
+      geo=new THREE.ConeGeometry(1,2,4);
+      mesh=new THREE.Mesh(geo,mat);
+      break;
+    case'Torus':
+      geo=new THREE.TorusGeometry(1,.4,16,48);
+      mesh=new THREE.Mesh(geo,mat);
+      break;
+    case'Cone':
+      geo=new THREE.ConeGeometry(1,2,32);
+      mesh=new THREE.Mesh(geo,mat);
+      break;
+    case'Spawn':{
+      geo=new THREE.CylinderGeometry(1,.8,.1,32);
+      const sm=new THREE.MeshStandardMaterial({color:0x4ade80,roughness:.5,metalness:.2,emissive:0x1a5c30});
+      mesh=new THREE.Mesh(geo,sm);
+      break;}
+    case'PointLight':{
+      geo=new THREE.SphereGeometry(.25,16,16);
+      const lm=new THREE.MeshBasicMaterial({color:0xfbbf24});
+      mesh=new THREE.Mesh(geo,lm);
+      const pl=new THREE.PointLight(0xffd966,2,20);
+      mesh.add(pl);
+      break;}
+    case'SpotLight':{
+      geo=new THREE.ConeGeometry(.3,.6,16);
+      const slm=new THREE.MeshBasicMaterial({color:0x4fc3f7});
+      mesh=new THREE.Mesh(geo,slm);
+      const sl=new THREE.SpotLight(0x4fc3f7,3,30,Math.PI/6,.3);
+      sl.position.set(0,0,0);
+      sl.target.position.set(0,-1,0);
+      mesh.add(sl);
+      mesh.add(sl.target);
+      break;}
+    case'Script':{
+      // Virtual object — no mesh, represented as group
+      const sg=new THREE.Group();
+      scene.add(sg);
+      sg.position.copy(pos);
+      const id=genId();
+      const name=uniqueName('Script');
+      const entry={id,name,type:'Script',mesh:sg,isVirtual:true,script:'-- Script: '+name+'\n\nfunction onStart()\n  print("Hello from "+name+"!")\nend\n',props:{visible:true}};
+      sceneObjects.push(entry);
+      sg.userData.studioId=id;
+      selectObject(entry);
+      buildExplorer();
+      conLog('Inserted Script: '+name,'info');
+      return;
+    }
+    case'Model':{
+      const mg=new THREE.Group();
+      scene.add(mg);
+      mg.position.copy(pos);
+      const id=genId();
+      const name=uniqueName('Model');
+      const entry={id,name,type:'Model',mesh:mg,isGroup:true,children:[],props:{visible:true}};
+      sceneObjects.push(entry);
+      mg.userData.studioId=id;
+      selectObject(entry);
+      buildExplorer();
+      conLog('Inserted Model group: '+name,'info');
+      return;
+    }
+    case'NPC':{
+      const npcG=new THREE.Group();
+      const bMat=new THREE.MeshStandardMaterial({color:new THREE.Color(color),roughness:.7,metalness:.05});
+      const aMat=new THREE.MeshStandardMaterial({color:0x6688cc,roughness:.7});
+      const lMat=new THREE.MeshStandardMaterial({color:0x334477,roughness:.8});
+      const body=new THREE.Mesh(new THREE.BoxGeometry(.8,1,.4),bMat);body.position.y=.5;
+      const head=new THREE.Mesh(new THREE.SphereGeometry(.3,16,16),bMat);head.position.y=1.3;
+      const eye1=new THREE.Mesh(new THREE.SphereGeometry(.06,8,8),new THREE.MeshBasicMaterial({color:0xffffff}));eye1.position.set(.1,1.35,.28);
+      const eye2=eye1.clone();eye2.position.x=-.1;
+      const armL=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,.8,8),aMat);armL.position.set(-.55,.5,0);armL.rotation.z=.2;
+      const armR=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,.8,8),aMat);armR.position.set(.55,.5,0);armR.rotation.z=-.2;
+      const legL=new THREE.Mesh(new THREE.CylinderGeometry(.14,.14,.9,8),lMat);legL.position.set(-.22,-.45,0);
+      const legR=new THREE.Mesh(new THREE.CylinderGeometry(.14,.14,.9,8),lMat);legR.position.set(.22,-.45,0);
+      [body,head,eye1,eye2,armL,armR,legL,legR].forEach(m=>{npcG.add(m);m.castShadow=true;m.receiveShadow=true;});
+      npcG.position.copy(pos);npcG.position.y=1;
+      scene.add(npcG);
+      const id=genId(),name=uniqueName('NPC');
+      const entry={id,name,type:'NPC',mesh:npcG,isGroup:true,props:{color,visible:true,behavior:'Idle'}};
+      npcG.userData.studioId=id;sceneObjects.push(entry);pushUndo();selectObject(entry);buildExplorer();
+      conLog('Inserted NPC: '+name,'info');return;
+    }
+    case'Vehicle':{
+      const vG=new THREE.Group();
+      const cMat=new THREE.MeshStandardMaterial({color:new THREE.Color(color),roughness:.4,metalness:.35});
+      const wMat=new THREE.MeshStandardMaterial({color:0x222222,roughness:.9});
+      const gMat=new THREE.MeshStandardMaterial({color:0x88ccff,transparent:true,opacity:.4});
+      const carBody=new THREE.Mesh(new THREE.BoxGeometry(2,.6,1),cMat);carBody.position.y=.5;
+      const cab=new THREE.Mesh(new THREE.BoxGeometry(1.2,.5,.9),cMat);cab.position.set(.1,1.05,0);
+      const windshield=new THREE.Mesh(new THREE.BoxGeometry(.8,.4,.05),gMat);windshield.position.set(.71,.95,.0);windshield.rotation.y=Math.PI/2;
+      [[-.8,.28,.55],[.8,.28,.55],[-.8,.28,-.55],[.8,.28,-.55]].forEach(wp=>{
+        const w=new THREE.Mesh(new THREE.CylinderGeometry(.28,.28,.2,16),wMat);
+        w.rotation.x=Math.PI/2;w.position.set(...wp);w.castShadow=true;vG.add(w);
+      });
+      [carBody,cab,windshield].forEach(m=>{vG.add(m);m.castShadow=true;m.receiveShadow=true;});
+      vG.position.copy(pos);
+      scene.add(vG);
+      const id=genId(),name=uniqueName('Vehicle');
+      const entry={id,name,type:'Vehicle',mesh:vG,isGroup:true,props:{color,visible:true,speed:20}};
+      vG.userData.studioId=id;sceneObjects.push(entry);pushUndo();selectObject(entry);buildExplorer();
+      conLog('Inserted Vehicle: '+name,'info');return;
+    }
+    case'Tree':{
+      const tG=new THREE.Group();
+      const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.18,.22,1.5,8),new THREE.MeshStandardMaterial({color:0x6b4423,roughness:.9}));
+      trunk.position.y=.75;trunk.castShadow=true;
+      const leaves=new THREE.Mesh(new THREE.SphereGeometry(1,16,12),new THREE.MeshStandardMaterial({color:0x2d7a2d,roughness:.85}));
+      leaves.position.y=2.4;leaves.scale.y=1.3;leaves.castShadow=true;
+      tG.add(trunk);tG.add(leaves);tG.position.copy(pos);
+      scene.add(tG);
+      const id=genId(),name=uniqueName('Tree');
+      const entry={id,name,type:'Tree',mesh:tG,isGroup:true,props:{color:'#2d7a2d',visible:true}};
+      tG.userData.studioId=id;sceneObjects.push(entry);pushUndo();selectObject(entry);buildExplorer();
+      conLog('Inserted Tree: '+name,'info');return;
+    }
+    case'Rock':{
+      geo=new THREE.DodecahedronGeometry(1,0);
+      mat=new THREE.MeshStandardMaterial({color:0x888888,roughness:.95,metalness:.05});
+      mesh=new THREE.Mesh(geo,mat);
+      mesh.scale.set(1+Math.random()*.4,.7+Math.random()*.4,1+Math.random()*.4);
+      break;}
+    case'House':{
+      const hG=new THREE.Group();
+      const walls=new THREE.Mesh(new THREE.BoxGeometry(4,3,4),new THREE.MeshStandardMaterial({color:0xd4b896,roughness:.8}));walls.position.y=1.5;walls.castShadow=true;walls.receiveShadow=true;
+      const roofGeo=new THREE.ConeGeometry(3.2,2,4);roofGeo.rotateY(Math.PI/4);
+      const roof=new THREE.Mesh(roofGeo,new THREE.MeshStandardMaterial({color:0x8b4513,roughness:.85}));roof.position.y=4;roof.castShadow=true;
+      const door=new THREE.Mesh(new THREE.BoxGeometry(.8,1.5,.05),new THREE.MeshStandardMaterial({color:0x6b3a2a,roughness:.9}));door.position.set(0,.75,2.03);
+      hG.add(walls);hG.add(roof);hG.add(door);hG.position.copy(pos);
+      scene.add(hG);
+      const id=genId(),name=uniqueName('House');
+      const entry={id,name,type:'House',mesh:hG,isGroup:true,props:{color:'#d4b896',visible:true}};
+      hG.userData.studioId=id;sceneObjects.push(entry);pushUndo();selectObject(entry);buildExplorer();
+      conLog('Inserted House: '+name,'info');return;
+    }
+    default:
+      geo=new THREE.BoxGeometry(2,2,2);
+      mesh=new THREE.Mesh(geo,mat);
+  }
+
+  mesh.castShadow=true;
+  mesh.receiveShadow=true;
+  mesh.position.copy(pos);
+  scene.add(mesh);
+
+  const id=genId();
+  const name=uniqueName(type);
+  const props={color,roughness:.7,metalness:.05,anchored:false,canCollide:true,visible:true};
+  const entry={id,name,type,mesh,props};
+  mesh.userData.studioId=id;
+  sceneObjects.push(entry);
+  pushUndo();
+  selectObject(entry);
+  buildExplorer();
+  conLog('Inserted '+type+': '+name,'info');
+}
+
+function randomColor(){
+  const palette=['#a78bfa','#4fc3f7','#4ade80','#f87171','#fbbf24','#e879f9','#38bdf8','#fb923c'];
+  return palette[Math.floor(Math.random()*palette.length)];
+}
+
+// ── Selection ─────────────────────────
+function selectObject(entry){
+  // deselect old
+  if(selected&&selected.mesh.material&&!selected.isVirtual){
+    if(Array.isArray(selected.mesh.material)){
+      selected.mesh.material.forEach(m=>m.emissive&&m.emissive.set(0,0,0));
+    } else if(selected.mesh.material.emissive){
+      selected.mesh.material.emissive.set(0,0,0);
+    }
+  }
+  selected=entry;
+  if(entry&&entry.mesh){
+    if(!entry.isVirtual&&!entry.isGroup){
+      if(entry.mesh.material&&entry.mesh.material.emissive)
+        entry.mesh.material.emissive.set(0.08,0.04,0.2);
+      if(currentTool==='move'){transformControls.setMode('translate');transformControls.attach(entry.mesh);}
+      else if(currentTool==='scale'){transformControls.setMode('scale');transformControls.attach(entry.mesh);}
+      else if(currentTool==='rotate'){transformControls.setMode('rotate');transformControls.attach(entry.mesh);}
+      else{transformControls.detach();}
+    } else {
+      transformControls.detach();
+    }
+  } else {
+    transformControls.detach();
+  }
+  buildPropsPanel();
+  buildExplorer();
+}
+
+function deselectAll(){
+  selectObject(null);
+}
+
+function onViewportClick(e){
+  if(playMode)return;
+  if(transformControls.dragging)return;
+  const rect=renderer.domElement.getBoundingClientRect();
+  mouse.x=((e.clientX-rect.left)/rect.width)*2-1;
+  mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
+  raycaster.setFromCamera(mouse,camera);
+  const meshes=sceneObjects.filter(o=>o.mesh&&o.mesh.isMesh).map(o=>o.mesh);
+  const hits=raycaster.intersectObjects(meshes,false);
+  if(hits.length>0){
+    const sid=hits[0].object.userData.studioId;
+    const entry=sceneObjects.find(o=>o.id===sid);
+    if(entry) selectObject(entry);
+  } else {
+    deselectAll();
+  }
+}
+
+function onViewportRightClick(e){
+  if(playMode)return;
+  e.preventDefault();
+  const m=document.getElementById('ctx-menu');
+  m.style.left=e.clientX+'px';
+  m.style.top=e.clientY+'px';
+  m.style.display='block';
+  // also try to select
+  const rect=renderer.domElement.getBoundingClientRect();
+  mouse.x=((e.clientX-rect.left)/rect.width)*2-1;
+  mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
+  raycaster.setFromCamera(mouse,camera);
+  const meshes=sceneObjects.filter(o=>o.mesh&&o.mesh.isMesh).map(o=>o.mesh);
+  const hits=raycaster.intersectObjects(meshes,false);
+  if(hits.length>0){
+    const sid=hits[0].object.userData.studioId;
+    const entry=sceneObjects.find(o=>o.id===sid);
+    if(entry)selectObject(entry);
+  }
+}
+function closeCtx(){document.getElementById('ctx-menu').style.display='none';}
+
+// ── Explorer ──────────────────────────
+function buildExplorer(){
+  const tree=document.getElementById('scene-tree');
+  tree.innerHTML='';
+  // Workspace root
+  const root=document.createElement('div');
+  root.className='tree-item';
+  root.innerHTML='<span class="tree-icon">&#127758;</span><span>Workspace</span>';
+  tree.appendChild(root);
+  const children=document.createElement('div');
+  children.className='tree-children';
+  sceneObjects.forEach(o=>{
+    children.appendChild(buildTreeItem(o));
+  });
+  tree.appendChild(children);
+}
+
+function buildTreeItem(entry){
+  const div=document.createElement('div');
+  const row=document.createElement('div');
+  row.className='tree-item'+(selected&&selected.id===entry.id?' selected':'');
+  row.innerHTML='<span class="tree-icon">'+(TYPE_ICONS[entry.type]||'&#9642;')+'</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+entry.name+'">'+entry.name+'</span>';
+  row.addEventListener('click',e=>{e.stopPropagation();selectObject(entry);});
+  div.appendChild(row);
+  if(entry.children&&entry.children.length){
+    const ch=document.createElement('div');ch.className='tree-children';
+    entry.children.forEach(c=>ch.appendChild(buildTreeItem(c)));
+    div.appendChild(ch);
+  }
+  return div;
+}
+
+// ── Properties Panel ──────────────────
+function buildPropsPanel(){
+  const body=document.getElementById('props-body');
+  if(!selected){body.innerHTML='<div class="no-select">Select an object to edit its properties.</div>';return;}
+  const o=selected;
+  const p=o.props||{};
+  const pos=o.mesh?o.mesh.position:new THREE.Vector3();
+  const rot=o.mesh?o.mesh.rotation:new THREE.Euler();
+  const sc=o.mesh?o.mesh.scale:new THREE.Vector3(1,1,1);
+
+  let html=`
+  <div class="props-section">
+    <div class="props-title">Identity</div>
+    <div class="prop-row"><span class="prop-label">Name</span><div class="prop-val"><input class="prop-input" id="pn-name" value="${escHtml(o.name)}" onchange="setPropName(this.value)"/></div></div>
+    <div class="prop-row"><span class="prop-label">Type</span><div class="prop-val"><input class="prop-input" value="${o.type}" disabled style="opacity:.5;"/></div></div>
+  </div>`;
+
+  if(!o.isVirtual){
+    html+=`
+  <div class="props-section">
+    <div class="props-title">Transform</div>
+    <div class="prop-row"><span class="prop-label">Position</span><div class="prop-val">
+      <input class="prop-input" type="number" id="p-px" value="${r3(pos.x)}" step="0.5" onchange="setProp('px',this.value)"/>
+      <input class="prop-input" type="number" id="p-py" value="${r3(pos.y)}" step="0.5" onchange="setProp('py',this.value)"/>
+      <input class="prop-input" type="number" id="p-pz" value="${r3(pos.z)}" step="0.5" onchange="setProp('pz',this.value)"/>
+    </div></div>
+    <div class="prop-row"><span class="prop-label">Rotation</span><div class="prop-val">
+      <input class="prop-input" type="number" id="p-rx" value="${r3(THREE.MathUtils.radToDeg(rot.x))}" step="5" onchange="setProp('rx',this.value)"/>
+      <input class="prop-input" type="number" id="p-ry" value="${r3(THREE.MathUtils.radToDeg(rot.y))}" step="5" onchange="setProp('ry',this.value)"/>
+      <input class="prop-input" type="number" id="p-rz" value="${r3(THREE.MathUtils.radToDeg(rot.z))}" step="5" onchange="setProp('rz',this.value)"/>
+    </div></div>
+    <div class="prop-row"><span class="prop-label">Scale</span><div class="prop-val">
+      <input class="prop-input" type="number" id="p-sx" value="${r3(sc.x)}" step="0.25" min="0.01" onchange="setProp('sx',this.value)"/>
+      <input class="prop-input" type="number" id="p-sy" value="${r3(sc.y)}" step="0.25" min="0.01" onchange="setProp('sy',this.value)"/>
+      <input class="prop-input" type="number" id="p-sz" value="${r3(sc.z)}" step="0.25" min="0.01" onchange="setProp('sz',this.value)"/>
+    </div></div>
+  </div>`;
+  }
+
+  if(o.mesh&&o.mesh.isMesh&&!o.isVirtual){
+    html+=`
+  <div class="props-section">
+    <div class="props-title">Appearance</div>
+    <div class="prop-row"><span class="prop-label">Color</span><div class="prop-val">
+      <input type="color" class="prop-color" id="p-color" value="${p.color||'#a78bfa'}" onchange="setProp('color',this.value)"/>
+      <input class="prop-input" id="p-colorhex" value="${p.color||'#a78bfa'}" onchange="setProp('color',this.value)" style="flex:1;"/>
+    </div></div>
+    <div class="prop-row"><span class="prop-label">Roughness</span><div class="prop-val"><div class="slider-wrap">
+      <input type="range" class="prop-slider" id="p-rough" min="0" max="1" step="0.05" value="${p.roughness!=null?p.roughness:.7}" onchange="setProp('roughness',this.value)"/>
+      <span id="p-rough-val" style="font-size:.7rem;color:var(--muted);min-width:28px;">${r3(p.roughness!=null?p.roughness:.7)}</span>
+    </div></div></div>
+    <div class="prop-row"><span class="prop-label">Metalness</span><div class="prop-val"><div class="slider-wrap">
+      <input type="range" class="prop-slider" id="p-metal" min="0" max="1" step="0.05" value="${p.metalness!=null?p.metalness:.05}" onchange="setProp('metalness',this.value)"/>
+      <span id="p-metal-val" style="font-size:.7rem;color:var(--muted);min-width:28px;">${r3(p.metalness!=null?p.metalness:.05)}</span>
+    </div></div></div>
+  </div>`;
+  }
+
+  if(!o.isVirtual){
+    html+=`
+  <div class="props-section">
+    <div class="props-title">Behavior</div>
+    <div class="prop-row"><span class="prop-label">Anchored</span><div class="prop-val">
+      <label class="prop-toggle"><input type="checkbox" id="p-anch" ${p.anchored?'checked':''} onchange="setProp('anchored',this.checked)"/><span class="toggle-slider"></span></label>
+    </div></div>
+    <div class="prop-row"><span class="prop-label">CanCollide</span><div class="prop-val">
+      <label class="prop-toggle"><input type="checkbox" id="p-col" ${p.canCollide!==false?'checked':''} onchange="setProp('canCollide',this.checked)"/><span class="toggle-slider"></span></label>
+    </div></div>
+    <div class="prop-row"><span class="prop-label">Visible</span><div class="prop-val">
+      <label class="prop-toggle"><input type="checkbox" id="p-vis" ${p.visible!==false?'checked':''} onchange="setProp('visible',this.checked)"/><span class="toggle-slider"></span></label>
+    </div></div>
+  </div>`;
+  }
+
+  if(o.type==='Script'){
+    html+=`
+  <div class="props-section">
+    <div class="props-title">Script</div>
+    <div class="prop-row" style="flex-direction:column;align-items:flex-start;gap:6px;padding:8px;">
+      <button class="btn btn-primary" style="font-size:.75rem;padding:5px 14px;" onclick="openScriptEditor()">&#128196; Open Script Editor</button>
+    </div>
+  </div>`;
+  }
+
+  body.innerHTML=html;
+  // live slider labels
+  const roughSlider=document.getElementById('p-rough');
+  const metalSlider=document.getElementById('p-metal');
+  if(roughSlider) roughSlider.addEventListener('input',()=>{
+    document.getElementById('p-rough-val').textContent=r3(roughSlider.value);
+  });
+  if(metalSlider) metalSlider.addEventListener('input',()=>{
+    document.getElementById('p-metal-val').textContent=r3(metalSlider.value);
+  });
+}
+
+function updatePropsFromMesh(){
+  if(!selected||!selected.mesh)return;
+  const m=selected.mesh;
+  const upd=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val;};
+  upd('p-px',r3(m.position.x));
+  upd('p-py',r3(m.position.y));
+  upd('p-pz',r3(m.position.z));
+  upd('p-rx',r3(THREE.MathUtils.radToDeg(m.rotation.x)));
+  upd('p-ry',r3(THREE.MathUtils.radToDeg(m.rotation.y)));
+  upd('p-rz',r3(THREE.MathUtils.radToDeg(m.rotation.z)));
+  upd('p-sx',r3(m.scale.x));
+  upd('p-sy',r3(m.scale.y));
+  upd('p-sz',r3(m.scale.z));
+}
+
+function setPropName(v){
+  if(!selected)return;
+  selected.name=v;
+  buildExplorer();
+}
+
+function setProp(key,val){
+  if(!selected)return;
+  const m=selected.mesh;
+  switch(key){
+    case'px':m.position.x=parseFloat(val);break;
+    case'py':m.position.y=parseFloat(val);break;
+    case'pz':m.position.z=parseFloat(val);break;
+    case'rx':m.rotation.x=THREE.MathUtils.degToRad(parseFloat(val));break;
+    case'ry':m.rotation.y=THREE.MathUtils.degToRad(parseFloat(val));break;
+    case'rz':m.rotation.z=THREE.MathUtils.degToRad(parseFloat(val));break;
+    case'sx':m.scale.x=Math.max(.01,parseFloat(val));break;
+    case'sy':m.scale.y=Math.max(.01,parseFloat(val));break;
+    case'sz':m.scale.z=Math.max(.01,parseFloat(val));break;
+    case'color':{
+      selected.props.color=val;
+      if(m.material&&m.material.color)m.material.color.set(val);
+      const hex=document.getElementById('p-colorhex');
+      const col=document.getElementById('p-color');
+      if(hex)hex.value=val;
+      if(col)col.value=val;
+      break;}
+    case'roughness':
+      selected.props.roughness=parseFloat(val);
+      if(m.material)m.material.roughness=parseFloat(val);
+      break;
+    case'metalness':
+      selected.props.metalness=parseFloat(val);
+      if(m.material)m.material.metalness=parseFloat(val);
+      break;
+    case'anchored':
+      selected.props.anchored=val;
+      break;
+    case'canCollide':
+      selected.props.canCollide=val;
+      break;
+    case'visible':
+      selected.props.visible=val;
+      m.visible=val;
+      break;
+  }
+  pushUndo();
+}
+
+function r3(n){return Math.round(parseFloat(n)*1000)/1000;}
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ── Script Editor ─────────────────────
+function openScriptEditor(){
+  if(!selected||selected.type!=='Script')return;
+  document.getElementById('script-editor-name').textContent=selected.name;
+  document.getElementById('code-input').value=selected.script||'';
+  document.getElementById('tab-props').classList.add('hidden');
+  document.getElementById('script-editor').style.display='flex';
+  updateLineNumbers();
+  // switch right tab
+  document.querySelectorAll('#right-panel .panel-tab').forEach((t,i)=>{
+    t.classList.toggle('active',i===1);
+  });
+}
+function closeScriptEditor(){
+  if(selected&&selected.type==='Script'){
+    selected.script=document.getElementById('code-input').value;
+  }
+  document.getElementById('script-editor').style.display='none';
+  document.getElementById('tab-props').classList.remove('hidden');
+  document.querySelectorAll('#right-panel .panel-tab').forEach((t,i)=>{
+    t.classList.toggle('active',i===0);
+  });
+}
+document.getElementById('code-input').addEventListener('input',updateLineNumbers);
+document.getElementById('code-input').addEventListener('keydown',e=>{
+  if(e.key==='Tab'){e.preventDefault();const ta=e.target;const s=ta.selectionStart,en=ta.selectionEnd;ta.value=ta.value.substring(0,s)+'  '+ta.value.substring(en);ta.selectionStart=ta.selectionEnd=s+2;updateLineNumbers();}
+});
+function updateLineNumbers(){
+  const ta=document.getElementById('code-input');
+  const lines=ta.value.split('\n').length;
+  document.getElementById('line-numbers').innerHTML=Array.from({length:lines},(_,i)=>i+1).join('<br>');
+}
+
+// ── Toolbox ───────────────────────────
+const TOOLBOX_CATS={
+  All:[
+    {type:'Part',icon:'&#9646;',label:'Part'},
+    {type:'Sphere',icon:'&#9711;',label:'Sphere'},
+    {type:'Cylinder',icon:'&#11618;',label:'Cylinder'},
+    {type:'Wedge',icon:'&#11176;',label:'Wedge'},
+    {type:'Torus',icon:'&#9737;',label:'Torus'},
+    {type:'Cone',icon:'&#9651;',label:'Cone'},
+    {type:'Rock',icon:'🪨',label:'Rock'},
+    {type:'Spawn',icon:'&#9654;',label:'Spawn'},
+    {type:'PointLight',icon:'&#9728;',label:'Point Light'},
+    {type:'SpotLight',icon:'&#9681;',label:'Spot Light'},
+    {type:'Script',icon:'&#128196;',label:'Script'},
+    {type:'Model',icon:'&#128194;',label:'Model'},
+    {type:'NPC',icon:'🤖',label:'NPC'},
+    {type:'Vehicle',icon:'🚗',label:'Vehicle'},
+    {type:'Tree',icon:'🌲',label:'Tree'},
+    {type:'House',icon:'🏠',label:'House'},
+  ],
+  Shapes:[
+    {type:'Part',icon:'&#9646;',label:'Part'},
+    {type:'Sphere',icon:'&#9711;',label:'Sphere'},
+    {type:'Cylinder',icon:'&#11618;',label:'Cylinder'},
+    {type:'Wedge',icon:'&#11176;',label:'Wedge'},
+    {type:'Torus',icon:'&#9737;',label:'Torus'},
+    {type:'Cone',icon:'&#9651;',label:'Cone'},
+    {type:'Rock',icon:'🪨',label:'Rock'},
+  ],
+  Lights:[
+    {type:'PointLight',icon:'&#9728;',label:'Point Light'},
+    {type:'SpotLight',icon:'&#9681;',label:'Spot Light'},
+  ],
+  NPCs:[
+    {type:'NPC',icon:'🤖',label:'NPC'},
+  ],
+  Vehicles:[
+    {type:'Vehicle',icon:'🚗',label:'Vehicle'},
+  ],
+  Nature:[
+    {type:'Tree',icon:'🌲',label:'Tree'},
+    {type:'Rock',icon:'🪨',label:'Rock'},
+  ],
+  Buildings:[
+    {type:'House',icon:'🏠',label:'House'},
+  ],
+  Scripts:[
+    {type:'Script',icon:'&#128196;',label:'Script'},
+    {type:'Model',icon:'&#128194;',label:'Model'},
+    {type:'Spawn',icon:'&#9654;',label:'Spawn'},
+  ],
+};
+let _tbxCat='All';
+function buildToolbox(){
+  // Build category buttons
+  const catsEl=document.getElementById('tbx-cats');
+  if(catsEl){
+    catsEl.innerHTML='';
+    Object.keys(TOOLBOX_CATS).forEach(cat=>{
+      const b=document.createElement('button');
+      b.className='tbx-cat'+(cat===_tbxCat?' active':'');
+      b.textContent=cat;
+      b.onclick=()=>{_tbxCat=cat;document.querySelectorAll('.tbx-cat').forEach(x=>x.classList.remove('active'));b.classList.add('active');filterToolbox(document.getElementById('tbx-search')?.value||'');};
+      catsEl.appendChild(b);
+    });
+  }
+  filterToolbox('');
+}
+function filterToolbox(query){
+  const g=document.getElementById('toolbox-grid');
+  if(!g) return;
+  const items=TOOLBOX_CATS[_tbxCat]||TOOLBOX_CATS.All;
+  const q=query.toLowerCase().trim();
+  const filtered=q?items.filter(i=>i.label.toLowerCase().includes(q)||i.type.toLowerCase().includes(q)):items;
+  g.innerHTML='';
+  filtered.forEach(item=>{
+    const d=document.createElement('div');
+    d.className='tool-card';
+    d.innerHTML='<span class="tool-icon">'+item.icon+'</span><span>'+item.label+'</span>';
+    d.onclick=()=>insertObject(item.type);
+    g.appendChild(d);
+  });
+  if(!filtered.length){
+    const empty=document.createElement('div');
+    empty.style.cssText='color:var(--muted);font-size:.72rem;text-align:center;padding:16px;grid-column:1/-1;';
+    empty.textContent='No results for "'+query+'"';
+    g.appendChild(empty);
+  }
+}
+
+// ── Undo/Redo ─────────────────────────
+function captureState(){
+  return sceneObjects.map(o=>({
+    id:o.id,
+    pos:o.mesh?o.mesh.position.clone():null,
+    rot:o.mesh?o.mesh.rotation.clone():null,
+    sc:o.mesh?o.mesh.scale.clone():null,
+    vis:o.props?o.props.visible:true
+  }));
+}
+function pushUndo(){
+  undoStack.push(captureState());
+  if(undoStack.length>MAX_UNDO)undoStack.shift();
+  redoStack.length=0;
+}
+function applyState(state){
+  state.forEach(s=>{
+    const o=sceneObjects.find(x=>x.id===s.id);
+    if(o&&o.mesh){
+      if(s.pos)o.mesh.position.copy(s.pos);
+      if(s.rot)o.mesh.rotation.copy(s.rot);
+      if(s.sc)o.mesh.scale.copy(s.sc);
+      if(o.props)o.props.visible=s.vis;
+      o.mesh.visible=s.vis;
+    }
+  });
+  buildPropsPanel();
+  if(selected) updatePropsFromMesh();
+}
+function undo(){
+  if(!undoStack.length)return;
+  redoStack.push(captureState());
+  applyState(undoStack.pop());
+  conLog('Undo','info');
+}
+function redo(){
+  if(!redoStack.length)return;
+  undoStack.push(captureState());
+  applyState(redoStack.pop());
+  conLog('Redo','info');
+}
+
+// ── Delete / Duplicate / Copy ─────────
+function deleteSelected(){
+  if(!selected)return;
+  if(selected.isBasePlate){conLog('Cannot delete Baseplate','warn');return;}
+  scene.remove(selected.mesh);
+  sceneObjects=sceneObjects.filter(o=>o.id!==selected.id);
+  transformControls.detach();
+  selected=null;
+  buildExplorer();
+  buildPropsPanel();
+  pushUndo();
+  conLog('Object deleted','info');
+}
+function copyObj(){
+  if(!selected)clipboard=null;
+  else clipboard=selected;
+  conLog('Copied: '+(selected?selected.name:'nothing'),'info');
+}
+function cutObj(){
+  copyObj();
+  deleteSelected();
+}
+function pasteObj(){
+  if(!clipboard)return;
+  duplicateEntry(clipboard);
+}
+function duplicateObj(){
+  if(!selected)return;
+  duplicateEntry(selected);
+}
+function duplicateEntry(entry){
+  if(!entry.mesh)return;
+  const newPos=entry.mesh.position.clone().add(new THREE.Vector3(2,0,0));
+  insertObject(entry.type,newPos);
+  // copy color
+  if(entry.props&&entry.props.color&&selected){
+    selected.props.color=entry.props.color;
+    if(selected.mesh.material)selected.mesh.material.color.set(entry.props.color);
+  }
+  conLog('Duplicated: '+entry.name,'info');
+}
+
+// ── Camera controls ───────────────────
+function focusSelected(){
+  if(!selected||!selected.mesh)return;
+  const pos=selected.mesh.position;
+  const offset=new THREE.Vector3(5,4,7);
+  camera.position.copy(pos).add(offset);
+  orbitControls.target.copy(pos);
+  orbitControls.update();
+}
+function resetCamera(){
+  camera.position.set(18,14,22);
+  orbitControls.target.set(0,0,0);
+  orbitControls.update();
+}
+function toggleGrid(){
+  gridHelper.visible=!gridHelper.visible;
+}
+function toggleWireframe(){
+  wireframeMode=!wireframeMode;
+  sceneObjects.forEach(o=>{
+    if(o.mesh&&o.mesh.material&&!o.isVirtual){
+      if(Array.isArray(o.mesh.material))o.mesh.material.forEach(m=>m.wireframe=wireframeMode);
+      else o.mesh.material.wireframe=wireframeMode;
+    }
+  });
+}
+
+// ── Scene / Save ─────────────────────
+function newScene(){
+  if(!confirm('Create a new scene? Unsaved changes will be lost.'))return;
+  sceneObjects.filter(o=>!o.isBasePlate).forEach(o=>scene.remove(o.mesh));
+  sceneObjects=sceneObjects.filter(o=>o.isBasePlate);
+  _nameCounters={};
+  deselectAll();
+  buildExplorer();
+  conLog('New scene created','ok');
+}
+function saveScene(){
+  const data={
+    objects:sceneObjects.filter(o=>!o.isBasePlate).map(o=>({
+      id:o.id,name:o.name,type:o.type,
+      pos:o.mesh?{x:o.mesh.position.x,y:o.mesh.position.y,z:o.mesh.position.z}:null,
+      rot:o.mesh?{x:o.mesh.rotation.x,y:o.mesh.rotation.y,z:o.mesh.rotation.z}:null,
+      sc:o.mesh?{x:o.mesh.scale.x,y:o.mesh.scale.y,z:o.mesh.scale.z}:null,
+      props:o.props,script:o.script||null
+    })),
+    savedAt:Date.now()
+  };
+  localStorage.setItem('eylox_studio_scene',JSON.stringify(data));
+  conLog('Scene saved','ok');
+  if(typeof showAutosaveBadge==='function') showAutosaveBadge();
+}
+function exportHTML(){
+  const blob=new Blob([document.documentElement.outerHTML],{type:'text/html'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='eylox-studio.html';
+  a.click();
+  conLog('Exported HTML file','ok');
+}
+// ── Play Mode ────────────────────────
+function startPlay(){
+  if(playMode)return;
+  playMode=true;
+  document.getElementById('play-btn').style.display='none';
+  document.getElementById('stop-btn').style.display='inline-flex';
+  document.getElementById('vp-badge').style.display='block';
+  orbitControls.enabled=false;
+  transformControls.detach();
+  deselectAll();
+
+  // save camera
+  editCamPos.copy(camera.position);
+  editCamTarget.copy(orbitControls.target);
+
+  // spawn player
+  const spawnEntry=sceneObjects.find(o=>o.type==='Spawn');
+  const spawnPos=spawnEntry?spawnEntry.mesh.position.clone():new THREE.Vector3(0,3,0);
+  spawnPos.y+=2;
+
+  const capsGeo=new THREE.CapsuleGeometry?new THREE.CapsuleGeometry(.5,1.5,8,16):new THREE.CylinderGeometry(.5,.5,2,16);
+  const capsMat=new THREE.MeshStandardMaterial({color:0xa78bfa,roughness:.5,metalness:.1});
+  playerObj=new THREE.Mesh(capsGeo,capsMat);
+  playerObj.position.copy(spawnPos);
+  playerObj.castShadow=true;
+  scene.add(playerObj);
+  playerVel.set(0,0,0);
+  playerOnGround=false;
+  playerPitch=0;
+  playerYaw=0;
+
+  // pointer lock
+  renderer.domElement.requestPointerLock();
+  renderer.domElement.addEventListener('mousemove',onPlayerMouseMove);
+  conLog('Play mode started. WASD to move, Space to jump, Esc to stop.','ok');
+}
+
+function stopPlay(){
+  if(!playMode)return;
+  playMode=false;
+  document.getElementById('play-btn').style.display='inline-flex';
+  document.getElementById('stop-btn').style.display='none';
+  document.getElementById('vp-badge').style.display='none';
+  orbitControls.enabled=true;
+
+  if(playerObj){scene.remove(playerObj);playerObj=null;}
+  if(document.pointerLockElement)document.exitPointerLock();
+  renderer.domElement.removeEventListener('mousemove',onPlayerMouseMove);
+
+  camera.position.copy(editCamPos);
+  orbitControls.target.copy(editCamTarget);
+  orbitControls.update();
+  conLog('Play mode stopped','info');
+}
+
+function onPlayerMouseMove(e){
+  if(!pointerLocked||!playMode)return;
+  const sens=0.002;
+  playerYaw-=e.movementX*sens;
+  playerPitch-=e.movementY*sens;
+  playerPitch=Math.max(-Math.PI/2.5,Math.min(Math.PI/2.5,playerPitch));
+}
+
+function updatePlayer(dt){
+  if(!playerObj)return;
+  const gravity=-20;
+  const speed=8;
+  const jumpForce=9;
+
+  // gravity
+  playerVel.y+=gravity*dt;
+
+  // ground check (simple: y>0.5)
+  const groundY=0.1; // just above baseplate top
+  if(playerObj.position.y<=groundY+1){
+    playerObj.position.y=groundY+1;
+    if(playerVel.y<0){playerVel.y=0;playerOnGround=true;}
+  } else {
+    playerOnGround=false;
+  }
+
+  // movement
+  const fwd=new THREE.Vector3(Math.sin(playerYaw),0,Math.cos(playerYaw));
+  const right=new THREE.Vector3(Math.cos(playerYaw),0,-Math.sin(playerYaw));
+  const move=new THREE.Vector3();
+  if(keysHeld['KeyW']||keysHeld['ArrowUp'])move.sub(fwd);
+  if(keysHeld['KeyS']||keysHeld['ArrowDown'])move.add(fwd);
+  if(keysHeld['KeyA']||keysHeld['ArrowLeft'])move.sub(right);
+  if(keysHeld['KeyD']||keysHeld['ArrowRight'])move.add(right);
+  if(move.lengthSq()>0)move.normalize().multiplyScalar(speed);
+  playerVel.x=move.x;
+  playerVel.z=move.z;
+
+  if((keysHeld['Space'])&&playerOnGround){
+    playerVel.y=jumpForce;
+    playerOnGround=false;
+  }
+
+  playerObj.position.addScaledVector(playerVel,dt);
+
+  // camera follow
+  const camOffset=new THREE.Vector3(
+    Math.sin(playerYaw)*4,
+    2.5,
+    Math.cos(playerYaw)*4
+  );
+  camera.position.copy(playerObj.position).add(camOffset);
+  const lookAt=playerObj.position.clone().add(new THREE.Vector3(
+    -Math.sin(playerYaw)*2,
+    playerPitch*3,
+    -Math.cos(playerYaw)*2
+  ));
+  camera.lookAt(lookAt);
+}
+
+// ── Keyboard Shortcuts ────────────────
+function onKeyDown(e){
+  keysHeld[e.code]=true;
+  if(playMode){
+    if(e.key==='F6'||e.key==='Escape'){stopPlay();}
+    return;
+  }
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;
+  if(e.key==='F5'){e.preventDefault();startPlay();return;}
+  if(e.key==='F6'){e.preventDefault();stopPlay();return;}
+  if(e.ctrlKey||e.metaKey){
+    switch(e.key.toLowerCase()){
+      case'z':e.preventDefault();undo();break;
+      case'y':e.preventDefault();redo();break;
+      case's':e.preventDefault();saveScene();break;
+      case'd':e.preventDefault();duplicateObj();break;
+      case'c':e.preventDefault();copyObj();break;
+      case'v':e.preventDefault();pasteObj();break;
+      case'x':e.preventDefault();cutObj();break;
+    }
+    return;
+  }
+  switch(e.key.toLowerCase()){
+    case'q':setTool('select');break;
+    case'w':setTool('move');break;
+    case'e':setTool('scale');break;
+    case'r':setTool('rotate');break;
+    case'f':focusSelected();break;
+    case'g':toggleGrid();break;
+    case'delete':case'backspace':deleteSelected();break;
+  }
+}
+
+function onMouseMove(e){
+  if(playMode)return;
+  const rect=renderer.domElement.getBoundingClientRect();
+  mouse.x=((e.clientX-rect.left)/rect.width)*2-1;
+  mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
+}
+
+// ── Menu helpers ──────────────────────
+function toggleMenu(id){
+  const dd=document.getElementById(id);
+  const wasOpen=dd.classList.contains('open');
+  closeMenus();
+  if(!wasOpen)dd.classList.add('open');
+}
+function closeMenus(){
+  document.querySelectorAll('.dropdown').forEach(d=>d.classList.remove('open'));
+}
+
+// ── Tab switchers ─────────────────────
+function switchLeftTab(tab,btn){
+  document.querySelectorAll('#left-panel .panel-tab').forEach(t=>t.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  document.getElementById('tab-explorer').classList.toggle('hidden',tab!=='explorer');
+  document.getElementById('tab-toolbox').classList.toggle('hidden',tab!=='toolbox');
+  const aiTab=document.getElementById('tab-ai');
+  if(aiTab) aiTab.classList.toggle('hidden',tab!=='ai');
+}
+function switchRightTab(tab,btn){
+  document.querySelectorAll('#right-panel .panel-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-props').classList.toggle('hidden',tab!=='props');
+  const se=document.getElementById('script-editor');
+  if(tab==='script'){
+    if(selected&&selected.type==='Script'){openScriptEditor();}
+    else{se.style.display='none';document.getElementById('tab-props').classList.remove('hidden');btn.classList.remove('active');document.querySelectorAll('#right-panel .panel-tab')[0].classList.add('active');}
+  } else {
+    se.style.display='none';
+    document.getElementById('tab-props').classList.remove('hidden');
+  }
+}
+function switchBottomTab(tab,btn){
+  document.querySelectorAll('.bottom-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+}
+function togglePanel(id){
+  const p=document.getElementById(id);
+  p.style.display=p.style.display==='none'?'':'none';
+}
+
+// ── Console ───────────────────────────
+function conLog(msg,type='info'){
+  const out=document.getElementById('console-output');
+  const line=document.createElement('div');
+  line.className='con-line con-'+type;
+  const time=new Date().toLocaleTimeString('en',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  line.textContent='['+time+'] '+msg;
+  out.appendChild(line);
+  out.scrollTop=out.scrollHeight;
+}
+
+// ── Window resize ─────────────────────
+window.addEventListener('resize',()=>{
+  resizeRenderer();
+  setTimeout(resizeRenderer,100);
+});
+
+// ── Login enter key ───────────────────
+document.getElementById('li-user').addEventListener('keydown',e=>{
+  if(e.key==='Enter')document.getElementById('li-pass').focus();
+});
+
+// ═══════════════════════════════════════
+// TERRAIN SYSTEM
+// ═══════════════════════════════════════
+let terrainMesh=null, waterMesh=null;
+
+function openTerrainModal(mode){
+  const m=document.getElementById('terrain-modal');
+  m.style.display='flex';
+  ['tab-tgen','tab-tpaint','tab-tsculpt'].forEach(id=>{
+    document.getElementById(id).style.display='none';
+  });
+  document.querySelectorAll('#terrain-modal .modal-tab').forEach(b=>b.classList.remove('active'));
+  if(mode==='generate'){
+    document.getElementById('tab-tgen').style.display='block';
+    document.getElementById('mtab-gen').classList.add('active');
+  } else if(mode==='paint'){
+    document.getElementById('tab-tpaint').style.display='block';
+    document.getElementById('mtab-paint').classList.add('active');
+  } else {
+    document.getElementById('tab-tsculpt').style.display='block';
+    document.getElementById('mtab-sculpt').classList.add('active');
+  }
+}
+function closeTerrainModal(){document.getElementById('terrain-modal').style.display='none';}
+function switchTerrainTab(mode,btn){
+  ['tab-tgen','tab-tpaint','tab-tsculpt'].forEach(id=>document.getElementById(id).style.display='none');
+  document.querySelectorAll('#terrain-modal .modal-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const map={generate:'tab-tgen',paint:'tab-tpaint',sculpt:'tab-tsculpt'};
+  document.getElementById(map[mode]).style.display='block';
+}
+
+/* ── Perlin noise for terrain generation ── */
+(function(){
+  function buildPerm(seed){
+    const p=Array.from({length:256},(_,i)=>i);
+    let s=seed&0xffffffff;
+    for(let i=255;i>0;i--){
+      s=((s^(s<<13))^((s^(s<<13))>>>17)^((s^(s<<13))^((s^(s<<13))>>>17))<<5)>>>0;
+      const j=s%(i+1);[p[i],p[j]]=[p[j],p[i]];
+    }
+    return [...p,...p];
+  }
+  function fade(t){return t*t*t*(t*(t*6-15)+10);}
+  function lerp(a,b,t){return a+(b-a)*t;}
+  function grad(h,x,y){
+    h&=3;
+    const u=h<2?x:y, v=h<2?y:x;
+    return ((h&1)?-u:u)+((h&2)?-v:v);
+  }
+  window._terrainNoise=function(seed){
+    const perm=buildPerm(seed);
+    return function noise(x,y){
+      const X=Math.floor(x)&255, Y=Math.floor(y)&255;
+      x-=Math.floor(x); y-=Math.floor(y);
+      const u=fade(x),v=fade(y);
+      const a=perm[X]+Y, aa=perm[a], ab=perm[a+1];
+      const b=perm[X+1]+Y, ba=perm[b], bb=perm[b+1];
+      return lerp(lerp(grad(perm[aa],x,y),grad(perm[ba],x-1,y),u),
+                  lerp(grad(perm[ab],x,y-1),grad(perm[bb],x-1,y-1),u),v);
+    };
+  };
+})();
+
+function generateTerrain(){
+  const seed=parseInt(document.getElementById('tgen-seed').value)||Math.floor(Math.random()*9999);
+  const size=parseInt(document.getElementById('tgen-size').value)||64;
+  const scale=parseFloat(document.getElementById('tgen-scale').value)||8;
+  const biome=document.getElementById('tgen-biome').value;
+  if(terrainMesh){scene.remove(terrainMesh);terrainMesh=null;}
+  const segs=Math.min(size-1,127);
+  const geo=new THREE.PlaneGeometry(size*2,size*2,segs,segs);
+  geo.rotateX(-Math.PI/2);
+  const pos=geo.attributes.position;
+
+  const noise=window._terrainNoise(seed);
+
+  /* FBM — 6 octaves of Perlin noise */
+  function fbm(x,y,octaves,freq,lacun,gain){
+    let v=0,amp=1,max=0;
+    for(let o=0;o<octaves;o++){v+=noise(x*freq,y*freq)*amp;max+=amp;freq*=lacun;amp*=gain;}
+    return v/max;
+  }
+
+  /* Biome parameters */
+  const biomeP={
+    grassland:{freq:0.04,lacun:2.1,gain:0.48,hMul:1.0,octaves:6},
+    mountains:{freq:0.03,lacun:2.2,gain:0.55,hMul:2.8,octaves:7},
+    plains:   {freq:0.025,lacun:2.0,gain:0.35,hMul:0.3,octaves:4},
+    desert:   {freq:0.06,lacun:1.9,gain:0.42,hMul:0.7,octaves:5},
+    island:   {freq:0.045,lacun:2.1,gain:0.5,hMul:1.4,octaves:6},
+    forest:   {freq:0.05,lacun:2.1,gain:0.5,hMul:1.2,octaves:6},
+  };
+  const p=biomeP[biome]||biomeP.grassland;
+  const halfSize=size;
+
+  for(let i=0;i<pos.count;i++){
+    const wx=pos.getX(i), wz=pos.getZ(i);
+    let h=fbm(wx,wz,p.octaves,p.freq,p.lacun,p.gain);
+    /* Remap [-1..1] to [0..1] */
+    h=(h+1)*0.5;
+    if(biome==='desert'){
+      /* Dune ridges: mix fbm with sine waves */
+      const dune=Math.abs(Math.sin(wx*0.12+wz*0.07+h*2))*0.6+Math.abs(Math.sin(wz*0.1-wx*0.05))*0.4;
+      h=h*0.4+dune*0.6;
+    }
+    if(biome==='island'){
+      /* Island falloff — edges underwater */
+      const dx=wx/halfSize, dz=wz/halfSize;
+      const falloff=Math.max(0,1-Math.pow(dx*dx+dz*dz,0.9)*1.2);
+      h=h*falloff;
+    }
+    if(biome==='mountains'){
+      /* Sharpen peaks */
+      h=Math.pow(h,0.65);
+    }
+    pos.setY(i,h*scale*p.hMul);
+  }
+  pos.needsUpdate=true;
+  geo.computeVertexNormals();
+
+  const colorMap={mountains:0x8b7355,plains:0x5a9e4a,grassland:0x4a7c3f,desert:0xc8a96e,island:0x3d9970,forest:0x2d5a27};
+  const mat=new THREE.MeshLambertMaterial({color:colorMap[biome]||0x5a8a4a,wireframe:studioSettings.wireframe||false});
+  terrainMesh=new THREE.Mesh(geo,mat);
+  terrainMesh.receiveShadow=true;
+  terrainMesh.castShadow=false;
+  scene.add(terrainMesh);
+
+  /* Auto-focus camera */
+  const tDist=size*1.4;
+  orbitControls.target.set(0,scale*p.hMul*0.3,0);
+  camera.position.set(tDist*0.7,tDist*0.55,tDist*0.7);
+  orbitControls.update();
+
+  closeTerrainModal();
+  conLog(`✅ Terrain generated: ${biome}, size=${size}, scale=${scale}, seed=${seed}`,'success');
+}
+
+function addWater(){
+  if(waterMesh){scene.remove(waterMesh);waterMesh=null;}
+  const geo=new THREE.PlaneGeometry(200,200,1,1);
+  geo.rotateX(-Math.PI/2);
+  const mat=new THREE.MeshPhongMaterial({color:0x1a6b9e,transparent:true,opacity:0.65,shininess:120});
+  waterMesh=new THREE.Mesh(geo,mat);
+  waterMesh.position.y=0.4;
+  scene.add(waterMesh);
+  conLog('Water plane added','success');
+}
+
+function clearTerrain(){
+  if(terrainMesh){scene.remove(terrainMesh);terrainMesh=null;}
+  if(waterMesh){scene.remove(waterMesh);waterMesh=null;}
+  conLog('Terrain cleared','warn');
+}
+
+let terrainBrushActive=false, terrainPaintColor='#4a7c3f';
+function setTerrainPaintColor(c){terrainPaintColor=c;}
+function startTerrainBrush(mode){
+  terrainBrushActive=!terrainBrushActive;
+  const btn=document.querySelector('#tab-t'+(mode==='paint'?'paint':'sculpt')+' .brush-toggle');
+  if(btn) btn.textContent=terrainBrushActive?'🛑 Stop Brush':'🖌️ Start Brush';
+  if(!terrainBrushActive) return;
+  if(!terrainMesh){conLog('Generate terrain first','warn');terrainBrushActive=false;return;}
+  conLog(`${mode} brush active — click viewport to apply`,'info');
+  const onVPClick=(e)=>{
+    if(!terrainBrushActive){renderer.domElement.removeEventListener('click',onVPClick);return;}
+    const rect=renderer.domElement.getBoundingClientRect();
+    const mouse=new THREE.Vector2(
+      ((e.clientX-rect.left)/rect.width)*2-1,
+      -((e.clientY-rect.top)/rect.height)*2+1
+    );
+    const ray=new THREE.Raycaster();
+    ray.setFromCamera(mouse,camera);
+    const hits=ray.intersectObject(terrainMesh);
+    if(!hits.length) return;
+    const pt=hits[0].point;
+    const pos=terrainMesh.geometry.attributes.position;
+    const brushR=parseFloat(document.getElementById(mode==='paint'?'tpaint-size':'tsculpt-size').value)||5;
+    const strength=parseFloat(document.getElementById(mode==='paint'?'tpaint-strength':'tsculpt-strength').value)||1;
+    for(let i=0;i<pos.count;i++){
+      const dx=pos.getX(i)-pt.x, dz=pos.getZ(i)-pt.z;
+      const dist=Math.sqrt(dx*dx+dz*dz);
+      if(dist<brushR){
+        const factor=(1-dist/brushR)*strength*0.5;
+        if(mode==='sculpt') pos.setY(i,pos.getY(i)+factor);
+        else if(mode==='flatten') pos.setY(i,pos.getY(i)*(1-factor)+pt.y*factor);
+      }
+    }
+    pos.needsUpdate=true;
+    terrainMesh.geometry.computeVertexNormals();
+    if(mode==='paint') terrainMesh.material.color.set(terrainPaintColor);
+  };
+  renderer.domElement.addEventListener('click',onVPClick);
+}
+
+// ═══════════════════════════════════════
+// SETTINGS SYSTEM
+// ═══════════════════════════════════════
+let studioSettings={
+  snapEnabled:false, snapPos:1, snapRot:15, snapScale:0.25,
+  camSpeed:1.0, gridVisible:true, shadowsEnabled:true,
+  fov:60, antialias:true,
+  ambLight:0.4, renderScale:1.0, wireframe:false,
+  fogEnabled:true, axesVisible:true, autoSave:true,
+  bgColor:'#0a0318'
+};
+
+function _setSlider(id,val,decimals){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.value=val;
+  const span=el.nextElementSibling;
+  if(span&&span.tagName==='SPAN') span.textContent=decimals!=null?parseFloat(val).toFixed(decimals):val;
+}
+function openSettingsModal(){
+  /* Reload persisted settings first */
+  try{
+    const saved=JSON.parse(localStorage.getItem('eylox_studio_settings')||'null');
+    if(saved) Object.assign(studioSettings,saved);
+  }catch{}
+  const s=studioSettings;
+  /* Snap */
+  document.getElementById('set-snap').checked=s.snapEnabled;
+  document.getElementById('set-snapPos').value=s.snapPos;
+  document.getElementById('set-snapRot').value=s.snapRot;
+  document.getElementById('set-snapScale').value=s.snapScale;
+  /* Camera */
+  _setSlider('set-camSpeed',s.camSpeed,1);
+  _setSlider('set-fov',s.fov,0);
+  /* Viewport */
+  document.getElementById('set-grid').checked=s.gridVisible;
+  document.getElementById('set-shadows').checked=s.shadowsEnabled;
+  /* New settings */
+  _setSlider('set-ambLight',s.ambLight!=null?s.ambLight:0.4,1);
+  _setSlider('set-renderScale',s.renderScale||1,1);
+  const wfEl=document.getElementById('set-wireframe');  if(wfEl) wfEl.checked=s.wireframe||false;
+  const fogEl=document.getElementById('set-fog');       if(fogEl) fogEl.checked=s.fogEnabled!=null?s.fogEnabled:true;
+  const axEl=document.getElementById('set-axes');       if(axEl) axEl.checked=s.axesVisible!=null?s.axesVisible:true;
+  const asEl=document.getElementById('set-autoSave');   if(asEl) asEl.checked=s.autoSave!=null?s.autoSave:true;
+  const bgEl=document.getElementById('set-bg');         if(bgEl) bgEl.value=s.bgColor||'#0a0318';
+  document.getElementById('settings-modal').style.display='flex';
+}
+function closeSettingsModal(){document.getElementById('settings-modal').style.display='none';}
+function applySettings(){
+  studioSettings.snapEnabled=document.getElementById('set-snap').checked;
+  studioSettings.snapPos=parseFloat(document.getElementById('set-snapPos').value)||1;
+  studioSettings.snapRot=parseFloat(document.getElementById('set-snapRot').value)||15;
+  studioSettings.snapScale=parseFloat(document.getElementById('set-snapScale').value)||0.25;
+  studioSettings.camSpeed=parseFloat(document.getElementById('set-camSpeed').value)||1.0;
+  studioSettings.gridVisible=document.getElementById('set-grid').checked;
+  studioSettings.shadowsEnabled=document.getElementById('set-shadows').checked;
+  studioSettings.fov=parseFloat(document.getElementById('set-fov').value)||60;
+  studioSettings.ambLight=parseFloat(document.getElementById('set-ambLight')?.value)||0.4;
+  studioSettings.renderScale=parseFloat(document.getElementById('set-renderScale')?.value)||1;
+  studioSettings.wireframe=document.getElementById('set-wireframe')?.checked||false;
+  studioSettings.fogEnabled=document.getElementById('set-fog')?.checked!=null?document.getElementById('set-fog').checked:true;
+  studioSettings.axesVisible=document.getElementById('set-axes')?.checked!=null?document.getElementById('set-axes').checked:true;
+  studioSettings.autoSave=document.getElementById('set-autoSave')?.checked!=null?document.getElementById('set-autoSave').checked:true;
+  studioSettings.bgColor=document.getElementById('set-bg')?.value||'#0a0318';
+  /* Apply: grid + shadows + FOV */
+  gridHelper.visible=studioSettings.gridVisible;
+  renderer.shadowMap.enabled=studioSettings.shadowsEnabled;
+  camera.fov=studioSettings.fov;
+  camera.updateProjectionMatrix();
+  /* Apply: snap */
+  if(transformControls){
+    const snapP=studioSettings.snapEnabled?studioSettings.snapPos:null;
+    const snapR=studioSettings.snapEnabled?THREE.MathUtils.degToRad(studioSettings.snapRot):null;
+    const snapS=studioSettings.snapEnabled?studioSettings.snapScale:null;
+    transformControls.setTranslationSnap(snapP);
+    transformControls.setRotationSnap(snapR);
+    transformControls.setScaleSnap(snapS);
+  }
+  /* Apply: camera speed */
+  if(orbitControls){
+    orbitControls.zoomSpeed=studioSettings.camSpeed;
+    orbitControls.panSpeed=studioSettings.camSpeed;
+    orbitControls.rotateSpeed=studioSettings.camSpeed*0.5;
+  }
+  /* Apply: ambient light */
+  if(ambientLight) ambientLight.intensity=studioSettings.ambLight;
+  /* Apply: render pixel ratio */
+  renderer.setPixelRatio(window.devicePixelRatio*Math.min(studioSettings.renderScale,2));
+  /* Apply: wireframe on all scene meshes */
+  scene.traverse(obj=>{if(obj.isMesh&&obj.material&&!obj.isHelper) obj.material.wireframe=studioSettings.wireframe;});
+  /* Apply: fog toggle */
+  fogEnabled=studioSettings.fogEnabled;
+  if(studioSettings.fogEnabled) scene.fog=new THREE.Fog(parseInt(studioSettings.bgColor.replace('#','0x'))||0x0a0318,50,250);
+  else scene.fog=null;
+  /* Apply: axes helper */
+  if(axesHelper) axesHelper.visible=studioSettings.axesVisible;
+  /* Apply: background color */
+  scene.background=new THREE.Color(studioSettings.bgColor);
+  /* Apply: autosave flag */
+  if(typeof _autosaveTimer!=='undefined'&&studioSettings.autoSave){
+    clearInterval(_autosaveTimer);
+    _autosaveTimer=setInterval(()=>{if(!playMode) saveScene(true);},30000);
+  } else if(!studioSettings.autoSave && _autosaveTimer){
+    clearInterval(_autosaveTimer);_autosaveTimer=null;
+  }
+  /* Persist settings */
+  localStorage.setItem('eylox_studio_settings',JSON.stringify(studioSettings));
+  closeSettingsModal();
+  conLog('Settings applied','success');
+}
+
+// ═══════════════════════════════════════
+// THEME SYSTEM
+// ═══════════════════════════════════════
+const themes={
+  dark:{bg:'#06010f',panel:'#120929',menubar:'#0d0620',text:'#e2d8f0',accent:'#a78bfa',border:'#2a1a4a'},
+  midnight:{bg:'#05080f',panel:'#0d1321',menubar:'#07111f',text:'#cdd9f0',accent:'#4fc3f7',border:'#1a2a40'},
+  forest:{bg:'#040e08',panel:'#0a1f10',menubar:'#071509',text:'#c8efd0',accent:'#4ade80',border:'#1a3a20'},
+  crimson:{bg:'#0f0404',panel:'#200a0a',menubar:'#180505',text:'#f0cdcd',accent:'#f87171',border:'#3a1515'},
+  light:{bg:'#f0eef8',panel:'#ffffff',menubar:'#e8e2f8',text:'#1a0a3a',accent:'#7c3aed',border:'#d0c8f0'}
+};
+function openThemeModal(){document.getElementById('theme-modal').style.display='flex';}
+function closeThemeModal(){document.getElementById('theme-modal').style.display='none';}
+function applyTheme(name){
+  const t=themes[name];
+  if(!t) return;
+  const r=document.documentElement.style;
+  r.setProperty('--bg',t.bg);
+  r.setProperty('--panel',t.panel);
+  r.setProperty('--menubar',t.menubar);
+  r.setProperty('--text',t.text);
+  r.setProperty('--purple',t.accent);
+  r.setProperty('--border',t.border);
+  renderer.setClearColor(t.bg);
+  closeThemeModal();
+  conLog(`Theme "${name}" applied`,'success');
+}
+
+// ═══════════════════════════════════════
+// PUBLISH MODAL
+// ═══════════════════════════════════════
+function openPublishModal(){
+  const user=getStudioUser();
+  document.getElementById('pub-author').textContent=user;
+  document.getElementById('publish-modal').style.display='flex';
+}
+function closePublishModal(){document.getElementById('publish-modal').style.display='none';}
+function publishGame(){
+  const name=(document.getElementById('pub-name').value||'').trim();
+  const desc=(document.getElementById('pub-desc').value||'').trim();
+  const genre=document.getElementById('pub-genre').value;
+  const vis=document.getElementById('pub-vis').value;
+  if(!name){conLog('Please enter a game name','warn');document.getElementById('pub-name').focus();return;}
+  const user=getStudioUser();
+  const games=JSON.parse(localStorage.getItem('eylox_my_games')||'[]');
+  const existing=games.findIndex(g=>g.name===name&&g.author===user);
+  const entry={
+    name,desc,genre,visibility:vis,author:user,
+    published:new Date().toISOString(),
+    plays:existing>=0?(games[existing].plays||0):0,
+    likes:existing>=0?(games[existing].likes||0):0,
+    id:existing>=0?games[existing].id:('game_'+Date.now())
+  };
+  if(existing>=0) games[existing]=entry; else games.push(entry);
+  localStorage.setItem('eylox_my_games',JSON.stringify(games));
+  closePublishModal();
+  conLog(`"${name}" published successfully!`,'success');
+  document.getElementById('pub-name').value='';
+  document.getElementById('pub-desc').value='';
+}
+
+// ═══════════════════════════════════════
+// DAY/NIGHT CYCLE
+// ═══════════════════════════════════════
+function setDayNight(v){
+  const t=parseFloat(v);
+  const nightC=new THREE.Color(0x020410);
+  const dawnC=new THREE.Color(0xff8c42);
+  const dayC=new THREE.Color(0x87ceeb);
+  let sky;
+  if(t<0.25) sky=nightC.clone().lerp(dawnC,t/0.25);
+  else if(t<0.5) sky=dawnC.clone().lerp(dayC,(t-0.25)/0.25);
+  else if(t<0.75) sky=dayC.clone().lerp(dawnC,(t-0.5)/0.25);
+  else sky=dawnC.clone().lerp(nightC,(t-0.75)/0.25);
+  scene.background=sky.clone();
+  if(scene.fog) scene.fog.color=sky.clone();
+  const angle=t*Math.PI*2-Math.PI/2;
+  const sunR=60;
+  const sunIntensity=Math.max(0.02,Math.sin(t*Math.PI))*1.3;
+  const ambIntensity=0.12+Math.sin(t*Math.PI)*0.38;
+  scene.children.forEach(c=>{
+    if(c.isDirectionalLight){c.position.set(Math.cos(angle)*sunR,Math.abs(Math.sin(angle))*sunR+2,30);c.intensity=sunIntensity;}
+    if(c.isAmbientLight){c.intensity=ambIntensity;}
+    if(c.isHemisphereLight){c.intensity=0.15+Math.sin(t*Math.PI)*0.25;}
+    if(c.isMesh&&c.geometry&&c.geometry.parameters&&c.geometry.parameters.radius===400){c.material.color=sky.clone();}
+  });
+  renderer.setClearColor(sky.clone());
+}
+
+// ═══════════════════════════════════════
+// AUTOSAVE SYSTEM
+// ═══════════════════════════════════════
+let _autosaveTimer=null;
+function showAutosaveBadge(){
+  const b=document.getElementById('autosave-badge');
+  if(!b) return;
+  b.style.display='block';
+  b.style.opacity='1';
+  clearTimeout(_autosaveTimer);
+  _autosaveTimer=setTimeout(()=>{b.style.opacity='0';setTimeout(()=>{b.style.display='none';},500);},2500);
+}
+function startAutosave(){
+  setInterval(()=>{
+    try{
+      const data=JSON.stringify(sceneObjects.map(o=>({
+        id:o.id,name:o.name,type:o.type,props:o.props,
+        pos:o.mesh?{x:o.mesh.position.x,y:o.mesh.position.y,z:o.mesh.position.z}:null,
+        rot:o.mesh?{x:o.mesh.rotation.x,y:o.mesh.rotation.y,z:o.mesh.rotation.z}:null,
+        sc:o.mesh?{x:o.mesh.scale.x,y:o.mesh.scale.y,z:o.mesh.scale.z}:null,
+        script:o.script||null
+      })));
+      localStorage.setItem('eylox_studio_autosave',data);
+      localStorage.setItem('eylox_studio_autosave_ts',Date.now());
+      showAutosaveBadge();
+    }catch(e){}
+  },60000); // every 60s
+}
+
+// ═══════════════════════════════════════
+// AI STUDIO ASSISTANT
+// ═══════════════════════════════════════
+const AI_KB=[
+  {q:['move','position','teleport','place'],a:'To move an object: use the Move tool (W) and drag the gizmo. In script: <code>obj.Position = Vector3.new(x, y, z)</code>. For smooth movement, update inside <code>onUpdate(dt)</code>.'},
+  {q:['health','damage','hurt','die'],a:'Track health with a variable: <code>local hp = 100</code>. On hit: <code>hp = hp - damage</code>. When <code>hp &lt;= 0</code>, call <code>onDeath()</code>. You can display it with a UI bar.'},
+  {q:['score','points','Eylux','currency'],a:'Store score globally: <code>local score = 0</code>. Add points: <code>score = score + 10</code>. Save it: <code>DataStore.Set("score", score)</code> to persist across sessions.'},
+  {q:['jump','gravity','physics','fall'],a:'For jumping: apply upward velocity <code>vel.y = jumpForce</code> when on ground. Each frame: <code>vel.y = vel.y - gravity * dt</code>. Set <code>onGround = false</code> and check floor collision.'},
+  {q:['npc','enemy','ai','bot','character'],a:'Use Plugins > NPC Generator to add a pre-built humanoid. In script, give it a patrol: store waypoints in a table and each frame move toward <code>waypoints[current]</code>.'},
+  {q:['spawn','respawn','start','checkpoint'],a:'Place a Spawn object (Insert > Spawn Point). The engine uses its position for player start. For respawn: <code>player.Position = spawn.Position</code>. Track checkpoints as variables.'},
+  {q:['color','material','texture','paint'],a:'Select an object, then use the color picker in the Properties panel. In script: <code>obj.BrickColor = BrickColor.new("Bright red")</code> or use hex colors.'},
+  {q:['sound','audio','music','play'],a:'Add an Audio object from Toolbox. Script: <code>local s = workspace.Sound</code>. Then <code>s:Play()</code> and <code>s:Stop()</code>. Set <code>s.Volume = 0.5</code> (0–1) and <code>s.Looped = true</code> for BGM.'},
+  {q:['light','glow','emit','bright'],a:'Add a PointLight or SpotLight from Insert menu. Set Range and Intensity in Properties. For glowing objects, set Emissive color in the material — this makes them appear to radiate light.'},
+  {q:['script','function','code','event'],a:'Scripts use Lua-like syntax. Example:\n<code>function onTouch(hit)\n  print("touched by "..hit.Name)\nend\nobj.Touched:Connect(onTouch)</code>'},
+  {q:['save','load','data','persist'],a:'Use DataStore API: <code>DataStore.Set("key", value)</code> saves data. <code>DataStore.Get("key")</code> retrieves it. This syncs to localStorage under the hood and persists across sessions.'},
+  {q:['terrain','ground','hill','mountain'],a:'Use Terrain menu to Generate terrain (choose biome & scale). Sculpt tab raises terrain with a brush click. Paint tab colors the surface. Add Water Plane for oceans/rivers.'},
+  {q:['publish','release','share','upload'],a:'Click Publish in the menubar. Enter a game name, description, and genre. Choose visibility: Public (anyone plays), Friends, or Private. Published games appear on your Eylox profile.'},
+  {q:['multiplayer','server','team','players'],a:'Use Test > Simulate Players to add up to 4 simulated clients. Test sync logic — changes to shared objects should use RemoteEvents to keep all clients in sync.'},
+  {q:['animate','animation','keyframe','motion'],a:'Open Animation Editor (Plugins menu). Select an object, click on the timeline to add keyframes. Drag keyframes to set timing. Press ▶ to preview. Export bakes the animation into script loops.'},
+  {q:['camera','fov','view','perspective'],a:'Change FOV in Settings (Studio Settings slider). Script control: <code>Camera.FieldOfView = 90</code>. For cutscenes: <code>Camera.CFrame = CFrame.new(pos, lookAt)</code> to position and point camera.'},
+  {q:['vehicle','car','drive','speed'],a:'Insert a Vehicle (Plugins menu). In script, detect seat occupation and apply forces: <code>if seat.Occupant then chassis.Velocity = dir * speed end</code>. Use throttle input from player.'},
+  {q:['tree','nature','plant','forest'],a:'Insert Trees from the Nature category in Toolbox. For a dense forest: use a loop in script to place trees at random positions — <code>for i=1,50 do spawnTree(randPos()) end</code>.'},
+  {q:['house','building','structure','room'],a:'Insert a House from Buildings in Toolbox. For custom buildings: combine Part/Box objects to form walls. Set Anchored=true so they don\'t fall. Use doors (thin parts) as visual indicators.'},
+];
+function aiGetResponse(text){
+  const lo=text.toLowerCase();
+  for(const e of AI_KB){if(e.q.some(k=>lo.includes(k)))return e.a;}
+  return 'For "<b>'+text+'</b>": check the Objects panel to inspect properties, or use <code>workspace:FindFirstChild("name")</code> to reference objects in script. The Output console at the bottom shows runtime errors and print() output. Need more help? Try a more specific question!';
+}
+function aiSend(){
+  const inp=document.getElementById('ai-input');
+  const text=(inp.value||'').trim();
+  if(!text) return;
+  inp.value='';
+  const msgs=document.getElementById('ai-msgs');
+  const um=document.createElement('div');um.className='ai-msg user-msg';um.textContent=text;msgs.appendChild(um);
+  const typing=document.createElement('div');typing.className='ai-msg bot-msg';typing.textContent='✦ thinking...';msgs.appendChild(typing);
+  msgs.scrollTop=msgs.scrollHeight;
+  setTimeout(()=>{
+    typing.innerHTML='🤖 '+aiGetResponse(text);
+    msgs.scrollTop=msgs.scrollHeight;
+  },380);
+}
+function aiChip(text){
+  const inp=document.getElementById('ai-input');
+  if(inp) inp.value=text;
+  aiSend();
+}
+
+// ═══════════════════════════════════════
+// ASSET MARKETPLACE
+// ═══════════════════════════════════════
+const MARKET_ASSETS=[
+  {id:'ma1',emoji:'🏰',name:'Medieval Castle',cat:'Buildings',creator:'EyloxStudio',price:'Free',stars:'★★★★★',type:'House'},
+  {id:'ma2',emoji:'🚀',name:'Space Rocket',cat:'Vehicles',creator:'CosmicBuilds',price:'150 💎',stars:'★★★★☆',type:'Vehicle'},
+  {id:'ma3',emoji:'🌳',name:'Oak Tree Pack',cat:'Nature',creator:'NatureLab',price:'Free',stars:'★★★★★',type:'Tree'},
+  {id:'ma4',emoji:'🤖',name:'Robot NPC',cat:'Characters',creator:'BotFactory',price:'200 💎',stars:'★★★☆☆',type:'NPC'},
+  {id:'ma5',emoji:'🏠',name:'Starter House',cat:'Buildings',creator:'ArchKit',price:'Free',stars:'★★★★☆',type:'House'},
+  {id:'ma6',emoji:'🚗',name:'Sports Car',cat:'Vehicles',creator:'RacerStudios',price:'300 💎',stars:'★★★★★',type:'Vehicle'},
+  {id:'ma7',emoji:'🪨',name:'Rock Formation',cat:'Nature',creator:'GeoArt',price:'Free',stars:'★★★☆☆',type:'Rock'},
+  {id:'ma8',emoji:'👾',name:'Alien NPC',cat:'Characters',creator:'AliensRC',price:'250 💎',stars:'★★★★☆',type:'NPC'},
+  {id:'ma9',emoji:'🗼',name:'Eiffel Tower',cat:'Buildings',creator:'LandmarkDB',price:'100 💎',stars:'★★★★★',type:'Model'},
+  {id:'ma10',emoji:'🌲',name:'Pine Forest',cat:'Nature',creator:'NatureLab',price:'Free',stars:'★★★★☆',type:'Tree'},
+];
+function openMarketplace(){
+  document.getElementById('marketplace-modal').style.display='flex';
+  renderMarketplace('');
+}
+function closeMarketplace(){document.getElementById('marketplace-modal').style.display='none';}
+function renderMarketplace(query){
+  const g=document.getElementById('mkt-grid');
+  if(!g) return;
+  const q=(query||'').toLowerCase();
+  const cat=document.getElementById('mkt-cat-filter')?.value||'All';
+  const filtered=MARKET_ASSETS.filter(a=>{
+    const matchQ=!q||a.name.toLowerCase().includes(q)||a.cat.toLowerCase().includes(q);
+    const matchC=cat==='All'||a.cat===cat;
+    return matchQ&&matchC;
+  });
+  g.innerHTML='';
+  filtered.forEach(a=>{
+    const d=document.createElement('div');d.className='mkt-card';
+    d.innerHTML=`<div class="mkt-thumb">${a.emoji}</div><div class="mkt-info"><div class="mkt-name">${a.name}</div><div style="font-size:.65rem;color:var(--muted)">by ${a.creator} · ${a.cat}</div><div class="mkt-meta"><span class="mkt-price">${a.price}</span><span class="mkt-stars">${a.stars}</span></div></div>`;
+    d.onclick=()=>{insertObject(a.type);closeMarketplace();conLog('Imported "'+a.name+'" from Marketplace','ok');};
+    g.appendChild(d);
+  });
+  if(!filtered.length){g.innerHTML='<div style="color:var(--muted);font-size:.8rem;text-align:center;padding:24px;grid-column:1/-1;">No assets found.</div>';}
+}
+
+// ═══════════════════════════════════════
+// NPC GENERATOR MODAL
+// ═══════════════════════════════════════
+const NPC_TYPES=[
+  {id:'warrior',icon:'⚔️',name:'Warrior',desc:'Combat NPC with sword'},
+  {id:'merchant',icon:'🛒',name:'Merchant',desc:'Friendly shop NPC'},
+  {id:'guard',icon:'🛡️',name:'Guard',desc:'Patrols an area'},
+  {id:'wizard',icon:'🧙',name:'Wizard',desc:'Magic-casting NPC'},
+  {id:'villager',icon:'👨‍🌾',name:'Villager',desc:'Idle background NPC'},
+  {id:'robot',icon:'🤖',name:'Robot',desc:'Mechanical character'},
+  {id:'alien',icon:'👽',name:'Alien',desc:'Extraterrestrial NPC'},
+  {id:'zombie',icon:'🧟',name:'Zombie',desc:'Enemy pursuer NPC'},
+];
+let _selectedNPCType='warrior';
+function openNPCModal(){
+  document.getElementById('npc-modal').style.display='flex';
+  renderNPCTypes();
+}
+function closeNPCModal(){document.getElementById('npc-modal').style.display='none';}
+function renderNPCTypes(){
+  const g=document.getElementById('npc-type-grid');
+  if(!g) return;
+  g.innerHTML='';
+  NPC_TYPES.forEach(n=>{
+    const d=document.createElement('div');
+    d.className='npc-card'+(_selectedNPCType===n.id?' npc-selected':'');
+    d.innerHTML=`<span class="npc-icon">${n.icon}</span><div class="npc-name">${n.name}</div><div class="npc-desc">${n.desc}</div>`;
+    d.onclick=()=>{_selectedNPCType=n.id;renderNPCTypes();document.getElementById('npc-name-input').value=n.name;};
+    g.appendChild(d);
+  });
+}
+function spawnNPC(){
+  const chosen=NPC_TYPES.find(n=>n.id===_selectedNPCType)||NPC_TYPES[0];
+  const customName=(document.getElementById('npc-name-input').value||'').trim()||chosen.name;
+  const behavior=document.getElementById('npc-behavior').value;
+  const scale=parseFloat(document.getElementById('npc-scale').value)||1;
+  insertObject('NPC');
+  const last=sceneObjects[sceneObjects.length-1];
+  if(last&&last.type==='NPC'){
+    last.name=customName;
+    if(last.props){last.props.behavior=behavior;last.props.npcType=chosen.id;}
+    if(last.mesh&&scale!==1){last.mesh.scale.setScalar(scale);}
+    buildExplorer();
+  }
+  closeNPCModal();
+  conLog('Spawned '+customName+' ('+chosen.name+', '+behavior+')','ok');
+}
+
+// ═══════════════════════════════════════
+// ANIMATION EDITOR
+// ═══════════════════════════════════════
+let _animKFs={Position:[],Rotation:[],Scale:[]};
+let _animPlaying=false,_animPlayhead=0,_animTimer=null;
+function openAnimEditor(){
+  if(!selected){conLog('Select an object first to animate','warn');return;}
+  document.getElementById('anim-obj-name').textContent=selected.name||'Object';
+  document.getElementById('anim-modal').style.display='flex';
+  renderAnimTimeline();
+}
+function closeAnimEditor(){
+  clearInterval(_animTimer);_animPlaying=false;
+  document.getElementById('anim-modal').style.display='none';
+}
+function renderAnimTimeline(){
+  const tl=document.getElementById('anim-timeline-body');
+  if(!tl) return;
+  tl.innerHTML='';
+  ['Position','Rotation','Scale'].forEach(prop=>{
+    const row=document.createElement('div');row.className='anim-track-row';
+    const label=document.createElement('div');label.className='anim-track-label';label.textContent=prop;
+    const bar=document.createElement('div');bar.className='anim-track-bar';
+    const playhead=document.createElement('div');playhead.className='anim-playhead';
+    playhead.style.left=(_animPlayhead*100)+'%';bar.appendChild(playhead);
+    // Keyframes
+    (_animKFs[prop]||[]).forEach(kf=>{
+      const k=document.createElement('div');k.className='anim-kf';
+      k.style.left=(kf.t*100)+'%';
+      k.title=prop+' @ t='+kf.t.toFixed(2);
+      k.onclick=(e)=>{e.stopPropagation();_animKFs[prop]=_animKFs[prop].filter(x=>x!==kf);renderAnimTimeline();};
+      bar.appendChild(k);
+    });
+    // Click to add keyframe
+    bar.addEventListener('click',e=>{
+      const rect=e.currentTarget.getBoundingClientRect();
+      const t=Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width));
+      const val=selected&&selected.mesh?selected.mesh[prop.toLowerCase()+'s']?[...selected.mesh[prop.toLowerCase()+'s']]:[selected.mesh[prop.toLowerCase()+'x']||0]:0;
+      if(!_animKFs[prop]) _animKFs[prop]=[];
+      _animKFs[prop].push({t,val});
+      _animKFs[prop].sort((a,b)=>a.t-b.t);
+      renderAnimTimeline();
+    });
+    row.appendChild(label);row.appendChild(bar);tl.appendChild(row);
+  });
+}
+function animAddKeyframe(){
+  if(!selected||!selected.mesh){conLog('Select an object first','warn');return;}
+  const t=_animPlayhead;
+  ['Position','Rotation','Scale'].forEach(prop=>{
+    const mesh=selected.mesh;
+    const val=prop==='Position'?mesh.position.clone():prop==='Rotation'?mesh.rotation.clone():mesh.scale.clone();
+    if(!_animKFs[prop]) _animKFs[prop]=[];
+    const existing=_animKFs[prop].findIndex(k=>Math.abs(k.t-t)<0.01);
+    if(existing>=0) _animKFs[prop][existing].val=val; else _animKFs[prop].push({t,val});
+    _animKFs[prop].sort((a,b)=>a.t-b.t);
+  });
+  renderAnimTimeline();
+  conLog('Keyframe added at t='+t.toFixed(2),'info');
+}
+function animPlay(){
+  if(!selected){conLog('Select an object first','warn');return;}
+  _animPlaying=!_animPlaying;
+  document.getElementById('anim-play-btn').textContent=_animPlaying?'⏸ Pause':'▶ Play';
+  if(_animPlaying){
+    _animTimer=setInterval(()=>{
+      _animPlayhead=(_animPlayhead+0.016)%1;
+      renderAnimTimeline();
+    },16);
+  } else {clearInterval(_animTimer);}
+}
+function animClear(){_animKFs={Position:[],Rotation:[],Scale:[]};_animPlayhead=0;renderAnimTimeline();conLog('Animation cleared','warn');}
+
+// ═══════════════════════════════════════
+// PLUGINS MODAL
+// ═══════════════════════════════════════
+const PLUGINS=[
+  {icon:'🎨',name:'Color Palette Pro',desc:'Advanced color picker with harmony suggestions',enabled:true},
+  {icon:'📐',name:'Align & Distribute',desc:'Snap-align multiple objects with one click',enabled:true},
+  {icon:'🌊',name:'Water Shader Plus',desc:'Animated water with reflections and waves',enabled:false},
+  {icon:'🔊',name:'Sound Manager',desc:'Visual audio mixer and sequencer for game music',enabled:false},
+  {icon:'🧪',name:'Physics Sandbox',desc:'Test object physics before publishing',enabled:true},
+  {icon:'📊',name:'Analytics Overlay',desc:'Shows play counts and heatmaps on your map',enabled:false},
+  {icon:'🤖',name:'AI Code Helper',desc:'Context-aware script suggestions (powered by AI)',enabled:true},
+  {icon:'📦',name:'Asset Batch Import',desc:'Import multiple marketplace assets at once',enabled:false},
+];
+let _pluginStates={};
+function openPluginsModal(){
+  document.getElementById('plugins-modal').style.display='flex';
+  renderPlugins();
+}
+function closePluginsModal(){document.getElementById('plugins-modal').style.display='none';}
+function renderPlugins(){
+  const list=document.getElementById('plugins-list');
+  if(!list) return;
+  list.innerHTML='';
+  PLUGINS.forEach((p,i)=>{
+    const enabled=(_pluginStates[i]!==undefined)?_pluginStates[i]:p.enabled;
+    const card=document.createElement('div');card.className='plugin-card';
+    card.innerHTML=`<div class="plugin-icon">${p.icon}</div><div class="plugin-info"><div class="plugin-name">${p.name}</div><div class="plugin-desc">${p.desc}</div></div><button class="plugin-toggle" onclick="togglePlugin(${i})">${enabled?'Enabled':'Disabled'}</button>`;
+    list.appendChild(card);
+  });
+}
+function togglePlugin(i){
+  const current=(_pluginStates[i]!==undefined)?_pluginStates[i]:PLUGINS[i].enabled;
+  _pluginStates[i]=!current;
+  renderPlugins();
+  conLog((PLUGINS[i].name)+(_pluginStates[i]?' enabled':' disabled'),'info');
+}
+
+// ═══════════════════════════════════════
+// KEYBOARD SHORTCUTS MODAL
+// ═══════════════════════════════════════
+function openShortcutsModal(){document.getElementById('shortcuts-modal').style.display='flex';}
+function closeShortcutsModal(){document.getElementById('shortcuts-modal').style.display='none';}
+
+function openAITab(){
+  const tabs=document.querySelectorAll('#left-panel .panel-tab');
+  const aiBtn=tabs[2]||null;
+  switchLeftTab('ai',aiBtn);
+}
+
+// ═══════════════════════════════════════
+// INIT NEW FEATURES
+// ═══════════════════════════════════════
+// Start autosave after studio loads
+const _origInitStudio=initStudio;
+// Patch initStudio to also start autosave
+(function(){
+  const orig=window.initStudio;
+  if(orig) return; // already defined inline
+})();
+
+// Auto-restore settings on page load
+document.addEventListener('DOMContentLoaded',()=>{
+  if(typeof studioSettings!=='undefined'){
+    try{
+      const saved=JSON.parse(localStorage.getItem('eylox_studio_settings')||'null');
+      if(saved){
+        Object.assign(studioSettings,saved);
+        /* Apply: grid + shadows + FOV */
+        if(gridHelper) gridHelper.visible=studioSettings.gridVisible;
+        if(renderer) renderer.shadowMap.enabled=studioSettings.shadowsEnabled;
+        if(camera){camera.fov=studioSettings.fov;camera.updateProjectionMatrix();}
+        /* Apply: snap */
+        if(transformControls){
+          const snapP=studioSettings.snapEnabled?studioSettings.snapPos:null;
+          const snapR=studioSettings.snapEnabled?THREE.MathUtils.degToRad(studioSettings.snapRot):null;
+          const snapS=studioSettings.snapEnabled?studioSettings.snapScale:null;
+          transformControls.setTranslationSnap(snapP);
+          transformControls.setRotationSnap(snapR);
+          transformControls.setScaleSnap(snapS);
+        }
+        /* Apply: camera speed */
+        if(orbitControls){
+          orbitControls.zoomSpeed=studioSettings.camSpeed;
+          orbitControls.panSpeed=studioSettings.camSpeed;
+          orbitControls.rotateSpeed=studioSettings.camSpeed*0.5;
+        }
+      }
+    }catch(e){console.warn('Could not restore settings:',e);}
+  }
+});
+
+// Call startAutosave after a short delay when studio is ready
+setTimeout(()=>{
+  if(document.getElementById('studio').classList.contains('visible')){
+    startAutosave();
+  } else {
+    // Hook into the studio becoming visible
+    const obs=new MutationObserver(()=>{
+      if(document.getElementById('studio').classList.contains('visible')){
+        startAutosave();obs.disconnect();
+      }
+    });
+    obs.observe(document.getElementById('studio'),{attributes:true});
+  }
+},2000);
+</script>
+
+<!-- ═══════ TERRAIN MODAL ═══════ -->
+<div id="terrain-modal" class="studio-modal" style="display:none">
+  <div class="smodal-box" style="width:480px">
+    <div class="smodal-head">
+      <span>🌍 Terrain Editor</span>
+      <button class="smodal-close" onclick="closeTerrainModal()">✕</button>
+    </div>
+    <div class="smodal-tabs">
+      <button id="mtab-gen"    class="modal-tab active" onclick="switchTerrainTab('generate',this)">Generate</button>
+      <button id="mtab-paint"  class="modal-tab"        onclick="switchTerrainTab('paint',this)">Paint</button>
+      <button id="mtab-sculpt" class="modal-tab"        onclick="switchTerrainTab('sculpt',this)">Sculpt</button>
+    </div>
+    <div class="smodal-body">
+      <!-- Generate tab -->
+      <div id="tab-tgen" style="display:block">
+        <div class="sfield"><label>Biome</label>
+          <select id="tgen-biome"><option value="plains">Plains</option><option value="mountains">Mountains</option><option value="forest">Forest</option><option value="desert">Desert</option><option value="island">Island</option></select>
+        </div>
+        <div class="sfield"><label>Grid Size</label><input id="tgen-size" type="number" value="64" min="16" max="128"></div>
+        <div class="sfield"><label>Height Scale</label><input id="tgen-scale" type="number" value="8" min="1" max="64" step="0.5"></div>
+        <div class="sfield"><label>Seed (blank = random)</label><input id="tgen-seed" type="number" placeholder="random"></div>
+        <button class="smodal-btn" onclick="generateTerrain()">🌍 Generate</button>
+      </div>
+      <!-- Paint tab -->
+      <div id="tab-tpaint" style="display:none">
+        <p style="color:var(--text-dim,#888);font-size:12px;margin:0 0 12px">Click the viewport after activating the brush to paint terrain color.</p>
+        <div class="sfield"><label>Brush Size</label><input id="tpaint-size" type="range" min="1" max="30" value="8" oninput="this.nextElementSibling.textContent=this.value"><span>8</span></div>
+        <div class="sfield"><label>Strength</label><input id="tpaint-strength" type="range" min="0.1" max="3" step="0.1" value="1" oninput="this.nextElementSibling.textContent=this.value"><span>1</span></div>
+        <div class="sfield"><label>Color</label><input type="color" value="#4a7c3f" onchange="setTerrainPaintColor(this.value)"></div>
+        <button class="smodal-btn brush-toggle" onclick="startTerrainBrush('paint')">🖌️ Start Brush</button>
+      </div>
+      <!-- Sculpt tab -->
+      <div id="tab-tsculpt" style="display:none">
+        <p style="color:var(--text-dim,#888);font-size:12px;margin:0 0 12px">Click the viewport after activating the brush to raise terrain. Terrain must be generated first.</p>
+        <div class="sfield"><label>Brush Size</label><input id="tsculpt-size" type="range" min="1" max="30" value="8" oninput="this.nextElementSibling.textContent=this.value"><span>8</span></div>
+        <div class="sfield"><label>Strength</label><input id="tsculpt-strength" type="range" min="0.1" max="3" step="0.1" value="1" oninput="this.nextElementSibling.textContent=this.value"><span>1</span></div>
+        <div class="sfield"><label>Mode</label>
+          <select id="tsculpt-mode"><option value="sculpt">Raise</option><option value="flatten">Flatten</option></select>
+        </div>
+        <button class="smodal-btn brush-toggle" onclick="startTerrainBrush(document.getElementById('tsculpt-mode').value)">🖌️ Start Brush</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ SETTINGS MODAL ═══════ -->
+<div id="settings-modal" class="studio-modal" style="display:none">
+  <div class="smodal-box" style="width:440px;max-height:90vh;overflow-y:auto">
+    <div class="smodal-head">
+      <span>⚙️ Studio Settings</span>
+      <button class="smodal-close" onclick="closeSettingsModal()">✕</button>
+    </div>
+    <div class="smodal-body">
+
+      <div class="settings-section">🔗 Snapping</div>
+      <div class="sfield"><label><input id="set-snap" type="checkbox"> Enable Snap</label></div>
+      <div class="sfield"><label>Position Snap</label><input id="set-snapPos" type="number" value="1" min="0.1" step="0.1"></div>
+      <div class="sfield"><label>Rotation Snap (°)</label><input id="set-snapRot" type="number" value="15" min="1"></div>
+      <div class="sfield"><label>Scale Snap</label><input id="set-snapScale" type="number" value="0.25" min="0.01" step="0.01"></div>
+
+      <div class="settings-section">📷 Camera</div>
+      <div class="sfield"><label>Camera Speed</label><input id="set-camSpeed" type="range" min="0.2" max="5" step="0.1" value="1" oninput="this.nextElementSibling.textContent=parseFloat(this.value).toFixed(1)"><span>1.0</span></div>
+      <div class="sfield"><label>Field of View</label><input id="set-fov" type="range" min="30" max="120" value="60" oninput="this.nextElementSibling.textContent=this.value"><span>60</span></div>
+
+      <div class="settings-section">🌅 Lighting & Scene</div>
+      <div class="sfield"><label>Ambient Light</label><input id="set-ambLight" type="range" min="0" max="2" step="0.05" value="0.4" oninput="this.nextElementSibling.textContent=parseFloat(this.value).toFixed(1)"><span>0.4</span></div>
+      <div class="sfield"><label>Background Color</label><input id="set-bg" type="color" value="#0a0318" style="width:60px;height:28px;border:none;background:none;cursor:pointer;padding:0;border-radius:4px;"></div>
+      <div class="sfield"><label><input id="set-fog" type="checkbox" checked> Enable Distance Fog</label></div>
+
+      <div class="settings-section">🖥️ Viewport</div>
+      <div class="sfield"><label>Render Scale</label><input id="set-renderScale" type="range" min="0.5" max="2" step="0.1" value="1" oninput="this.nextElementSibling.textContent=parseFloat(this.value).toFixed(1)"><span>1.0</span></div>
+      <div class="sfield"><label><input id="set-grid" type="checkbox" checked> Show Grid</label></div>
+      <div class="sfield"><label><input id="set-shadows" type="checkbox" checked> Enable Shadows</label></div>
+      <div class="sfield"><label><input id="set-wireframe" type="checkbox"> Wireframe Mode</label></div>
+      <div class="sfield"><label><input id="set-axes" type="checkbox" checked> Show Axes Helper</label></div>
+
+      <div class="settings-section">💾 General</div>
+      <div class="sfield"><label><input id="set-autoSave" type="checkbox" checked> Auto-Save (every 30s)</label></div>
+
+      <div style="display:flex;gap:8px;margin-top:18px">
+        <button class="smodal-btn" onclick="applySettings()">✓ Apply</button>
+        <button class="smodal-btn smodal-cancel" onclick="closeSettingsModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ THEME MODAL ═══════ -->
+<div id="theme-modal" class="studio-modal" style="display:none">
+  <div class="smodal-box" style="width:420px">
+    <div class="smodal-head">
+      <span>🎨 Choose Theme</span>
+      <button class="smodal-close" onclick="closeThemeModal()">✕</button>
+    </div>
+    <div class="smodal-body">
+      <p style="color:var(--text-dim,#888);font-size:13px;margin:0 0 16px">Select a color theme for the Eylox Studio interface.</p>
+      <div class="theme-grid">
+        <button class="theme-card" style="--tc:#a78bfa" onclick="applyTheme('dark')">
+          <div class="theme-preview" style="background:#06010f;border-color:#a78bfa"></div>
+          <span>Dark Purple</span>
+        </button>
+        <button class="theme-card" style="--tc:#4fc3f7" onclick="applyTheme('midnight')">
+          <div class="theme-preview" style="background:#05080f;border-color:#4fc3f7"></div>
+          <span>Midnight Blue</span>
+        </button>
+        <button class="theme-card" style="--tc:#4ade80" onclick="applyTheme('forest')">
+          <div class="theme-preview" style="background:#040e08;border-color:#4ade80"></div>
+          <span>Forest Green</span>
+        </button>
+        <button class="theme-card" style="--tc:#f87171" onclick="applyTheme('crimson')">
+          <div class="theme-preview" style="background:#0f0404;border-color:#f87171"></div>
+          <span>Crimson</span>
+        </button>
+        <button class="theme-card" style="--tc:#7c3aed" onclick="applyTheme('light')">
+          <div class="theme-preview" style="background:#f0eef8;border-color:#7c3aed"></div>
+          <span>Light</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ MARKETPLACE MODAL ═══════ -->
+<div id="marketplace-modal" class="studio-modal" style="display:none">
+  <div class="smodal-box" style="width:560px">
+    <div class="smodal-head">
+      <span>🛒 Asset Marketplace</span>
+      <button class="smodal-close" onclick="closeMarketplace()">✕</button>
+    </div>
+    <div class="smodal-body">
+      <div class="mkt-top-bar">
+        <input type="text" placeholder="🔍 Search assets..." oninput="renderMarketplace(this.value)" id="mkt-search">
+        <select id="mkt-cat-filter" onchange="renderMarketplace(document.getElementById('mkt-search').value)">
+          <option value="All">All Categories</option>
+          <option value="Buildings">Buildings</option>
+          <option value="Vehicles">Vehicles</option>
+          <option value="Characters">Characters</option>
+          <option value="Nature">Nature</option>
+        </select>
+      </div>
+      <div style="font-size:.72rem;color:var(--muted);margin-bottom:10px;">Click any asset to insert it into your scene instantly.</div>
+      <div class="mkt-grid" id="mkt-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ NPC GENERATOR MODAL ═══════ -->
+<div id="npc-modal" class="studio-modal" style="display:none">
+  <div class="smodal-box" style="width:480px">
+    <div class="smodal-head">
+      <span>🤖 NPC Generator</span>
+      <button class="smodal-close" onclick="closeNPCModal()">✕</button>
+    </div>
+    <div class="smodal-body">
+      <p style="color:var(--muted);font-size:.78rem;margin-bottom:12px">Choose an NPC type, customize it, then click Spawn to add it to your scene.</p>
+      <div class="npc-grid" id="npc-type-grid"></div>
+      <div class="sfield"><label>NPC Name</label><input id="npc-name-input" type="text" placeholder="MyNPC" value="Warrior"></div>
+      <div class="sfield"><label>Behavior</label>
+        <select id="npc-behavior">
+          <option value="Idle">Idle (stands still)</option>
+          <option value="Patrol">Patrol (walks a path)</option>
+          <option value="Guard">Guard (watches area)</option>
+          <option value="Friendly">Friendly (approaches player)</option>
+          <option value="Hostile">Hostile (attacks player)</option>
+          <option value="Wanderer">Wanderer (random movement)</option>
+        </select>
+      </div>
+      <div class="sfield"><label>Scale</label>
+        <input type="range" min="0.5" max="3" step="0.1" value="1" id="npc-scale" oninput="this.nextElementSibling.textContent=parseFloat(this.value).toFixed(1)"><span>1.0</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button class="smodal-btn" onclick="spawnNPC()">🤖 Spawn NPC</button>
+        <button class="smodal-btn smodal-cancel" onclick="closeNPCModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ ANIMATION EDITOR MODAL ═══════ -->
+<div id="anim-modal" class="studio-modal" style="display:none">
+  <div class="smodal-box" style="width:580px">
+    <div class="smodal-head">
+      <span>🎬 Animation Editor — <span id="anim-obj-name">Object</span></span>
+      <button class="smodal-close" onclick="closeAnimEditor()">✕</button>
+    </div>
+    <div class="smodal-body">
+      <p style="color:var(--muted);font-size:.75rem;margin-bottom:10px">Click on a track bar to add a keyframe at that time. Click an existing keyframe (diamond) to remove it.</p>
+      <div class="anim-controls">
+        <button id="anim-play-btn" onclick="animPlay()">▶ Play</button>
+        <button onclick="animAddKeyframe()">◆ Add Keyframe</button>
+        <button onclick="animClear()" style="color:var(--red);">🗑 Clear</button>
+        <span style="font-size:.7rem;color:var(--muted);margin-left:auto;">Duration: 3s | 30 FPS</span>
+      </div>
+      <div style="font-size:.65rem;color:var(--muted);display:flex;gap:0;margin-bottom:4px;padding-left:80px;">
+        <span style="flex:1;text-align:left;">0s</span><span style="flex:1;text-align:center;">1.5s</span><span style="flex:1;text-align:right;">3s</span>
+      </div>
+      <div class="anim-timeline" id="anim-timeline-body"></div>
+      <div style="font-size:.72rem;color:var(--muted);margin-top:8px;">💡 Tip: Position your object, press ◆ Add Keyframe, then move to another time and pose for smooth transitions.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ PLUGINS MODAL ═══════ -->
+<div id="plugins-modal" class="studio-modal" style="display:none">
+  <div class="smodal-box" style="width:480px">
+    <div class="smodal-head">
+      <span>🧩 Manage Plugins</span>
+      <button class="smodal-close" onclick="closePluginsModal()">✕</button>
+    </div>
+    <div class="smodal-body">
+      <p style="color:var(--muted);font-size:.78rem;margin-bottom:14px">Enable or disable plugins to extend Eylox Studio with new tools and features.</p>
+      <div class="plugin-list" id="plugins-list"></div>
+      <div style="margin-top:14px;padding:10px;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.15);border-radius:8px;font-size:.72rem;color:var(--muted);">
+        💡 Want to publish your own plugin? Visit the Eylox Developer Portal and submit your plugin for review.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ SHORTCUTS MODAL ═══════ -->
+<div id="shortcuts-modal" class="studio-modal" style="display:none">
+  <div class="smodal-box" style="width:520px">
+    <div class="smodal-head">
+      <span>⌨️ Keyboard Shortcuts</span>
+      <button class="smodal-close" onclick="closeShortcutsModal()">✕</button>
+    </div>
+    <div class="smodal-body">
+      <div class="shortcuts-grid">
+        <div class="sc-row"><span class="sc-action">Select Tool</span><kbd class="sc-key">Q</kbd></div>
+        <div class="sc-row"><span class="sc-action">Move Tool</span><kbd class="sc-key">W</kbd></div>
+        <div class="sc-row"><span class="sc-action">Scale Tool</span><kbd class="sc-key">E</kbd></div>
+        <div class="sc-row"><span class="sc-action">Rotate Tool</span><kbd class="sc-key">R</kbd></div>
+        <div class="sc-row"><span class="sc-action">Focus Selected</span><kbd class="sc-key">F</kbd></div>
+        <div class="sc-row"><span class="sc-action">Toggle Grid</span><kbd class="sc-key">G</kbd></div>
+        <div class="sc-row"><span class="sc-action">Delete Selected</span><kbd class="sc-key">Del</kbd></div>
+        <div class="sc-row"><span class="sc-action">Play Game</span><kbd class="sc-key">F5</kbd></div>
+        <div class="sc-row"><span class="sc-action">Stop Game</span><kbd class="sc-key">F6 / Esc</kbd></div>
+        <div class="sc-row"><span class="sc-action">Undo</span><kbd class="sc-key">Ctrl+Z</kbd></div>
+        <div class="sc-row"><span class="sc-action">Redo</span><kbd class="sc-key">Ctrl+Y</kbd></div>
+        <div class="sc-row"><span class="sc-action">Save Scene</span><kbd class="sc-key">Ctrl+S</kbd></div>
+        <div class="sc-row"><span class="sc-action">Duplicate</span><kbd class="sc-key">Ctrl+D</kbd></div>
+        <div class="sc-row"><span class="sc-action">Copy</span><kbd class="sc-key">Ctrl+C</kbd></div>
+        <div class="sc-row"><span class="sc-action">Paste</span><kbd class="sc-key">Ctrl+V</kbd></div>
+        <div class="sc-row"><span class="sc-action">Cut</span><kbd class="sc-key">Ctrl+X</kbd></div>
+        <div class="sc-row"><span class="sc-action">Play (WASD move)</span><kbd class="sc-key">W/A/S/D</kbd></div>
+        <div class="sc-row"><span class="sc-action">Jump (Play mode)</span><kbd class="sc-key">Space</kbd></div>
+      </div>
+      <div style="margin-top:14px;font-size:.7rem;color:var(--muted);text-align:center;">In Play mode, move mouse to look around. Press Esc or F6 to return to editor.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ PUBLISH MODAL ═══════ -->
+<div id="publish-modal" class="studio-modal" style="display:none">
+  <div class="smodal-box" style="width:440px">
+    <div class="smodal-head">
+      <span>🚀 Publish Game</span>
+      <button class="smodal-close" onclick="closePublishModal()">✕</button>
+    </div>
+    <div class="smodal-body">
+      <div class="sfield"><label>Game Name *</label><input id="pub-name" type="text" placeholder="My Awesome Game" maxlength="60"></div>
+      <div class="sfield"><label>Description</label><textarea id="pub-desc" rows="3" placeholder="Describe your game..." maxlength="300" style="background:var(--bg,#06010f);color:var(--text,#e2d8f0);border:1px solid #2a1a4a;border-radius:4px;padding:6px;width:100%;resize:vertical;font-size:13px"></textarea></div>
+      <div class="sfield"><label>Genre</label>
+        <select id="pub-genre">
+          <option value="adventure">Adventure</option>
+          <option value="fps">FPS / Shooter</option>
+          <option value="rpg">RPG</option>
+          <option value="racing">Racing</option>
+          <option value="puzzle">Puzzle</option>
+          <option value="simulator">Simulator</option>
+          <option value="platformer">Platformer</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="sfield"><label>Visibility</label>
+        <select id="pub-vis">
+          <option value="public">Public</option>
+          <option value="friends">Friends Only</option>
+          <option value="private">Private</option>
+        </select>
+      </div>
+      <div class="sfield" style="opacity:0.6"><label>Author</label><span id="pub-author" style="font-size:13px;color:var(--purple,#a78bfa)">Guest</span></div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button class="smodal-btn" onclick="publishGame()">🚀 Publish</button>
+        <button class="smodal-btn smodal-cancel" onclick="closePublishModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

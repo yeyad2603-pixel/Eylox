@@ -1,22 +1,23 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>∞ Eylox — Welcome</title>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#7c3aed"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --purple:#a78bfa;--green:#4ade80;--pink:#f472b6;--yellow:#fde68a;--blue:#4fc3f7;
-  --bg:#07011a;--card:#120630;--border:#2a1560;--text:#f0e8ff;--muted:#9d8ec7;
+  --bg:#000000;--card:#0d0018;--border:#a78bfa;--text:#f0e8ff;--muted:#9d8ec7;
   --font-h:'Fredoka One',cursive;--font-b:'Nunito',sans-serif;
 }
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font-b)}
 
-/* ── Starfield ── */
-#stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+/* Starfield handled by space-bg.js */
 
 /* ── Orbs ── */
 .orb{position:fixed;border-radius:50%;filter:blur(90px);opacity:.15;pointer-events:none;z-index:0}
@@ -80,6 +81,25 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 @media(min-width:560px){.cta-group{flex-direction:row;max-width:none;justify-content:center}.cta-btn{width:auto;min-width:170px}}
 @media(max-width:400px){.thumbs{gap:8px}.thumb-chip{padding:8px 12px;font-size:1.3rem}}
+
+/* ── Ripple effect on buttons ── */
+.cta-btn::after{content:'';position:absolute;inset:0;border-radius:inherit;background:radial-gradient(circle at var(--rx,50%) var(--ry,50%),rgba(255,255,255,.25) 0%,transparent 60%);opacity:0;transition:opacity .4s}
+.cta-btn.ripple::after{opacity:1;transition:opacity 0s}
+
+/* ── Shake animation for errors ── */
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.auth-err.shake{animation:shake .35s ease}
+
+/* ── Pulse glow for sign-up button ── */
+@keyframes signupGlow{0%,100%{box-shadow:0 6px 28px rgba(74,222,128,.45)}50%{box-shadow:0 6px 36px rgba(74,222,128,.75),0 0 0 4px rgba(74,222,128,.12)}}
+.btn-signup{animation:signupGlow 2.5s ease-in-out infinite}
+
+/* ── Mobile tap area improvement ── */
+@media(max-width:480px){
+  .auth-card{padding:24px 20px;border-radius:20px}
+  .f-input{padding:14px 14px;font-size:1rem}
+  .auth-submit{padding:15px;font-size:1.05rem}
+}
 
 /* ══════════════════════
    AUTH MODAL
@@ -178,6 +198,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .ls-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--blue));border-radius:99px;width:0;animation:lsLoad .9s ease .2s forwards}
 @keyframes lsLoad{to{width:100%}}
 </style>
+<script src="audit-loader.js" defer></script>
+  <script src="debug-dashboard.js" defer></script>
 </head>
 <body>
 
@@ -187,8 +209,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   <div class="ls-bar"><div class="ls-fill"></div></div>
 </div>
 
-<!-- Starfield + orbs -->
-<canvas id="stars"></canvas>
+<!-- Space BG provided by space-bg.js -->
 <div class="orb orb1"></div>
 <div class="orb orb2"></div>
 <div class="orb orb3"></div>
@@ -246,6 +267,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <!-- Error / success banners -->
     <div class="auth-err" id="authErr"></div>
     <div class="auth-ok"  id="authOk"></div>
+
+    <!-- Account not found banner -->
+    <div id="noAccountBanner" style="display:none;background:rgba(251,191,36,.09);border:1.5px solid rgba(251,191,36,.45);border-radius:12px;padding:14px 16px;margin-bottom:14px;text-align:center">
+      <p style="color:#fbbf24;font-size:.87rem;font-weight:800;margin-bottom:10px;line-height:1.4">⚠️ This account does not exist.<br>Please go to <strong>Sign Up</strong> first.</p>
+      <button id="noAccountSignUpBtn" style="background:linear-gradient(135deg,#059669,#4ade80);color:#fff;border:none;border-radius:99px;padding:10px 24px;font-family:var(--font-b);font-weight:900;font-size:.88rem;cursor:pointer;box-shadow:0 4px 16px rgba(74,222,128,.35);transition:transform .18s,filter .18s">✨ Create Account →</button>
+    </div>
 
     <!-- ── LOGIN FORM ── -->
     <form id="loginForm" autocomplete="on">
@@ -332,15 +359,34 @@ function setSession(data, username) {
     localStorage.setItem('eylox_token', data.token);
     /* Merge any locally saved coins/wins back so server round-trips don't wipe local progress */
     try {
-      const saved = JSON.parse(localStorage.getItem('eylox_userdata_' + data.user.username));
-      if (saved && (saved.coins > (data.user.coins || 0) || saved.wins > (data.user.wins || 0))) {
-        data.user.coins = Math.max(saved.coins || 0, data.user.coins || 0);
-        data.user.wins  = Math.max(saved.wins  || 0, data.user.wins  || 0);
+      const uLow  = data.user.username.toLowerCase();
+      const saved = JSON.parse(localStorage.getItem('eylox_userdata_' + data.user.username))
+                 || JSON.parse(localStorage.getItem('eylox_save_' + uLow));
+      if (saved && saved.username === data.user.username) {
+        /* Numeric progress — always keep the higher value */
+        for (const f of ['Eylux','wins','level','xp','Eyltrophs','gamesPlayed','loginStreak','totalPlayTime']) {
+          if (saved[f] !== undefined) data.user[f] = Math.max(saved[f] || 0, data.user[f] || 0);
+        }
+        /* Non-numeric fields — local copy is source of truth (server doesn't store these) */
+        for (const f of ['avatar','badges','recentlyPlayed','lastLogin','theme']) {
+          if (saved[f] !== undefined) data.user[f] = saved[f];
+        }
       }
     } catch {}
     localStorage.setItem('eylox_user', JSON.stringify(data.user));
     /* Keep per-user backup in sync */
     localStorage.setItem('eylox_userdata_' + data.user.username, JSON.stringify(data.user));
+    /* Restore profile picture, AI data and friends saved by user-persist.js */
+    try {
+      const uLow = data.user.username.toLowerCase();
+      const pic  = localStorage.getItem('eylox_save_pic_' + uLow);
+      if (pic)  localStorage.setItem('eylox_profile_pic', pic);
+      else      localStorage.removeItem('eylox_profile_pic');
+      const ai   = localStorage.getItem('eylox_save_ai_' + uLow);
+      if (ai)   localStorage.setItem('eylox_ai_data', ai);
+      const fr   = localStorage.getItem('eylox_save_friends_' + uLow);
+      if (fr)   localStorage.setItem('eylox_friends', fr);
+    } catch {}
     localStorage.removeItem('eylox_guest');
   } else {
     /* Server offline — restore this user's saved data (coins/wins persist between sessions) */
@@ -381,33 +427,7 @@ window.addEventListener('load', () => {
   }, 950);
 });
 
-/* ══════════════════════════════════════════════════
-   STARFIELD
-══════════════════════════════════════════════════ */
-const canvas = document.getElementById('stars');
-const ctx    = canvas.getContext('2d');
-let stars    = [];
-function initStars() {
-  canvas.width = innerWidth; canvas.height = innerHeight;
-  stars = Array.from({length:130}, () => ({
-    x:Math.random()*canvas.width, y:Math.random()*canvas.height,
-    r:Math.random()*1.7+.2, o:Math.random(),
-    do:(Math.random()-.5)*.014, dx:(Math.random()-.5)*.07,
-  }));
-}
-function drawStars() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  for(const s of stars){
-    s.o = Math.max(.04,Math.min(1,s.o+s.do));
-    if(s.o<=.05||s.o>=.99)s.do*=-1;
-    s.x=(s.x+s.dx+canvas.width)%canvas.width;
-    ctx.fillStyle=`rgba(255,255,255,${s.o})`;
-    ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();
-  }
-  requestAnimationFrame(drawStars);
-}
-window.addEventListener('resize', initStars, {passive:true});
-initStars(); drawStars();
+/* Starfield handled by space-bg.js */
 
 /* ══════════════════════════════════════════════════
    MODAL OPEN / CLOSE
@@ -458,16 +478,61 @@ function clearErrors() {
     const el = document.getElementById(id);
     if(el){ el.style.display='none'; el.textContent=''; }
   });
+  const nb = document.getElementById('noAccountBanner');
+  if(nb) nb.style.display = 'none';
 }
 function showErr(msg) {
   const el = document.getElementById('authErr');
   el.textContent = '❌ ' + msg; el.style.display = 'block';
+  el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake');
   document.getElementById('authOk').style.display = 'none';
+  document.getElementById('noAccountBanner').style.display = 'none';
+  playSound('error');
 }
 function showOk(msg) {
   const el = document.getElementById('authOk');
   el.textContent = '✅ ' + msg; el.style.display = 'block';
   document.getElementById('authErr').style.display = 'none';
+  document.getElementById('noAccountBanner').style.display = 'none';
+  playSound('success');
+}
+function showAccountNotFound() {
+  document.getElementById('noAccountBanner').style.display = 'block';
+  document.getElementById('authErr').style.display = 'none';
+  document.getElementById('authOk').style.display = 'none';
+  playSound('error');
+}
+
+/* ── Sound effects (Web Audio API) ── */
+let _audioCtx = null;
+function getAudio() { return _audioCtx || (_audioCtx = new (window.AudioContext || window.webkitAudioContext)()); }
+function playSound(type) {
+  try {
+    const ac = getAudio();
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.connect(g); g.connect(ac.destination);
+    if (type === 'success') {
+      o.frequency.setValueAtTime(523, ac.currentTime);
+      o.frequency.setValueAtTime(659, ac.currentTime + .12);
+      o.frequency.setValueAtTime(784, ac.currentTime + .24);
+      g.gain.setValueAtTime(.18, ac.currentTime);
+      g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + .55);
+      o.start(); o.stop(ac.currentTime + .55);
+    } else if (type === 'error') {
+      o.type = 'sawtooth';
+      o.frequency.setValueAtTime(220, ac.currentTime);
+      o.frequency.setValueAtTime(180, ac.currentTime + .1);
+      g.gain.setValueAtTime(.12, ac.currentTime);
+      g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + .3);
+      o.start(); o.stop(ac.currentTime + .3);
+    } else if (type === 'click') {
+      o.type = 'sine';
+      o.frequency.setValueAtTime(880, ac.currentTime);
+      g.gain.setValueAtTime(.08, ac.currentTime);
+      g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + .12);
+      o.start(); o.stop(ac.currentTime + .12);
+    }
+  } catch {}
 }
 function fieldErr(id, msg) {
   const el = document.getElementById(id);
@@ -487,6 +552,15 @@ document.getElementById('lEye').addEventListener('click', () => {
 document.getElementById('rEye').addEventListener('click', () => {
   const inp = document.getElementById('rPassword');
   inp.type = inp.type === 'password' ? 'text' : 'password';
+});
+
+/* Sign Up button inside the "no account" banner */
+document.getElementById('noAccountSignUpBtn').addEventListener('click', () => {
+  switchTab('register');
+  document.getElementById('noAccountBanner').style.display = 'none';
+  /* Pre-fill username if typed */
+  const uval = document.getElementById('lUsername').value.trim();
+  if (uval) document.getElementById('rUsername').value = uval;
 });
 
 /* ── Restore per-user shop data on login (so purchases survive re-login) ── */
@@ -536,7 +610,7 @@ document.getElementById('loginForm').addEventListener('submit', async e => {
       localStorage.removeItem('eylox_is_owner');
     }
     recordLogin(username);
-    const data = await apiPost('/auth/login', { username, password });
+    const data = await apiPost('/login', { username, password });
     if (data) {
       setSession(data, username);
       restoreShopData(username);                          /* keep purchases */
@@ -544,7 +618,14 @@ document.getElementById('loginForm').addEventListener('submit', async e => {
       showOk('Welcome back, ' + username + '! 👋');
       setTimeout(() => { window.location.href = 'index.html'; }, 800);
     } else {
-      /* Server offline → local session */
+      /* Server offline → only allow login if account was previously saved locally */
+      const savedLocal = localStorage.getItem('eylox_userdata_' + username)
+                      || localStorage.getItem('eylox_save_' + username.toLowerCase());
+      if (!savedLocal) {
+        showAccountNotFound();
+        setLoading(btn, false, '🔑 Log In & Play!');
+        return;
+      }
       setSession(null, username);
       restoreShopData(username);
       localStorage.removeItem('eylox_recently_played');
@@ -552,7 +633,12 @@ document.getElementById('loginForm').addEventListener('submit', async e => {
       setTimeout(() => { window.location.href = 'index.html'; }, 900);
     }
   } catch(err) {
-    showErr(err.message || 'Login failed. Check your details.');
+    const msg = err.message || '';
+    if (msg.toLowerCase().includes('not found') || msg.toLowerCase().includes('does not exist')) {
+      showAccountNotFound();
+    } else {
+      showErr(msg || 'Login failed. Check your details.');
+    }
     setLoading(btn, false, '🔑 Log In & Play!');
   }
 });
@@ -580,13 +666,25 @@ document.getElementById('registerForm').addEventListener('submit', async e => {
 
   try {
     localStorage.removeItem('eylox_is_owner'); /* new accounts are never owner */
-    /* ── Fresh account → wipe any leftover shop + play data from a previous session ── */
+    /* ── Fresh account → wipe ALL leftover data for this username so nothing bleeds through ── */
+    const uLow = username.toLowerCase();
+    localStorage.removeItem('eylox_userdata_'     + username);
+    localStorage.removeItem('eylox_save_'         + uLow);
+    localStorage.removeItem('eylox_save_ai_'      + uLow);
+    localStorage.removeItem('eylox_save_friends_' + uLow);
+    localStorage.removeItem('eylox_save_pic_'     + uLow);
+    localStorage.removeItem('eylox_shopdata_'     + username);
     localStorage.removeItem('eylox_owned_items');
     localStorage.removeItem('eylox_equipped');
     localStorage.removeItem('eylox_inventory');
     localStorage.removeItem('eylox_recently_played');
+    localStorage.removeItem('eylox_profile_pic');
+    localStorage.removeItem('eylox_ai_data');
+    localStorage.removeItem('eylox_friends');
+    localStorage.removeItem('eylox_tutorial_done');
+    localStorage.removeItem('eylox_tutorial_step');
     recordLogin(username);
-    const data = await apiPost('/auth/register', { username, email, password });
+    const data = await apiPost('/register', { username, email, password });
     if (data) {
       setSession(data, username);
       showOk('Account created! Welcome, ' + username + '! 🎉');
@@ -617,6 +715,27 @@ function playAsGuest() {
 }
 document.getElementById('btnGuest')     .addEventListener('click', playAsGuest);
 document.getElementById('authGuestBtn') .addEventListener('click', playAsGuest);
+
+/* ── Ripple effect on CTA buttons ── */
+document.querySelectorAll('.cta-btn').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    playSound('click');
+    const r = this.getBoundingClientRect();
+    this.style.setProperty('--rx', ((e.clientX - r.left) / r.width * 100) + '%');
+    this.style.setProperty('--ry', ((e.clientY - r.top)  / r.height * 100) + '%');
+    this.classList.add('ripple');
+    setTimeout(() => this.classList.remove('ripple'), 400);
+  });
+});
+
+/* ── Auth submit button click sound ── */
+document.querySelectorAll('.auth-submit, .auth-tab, .auth-guest').forEach(btn => {
+  btn.addEventListener('mousedown', () => playSound('click'));
+});
 </script>
+<script src="tooltip.js"></script>
+<script src="sw-register.js"></script>
+<script src="offline.js" defer></script>
+
 </body>
 </html>

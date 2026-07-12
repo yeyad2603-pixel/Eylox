@@ -1,0 +1,29 @@
+# ============================================================
+#  EYLOX — root .gitignore
+#  Secrets and machine-specific/generated files. Never commit these.
+# ============================================================
+
+# Secret configuration — NEVER commit
+.env
+.env.*
+!.env.example
+**/config/serviceAccountKey.json
+**/serviceAccountKey.json
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Compiled output
+backend/dist/
+
+# Runtime data (legacy JSON store, superseded by Firestore)
+backend/data/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor junk
+.DS_Store
+Thumbs.db

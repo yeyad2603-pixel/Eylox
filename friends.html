@@ -1,159 +1,785 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>∞ Eylox — Friends</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Eylox — Friends</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="apple-touch-icon" href="apple-touch-icon.png"/>
+  <meta name="theme-color" content="#7c3aed"/>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="theme-switcher.js"></script>
+  <script>
+    try {
+      const s = localStorage.getItem('eylox_token')||localStorage.getItem('eylox_guest')||localStorage.getItem('eylox_user');
+      if (!s) window.location.replace('landing.html');
+    } catch {}
+  </script>
+  <style>
+    /* ── Search section ── */
+    .fr-search-section {
+      background: rgba(var(--accent-rgb,167,139,250),.07);
+      border: 1px solid rgba(var(--accent-rgb,167,139,250),.18);
+      border-radius: 16px;
+      padding: 20px 22px;
+      margin-bottom: 28px;
+    }
+    .fr-search-title {
+      font-family: var(--font-head);
+      font-size: 1rem;
+      color: var(--text,#f0e8ff);
+      margin-bottom: 12px;
+    }
+    .fr-search-row {
+      display: flex;
+      gap: 10px;
+    }
+    .fr-search-input {
+      flex: 1;
+      background: rgba(var(--accent-rgb,167,139,250),.09);
+      border: 1px solid rgba(var(--accent-rgb,167,139,250),.22);
+      border-radius: 10px;
+      padding: 10px 16px;
+      color: var(--text,#f0e8ff);
+      font-family: var(--font-body,'Nunito');
+      font-size: .92rem;
+      font-weight: 700;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .fr-search-input:focus { border-color: rgba(var(--accent-rgb,167,139,250),.5); }
+    .fr-search-input::placeholder { color: rgba(var(--accent-rgb,167,139,250),.4); }
+    .fr-search-btn {
+      background: linear-gradient(135deg,var(--accent,#a78bfa),var(--accent2,#7c3aed));
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-weight: 800;
+      font-size: .88rem;
+      cursor: pointer;
+      transition: opacity .2s;
+      white-space: nowrap;
+    }
+    .fr-search-btn:hover { opacity: .85; }
+    #friendSearchResults { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+    .search-result-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(var(--accent-rgb,167,139,250),.05);
+      border: 1px solid rgba(var(--accent-rgb,167,139,250),.15);
+      border-radius: 12px;
+      padding: 12px 16px;
+      animation: fr-in .2s ease;
+    }
+    @keyframes fr-in { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:none} }
+
+    /* ── Request cards ── */
+    .req-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(var(--accent-rgb,167,139,250),.06);
+      border: 1px solid rgba(var(--accent-rgb,167,139,250),.18);
+      border-radius: 14px;
+      padding: 14px 18px;
+      animation: fr-in .2s ease;
+    }
+    .req-incoming { border-color: rgba(74,222,128,.25); background: rgba(74,222,128,.05); }
+    .req-outgoing { border-color: rgba(var(--accent-rgb,167,139,250),.2); }
+    .btn-accept {
+      background: linear-gradient(135deg,#4ade80,#22d3ee);
+      color: #0a2010;
+      border: none; border-radius: 20px;
+      padding: 7px 16px; font-size: .8rem; font-weight: 800;
+      cursor: pointer; transition: opacity .2s;
+    }
+    .btn-accept:hover { opacity: .85; }
+    .btn-decline {
+      background: rgba(244,114,182,.15);
+      color: #f472b6;
+      border: 1px solid rgba(244,114,182,.3);
+      border-radius: 20px;
+      padding: 7px 14px; font-size: .8rem; font-weight: 800;
+      cursor: pointer; transition: opacity .2s;
+    }
+    .btn-decline:hover { opacity: .85; }
+    .req-pending-chip {
+      font-size: .7rem; font-weight: 800; letter-spacing: .5px;
+      background: rgba(var(--accent-rgb,167,139,250),.15);
+      color: var(--purple,#a78bfa);
+      border-radius: 99px; padding: 3px 10px;
+    }
+    .req-count-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: #f87171; color: #fff;
+      border-radius: 99px; padding: 2px 7px;
+      font-size: .68rem; font-weight: 900; margin-left: 6px;
+      min-width: 18px;
+    }
+
+    /* ── Friend cards ── */
+    .friends-section { margin-bottom: 32px; }
+    .friends-section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .friends-section-title {
+      font-family: var(--font-head); font-size: 1.05rem; color: var(--text,#f0e8ff);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .friends-empty-card {
+      background: rgba(var(--accent-rgb,167,139,250),.04);
+      border: 1px solid rgba(var(--accent-rgb,167,139,250),.1);
+      border-radius: 14px; padding: 36px 24px;
+      text-align: center; color: rgba(var(--accent-rgb,167,139,250),.45);
+    }
+    .friends-empty-card .fec-icon { font-size: 2.5rem; margin-bottom: 10px; }
+    .friends-empty-card .fec-title { font-family: var(--font-head); font-size: .95rem; color: rgba(var(--accent-rgb,167,139,250),.65); margin-bottom: 5px; }
+    .friends-empty-card .fec-sub { font-size: .8rem; font-weight: 600; }
+    .pmyk-card {
+      display: flex; align-items: center; gap: 14px;
+      background: rgba(var(--accent-rgb,167,139,250),.05);
+      border: 1px solid rgba(var(--accent-rgb,167,139,250),.13);
+      border-radius: 14px; padding: 13px 18px;
+      transition: border-color .2s;
+    }
+    .pmyk-card:hover { border-color: rgba(var(--accent-rgb,167,139,250),.28); }
+    .pmyk-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.35rem;
+      background: linear-gradient(135deg,var(--accent2,#7c3aed),var(--accent,#a78bfa));
+      flex-shrink: 0;
+    }
+    .pmyk-name { font-weight: 800; font-size: .92rem; color: var(--text,#f0e8ff); }
+    .pmyk-meta { font-size: .73rem; color: var(--muted,#9d8ec7); font-weight: 600; }
+    .btn-friend-action {
+      margin-left: auto;
+      border: none; border-radius: 20px;
+      padding: 7px 16px; font-size: .8rem; font-weight: 800;
+      cursor: pointer; transition: opacity .2s; flex-shrink: 0;
+    }
+    .btn-friend-action:hover { opacity: .85; }
+
+    /* ── Suggestions ── */
+    .suggestion-row { display: flex; flex-direction: column; gap: 8px; }
+
+    /* ── Activity ── */
+    .activity-card {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; background: rgba(var(--accent-rgb,167,139,250),.04);
+      border: 1px solid rgba(var(--accent-rgb,167,139,250),.1);
+      border-radius: 14px; padding: 18px 22px;
+    }
+    .activity-card-text { font-size: .88rem; color: rgba(var(--accent-rgb,167,139,250),.5); font-weight: 600; }
+    .btn-quick-play {
+      display: flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg,var(--accent,#a78bfa),var(--accent2,#7c3aed));
+      color: #fff; border: none; border-radius: 20px;
+      padding: 9px 20px; font-size: .85rem; font-weight: 800;
+      cursor: pointer; white-space: nowrap; transition: opacity .2s; text-decoration: none;
+    }
+    .btn-quick-play:hover { opacity: .85; }
+  </style>
+<script src="audit-loader.js" defer></script>
+  <script src="debug-dashboard.js" defer></script>
 </head>
 <body data-page="friends">
 <div class="app-shell">
 
+  <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
-    <a href="index.html" class="sidebar-logo"><span class="sidebar-logo-icon">🎮</span><span class="sidebar-logo-text">Eylox</span></a>
+    <a href="index.html" class="sidebar-logo">
+      <span class="sidebar-logo-icon">🎮</span>
+      <span class="sidebar-logo-text">Eylox</span>
+    </a>
     <p class="sidebar-section-label">Menu</p>
-    <nav class="sidebar-nav"><ul>
-      <li><a href="index.html"    class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
-      <li><a href="games.html"    class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
-      <li><a href="friends.html"  class="sidebar-link active"><span class="s-icon">🤝</span><span class="s-label">Friends</span><span class="s-badge" style="display:none">0</span></a></li>
-      <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
-      <li><a href="profile.html"  class="sidebar-link"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
-    </ul></nav>
+    <nav class="sidebar-nav" aria-label="Main navigation">
+      <ul>
+        <li><a href="index.html" class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
+        <li><a href="games.html" class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
+        <li><a href="leaderboard.html" class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
+        <li><a href="achievements.html" class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
+        <li><a href="events.html" class="sidebar-link"><span class="s-icon">🎯</span><span class="s-label">Live Events</span></a></li>
+        <li><a href="communities.html" class="sidebar-link"><span class="s-icon">🌐</span><span class="s-label">Communities</span></a></li>
+        <li><a href="friends.html" class="sidebar-link active" aria-current="page"><span class="s-icon">🤝</span><span class="s-label">Friends</span><span class="s-badge" id="reqBadgeSide" style="display:none">0</span></a></li>
+        <li><a href="profile.html" class="sidebar-link"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
+        <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
+      </ul>
+    </nav>
     <div class="sidebar-divider"></div>
     <p class="sidebar-section-label">More</p>
-    <nav class="sidebar-nav"><ul>
-      <li><a href="leaderboard.html"  class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
-      <li><a href="achievements.html" class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
-      <li><a href="communities.html"  class="sidebar-link"><span class="s-icon">🌍</span><span class="s-label">Communities</span></a></li>
-      <li><a href="live-events.html"  class="sidebar-link"><span class="s-icon">⚡</span><span class="s-label">Live Events</span></a></li>
-      <li><a href="shop.html"         class="sidebar-link"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
-      <li><a href="#" class="sidebar-link" id="settingsBtn"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></a></li>
-      <li><a href="#" class="sidebar-link" id="logoutBtn"><span class="s-icon">🚪</span><span class="s-label">Logout</span></a></li>
-    </ul></nav>
-    <div class="sidebar-coins"><img src="eylux-coin.png" class="coins-icon-img" alt="Eylux" /><div><div class="coins-amount">—</div><div class="coins-label">Eylux</div></div></div>
-    <div class="sidebar-coins sidebar-trophies"><span class="coins-icon">🏆</span><div><div class="trophies-amount">—</div><div class="coins-label">Trophies</div></div></div>
+    <nav class="sidebar-nav" aria-label="Secondary navigation">
+      <ul>
+        <li><a href="shop.html" class="sidebar-link"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
+        <li><a href="ai.html" class="sidebar-link"><span class="s-icon">🤖</span><span class="s-label">Eylox Studio</span><span class="s-soon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff">AI</span></a></li>
+        <li><button class="sidebar-link sb-action" onclick="openSettingsPanel()"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></button></li>
+        <li><button class="sidebar-link sb-action" onclick="eyloxLogout()" style="color:#f87171"><span class="s-icon">🚪</span><span class="s-label">Log Out</span></button></li>
+      </ul>
+    </nav>
+    <div class="sidebar-coins">
+      <span>💰</span>
+      <div>
+        <div class="coins-amount" id="sidebarEylux">0</div>
+        <div class="coins-label">Eylux</div>
+      </div>
+    </div>
+    <div class="sidebar-coins" style="margin-top:8px">
+      <span>🏆</span>
+      <div>
+        <div class="Eyltrophs-amount" id="sidebarEyltrophs">0</div>
+        <div class="coins-label">Eyltrophs</div>
+      </div>
+    </div>
   </aside>
 
+  <!-- MAIN AREA -->
   <div class="main-area">
+    <!-- TOPBAR -->
     <header class="topbar">
-      <button class="menu-btn" id="menuBtn" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
-      <div class="search-wrap"><span class="search-icon">🔍</span><input type="search" class="search-input" placeholder="Search games…" aria-label="Search" /></div>
+      <button class="menu-btn" id="sidebarToggle" aria-label="Toggle sidebar">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="search" class="search-input" id="topbarFilter" placeholder="Filter friends…" aria-label="Filter friends"/>
+      </div>
       <div class="topbar-right">
-        <button class="tb-btn" aria-label="Notifications">🔔<span class="notif-dot"></span></button>
-        <div class="tb-coins"><img src="eylux-coin.png" class="tb-coin-img" alt="EC"> <span>—</span></div>
-        <a href="profile.html" class="tb-avatar">🎮<span class="online-dot"></span></a>
+        <button class="topbar-icon-btn" id="notifBtn" aria-label="Notifications">🔔<span class="notif-dot"></span></button>
+        <div class="tb-Eyltrophs">🏆 <span id="topbarEyltrophs">0</span></div>
+        <div class="tb-coins">💰 <span id="topbarEylux">0</span></div>
+        <a href="profile.html" class="tb-avatar" aria-label="My profile">🎮<span class="online-dot"></span></a>
       </div>
     </header>
 
+    <!-- PAGE CONTENT -->
     <main class="page-content">
 
-      <div class="page-heading">
-        <h1>🤝 Friends <span>Hub</span></h1>
-        <p>Stay connected with your gaming crew</p>
+      <div style="margin-bottom:24px">
+        <h1 style="font-family:var(--font-head);font-size:clamp(1.6rem,3.5vw,2.2rem);margin-bottom:4px">
+          🤝 Friends <span style="color:var(--purple,#a78bfa)">Hub</span>
+        </h1>
+        <p style="color:rgba(var(--accent-rgb,167,139,250),.5);font-weight:600;font-size:.9rem">Send requests, accept friends, stay connected</p>
       </div>
 
-      <!-- ── Add Friend ── -->
-      <div class="section">
-        <div class="add-friend-hero">
-          <div class="afh-icon">🤝</div>
-          <div class="afh-text">
-            <h2 style="font-family:var(--font-head);font-size:1.3rem;margin-bottom:4px">Find a Friend</h2>
-            <p style="color:var(--muted);font-size:.83rem;font-weight:700">Add friends by their username to see them here and invite to games</p>
+      <!-- Search & Add Section -->
+      <div class="fr-search-section">
+        <div class="fr-search-title">🔎 Find a Player</div>
+        <div class="fr-search-row">
+          <input class="fr-search-input" id="frSearchInput" placeholder="Enter exact username…" maxlength="40" autocomplete="off"/>
+          <button class="fr-search-btn" onclick="searchUser()">Search</button>
+        </div>
+        <div id="friendSearchResults"></div>
+      </div>
+
+      <!-- Incoming Requests -->
+      <div class="friends-section" id="incomingSection" style="display:none">
+        <div class="friends-section-header">
+          <div class="friends-section-title">
+            📩 Incoming Requests
+            <span class="req-count-badge" id="incomingCount">0</span>
           </div>
         </div>
-        <div class="add-friend-wrap">
-          <input type="text" id="friendSearchInput" class="friend-search-input" placeholder="Enter their username…" autocomplete="off" />
-          <button id="sendFriendBtn" class="btn-play" style="padding:10px 22px;font-size:.88rem;flex-shrink:0">➕ Add Friend</button>
+        <div id="incomingList" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+
+      <!-- Outgoing Requests -->
+      <div class="friends-section" id="outgoingSection" style="display:none">
+        <div class="friends-section-header">
+          <div class="friends-section-title">📤 Sent Requests</div>
+        </div>
+        <div id="outgoingList" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+
+      <!-- My Friends -->
+      <div class="friends-section">
+        <div class="friends-section-header">
+          <div class="friends-section-title">👥 My Friends (<span id="friendsCount">0</span>)</div>
+        </div>
+        <div id="friendsList"></div>
+      </div>
+
+      <!-- People You May Know -->
+      <div class="friends-section">
+        <div class="friends-section-header">
+          <div class="friends-section-title">🌐 People You May <span style="color:var(--purple,#a78bfa)">Know</span></div>
+          <div style="font-size:.78rem;color:rgba(var(--accent-rgb,167,139,250),.45);font-weight:700">Real Eylox players</div>
+        </div>
+        <div id="suggestedList" class="suggestion-row"></div>
+      </div>
+
+      <!-- Activity -->
+      <div class="friends-section">
+        <div class="friends-section-header">
+          <div class="friends-section-title">⚡ Your Activity</div>
+        </div>
+        <div class="activity-card">
+          <div class="activity-card-text" id="activityText">Add friends to see their activity here</div>
+          <a href="games.html?random=1" class="btn-quick-play">🚀 Quick Play</a>
         </div>
       </div>
 
-      <!-- ── Friend Requests ── -->
-      <div class="section">
-        <div class="section-header">
-          <h2 class="section-title" id="req-header">📨 Friend Requests</h2>
+      <!-- My Clans -->
+      <div class="friends-section">
+        <div class="friends-section-header">
+          <div class="friends-section-title">⚔️ My <span style="color:var(--purple,#a78bfa)">Clans</span></div>
+          <button class="btn-friend-action" onclick="openCreateClan()" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#1a1040">+ Create Clan</button>
         </div>
-        <!-- Populated by features.js -->
-        <div class="req-list" id="req-list">
-          <p class="empty-msg">Loading…</p>
-        </div>
-      </div>
-
-      <!-- ── Friends Grid ── -->
-      <div class="section">
-        <div class="section-header">
-          <h2 class="section-title" id="friends-header">👥 My Friends</h2>
-        </div>
-        <!-- Populated by features.js -->
-        <div class="friend-cards-grid" id="friend-cards-grid">
-          <p class="empty-msg">Loading…</p>
-        </div>
-      </div>
-
-      <!-- Activity Feed -->
-      <div class="section">
-        <div class="section-header">
-          <h2 class="section-title">⚡ Friend Activity</h2>
-        </div>
-        <div class="sub-card">
-          <div class="activity-feed">
-            <div class="af-item"><div class="af-icon">🥷</div><div class="af-text"><strong>NinjaKing99</strong> scored <strong>42,810 pts</strong> in Ninja Dash</div><span class="af-time">2m ago</span></div>
-            <div class="af-item"><div class="af-icon">🏆</div><div class="af-text"><strong>StarBlaster_X</strong> unlocked the <strong>🌟 Space Legend</strong> badge</div><span class="af-time">14m ago</span></div>
-            <div class="af-item"><div class="af-icon">🐉</div><div class="af-text"><strong>DragonSlayer</strong> is playing <strong>Dragon Escape</strong> right now</div><span class="af-time">just now</span></div>
-            <div class="af-item"><div class="af-icon">🎉</div><div class="af-text"><strong>PuzzleWizard</strong> hit a <strong>🔥 7 Day Streak!</strong></div><span class="af-time">1h ago</span></div>
-            <div class="af-item"><div class="af-icon">💰</div><div class="af-text"><strong>OceanRunner</strong> earned <strong>+200 coins</strong> in Ocean Quest</div><span class="af-time">3h ago</span></div>
-          </div>
-        </div>
+        <div id="clansList"></div>
       </div>
 
     </main>
   </div>
 </div>
+
+<!-- Create Clan Modal -->
+<div id="clanModal" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.65);align-items:center;justify-content:center">
+  <div style="background:var(--card,#230e56);border:1px solid rgba(var(--accent-rgb,167,139,250),.25);border-radius:18px;padding:28px 24px;width:100%;max-width:440px;margin:0 16px">
+    <h2 style="font-family:var(--font-head);font-size:1.2rem;margin-bottom:16px">⚔️ Create a Clan</h2>
+    <input id="clanName" placeholder="Clan name…" maxlength="30" style="width:100%;background:rgba(var(--accent-rgb,167,139,250),.07);border:1px solid rgba(var(--accent-rgb,167,139,250),.18);border-radius:10px;padding:11px 14px;color:var(--text,#f0e8ff);font-family:var(--font-body,'Nunito');font-size:.9rem;outline:none;box-sizing:border-box;margin-bottom:10px"/>
+    <input id="clanTag" placeholder="Tag [e.g. ELX] max 5…" maxlength="5" style="width:100%;background:rgba(var(--accent-rgb,167,139,250),.07);border:1px solid rgba(var(--accent-rgb,167,139,250),.18);border-radius:10px;padding:11px 14px;color:var(--text,#f0e8ff);font-family:var(--font-body,'Nunito');font-size:.9rem;outline:none;box-sizing:border-box;margin-bottom:10px"/>
+    <textarea id="clanDesc" placeholder="Clan description…" maxlength="120" rows="2" style="width:100%;background:rgba(var(--accent-rgb,167,139,250),.07);border:1px solid rgba(var(--accent-rgb,167,139,250),.18);border-radius:10px;padding:11px 14px;color:var(--text,#f0e8ff);font-family:var(--font-body,'Nunito');font-size:.9rem;outline:none;box-sizing:border-box;resize:none;margin-bottom:16px"></textarea>
+    <div style="font-size:.8rem;font-weight:700;color:rgba(var(--accent-rgb,167,139,250),.6);margin-bottom:10px">Add friends to clan:</div>
+    <div id="clanFriendPicker" style="display:flex;flex-direction:column;gap:8px;max-height:180px;overflow-y:auto;margin-bottom:16px"></div>
+    <div style="display:flex;gap:10px">
+      <button onclick="createClan()" style="flex:1;background:linear-gradient(135deg,var(--accent,#a78bfa),var(--accent2,#7c3aed));border:none;color:#fff;border-radius:10px;padding:11px;font-weight:800;font-size:.9rem;cursor:pointer">⚔️ Create Clan</button>
+      <button onclick="closeClanModal()" style="background:rgba(var(--accent-rgb,167,139,250),.1);border:1px solid rgba(var(--accent-rgb,167,139,250),.2);color:var(--muted,#9d8ec7);border-radius:10px;padding:11px 18px;cursor:pointer;font-weight:700">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
 <script src="security.js"></script>
 <script src="api.js"></script>
 <script src="script.js"></script>
 <script src="features.js"></script>
 <script src="notifications.js"></script>
+<script src="platform-enhancements.js"></script>
+<script src="user-persist.js"></script>
 <script src="polish.js"></script>
 <script src="admin-button.js"></script>
 <script src="studio-button.js"></script>
 <script src="extras.js"></script>
-<script src="friends-local.js"></script>
-<style>
-/* ── Add friend input glow ── */
-.friend-search-input:focus {
-  border-color: var(--purple) !important;
-  box-shadow: 0 0 0 3px rgba(167,139,250,.2) !important;
-}
-/* ── Friend card pulse for online ── */
-.fc-status.on {
-  animation: online-pulse 2s ease-in-out infinite;
-}
-@keyframes online-pulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(74,222,128,.6); }
-  50%      { box-shadow: 0 0 0 5px rgba(74,222,128,0); }
-}
-/* ── Activity feed ── */
-.activity-feed { display:flex; flex-direction:column; gap:0; }
-.af-item {
-  display:flex; align-items:center; gap:12px; padding:12px 16px;
-  border-bottom:1px solid rgba(167,139,250,.08);
-  transition:background .15s;
-}
-.af-item:hover { background:rgba(167,139,250,.06); }
-.af-item:last-child { border-bottom:none; }
-.af-icon { font-size:1.3rem; flex-shrink:0; width:36px; height:36px; border-radius:50%; background:rgba(167,139,250,.1); display:flex; align-items:center; justify-content:center; }
-.af-text { flex:1; font-size:.83rem; font-weight:700; color:var(--muted); line-height:1.5; }
-.af-text strong { color:var(--text); }
-.af-time { font-size:.72rem; font-weight:700; color:rgba(157,142,199,.5); white-space:nowrap; }
-
-/* ── Page heading upgrade ── */
-.page-heading h1 span {
-  background: linear-gradient(90deg,var(--purple),var(--blue));
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-}
-</style>
 <script src="effects.js"></script>
 <script src="sound.js"></script>
 <script src="settings.js"></script>
+<script src="quick-access.js"></script>
+<script src="friends-local.js"></script>
+<script>
+'use strict';
+
+/* ── Data helpers ── */
+function getUser()  { try { return JSON.parse(localStorage.getItem('eylox_user')||'{}'); } catch { return {}; } }
+function getFriends() { try { return JSON.parse(localStorage.getItem('eylox_friends')||'[]'); } catch { return []; } }
+function saveFriends(a) { localStorage.setItem('eylox_friends', JSON.stringify(a)); }
+function getRequests() { try { return JSON.parse(localStorage.getItem('eylox_friend_requests')||'[]'); } catch { return []; } }
+function saveRequests(a) { localStorage.setItem('eylox_friend_requests', JSON.stringify(a)); }
+function getConversations() { try { return JSON.parse(localStorage.getItem('eylox_conversations')||'[]'); } catch { return []; } }
+function saveConversations(a) { localStorage.setItem('eylox_conversations', JSON.stringify(a)); }
+function getClans() { try { return JSON.parse(localStorage.getItem('eylox_clans')||'[]'); } catch { return []; } }
+function saveClans(a) { localStorage.setItem('eylox_clans', JSON.stringify(a)); }
+
+const me = () => (getUser().username || '').toLowerCase();
+
+/* ── Platform users pool (for search) ── */
+function getAllKnownUsers() {
+  const pool = new Map();
+  /* Scan localStorage for real registered accounts */
+  for (const k in localStorage) {
+    if (k.startsWith('eylox_userdata_') || k.startsWith('eylox_save_')) {
+      try {
+        const d = JSON.parse(localStorage[k]);
+        if (!d || !d.username) continue;
+        const uname = d.username;
+        if (!pool.has(uname.toLowerCase())) {
+          pool.set(uname.toLowerCase(), {username: uname, avatar: d.avatar||'🎮', level: d.level||1, wins: d.wins||0});
+        }
+      } catch {}
+    }
+  }
+  return pool;
+}
+
+/* ── Search ── */
+window.searchUser = function() {
+  const q = document.getElementById('frSearchInput').value.trim();
+  const res = document.getElementById('friendSearchResults');
+  if (!q) { res.innerHTML = '<div style="color:rgba(var(--accent-rgb,167,139,250),.4);font-size:.83rem;text-align:center;padding:8px">Enter a username to search</div>'; return; }
+
+  const myName = me();
+  const friends = new Set(getFriends().map(f=>f.username.toLowerCase()));
+  const requests = getRequests();
+  const sentTo   = new Set(requests.filter(r=>r.from.toLowerCase()===myName&&r.status==='pending').map(r=>r.to.toLowerCase()));
+  const pending  = new Set(requests.filter(r=>r.to.toLowerCase()===myName&&r.status==='pending').map(r=>r.from.toLowerCase()));
+  const pool = getAllKnownUsers();
+
+  const matches = [...pool.values()].filter(u =>
+    u.username.toLowerCase().includes(q.toLowerCase()) &&
+    u.username.toLowerCase() !== myName
+  ).slice(0, 6);
+
+  if (!matches.length) {
+    res.innerHTML = `<div style="color:rgba(var(--accent-rgb,167,139,250),.4);font-size:.83rem;text-align:center;padding:12px">No players found for "<strong style="color:var(--purple,#a78bfa)">${escHtml(q)}</strong>"</div>`;
+    return;
+  }
+
+  res.innerHTML = matches.map(u => {
+    const uLow = u.username.toLowerCase();
+    let actionHtml = '';
+    if (friends.has(uLow)) {
+      actionHtml = `<span style="font-size:.78rem;font-weight:800;color:#4ade80">✅ Friends</span>`;
+    } else if (sentTo.has(uLow)) {
+      actionHtml = `<span style="font-size:.78rem;font-weight:800;color:rgba(var(--accent-rgb,167,139,250),.6)">⏳ Pending</span>`;
+    } else if (pending.has(uLow)) {
+      actionHtml = `<button class="btn-accept" onclick="acceptReqByName('${escAttr(u.username)}')">Accept</button>`;
+    } else {
+      actionHtml = `<button class="btn-friend-action" style="background:linear-gradient(135deg,var(--accent,#a78bfa),var(--accent2,#7c3aed));color:#fff" onclick="sendRequest('${escAttr(u.username)}','${escAttr(u.avatar)}',this)">+ Add</button>`;
+    }
+    return `<div class="search-result-card">
+      <div class="pmyk-avatar">${u.avatar}</div>
+      <div style="flex:1">
+        <div class="pmyk-name">${escHtml(u.username)}</div>
+        <div class="pmyk-meta">Lv.${u.level} · 🏆 ${u.wins} wins</div>
+      </div>
+      ${actionHtml}
+    </div>`;
+  }).join('');
+};
+
+/* Enter = search */
+document.getElementById('frSearchInput').addEventListener('keydown', e => { if (e.key==='Enter') window.searchUser(); });
+
+/* ── Send a friend request ── */
+window.sendRequest = function(toUser, avatar, btn) {
+  const myName = getUser().username;
+  if (!myName) { showToast('Log in to add friends','#f87171'); return; }
+  const requests = getRequests();
+  const already = requests.find(r =>
+    r.from.toLowerCase()===myName.toLowerCase() &&
+    r.to.toLowerCase()===toUser.toLowerCase() &&
+    r.status==='pending'
+  );
+  if (already) { showToast('Request already sent','#f59e0b'); return; }
+  requests.push({ id:'req_'+Date.now(), from: myName, to: toUser, avatar: avatar||'🎮', sentAt: Date.now(), status:'pending' });
+  saveRequests(requests);
+  if (btn) { btn.textContent='⏳ Sent!'; btn.disabled=true; btn.style.opacity='.6'; }
+  showToast(`Friend request sent to ${toUser}!`);
+  renderRequests();
+  window.searchUser(); /* refresh results */
+};
+
+/* ── Accept by name (from search results) ── */
+window.acceptReqByName = function(fromUser) {
+  const requests = getRequests();
+  const req = requests.find(r => r.from.toLowerCase()===fromUser.toLowerCase() && r.to.toLowerCase()===me() && r.status==='pending');
+  if (req) acceptRequest(req.id);
+};
+
+/* ── Accept / Decline ── */
+window.acceptRequest = function(reqId) {
+  const requests = getRequests();
+  const req = requests.find(r => r.id===reqId);
+  if (!req) return;
+  req.status = 'accepted';
+  saveRequests(requests);
+  /* Add to friends both ways (simulated) */
+  mutualAdd(req.to, req.from, req.avatar||'🎮');
+  showToast(`You and ${req.from} are now friends! 🎉`, '#4ade80');
+  renderAll();
+  window.searchUser();
+};
+
+window.declineRequest = function(reqId) {
+  const requests = getRequests();
+  const req = requests.find(r => r.id===reqId);
+  if (req) req.status = 'declined';
+  saveRequests(requests);
+  showToast('Request declined');
+  renderRequests();
+};
+
+window.cancelRequest = function(reqId) {
+  saveRequests(getRequests().filter(r => r.id!==reqId));
+  showToast('Request cancelled');
+  renderRequests();
+  window.searchUser();
+};
+
+function mutualAdd(toUser, fromUser, avatar) {
+  /* Add fromUser to the current user's friends list */
+  const friends = getFriends();
+  if (!friends.find(f => f.username.toLowerCase()===fromUser.toLowerCase())) {
+    friends.push({ username: fromUser, avatar, addedAt: Date.now() });
+    saveFriends(friends);
+    /* Create convo */
+    const convs = getConversations();
+    if (!convs.find(c => c.name.toLowerCase()===fromUser.toLowerCase())) {
+      convs.unshift({ id:'conv_'+Date.now(), name: fromUser, avatar, messages:[], unread:0 });
+      saveConversations(convs);
+    }
+    /* Update friend count */
+    try {
+      const u = getUser();
+      u.friendCount = (u.friendCount||0)+1;
+      localStorage.setItem('eylox_user', JSON.stringify(u));
+    } catch {}
+  }
+}
+
+/* ── Remove friend ── */
+window.removeFriend = function(username) {
+  if (!confirm(`Remove ${username} from friends?`)) return;
+  saveFriends(getFriends().filter(f => f.username.toLowerCase()!==username.toLowerCase()));
+  renderAll();
+  showToast('Friend removed');
+};
+
+/* ── Render: Incoming / Outgoing Requests ── */
+function renderRequests() {
+  const myName = me();
+  const all = getRequests();
+  const incoming = all.filter(r => r.to.toLowerCase()===myName && r.status==='pending');
+  const outgoing = all.filter(r => r.from.toLowerCase()===myName && r.status==='pending');
+
+  /* Incoming */
+  const inSec  = document.getElementById('incomingSection');
+  const inList = document.getElementById('incomingList');
+  const inCnt  = document.getElementById('incomingCount');
+  if (incoming.length) {
+    inSec.style.display = '';
+    if (inCnt) inCnt.textContent = incoming.length;
+    inList.innerHTML = incoming.map(r => `
+      <div class="req-card req-incoming">
+        <div class="pmyk-avatar">${r.avatar||'🎮'}</div>
+        <div style="flex:1">
+          <div class="pmyk-name">${escHtml(r.from)}</div>
+          <div class="pmyk-meta">Wants to be your friend</div>
+        </div>
+        <button class="btn-accept" onclick="acceptRequest('${r.id}')">✅ Accept</button>
+        <button class="btn-decline" style="margin-left:6px" onclick="declineRequest('${r.id}')">✕</button>
+      </div>`).join('');
+  } else {
+    inSec.style.display = 'none';
+  }
+
+  /* Outgoing */
+  const outSec  = document.getElementById('outgoingSection');
+  const outList = document.getElementById('outgoingList');
+  if (outgoing.length) {
+    outSec.style.display = '';
+    outList.innerHTML = outgoing.map(r => `
+      <div class="req-card req-outgoing">
+        <div class="pmyk-avatar">${r.avatar||'🎮'}</div>
+        <div style="flex:1">
+          <div class="pmyk-name">${escHtml(r.to)}</div>
+          <div class="pmyk-meta">Waiting for response…</div>
+        </div>
+        <span class="req-pending-chip">Pending</span>
+        <button class="btn-decline" style="margin-left:8px" onclick="cancelRequest('${r.id}')">Cancel</button>
+      </div>`).join('');
+  } else {
+    outSec.style.display = 'none';
+  }
+
+  /* Sidebar badge */
+  const badge = document.getElementById('reqBadgeSide');
+  if (badge) {
+    badge.textContent = incoming.length;
+    badge.style.display = incoming.length ? '' : 'none';
+  }
+}
+
+/* ── Render: Friends List ── */
+function renderFriendsList() {
+  const friends = getFriends();
+  const el  = document.getElementById('friendsList');
+  const cnt = document.getElementById('friendsCount');
+  if (cnt) cnt.textContent = friends.length;
+
+  const filter = (document.getElementById('topbarFilter')?.value||'').toLowerCase();
+  const visible = filter ? friends.filter(f => f.username.toLowerCase().includes(filter)) : friends;
+
+  if (!visible.length) {
+    el.innerHTML = `<div class="friends-empty-card">
+      <div class="fec-icon">👥</div>
+      <div class="fec-title">${filter ? 'No match for "'+escHtml(filter)+'"' : 'No friends yet!'}</div>
+      <div class="fec-sub">${filter ? 'Try a different name' : 'Use the search above to find and add players'}</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML = visible.map(f => `
+    <div class="pmyk-card" style="margin-bottom:8px">
+      <div class="pmyk-avatar">${f.avatar}</div>
+      <div style="flex:1">
+        <div class="pmyk-name">${escHtml(f.username)}</div>
+        <div class="pmyk-meta">🟢 Friend · Added ${friendAge(f.addedAt)}</div>
+      </div>
+      <a href="messages.html" class="btn-friend-action" style="background:linear-gradient(135deg,#4ade80,#22d3ee);color:#0a2010;text-decoration:none;margin-right:6px">💬</a>
+      <button class="btn-friend-action" style="background:rgba(244,114,182,.14);color:#f472b6;border:1px solid rgba(244,114,182,.28)" onclick="removeFriend('${escAttr(f.username)}')">✕</button>
+    </div>`).join('');
+}
+
+function friendAge(ts) {
+  if (!ts) return '';
+  const d = Math.floor((Date.now()-ts)/86400000);
+  return d===0 ? 'today' : d===1 ? 'yesterday' : d+'d ago';
+}
+
+/* ── Render: Suggestions ── */
+function renderSuggested() {
+  const myName = me();
+  const friends = new Set(getFriends().map(f=>f.username.toLowerCase()));
+  const requests = getRequests();
+  const sentTo  = new Set(requests.filter(r=>r.from.toLowerCase()===myName&&r.status==='pending').map(r=>r.to.toLowerCase()));
+  const pool    = getAllKnownUsers();
+  const sl      = document.getElementById('suggestedList');
+  if (!sl) return;
+
+  const suggestions = [...pool.values()]
+    .filter(u => u.username.toLowerCase() !== myName && !friends.has(u.username.toLowerCase()))
+    .slice(0, 5);
+
+  if (!suggestions.length) {
+    sl.innerHTML = '<div style="color:rgba(var(--accent-rgb,167,139,250),.4);font-size:.83rem;text-align:center;padding:12px">No suggestions right now</div>';
+    return;
+  }
+  sl.innerHTML = suggestions.map(u => {
+    const uLow = u.username.toLowerCase();
+    const alreadySent = sentTo.has(uLow);
+    return `<div class="pmyk-card" id="sug-${escAttr(u.username)}">
+      <div class="pmyk-avatar">${u.avatar}</div>
+      <div style="flex:1">
+        <div class="pmyk-name">${escHtml(u.username)}</div>
+        <div class="pmyk-meta">Lv.${u.level} · 🏆 ${u.wins} wins</div>
+      </div>
+      ${alreadySent
+        ? `<span class="req-pending-chip">Pending</span>`
+        : `<button class="btn-friend-action" style="background:linear-gradient(135deg,var(--accent,#a78bfa),var(--accent2,#7c3aed));color:#fff" onclick="sendRequest('${escAttr(u.username)}','${escAttr(u.avatar)}',this)">+ Add</button>`}
+    </div>`;
+  }).join('');
+}
+
+/* ── Render: Clans ── */
+function renderClans() {
+  const clans = getClans();
+  const el = document.getElementById('clansList');
+  if (!el) return;
+  if (!clans.length) {
+    el.innerHTML = `<div style="background:rgba(var(--accent-rgb,167,139,250),.04);border:1px solid rgba(var(--accent-rgb,167,139,250),.1);border-radius:14px;padding:28px;text-align:center;color:rgba(var(--accent-rgb,167,139,250),.4);font-size:.88rem;font-weight:600">⚔️ No clans yet. Create one above!</div>`;
+    return;
+  }
+  el.innerHTML = clans.map(c => `
+    <div style="background:rgba(var(--accent-rgb,167,139,250),.05);border:1px solid rgba(var(--accent-rgb,167,139,250),.14);border-radius:14px;padding:15px 18px;display:flex;align-items:center;gap:14px;margin-bottom:10px">
+      <div style="font-size:1.8rem">${c.icon||'⚔️'}</div>
+      <div style="flex:1">
+        <div style="font-weight:800;font-size:.93rem;color:var(--text,#f0e8ff)">${escHtml(c.name)} <span style="font-size:.7rem;color:#f59e0b;font-weight:900">[${escHtml(c.tag)}]</span></div>
+        <div style="font-size:.76rem;color:var(--muted,#9d8ec7);margin-top:2px">${escHtml(c.desc||'')} · ${c.members?.length||1} member${(c.members?.length||1)!==1?'s':''}</div>
+      </div>
+      <button onclick="deleteClan('${c.id}')" style="background:rgba(244,114,182,.12);border:1px solid rgba(244,114,182,.25);color:#f472b6;border-radius:8px;padding:6px 12px;font-size:.74rem;font-weight:800;cursor:pointer">✕ Leave</button>
+    </div>`).join('');
+}
+
+function deleteClan(id) { saveClans(getClans().filter(c=>c.id!==id)); renderClans(); }
+
+/* ── Master render ── */
+function renderAll() {
+  renderFriendsList();
+  renderSuggested();
+  renderRequests();
+  renderClans();
+  const u = getUser();
+  ['sidebarEylux','topbarEylux'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = (u.coins||0).toLocaleString();
+  });
+  ['sidebarEyltrophs','topbarEyltrophs'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = (u.Eyltrophs||0).toLocaleString();
+  });
+  if (u.friends?.length) {
+    const el = document.getElementById('activityText');
+    if (el) el.textContent = `You have ${getFriends().length} friend${getFriends().length!==1?'s':''}! Send them a message 💬`;
+  }
+}
+
+/* ── Clan Modal ── */
+window.openCreateClan = function() {
+  const modal = document.getElementById('clanModal');
+  modal.style.display = 'flex';
+  const friends = getFriends();
+  const fp = document.getElementById('clanFriendPicker');
+  fp.innerHTML = !friends.length
+    ? '<div style="color:rgba(var(--accent-rgb,167,139,250),.4);font-size:.82rem;text-align:center;padding:8px">Add friends first to include them in your clan.</div>'
+    : friends.map(f => `<label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:6px 0">
+        <input type="checkbox" value="${escAttr(f.username)}" style="accent-color:var(--accent,#a78bfa);width:16px;height:16px"/>
+        <span style="font-size:1.2rem">${f.avatar}</span>
+        <span style="font-weight:700;font-size:.88rem;color:var(--text,#f0e8ff)">${escHtml(f.username)}</span>
+      </label>`).join('');
+};
+window.closeClanModal = function() { document.getElementById('clanModal').style.display='none'; };
+window.createClan = function() {
+  const name = document.getElementById('clanName').value.trim();
+  const tag  = document.getElementById('clanTag').value.trim().toUpperCase();
+  const desc = document.getElementById('clanDesc').value.trim();
+  if (!name) { showToast('Enter a clan name!','#f87171'); return; }
+  if (!tag)  { showToast('Enter a clan tag!','#f87171'); return; }
+  const checked = [...document.querySelectorAll('#clanFriendPicker input:checked')].map(i=>i.value);
+  const u = getUser();
+  const clan = { id:'clan_'+Date.now(), name, tag, desc, icon:'⚔️', leader: u.username||'Me', members:[u.username||'Me',...checked], createdAt:Date.now() };
+  const clans = getClans(); clans.unshift(clan); saveClans(clans);
+  closeClanModal(); renderClans();
+  ['clanName','clanTag','clanDesc'].forEach(id => { document.getElementById(id).value=''; });
+  showToast('Clan created! ⚔️', '#a78bfa');
+};
+document.getElementById('clanModal').addEventListener('click', e => { if (e.target===e.currentTarget) closeClanModal(); });
+
+/* ── Topbar filter ── */
+document.getElementById('topbarFilter')?.addEventListener('input', renderFriendsList);
+
+/* ── Sidebar toggle ── */
+document.getElementById('sidebarToggle')?.addEventListener('click', () => document.getElementById('sidebar')?.classList.toggle('open'));
+
+/* ── Toast ── */
+function showToast(msg, color) {
+  if (window.EyloxToast) { window.EyloxToast(msg); return; }
+  const t = document.createElement('div');
+  t.style.cssText = `position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:${color||'rgba(17,3,48,.95)'};border:1px solid rgba(var(--accent-rgb,167,139,250),.3);color:#fff;padding:10px 22px;border-radius:12px;font-size:.84rem;font-weight:800;z-index:9999;pointer-events:none;white-space:nowrap`;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 2500);
+}
+
+/* ── Security helpers ── */
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) { return String(s).replace(/'/g,'&#39;').replace(/"/g,'&quot;'); }
+
+/* ── Boot ── */
+document.addEventListener('DOMContentLoaded', renderAll);
+window.addEventListener('storage', renderAll);
+
+function eyloxLogout() {
+  if (!confirm('Log out of Eylox?')) return;
+  ['eylox_token','eylox_user','eylox_guest'].forEach(k=>localStorage.removeItem(k));
+  window.location.href = 'landing.html';
+}
+function openSettingsPanel() { window.location.href = 'settings.html'; }
+</script>
+<script src="floating-actions.js"></script>
+  <script src="tooltip.js"></script>
+<script src="sw-register.js"></script>
+<script src="offline.js" defer></script>
+<!-- v2.0 Improvements -->
+<script src="currencies.js"></script>
+  <script src="platform-improvements.js"></script>
+<script src="clan-system.js"></script>
+<script src="season-pass.js"></script>
+<script src="video-call.js"></script>
 </body>
 </html>

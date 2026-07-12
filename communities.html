@@ -1,763 +1,1145 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>∞ Eylox — Communities</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Eylox — Communities</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap"/>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#7c3aed"/>
+  <link rel="stylesheet" href="style.css"/>
   <script>
     try {
-      const hasSession = localStorage.getItem('eylox_token') ||
-                         localStorage.getItem('eylox_guest') ||
-                         localStorage.getItem('eylox_user');
-      if (!hasSession) window.location.replace('landing.html');
+      const s = localStorage.getItem('eylox_token')||localStorage.getItem('eylox_guest')||localStorage.getItem('eylox_user');
+      if (!s) window.location.replace('landing.html');
     } catch {}
   </script>
+  <style>
+/* ── Communities page styles ── */
+.comm-hero {
+  background: linear-gradient(160deg,#1a0940 0%,#0d0520 55%,#001a2e 100%);
+  border:1px solid rgba(167,139,250,.18); border-radius:20px;
+  padding:32px; margin-bottom:24px;
+  display:flex; align-items:center; gap:24px; flex-wrap:wrap;
+  position:relative; overflow:hidden;
+}
+.comm-hero::before {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse at 20% 50%,rgba(79,195,247,.08) 0%,transparent 55%);
+  pointer-events:none;
+}
+.comm-hero-icon { font-size:4rem; flex-shrink:0; }
+.comm-hero-text h1 { font-family:var(--font-head); font-size:2rem; margin-bottom:6px; color:#fff; }
+.comm-hero-text p { color:rgba(180,160,220,.6); font-size:.9rem; font-weight:700; }
+.comm-hero-stats { display:flex; gap:20px; flex-wrap:wrap; }
+.comm-hero-stat { text-align:center; }
+.comm-hero-stat-num { font-family:var(--font-head); font-size:1.6rem; color:var(--purple); }
+.comm-hero-stat-lbl { font-size:.72rem; color:var(--muted); font-weight:800; text-transform:uppercase; letter-spacing:.8px; }
+
+/* ── Search & actions bar ── */
+.comm-action-bar {
+  display:flex; gap:12px; align-items:center; flex-wrap:wrap;
+  margin-bottom:20px;
+}
+.comm-search-wrap {
+  flex:1; min-width:200px; display:flex; align-items:center; gap:10px;
+  background:var(--card); border:1px solid var(--border);
+  border-radius:var(--r-md); padding:10px 16px;
+  transition:border-color .2s;
+}
+.comm-search-wrap:focus-within { border-color:rgba(167,139,250,.5); }
+.comm-search-icon { font-size:1rem; color:var(--muted); }
+.comm-search-input {
+  background:none; border:none; color:var(--text);
+  font-family:var(--font-body); font-size:.9rem; font-weight:700; flex:1; outline:none;
+}
+.comm-search-input::placeholder { color:var(--muted); }
+.comm-create-btn {
+  background:linear-gradient(135deg,#a78bfa,#7c3aed);
+  border:none; color:#fff; padding:11px 20px; border-radius:var(--r-md);
+  cursor:pointer; font-family:var(--font-body); font-weight:800; font-size:.88rem;
+  transition:all .2s; white-space:nowrap;
+}
+.comm-create-btn:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(124,58,237,.4); }
+
+/* ── Category tabs ── */
+.comm-tabs { display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap; }
+.comm-tab {
+  padding:8px 16px; border-radius:20px;
+  background:rgba(167,139,250,.08); border:1px solid rgba(167,139,250,.15);
+  color:rgba(180,160,220,.6); cursor:pointer; font-weight:700; font-size:.85rem; transition:all .2s;
+}
+.comm-tab.active {
+  background:linear-gradient(135deg,#a78bfa,#8b5cf6);
+  border-color:rgba(167,139,250,.5); color:#fff;
+}
+
+/* ── Communities grid ── */
+.comm-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(270px,1fr));
+  gap:16px;
+  margin-bottom:40px;
+}
+.comm-card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:16px; padding:20px; cursor:pointer;
+  transition:all .22s; display:flex; flex-direction:column;
+  position:relative; overflow:hidden;
+}
+.comm-card:hover {
+  border-color:rgba(167,139,250,.35); transform:translateY(-3px);
+  box-shadow:0 10px 32px rgba(124,58,237,.2);
+}
+.comm-card.joined-card { border-color:rgba(74,222,128,.25); background:linear-gradient(135deg,rgba(74,222,128,.04) 0%,var(--card) 100%); }
+.comm-card-header { display:flex; align-items:center; gap:14px; margin-bottom:12px; }
+.comm-card-icon {
+  width:56px; height:56px; border-radius:12px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.8rem; background:rgba(167,139,250,.1); border:1px solid rgba(167,139,250,.2);
+}
+.comm-card-info h3 { color:#f0e8ff; font-size:.95rem; font-weight:800; margin-bottom:3px; }
+.comm-card-cat { font-size:.72rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.6px; }
+.comm-card-desc {
+  color:var(--muted); font-size:.82rem; line-height:1.5; flex:1; margin-bottom:14px;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.comm-card-stats { display:flex; gap:16px; padding:12px 0; border-top:1px solid var(--border); margin-bottom:12px; }
+.comm-card-stat { text-align:center; flex:1; }
+.comm-card-stat-val { font-family:var(--font-head); font-size:1.2rem; color:var(--purple); }
+.comm-card-stat-lbl { font-size:.68rem; color:var(--muted); font-weight:800; text-transform:uppercase; }
+.comm-join-btn {
+  width:100%; padding:10px; border-radius:10px;
+  font-family:var(--font-body); font-weight:800; font-size:.88rem; cursor:pointer;
+  border:1px solid rgba(167,139,250,.35); background:rgba(167,139,250,.1); color:var(--purple);
+  transition:all .2s;
+}
+.comm-join-btn:hover { background:linear-gradient(135deg,#a78bfa,#7c3aed); color:#fff; border-color:transparent; }
+.comm-join-btn.joined { background:rgba(74,222,128,.12); border-color:rgba(74,222,128,.3); color:#4ade80; }
+.comm-join-btn.joined:hover { background:rgba(239,68,68,.12); border-color:rgba(239,68,68,.3); color:#f87171; }
+
+.comm-badge-tag {
+  position:absolute; top:14px; right:14px;
+  font-size:.65rem; font-weight:900; padding:3px 8px; border-radius:6px;
+  background:rgba(167,139,250,.15); color:var(--purple);
+}
+.comm-badge-tag.hot { background:rgba(251,146,60,.15); color:#fb923c; }
+.comm-badge-tag.new { background:rgba(74,222,128,.15); color:#4ade80; }
+
+.comm-empty { text-align:center; padding:60px 20px; color:rgba(180,160,220,.45); }
+.comm-empty-icon { font-size:3.5rem; margin-bottom:14px; }
+
+/* ── Create modal ── */
+.comm-modal-overlay {
+  display:none; position:fixed; inset:0; z-index:500;
+  background:rgba(13,5,32,.85); backdrop-filter:blur(6px);
+  align-items:center; justify-content:center; padding:20px;
+}
+.comm-modal-overlay.show { display:flex; }
+.comm-modal {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:20px; padding:32px; max-width:480px; width:100%;
+  max-height:90vh; overflow-y:auto;
+}
+.comm-modal h2 { font-family:var(--font-head); font-size:1.6rem; color:#fff; margin-bottom:6px; }
+.comm-modal-sub { color:var(--muted); font-size:.85rem; font-weight:700; margin-bottom:24px; }
+.comm-modal-close {
+  float:right; background:none; border:none; color:var(--muted);
+  font-size:1.4rem; cursor:pointer; padding:0; line-height:1;
+}
+.comm-modal-close:hover { color:var(--text); }
+.comm-form-row { margin-bottom:16px; }
+.comm-form-label { display:block; font-size:.8rem; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.8px; margin-bottom:6px; }
+.comm-form-input,
+.comm-form-select,
+.comm-form-textarea {
+  width:100%; background:rgba(167,139,250,.06); border:1px solid var(--border);
+  border-radius:10px; padding:10px 14px; color:var(--text);
+  font-family:var(--font-body); font-size:.9rem; font-weight:700;
+  box-sizing:border-box; outline:none; transition:border-color .2s;
+}
+.comm-form-input:focus, .comm-form-select:focus, .comm-form-textarea:focus { border-color:rgba(167,139,250,.5); }
+.comm-form-textarea { resize:vertical; min-height:80px; }
+.comm-form-select option { background:var(--surface); }
+.comm-form-submit {
+  width:100%; padding:13px; border-radius:12px;
+  background:linear-gradient(135deg,#a78bfa,#7c3aed); border:none;
+  color:#fff; font-family:var(--font-head); font-size:1.1rem; cursor:pointer;
+  transition:all .2s; margin-top:8px;
+}
+.comm-form-submit:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(124,58,237,.4); }
+
+/* ── Clan panel ── */
+.clan-panel { display:none; }
+.clan-panel.show { display:block; }
+.clan-empty-card {
+  background: var(--card); border:1px solid var(--border); border-radius:18px;
+  padding:40px 28px; text-align:center; margin-bottom:16px;
+}
+.clan-empty-icon { font-size:3rem; margin-bottom:12px; }
+.clan-empty-title { font-family:var(--font-head); font-size:1.3rem; color:var(--text); margin-bottom:8px; }
+.clan-empty-sub   { font-size:.85rem; color:var(--muted); font-weight:600; line-height:1.5; margin-bottom:20px; }
+.clan-myclan-card {
+  background:linear-gradient(160deg,#12063a 0%,#1e0b54 60%,#0d1535 100%);
+  border:1px solid rgba(167,139,250,.22); border-radius:18px;
+  padding:28px; margin-bottom:16px;
+}
+.clan-header { display:flex; align-items:center; gap:16px; margin-bottom:20px; }
+.clan-icon-big { font-size:3rem; width:70px; height:70px; background:rgba(167,139,250,.1); border:2px solid rgba(167,139,250,.25); border-radius:16px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.clan-name-row h2 { font-family:var(--font-head); font-size:1.4rem; color:#fff; margin-bottom:4px; }
+.clan-tag { display:inline-block; background:rgba(167,139,250,.15); border:1px solid rgba(167,139,250,.3); color:#a78bfa; border-radius:6px; padding:2px 8px; font-size:.72rem; font-weight:900; letter-spacing:.8px; margin-right:8px; }
+.clan-role { font-size:.72rem; color:#fbbf24; font-weight:900; }
+.clan-stats-row { display:flex; gap:16px; margin-bottom:20px; flex-wrap:wrap; }
+.clan-stat-box { flex:1; min-width:80px; background:rgba(167,139,250,.07); border:1px solid rgba(167,139,250,.12); border-radius:12px; padding:12px; text-align:center; }
+.clan-stat-val { font-family:var(--font-head); font-size:1.3rem; color:var(--purple); }
+.clan-stat-lbl { font-size:.65rem; font-weight:900; color:var(--muted); text-transform:uppercase; letter-spacing:.6px; }
+/* Battle */
+.clan-battle-btn {
+  width:100%; padding:15px; border:none; border-radius:14px;
+  background:linear-gradient(135deg,#ec4899,#a855f7,#6366f1);
+  color:#fff; font-family:var(--font-head); font-size:1.05rem;
+  cursor:pointer; letter-spacing:.5px; transition:opacity .2s;
+  box-shadow:0 4px 20px rgba(168,85,247,.35); margin-bottom:14px;
+}
+.clan-battle-btn:hover { opacity:.88; }
+.clan-battle-btn:disabled { opacity:.45; cursor:not-allowed; }
+.clan-battle-progress { display:none; margin-bottom:14px; }
+.clan-battle-bar-wrap { height:14px; background:rgba(167,139,250,.1); border-radius:99px; overflow:hidden; margin-bottom:8px; }
+.clan-battle-bar-fill { height:100%; width:0%; border-radius:99px; background:linear-gradient(90deg,#ec4899,#a855f7); transition:width .05s linear; }
+.clan-battle-status { text-align:center; font-size:.82rem; font-weight:800; color:rgba(167,139,250,.7); }
+.clan-result-card { display:none; border-radius:14px; padding:18px; text-align:center; margin-bottom:14px; }
+.clan-result-card.win  { background:linear-gradient(135deg,rgba(74,222,128,.12),rgba(16,185,129,.08)); border:1px solid rgba(74,222,128,.3); }
+.clan-result-card.loss { background:linear-gradient(135deg,rgba(239,68,68,.08),rgba(239,68,68,.04)); border:1px solid rgba(239,68,68,.2); }
+.clan-result-emoji { font-size:2.5rem; margin-bottom:6px; }
+.clan-result-title { font-family:var(--font-head); font-size:1.2rem; margin-bottom:4px; }
+.clan-result-reward { font-size:.88rem; font-weight:800; color:#fbbf24; margin-top:6px; }
+/* Clan members */
+.clan-members-list { display:flex; flex-direction:column; gap:8px; margin-top:16px; }
+.clan-member-row { display:flex; align-items:center; gap:10px; background:rgba(167,139,250,.06); border:1px solid rgba(167,139,250,.1); border-radius:10px; padding:10px 14px; }
+.clan-member-av { font-size:1.4rem; flex-shrink:0; }
+.clan-member-name { font-weight:800; font-size:.88rem; color:var(--text); flex:1; }
+.clan-member-badge { font-size:.65rem; font-weight:900; padding:3px 8px; border-radius:6px; }
+.cmb-leader { background:rgba(251,191,36,.15); color:#fbbf24; }
+.cmb-member { background:rgba(167,139,250,.12); color:#a78bfa; }
+/* Battle history */
+.clan-battles-list { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+.clan-bh-row { display:flex; align-items:center; gap:10px; background:rgba(167,139,250,.05); border:1px solid rgba(167,139,250,.09); border-radius:9px; padding:9px 13px; font-size:.8rem; }
+.cbl-win  { color:#4ade80; font-weight:900; }
+.cbl-loss { color:#f87171; font-weight:900; }
+/* Invite friends */
+.clan-invite-list { display:flex; flex-direction:column; gap:8px; margin-top:8px; max-height:200px; overflow-y:auto; }
+.clan-inv-row { display:flex; align-items:center; gap:10px; background:rgba(167,139,250,.06); border:1px solid rgba(167,139,250,.1); border-radius:9px; padding:9px 13px; }
+.clan-inv-btn { margin-left:auto; background:rgba(167,139,250,.14); border:1px solid rgba(167,139,250,.25); color:#a78bfa; border-radius:8px; padding:4px 12px; font-size:.75rem; font-weight:800; cursor:pointer; transition:background .18s; }
+.clan-inv-btn:hover { background:rgba(167,139,250,.28); }
+.clan-inv-btn.added { background:rgba(74,222,128,.12); border-color:rgba(74,222,128,.3); color:#4ade80; cursor:default; }
+
+.comm-page-wrap { padding:24px; max-width:1060px; margin:0 auto; }
+
+@media(max-width:600px){
+  .comm-hero { padding:20px; gap:14px; }
+  .comm-hero-icon { font-size:2.8rem; }
+  .comm-hero-text h1 { font-size:1.5rem; }
+  .comm-grid { grid-template-columns:1fr; }
+}
+  </style>
+<script src="audit-loader.js" defer></script>
+  <script src="debug-dashboard.js" defer></script>
 </head>
 <body data-page="communities">
 <div class="app-shell">
 
-  <!-- ══════════ SIDEBAR ══════════ -->
+  <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <a href="index.html" class="sidebar-logo">
       <span class="sidebar-logo-icon">🎮</span>
       <span class="sidebar-logo-text">Eylox</span>
     </a>
+
     <p class="sidebar-section-label">Menu</p>
-    <nav class="sidebar-nav"><ul>
-      <li><a href="index.html"    class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
-      <li><a href="games.html"    class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
-      <li><a href="friends.html"  class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span><span class="s-badge" style="display:none">0</span></a></li>
-      <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
-      <li><a href="profile.html"  class="sidebar-link"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
-    </ul></nav>
+    <nav class="sidebar-nav" aria-label="Main navigation">
+      <ul>
+        <li><a href="index.html" class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
+        <li><a href="games.html" class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
+        <li><a href="leaderboard.html" class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
+        <li><a href="achievements.html" class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
+        <li><a href="events.html" class="sidebar-link"><span class="s-icon">🎯</span><span class="s-label">Live Events</span></a></li>
+        <li><a href="communities.html" class="sidebar-link active" aria-current="page"><span class="s-icon">🌐</span><span class="s-label">Communities</span></a></li>
+        <li><a href="friends.html" class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span><span class="s-badge" id="friendReqBadge" style="display:none">0</span></a></li>
+        <li><a href="profile.html" class="sidebar-link"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
+        <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
+      </ul>
+    </nav>
+
     <div class="sidebar-divider"></div>
+
     <p class="sidebar-section-label">More</p>
-    <nav class="sidebar-nav"><ul>
-      <li><a href="leaderboard.html"   class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
-      <li><a href="achievements.html"  class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
-      <li><a href="communities.html"   class="sidebar-link active"><span class="s-icon">🌍</span><span class="s-label">Communities</span></a></li>
-      <li><a href="live-events.html"   class="sidebar-link"><span class="s-icon">⚡</span><span class="s-label">Live Events</span></a></li>
-      <li><a href="shop.html"          class="sidebar-link"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
-      <li><a href="#" class="sidebar-link" id="settingsBtn"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></a></li>
-      <li><a href="#" class="sidebar-link" id="logoutBtn"><span class="s-icon">🚪</span><span class="s-label">Logout</span></a></li>
-    </ul></nav>
+    <nav class="sidebar-nav" aria-label="Secondary navigation">
+      <ul>
+        <li><a href="shop.html" class="sidebar-link"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
+        <li><a href="ai.html" class="sidebar-link"><span class="s-icon">🤖</span><span class="s-label">Eylox Studio</span><span class="s-soon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff">AI</span></a></li>
+        <li><a href="subscription.html" class="sidebar-link"><span class="s-icon">💎</span><span class="s-label">Subscription</span></a></li>
+        <li><button class="sidebar-link sb-action" onclick="openSettingsPanel()"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></button></li>
+        <li><button class="sidebar-link sb-action" onclick="eyloxLogout()" style="color:#f87171"><span class="s-icon">🚪</span><span class="s-label">Log Out</span></button></li>
+      </ul>
+    </nav>
+
     <div class="sidebar-coins">
-      <img src="eylux-coin.png" class="coins-icon-img" alt="Eylux" />
-      <div><div class="coins-amount">—</div><div class="coins-label">Eylux</div></div>
+      <span>💰</span>
+      <div>
+        <div class="coins-amount" id="sidebarEylux">0</div>
+        <div class="coins-label">Eylux</div>
+      </div>
     </div>
-    <div class="sidebar-coins sidebar-trophies">
-      <span class="coins-icon">🏆</span>
-      <div><div class="trophies-amount">—</div><div class="coins-label">Trophies</div></div>
+    <div class="sidebar-coins" style="margin-top:8px">
+      <span>🏆</span>
+      <div>
+        <div class="Eyltrophs-amount" id="sidebarEyltrophs">0</div>
+        <div class="coins-label">Eyltrophs</div>
+      </div>
     </div>
   </aside>
 
-  <!-- ══════════ MAIN ══════════ -->
+  <!-- MAIN AREA -->
   <div class="main-area">
 
+    <!-- TOPBAR -->
     <header class="topbar">
-      <button class="menu-btn" id="menuBtn" aria-label="Toggle menu" aria-expanded="false">
+      <button class="menu-btn" id="sidebarToggle" aria-label="Toggle sidebar">
         <span></span><span></span><span></span>
       </button>
       <div class="search-wrap">
         <span class="search-icon">🔍</span>
-        <input type="search" class="search-input" id="commSearch" placeholder="Search communities…" aria-label="Search communities" />
+        <input type="search" class="search-input" placeholder="Search games…" aria-label="Search games"/>
       </div>
       <div class="topbar-right">
-        <button class="tb-btn" id="notifBellBtn" aria-label="Notifications">🔔<span class="notif-dot"></span></button>
-        <div class="tb-coins"><img src="eylux-coin.png" class="tb-coin-img" alt="EC"> <span id="topbarCoins">—</span></div>
-        <div class="tb-trophies"><span class="tb-trophy-icon">🏆</span> <span id="topbarTrophies">—</span></div>
-        <a href="profile.html" class="tb-avatar" aria-label="My Profile">🎮<span class="online-dot"></span></a>
+        <button class="topbar-icon-btn" id="notifBtn" aria-label="Notifications">🔔<span class="notif-dot"></span></button>
+        <div class="tb-Eyltrophs">🏆 <span id="topbarEyltrophs">0</span></div>
+        <div class="tb-coins">💰 <span id="topbarEylux">0</span></div>
+        <a href="profile.html" class="tb-avatar" aria-label="My profile">🎮<span class="online-dot"></span></a>
       </div>
     </header>
 
-    <main class="page-content">
+    <!-- PAGE CONTENT -->
+    <main class="page-content" id="main-content">
+      <div class="comm-page-wrap">
 
-      <!-- Page Header -->
-      <div class="comm-page-head">
-        <div>
-          <h1 class="comm-title">🌍 Communities</h1>
-          <p class="comm-subtitle">Join groups, share your passion, find your crew</p>
+        <!-- Hero -->
+        <div class="comm-hero">
+          <div class="comm-hero-icon">🌐</div>
+          <div class="comm-hero-text">
+            <h1>Communities</h1>
+            <p>Join clans, guilds, and groups. Compete, collaborate, and make friends!</p>
+          </div>
+          <div class="comm-hero-stats">
+            <div class="comm-hero-stat">
+              <div class="comm-hero-stat-num" id="statTotalComm">0</div>
+              <div class="comm-hero-stat-lbl">Communities</div>
+            </div>
+            <div class="comm-hero-stat">
+              <div class="comm-hero-stat-num" id="statMyComm">0</div>
+              <div class="comm-hero-stat-lbl">Joined</div>
+            </div>
+            <div class="comm-hero-stat">
+              <div class="comm-hero-stat-num" id="statTotalMembers">0</div>
+              <div class="comm-hero-stat-lbl">Total Members</div>
+            </div>
+          </div>
         </div>
-        <button class="btn-play comm-create-btn" id="createCommBtn">+ Create Community</button>
-      </div>
 
-      <!-- Featured Banner -->
-      <div class="comm-featured" id="commFeatured">
-        <div class="cf-content">
-          <div class="cf-tag">🔥 FEATURED</div>
-          <div class="cf-name">Ninja Dash Masters</div>
-          <div class="cf-desc">The #1 community for Ninja Dash fans. Share your high scores, tips, and compete in weekly challenges!</div>
-          <div class="cf-meta">👥 12,400 members &nbsp;·&nbsp; 🎮 Gaming &nbsp;·&nbsp; ⚡ Very Active</div>
-          <button class="btn-play" style="padding:9px 22px;font-size:.85rem;margin-top:12px" onclick="joinCommunity('ninja-dash-masters')">Join Now</button>
+        <!-- Action bar -->
+        <div class="comm-action-bar">
+          <div class="comm-search-wrap">
+            <span class="comm-search-icon">🔍</span>
+            <input type="text" class="comm-search-input" id="commSearch" placeholder="Search communities…"/>
+          </div>
+          <button class="comm-create-btn" id="createBtn">✨ Create Community</button>
         </div>
-        <div class="cf-art">🥷</div>
-      </div>
 
-      <!-- My Communities -->
-      <div class="section" id="myCommSection" style="display:none">
-        <div class="section-header">
-          <h2 class="section-title">✅ My Communities</h2>
-          <span class="section-link" id="myCommCount">0 joined</span>
+        <!-- Category tabs -->
+        <div class="comm-tabs" id="commTabs">
+          <div class="comm-tab active" data-cat="all">All</div>
+          <div class="comm-tab" data-cat="gaming">🎮 Gaming</div>
+          <div class="comm-tab" data-cat="creative">🎨 Creative</div>
+          <div class="comm-tab" data-cat="competitive">⚔️ Competitive</div>
+          <div class="comm-tab" data-cat="roleplay">🎭 Roleplay</div>
+          <div class="comm-tab" data-cat="social">👥 Social</div>
+          <div class="comm-tab" data-cat="mine">My Communities</div>
+          <div class="comm-tab" data-cat="clans" style="background:linear-gradient(135deg,rgba(236,72,153,.15),rgba(168,85,247,.15));border-color:rgba(168,85,247,.3);color:#c084fc">⚔️ My Clan</div>
         </div>
-        <div class="comm-row" id="myCommRow"></div>
-      </div>
 
-      <!-- Category Filter -->
-      <div class="comm-cats">
-        <button class="comm-cat-btn active" data-cat="all">🌍 All</button>
-        <button class="comm-cat-btn" data-cat="gaming">🎮 Gaming</button>
-        <button class="comm-cat-btn" data-cat="creative">🎨 Creative</button>
-        <button class="comm-cat-btn" data-cat="competitive">🏆 Competitive</button>
-        <button class="comm-cat-btn" data-cat="roleplay">🎭 Roleplay</button>
-        <button class="comm-cat-btn" data-cat="social">💬 Social</button>
-      </div>
-
-      <!-- Sort + Count -->
-      <div class="comm-toolbar">
-        <span id="commFoundCount" style="font-size:.82rem;font-weight:800;color:var(--muted)">Loading…</span>
-        <div style="display:flex;gap:8px;align-items:center">
-          <span style="font-size:.8rem;font-weight:800;color:var(--muted)">Sort:</span>
-          <select id="commSort" class="comm-sort-select">
-            <option value="popular">Most Popular</option>
-            <option value="newest">Newest</option>
-            <option value="active">Most Active</option>
-          </select>
+        <!-- Communities grid -->
+        <div class="comm-grid" id="commGrid">
+          <div class="comm-empty"><div class="comm-empty-icon">🌐</div>Loading communities…</div>
         </div>
-      </div>
 
-      <!-- Communities Grid -->
-      <div class="comm-grid" id="commGrid">
-        <div class="comm-loading">Loading communities…</div>
-      </div>
+        <!-- ─── Clan Panel ─── -->
+        <div class="clan-panel" id="clanPanel">
 
-      <!-- Load More -->
-      <div style="text-align:center;margin-top:24px">
-        <button class="comm-load-more hidden" id="loadMoreBtn">Load More</button>
-      </div>
+          <!-- No clan state -->
+          <div id="noClanSection">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:8px">
+              <div class="clan-empty-card">
+                <div class="clan-empty-icon">⚔️</div>
+                <div class="clan-empty-title">Create a Clan</div>
+                <div class="clan-empty-sub">Start your own clan, invite friends, and battle other clans for rewards!</div>
+                <button class="comm-create-btn" style="width:100%" onclick="openCreateClanModal()">✨ Create Clan</button>
+              </div>
+              <div class="clan-empty-card">
+                <div class="clan-empty-icon">🔍</div>
+                <div class="clan-empty-title">Join a Clan</div>
+                <div class="clan-empty-sub">Find an existing clan and jump right into the action with other players.</div>
+                <button class="comm-create-btn" style="width:100%;background:linear-gradient(135deg,#f59e0b,#d97706)" onclick="showJoinClanList()">🤝 Browse Clans</button>
+              </div>
+            </div>
+            <div id="joinClanList" style="display:none;margin-top:16px"></div>
+          </div>
 
+          <!-- Has clan state -->
+          <div id="myClanSection" style="display:none">
+            <div class="clan-myclan-card">
+              <div class="clan-header">
+                <div class="clan-icon-big" id="clanIconBig">⚔️</div>
+                <div class="clan-name-row">
+                  <h2 id="clanNameBig">My Clan</h2>
+                  <span class="clan-tag" id="clanTagBig">[TAG]</span>
+                  <span class="clan-role" id="clanRoleBig">👑 Leader</span>
+                  <div style="font-size:.78rem;color:rgba(167,139,250,.55);margin-top:4px" id="clanDescBig"></div>
+                </div>
+              </div>
+              <div class="clan-stats-row">
+                <div class="clan-stat-box"><div class="clan-stat-val" id="clanWins">0</div><div class="clan-stat-lbl">Eyltrophs</div></div>
+                <div class="clan-stat-box"><div class="clan-stat-val" id="clanLosses">0</div><div class="clan-stat-lbl">Losses</div></div>
+                <div class="clan-stat-box"><div class="clan-stat-val" id="clanMembers">1</div><div class="clan-stat-lbl">Members</div></div>
+                <div class="clan-stat-box"><div class="clan-stat-val" id="clanTrophies">0</div><div class="clan-stat-lbl">Eyltrophs</div></div>
+              </div>
+
+              <!-- Battle section -->
+              <div id="battleCooldownMsg" style="display:none;text-align:center;font-size:.82rem;color:rgba(167,139,250,.55);font-weight:700;margin-bottom:12px"></div>
+              <button class="clan-battle-btn" id="battleBtn" onclick="startBattle()">⚔️ Battle an Enemy Clan!</button>
+              <div class="clan-battle-progress" id="battleProgress">
+                <div class="clan-battle-bar-wrap"><div class="clan-battle-bar-fill" id="battleBarFill"></div></div>
+                <div class="clan-battle-status" id="battleStatusTxt">Preparing for battle…</div>
+              </div>
+              <div class="clan-result-card" id="battleResult">
+                <div class="clan-result-emoji" id="resultEmoji">🏆</div>
+                <div class="clan-result-title" id="resultTitle">Victory!</div>
+                <div id="resultDesc" style="font-size:.8rem;color:rgba(167,139,250,.6);font-weight:600;margin-bottom:6px"></div>
+                <div class="clan-result-reward" id="resultReward"></div>
+              </div>
+
+              <!-- Members -->
+              <div style="margin-top:20px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                  <div style="font-weight:900;font-size:.88rem;color:var(--muted);text-transform:uppercase;letter-spacing:.8px">Members</div>
+                  <button onclick="openInviteFriendsModal()" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);color:#a78bfa;border-radius:8px;padding:5px 12px;font-size:.75rem;font-weight:800;cursor:pointer">+ Invite Friends</button>
+                </div>
+                <div class="clan-members-list" id="clanMembersList"></div>
+              </div>
+
+              <!-- Battle history -->
+              <div style="margin-top:20px">
+                <div style="font-weight:900;font-size:.88rem;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Recent Battles</div>
+                <div class="clan-battles-list" id="battleHistoryList"></div>
+              </div>
+
+              <!-- Danger zone -->
+              <div style="margin-top:24px;padding-top:16px;border-top:1px solid rgba(239,68,68,.15);text-align:right">
+                <button onclick="leaveClan()" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#f87171;border-radius:9px;padding:7px 16px;font-size:.78rem;font-weight:800;cursor:pointer">🚪 Leave Clan</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
     </main>
+
+    <!-- Mobile Bottom Nav -->
+    <nav class="bottom-nav" aria-label="Mobile navigation">
+      <a href="index.html" class="bn-item"><span class="bn-icon">🏠</span>Home</a>
+      <a href="leaderboard.html" class="bn-item"><span class="bn-icon">🏆</span>Leaderboard</a>
+      <a href="communities.html" class="bn-item active"><span class="bn-icon">🌐</span>Communities</a>
+      <a href="achievements.html" class="bn-item"><span class="bn-icon">🎖️</span>Achievements</a>
+      <a href="profile.html" class="bn-item"><span class="bn-icon">👤</span>Profile</a>
+    </nav>
+
+  </div><!-- /main-area -->
+</div><!-- /app-shell -->
+
+<!-- Create Clan Modal -->
+<div class="comm-modal-overlay" id="createClanModal">
+  <div class="comm-modal">
+    <button class="comm-modal-close" onclick="document.getElementById('createClanModal').classList.remove('show')">✕</button>
+    <h2>⚔️ Create a Clan</h2>
+    <p class="comm-modal-sub">Lead your clan to glory — invite friends and battle!</p>
+    <div class="comm-form-row">
+      <label class="comm-form-label">Clan Icon (emoji)</label>
+      <input type="text" class="comm-form-input" id="newClanIcon" placeholder="⚔️" maxlength="2" value="⚔️"/>
+    </div>
+    <div class="comm-form-row">
+      <label class="comm-form-label">Clan Name</label>
+      <input type="text" class="comm-form-input" id="newClanName" placeholder="e.g. Shadow Blades" maxlength="40"/>
+    </div>
+    <div class="comm-form-row">
+      <label class="comm-form-label">Clan Tag (3–5 chars)</label>
+      <input type="text" class="comm-form-input" id="newClanTag" placeholder="SBL" maxlength="5"/>
+    </div>
+    <div class="comm-form-row">
+      <label class="comm-form-label">Description</label>
+      <textarea class="comm-form-textarea" id="newClanDesc" placeholder="What's your clan about?" maxlength="200"></textarea>
+    </div>
+    <button class="comm-form-submit" onclick="submitCreateClan()">⚔️ Create Clan</button>
+  </div>
+</div>
+
+<!-- Invite Friends to Clan Modal -->
+<div class="comm-modal-overlay" id="inviteFriendsModal">
+  <div class="comm-modal">
+    <button class="comm-modal-close" onclick="document.getElementById('inviteFriendsModal').classList.remove('show')">✕</button>
+    <h2>🤝 Invite Friends</h2>
+    <p class="comm-modal-sub">Add your friends to the clan!</p>
+    <div class="clan-invite-list" id="inviteFriendsList">
+      <div style="color:rgba(167,139,250,.4);text-align:center;padding:14px;font-size:.85rem">No friends to invite yet. Add friends first!</div>
+    </div>
+    <button class="comm-form-submit" style="margin-top:16px;background:rgba(167,139,250,.12);color:#a78bfa;font-size:.9rem" onclick="document.getElementById('inviteFriendsModal').classList.remove('show')">Done</button>
   </div>
 </div>
 
 <!-- Create Community Modal -->
-<div class="modal-overlay hidden" id="createCommModal">
-  <div class="modal-box" style="max-width:500px">
-    <div class="modal-head">
-      <span class="modal-title">🌍 Create Community</span>
-      <button class="modal-close" id="closeCreateModal">✕</button>
+<div class="comm-modal-overlay" id="createModal">
+  <div class="comm-modal">
+    <button class="comm-modal-close" id="closeModal">✕</button>
+    <h2>Create a Community</h2>
+    <p class="comm-modal-sub">Build your own club and invite players who share your passion!</p>
+
+    <div class="comm-form-row">
+      <label class="comm-form-label" for="newCommName">Community Name</label>
+      <input type="text" class="comm-form-input" id="newCommName" placeholder="e.g. Dragon Slayers Guild" maxlength="50"/>
     </div>
-    <div class="modal-body">
-      <div class="form-group-row">
-        <div style="flex:1">
-          <label class="form-label">Community Name *</label>
-          <input type="text" class="form-input" id="commName" placeholder="e.g. Speed Runners" maxlength="50" />
-        </div>
-        <div>
-          <label class="form-label">Icon (emoji)</label>
-          <input type="text" class="form-input" id="commAvatar" placeholder="🌍" maxlength="4" style="width:70px;text-align:center;font-size:1.3rem" />
-        </div>
-      </div>
-      <div style="margin-top:14px">
-        <label class="form-label">Category *</label>
-        <select class="form-input" id="commCategory">
-          <option value="">Select a category…</option>
-          <option value="gaming">🎮 Gaming</option>
-          <option value="creative">🎨 Creative</option>
-          <option value="competitive">🏆 Competitive</option>
-          <option value="roleplay">🎭 Roleplay</option>
-          <option value="social">💬 Social</option>
-        </select>
-      </div>
-      <div style="margin-top:14px">
-        <label class="form-label">Description</label>
-        <textarea class="form-input" id="commDesc" rows="3" placeholder="What is this community about?" maxlength="500" style="resize:vertical;min-height:80px"></textarea>
-      </div>
-      <div style="margin-top:14px">
-        <label class="form-label">Tags (comma separated)</label>
-        <input type="text" class="form-input" id="commTags" placeholder="e.g. fast, speedrun, racing" />
-      </div>
-      <div id="createCommError" style="display:none;color:var(--pink);font-size:.83rem;font-weight:700;margin-top:10px"></div>
-      <button class="btn-play" id="submitCreateComm" style="width:100%;margin-top:16px;padding:13px">🌍 Create Community</button>
+    <div class="comm-form-row">
+      <label class="comm-form-label" for="newCommDesc">Description</label>
+      <textarea class="comm-form-textarea" id="newCommDesc" placeholder="What's your community about?" maxlength="300"></textarea>
     </div>
+    <div class="comm-form-row">
+      <label class="comm-form-label" for="newCommCat">Category</label>
+      <select class="comm-form-select" id="newCommCat">
+        <option value="gaming">🎮 Gaming</option>
+        <option value="creative">🎨 Creative</option>
+        <option value="competitive">⚔️ Competitive</option>
+        <option value="roleplay">🎭 Roleplay</option>
+        <option value="social">👥 Social</option>
+      </select>
+    </div>
+    <div class="comm-form-row">
+      <label class="comm-form-label" for="newCommIcon">Icon (emoji)</label>
+      <input type="text" class="comm-form-input" id="newCommIcon" placeholder="🎮" maxlength="2" value="🎮"/>
+    </div>
+    <button class="comm-form-submit" id="submitCreate">🚀 Create Community</button>
   </div>
 </div>
 
-<!-- Community Detail Modal -->
-<div class="modal-overlay hidden" id="commDetailModal">
-  <div class="modal-box" style="max-width:520px">
-    <div class="modal-head">
-      <span class="modal-title" id="commDetailTitle">Community</span>
-      <button class="modal-close" id="closeDetailModal">✕</button>
-    </div>
-    <div class="modal-body" id="commDetailBody"></div>
-  </div>
-</div>
-
-<style>
-/* ── Page head ── */
-.comm-page-head {
-  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
-  flex-wrap: wrap; margin-bottom: 24px;
-}
-.comm-title {
-  font-family: var(--font-head); font-size: clamp(1.6rem,4vw,2.2rem);
-  background: linear-gradient(135deg, var(--purple), var(--blue));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-}
-.comm-subtitle { color: var(--muted); font-weight: 700; font-size: .9rem; margin-top: 4px; }
-.comm-create-btn { padding: 10px 22px; font-size: .88rem; white-space: nowrap; }
-
-/* ── Featured Banner ── */
-.comm-featured {
-  background: linear-gradient(135deg, rgba(124,58,237,.18), rgba(14,165,233,.12));
-  border: 1px solid rgba(167,139,250,.25); border-radius: var(--r-lg);
-  padding: 24px 28px; margin-bottom: 28px;
-  display: flex; align-items: center; justify-content: space-between; gap: 20px;
-  position: relative; overflow: hidden;
-}
-.comm-featured::before {
-  content: ''; position: absolute; inset: 0;
-  background: radial-gradient(ellipse at top left, rgba(167,139,250,.1), transparent 60%);
-  pointer-events: none;
-}
-.cf-content { flex: 1; }
-.cf-tag {
-  display: inline-block; background: rgba(244,114,182,.15); border: 1px solid rgba(244,114,182,.3);
-  border-radius: 99px; padding: 3px 12px; font-size: .72rem; font-weight: 900;
-  color: var(--pink); letter-spacing: .5px; margin-bottom: 10px;
-}
-.cf-name { font-family: var(--font-head); font-size: 1.5rem; color: var(--text); margin-bottom: 6px; }
-.cf-desc { color: var(--muted); font-size: .85rem; font-weight: 700; line-height: 1.6; max-width: 420px; }
-.cf-meta { color: rgba(157,142,199,.7); font-size: .78rem; font-weight: 800; margin-top: 8px; }
-.cf-art { font-size: 4rem; filter: drop-shadow(0 0 24px rgba(167,139,250,.5)); flex-shrink: 0; }
-
-/* ── Category Filter ── */
-.comm-cats {
-  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;
-}
-.comm-cat-btn {
-  background: rgba(167,139,250,.08); border: 1px solid rgba(167,139,250,.15);
-  color: var(--muted); border-radius: 99px; padding: 7px 16px;
-  font-family: var(--font-body); font-size: .82rem; font-weight: 800;
-  cursor: pointer; transition: all .18s;
-}
-.comm-cat-btn:hover { background: rgba(167,139,250,.15); color: var(--text); }
-.comm-cat-btn.active { background: rgba(167,139,250,.22); border-color: var(--purple); color: var(--purple); }
-
-/* ── Toolbar ── */
-.comm-toolbar {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  margin-bottom: 18px;
-}
-.comm-sort-select {
-  background: var(--card); border: 1px solid rgba(167,139,250,.2);
-  border-radius: var(--r-sm); color: var(--text); padding: 6px 12px;
-  font-family: var(--font-body); font-size: .82rem; font-weight: 800; outline: none;
-  cursor: pointer;
-}
-
-/* ── Communities Grid ── */
-.comm-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
-}
-
-.comm-card {
-  background: var(--card); border: 1px solid rgba(167,139,250,.1);
-  border-radius: var(--r-lg); overflow: hidden;
-  cursor: pointer; transition: all .22s; position: relative;
-}
-.comm-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 32px rgba(0,0,0,.3), 0 0 0 1px rgba(167,139,250,.2);
-}
-.comm-card.joined { border-color: rgba(74,222,128,.3); }
-
-.comm-card-banner {
-  height: 72px; display: flex; align-items: center; justify-content: center;
-  font-size: 2.8rem; position: relative;
-  background: linear-gradient(135deg, var(--card), rgba(167,139,250,.08));
-}
-.comm-card-banner.cat-gaming     { background: linear-gradient(135deg, rgba(124,58,237,.12), rgba(60,165,250,.08)); }
-.comm-card-banner.cat-creative   { background: linear-gradient(135deg, rgba(244,114,182,.1), rgba(251,191,36,.08)); }
-.comm-card-banner.cat-competitive{ background: linear-gradient(135deg, rgba(253,230,138,.1), rgba(251,191,36,.08)); }
-.comm-card-banner.cat-roleplay   { background: linear-gradient(135deg, rgba(45,212,191,.1), rgba(96,165,250,.08)); }
-.comm-card-banner.cat-social     { background: linear-gradient(135deg, rgba(167,139,250,.1), rgba(244,114,182,.08)); }
-
-.comm-joined-badge {
-  position: absolute; top: 8px; right: 8px;
-  background: rgba(74,222,128,.15); border: 1px solid rgba(74,222,128,.3);
-  border-radius: 99px; padding: 2px 10px; font-size: .7rem; font-weight: 900; color: var(--green);
-}
-
-.comm-card-body { padding: 14px 16px 16px; }
-.comm-card-name { font-family: var(--font-head); font-size: 1rem; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.comm-card-desc { font-size: .78rem; font-weight: 700; color: var(--muted); line-height: 1.5; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.comm-card-meta { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
-.comm-meta-chip {
-  background: rgba(167,139,250,.08); border-radius: 99px; padding: 3px 10px;
-  font-size: .72rem; font-weight: 800; color: var(--muted);
-}
-.comm-card-footer { display: flex; gap: 8px; }
-.comm-join-btn {
-  flex: 1; padding: 8px 14px; border-radius: 99px; border: none;
-  font-family: var(--font-body); font-size: .8rem; font-weight: 800;
-  cursor: pointer; transition: all .18s;
-  background: linear-gradient(135deg, #7c3aed, #a78bfa); color: #fff;
-}
-.comm-join-btn:hover { transform: scale(1.04); box-shadow: 0 4px 16px rgba(124,58,237,.4); }
-.comm-join-btn.leave {
-  background: rgba(244,114,182,.12); border: 1px solid rgba(244,114,182,.25); color: var(--pink);
-}
-.comm-join-btn.leave:hover { background: rgba(244,114,182,.22); }
-.comm-view-btn {
-  background: rgba(167,139,250,.1); border: 1px solid rgba(167,139,250,.2);
-  color: var(--purple); border-radius: 99px; padding: 8px 14px;
-  font-family: var(--font-body); font-size: .8rem; font-weight: 800;
-  cursor: pointer; transition: all .18s;
-}
-.comm-view-btn:hover { background: rgba(167,139,250,.2); }
-
-/* My communities row */
-.comm-row { display: flex; gap: 10px; flex-wrap: wrap; }
-.my-comm-chip {
-  display: flex; align-items: center; gap: 8px;
-  background: rgba(74,222,128,.08); border: 1px solid rgba(74,222,128,.2);
-  border-radius: 99px; padding: 8px 14px; cursor: pointer; transition: all .18s;
-}
-.my-comm-chip:hover { background: rgba(74,222,128,.15); }
-.my-comm-chip .mc-icon { font-size: 1.1rem; }
-.my-comm-chip .mc-name { font-size: .83rem; font-weight: 800; color: var(--text); }
-
-/* Load more */
-.comm-load-more {
-  background: rgba(167,139,250,.1); border: 1px solid rgba(167,139,250,.22);
-  color: var(--purple); border-radius: 99px; padding: 10px 30px;
-  font-family: var(--font-body); font-size: .88rem; font-weight: 800;
-  cursor: pointer; transition: all .18s;
-}
-.comm-load-more:hover { background: rgba(167,139,250,.2); }
-
-.comm-loading {
-  grid-column: 1/-1; text-align: center; padding: 60px;
-  color: var(--muted); font-size: .9rem; font-weight: 700;
-  animation: pulse 1.5s ease-in-out infinite;
-}
-@keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
-
-/* ── Form ── */
-.form-group-row { display: flex; gap: 12px; align-items: flex-end; }
-.form-label { display: block; font-size: .82rem; font-weight: 800; color: var(--muted); margin-bottom: 6px; letter-spacing: .3px; }
-.form-input {
-  width: 100%; background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--r-sm); padding: 10px 14px; color: var(--text);
-  font-family: var(--font-body); font-size: .9rem; font-weight: 700; outline: none;
-  transition: border-color .18s;
-}
-.form-input:focus { border-color: var(--purple); }
-
-/* ── Modal ── */
-.modal-overlay {
-  position: fixed; inset: 0; z-index: 999;
-  background: rgba(8,4,22,.82); backdrop-filter: blur(8px);
-  display: flex; align-items: center; justify-content: center; padding: 20px;
-}
-.modal-box {
-  background: var(--card); border: 1px solid rgba(167,139,250,.2);
-  border-radius: var(--r-lg); width: 100%; box-shadow: 0 16px 64px rgba(0,0,0,.5);
-  overflow: hidden; max-height: 90vh; overflow-y: auto;
-}
-.modal-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 20px; border-bottom: 1px solid rgba(167,139,250,.1);
-  position: sticky; top: 0; background: var(--card); z-index: 2;
-}
-.modal-title { font-family: var(--font-head); font-size: 1.1rem; color: var(--text); }
-.modal-close {
-  background: rgba(167,139,250,.1); border: 1px solid rgba(167,139,250,.2);
-  color: var(--muted); border-radius: 50%; width: 30px; height: 30px;
-  font-size: .85rem; cursor: pointer; transition: all .15s; flex-shrink: 0;
-}
-.modal-close:hover { background: rgba(244,114,182,.15); color: var(--pink); }
-.modal-body { padding: 20px; }
-.hidden { display: none !important; }
-</style>
 
 <script src="security.js"></script>
 <script src="api.js"></script>
 <script src="script.js"></script>
 <script src="features.js"></script>
 <script src="notifications.js"></script>
+<script src="platform-enhancements.js"></script>
+<script src="user-persist.js"></script>
 <script src="polish.js"></script>
 <script src="admin-button.js"></script>
 <script src="studio-button.js"></script>
 <script src="extras.js"></script>
-<script src="friends-local.js"></script>
-
-<script>
-/* ============================================================
-   EYLOX — Communities Page
-   ============================================================ */
-
-const API_BASE = 'http://localhost:3001/api';
-
-/* ── Default communities (offline fallback) ── */
-const DEFAULT_COMMUNITIES = [
-  { _id:'1', avatar:'🥷', name:'Ninja Dash Masters',   category:'gaming',      memberCount:12400, description:"The #1 community for Ninja Dash fans. Share your high scores, tips, and compete in weekly challenges!", tags:['ninja','speedrun','action'], featured:true,  stats:{lastActivity:new Date()} },
-  { _id:'2', avatar:'🌌', name:'Space Explorers',       category:'gaming',      memberCount:8900,  description:'Fans of space and sci-fi games. Coordinate missions and share discovery screenshots.',                 tags:['space','sci-fi','explore'],  featured:false, stats:{lastActivity:new Date()} },
-  { _id:'3', avatar:'🎨', name:'Creative Studio',       category:'creative',    memberCount:7200,  description:'Game creators, artists and builders unite! Share your creations and get feedback from the community.',  tags:['create','art','design'],     featured:false, stats:{lastActivity:new Date()} },
-  { _id:'4', avatar:'🏆', name:'Pro League',             category:'competitive', memberCount:6100,  description:'For the best of the best. Weekly tournaments, ranking battles, and prize pools for top competitors.',   tags:['pro','tournament','rank'],   featured:false, stats:{lastActivity:new Date()} },
-  { _id:'5', avatar:'🎭', name:'Roleplay World',         category:'roleplay',    memberCount:5500,  description:'Live your second life. Active RP sessions every day — city life, crime, school, and more!',             tags:['rp','drama','characters'],   featured:false, stats:{lastActivity:new Date()} },
-  { _id:'6', avatar:'🤝', name:'Eylox Newcomers',        category:'social',      memberCount:14200, description:'Welcome to Eylox! Meet other new players, get tips, and find your first friends here.',                tags:['welcome','new','friendly'],  featured:false, stats:{lastActivity:new Date()} },
-  { _id:'7', avatar:'🐉', name:'Dragon Slayers Guild',  category:'gaming',      memberCount:3800,  description:'Dedicated to Dragon Escape and all dragon-themed games. Raid boss alerts and strategy guides daily.',    tags:['dragon','guild','rpg'],      featured:false, stats:{lastActivity:new Date()} },
-  { _id:'8', avatar:'🎵', name:'Music Makers',           category:'creative',    memberCount:2600,  description:'Compose and share music for your games. Tutorials, feedback, and collab requests welcome!',             tags:['music','sound','compose'],   featured:false, stats:{lastActivity:new Date()} },
-  { _id:'9', avatar:'🚀', name:'Speed Runners',          category:'competitive', memberCount:4100,  description:'World record chasers and any% runners. Route planning, glitch hunting, and live PB attempts.',          tags:['speedrun','wr','any%'],      featured:false, stats:{lastActivity:new Date()} },
-  { _id:'10',avatar:'📺', name:'Content Creators Hub',  category:'social',      memberCount:3200,  description:'Eylox YouTubers and streamers share clips, collabs, and grow together. Promo swaps welcome!',           tags:['youtube','stream','content'],featured:false, stats:{lastActivity:new Date()} },
-  { _id:'11',avatar:'🏙️', name:'City Roleplay',          category:'roleplay',    memberCount:4700,  description:'Full city life simulation. Jobs, cars, businesses, gangs, police — immersive 24/7 RP server.',          tags:['city','cars','jobs','cops'], featured:false, stats:{lastActivity:new Date()} },
-  { _id:'12',avatar:'🧩', name:'Puzzle Masters',          category:'gaming',      memberCount:2100,  description:'Logic puzzles, brain teasers, and riddle games. Daily challenges posted at midnight.',                   tags:['puzzle','brain','logic'],    featured:false, stats:{lastActivity:new Date()} },
-];
-
-let allCommunities = [];
-let joinedIds      = new Set();
-let currentCat     = 'all';
-let currentSort    = 'popular';
-let searchQuery    = '';
-let page           = 1;
-
-/* ── Init ── */
-document.addEventListener('DOMContentLoaded', async () => {
-  loadJoined();
-  await fetchCommunities();
-
-  /* Category filter */
-  document.querySelectorAll('.comm-cat-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.comm-cat-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentCat = btn.dataset.cat;
-      page = 1;
-      renderGrid();
-    });
-  });
-
-  /* Sort */
-  document.getElementById('commSort').addEventListener('change', e => {
-    currentSort = e.target.value;
-    sortCommunities();
-    renderGrid();
-  });
-
-  /* Search */
-  document.getElementById('commSearch').addEventListener('input', e => {
-    searchQuery = e.target.value.toLowerCase();
-    renderGrid();
-  });
-
-  /* Create modal */
-  document.getElementById('createCommBtn').addEventListener('click', () => openCreateModal());
-  document.getElementById('closeCreateModal').addEventListener('click', () => closeCreateModal());
-  document.getElementById('createCommModal').addEventListener('click', e => { if (e.target.id === 'createCommModal') closeCreateModal(); });
-  document.getElementById('submitCreateComm').addEventListener('click', () => submitCreate());
-
-  /* Detail modal close */
-  document.getElementById('closeDetailModal').addEventListener('click', () => {
-    document.getElementById('commDetailModal').classList.add('hidden');
-  });
-  document.getElementById('commDetailModal').addEventListener('click', e => {
-    if (e.target.id === 'commDetailModal') document.getElementById('commDetailModal').classList.add('hidden');
-  });
-
-  /* Load more */
-  document.getElementById('loadMoreBtn').addEventListener('click', () => { page++; renderGrid(); });
-});
-
-/* ── Load joined from localStorage ── */
-function loadJoined() {
-  try {
-    const j = JSON.parse(localStorage.getItem('eylox_joined_communities') || '[]');
-    joinedIds = new Set(j);
-  } catch { joinedIds = new Set(); }
-}
-function saveJoined() {
-  try { localStorage.setItem('eylox_joined_communities', JSON.stringify([...joinedIds])); } catch {}
-}
-
-/* ── Fetch communities ── */
-async function fetchCommunities() {
-  let data = DEFAULT_COMMUNITIES;
-
-  try {
-    const res = await fetch(`${API_BASE}/communities?sort=${currentSort}&page=${page}`);
-    if (res.ok) {
-      const json = await res.json();
-      if (json.success && json.communities?.length) data = json.communities;
-    }
-  } catch { /* offline */ }
-
-  allCommunities = data;
-  sortCommunities();
-  renderMyCommunities();
-  renderGrid();
-}
-
-/* ── Sort ── */
-function sortCommunities() {
-  if (currentSort === 'popular') allCommunities.sort((a,b) => (b.memberCount||0) - (a.memberCount||0));
-  else if (currentSort === 'newest') allCommunities.sort((a,b) => new Date(b.createdAt||0) - new Date(a.createdAt||0));
-  else if (currentSort === 'active') allCommunities.sort((a,b) => new Date(b.stats?.lastActivity||0) - new Date(a.stats?.lastActivity||0));
-}
-
-/* ── Render my communities ── */
-function renderMyCommunities() {
-  const section = document.getElementById('myCommSection');
-  const row     = document.getElementById('myCommRow');
-  if (joinedIds.size === 0) { section.style.display = 'none'; return; }
-
-  section.style.display = '';
-  document.getElementById('myCommCount').textContent = joinedIds.size + ' joined';
-
-  const myComms = allCommunities.filter(c => joinedIds.has(c._id));
-  row.innerHTML = myComms.map(c => `
-    <div class="my-comm-chip" onclick="openDetail('${c._id}')">
-      <span class="mc-icon">${c.avatar || '🌍'}</span>
-      <span class="mc-name">${escHtml(c.name)}</span>
-    </div>`).join('');
-}
-
-/* ── Render communities grid ── */
-function renderGrid() {
-  const grid = document.getElementById('commGrid');
-
-  let list = allCommunities;
-  if (currentCat !== 'all') list = list.filter(c => c.category === currentCat);
-  if (searchQuery) list = list.filter(c =>
-    c.name.toLowerCase().includes(searchQuery) ||
-    c.description?.toLowerCase().includes(searchQuery) ||
-    c.tags?.some(t => t.toLowerCase().includes(searchQuery))
-  );
-
-  const PAGE_SIZE = 9;
-  const shown = list.slice(0, page * PAGE_SIZE);
-
-  document.getElementById('commFoundCount').textContent = `${list.length} communities`;
-  document.getElementById('loadMoreBtn').classList.toggle('hidden', shown.length >= list.length);
-
-  if (list.length === 0) {
-    grid.innerHTML = `<div class="comm-loading" style="animation:none;opacity:.6">No communities found.</div>`;
-    return;
-  }
-
-  grid.innerHTML = shown.map(c => commCard(c)).join('');
-
-  /* Bind buttons */
-  grid.querySelectorAll('.comm-join-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      const id = btn.closest('.comm-card').dataset.id;
-      toggleJoin(id, btn);
-    });
-  });
-  grid.querySelectorAll('.comm-view-btn, .comm-card-banner, .comm-card-name').forEach(el => {
-    el.addEventListener('click', e => {
-      e.stopPropagation();
-      const card = el.closest('.comm-card');
-      if (card) openDetail(card.dataset.id);
-    });
-  });
-}
-
-/* ── Build community card ── */
-function commCard(c) {
-  const joined  = joinedIds.has(c._id);
-  const catClass = 'cat-' + (c.category || 'gaming');
-  const tags     = (c.tags || []).slice(0,3).map(t => `<span class="comm-meta-chip">#${escHtml(t)}</span>`).join('');
-  return `
-  <div class="comm-card ${joined ? 'joined' : ''}" data-id="${c._id}">
-    <div class="comm-card-banner ${catClass}">
-      ${c.avatar || '🌍'}
-      ${joined ? '<div class="comm-joined-badge">✅ Joined</div>' : ''}
-    </div>
-    <div class="comm-card-body">
-      <div class="comm-card-name">${escHtml(c.name)}</div>
-      <div class="comm-card-desc">${escHtml(c.description || '')}</div>
-      <div class="comm-card-meta">
-        <span class="comm-meta-chip">👥 ${fmtNum(c.memberCount || 0)}</span>
-        <span class="comm-meta-chip">${catIcon(c.category)} ${c.category || 'gaming'}</span>
-        ${tags}
-      </div>
-      <div class="comm-card-footer">
-        <button class="comm-join-btn ${joined ? 'leave' : ''}">${joined ? '✕ Leave' : '+ Join'}</button>
-        <button class="comm-view-btn">View →</button>
-      </div>
-    </div>
-  </div>`;
-}
-
-/* ── Toggle join / leave ── */
-async function toggleJoin(id, btn) {
-  const isJoined = joinedIds.has(id);
-
-  if (isJoined) {
-    joinedIds.delete(id);
-    const c = allCommunities.find(x => x._id === id);
-    if (c) c.memberCount = Math.max(0, (c.memberCount || 1) - 1);
-  } else {
-    joinedIds.add(id);
-    const c = allCommunities.find(x => x._id === id);
-    if (c) c.memberCount = (c.memberCount || 0) + 1;
-  }
-  saveJoined();
-
-  /* Try API */
-  if (localStorage.getItem('eylox_token')) {
-    try {
-      const method = isJoined ? 'DELETE' : 'POST';
-      await fetch(`${API_BASE}/communities/${id}/join`, {
-        method,
-        headers: { Authorization: `Bearer ${localStorage.getItem('eylox_token')}` }
-      });
-    } catch {}
-  }
-
-  renderMyCommunities();
-  renderGrid();
-
-  /* Toast feedback */
-  const c = allCommunities.find(x => x._id === id);
-  showToast(isJoined ? `Left "${c?.name || ''}"` : `Joined "${c?.name || ''}"! 🎉`);
-}
-
-/* ── Join from outside the grid ── */
-function joinCommunity(nameOrId) {
-  const c = allCommunities.find(x => x.name.toLowerCase().replace(/\s/g,'-') === nameOrId || x._id === nameOrId);
-  if (c && !joinedIds.has(c._id)) { toggleJoin(c._id); }
-}
-
-/* ── Open detail modal ── */
-function openDetail(id) {
-  const c = allCommunities.find(x => x._id === id);
-  if (!c) return;
-  const joined = joinedIds.has(id);
-
-  document.getElementById('commDetailTitle').textContent = c.avatar + ' ' + c.name;
-  document.getElementById('commDetailBody').innerHTML = `
-    <div style="margin-bottom:18px">
-      <div style="background:linear-gradient(135deg,rgba(167,139,250,.1),rgba(14,165,233,.08));border-radius:var(--r-md);padding:20px;text-align:center;margin-bottom:14px">
-        <div style="font-size:3rem;margin-bottom:6px">${c.avatar || '🌍'}</div>
-        <div style="font-family:var(--font-head);font-size:1.2rem;color:var(--text)">${escHtml(c.name)}</div>
-        <div style="display:inline-block;margin-top:6px;background:rgba(167,139,250,.1);border-radius:99px;padding:3px 12px;font-size:.75rem;font-weight:900;color:var(--purple)">${catIcon(c.category)} ${c.category}</div>
-      </div>
-      <p style="color:var(--muted);font-size:.85rem;font-weight:700;line-height:1.7">${escHtml(c.description || 'No description.')}</p>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">
-      <div style="background:var(--surface);border-radius:var(--r-sm);padding:14px;text-align:center">
-        <div style="font-family:var(--font-head);font-size:1.5rem;color:var(--purple)">${fmtNum(c.memberCount || 0)}</div>
-        <div style="font-size:.72rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px">Members</div>
-      </div>
-      <div style="background:var(--surface);border-radius:var(--r-sm);padding:14px;text-align:center">
-        <div style="font-family:var(--font-head);font-size:1.5rem;color:var(--green)">⚡ Active</div>
-        <div style="font-size:.72rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px">Status</div>
-      </div>
-    </div>
-    ${c.tags?.length ? `
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">
-      ${c.tags.map(t => `<span style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.15);border-radius:99px;padding:4px 12px;font-size:.75rem;font-weight:800;color:var(--muted)">#${escHtml(t)}</span>`).join('')}
-    </div>` : ''}
-    <button class="btn-play" onclick="toggleJoin('${id}');document.getElementById('commDetailModal').classList.add('hidden')" style="width:100%;padding:13px">
-      ${joined ? '✕ Leave Community' : '+ Join Community'}
-    </button>
-  `;
-  document.getElementById('commDetailModal').classList.remove('hidden');
-}
-
-/* ── Create community ── */
-function openCreateModal() {
-  document.getElementById('createCommModal').classList.remove('hidden');
-  document.getElementById('commName').focus();
-}
-function closeCreateModal() {
-  document.getElementById('createCommModal').classList.add('hidden');
-  document.getElementById('createCommError').style.display = 'none';
-}
-async function submitCreate() {
-  const name     = document.getElementById('commName').value.trim();
-  const avatar   = document.getElementById('commAvatar').value.trim() || '🌍';
-  const category = document.getElementById('commCategory').value;
-  const desc     = document.getElementById('commDesc').value.trim();
-  const tags     = document.getElementById('commTags').value.split(',').map(t=>t.trim()).filter(Boolean);
-  const errEl    = document.getElementById('createCommError');
-
-  if (!name || !category) {
-    errEl.textContent = 'Please fill in the name and category.';
-    errEl.style.display = 'block'; return;
-  }
-  errEl.style.display = 'none';
-
-  const newComm = {
-    _id:         'local_' + Date.now(),
-    name, avatar, category, description: desc, tags,
-    memberCount: 1, featured: false,
-    stats:       { lastActivity: new Date() },
-  };
-
-  /* Try API */
-  if (localStorage.getItem('eylox_token')) {
-    try {
-      const res = await fetch(`${API_BASE}/communities`, {
-        method: 'POST',
-        headers: { 'Content-Type':'application/json', Authorization:`Bearer ${localStorage.getItem('eylox_token')}` },
-        body: JSON.stringify({ name, avatar, category, description: desc, tags }),
-      });
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success && json.community) newComm._id = json.community._id;
-      }
-    } catch {}
-  }
-
-  allCommunities.unshift(newComm);
-  joinedIds.add(newComm._id);
-  saveJoined();
-
-  closeCreateModal();
-  renderMyCommunities();
-  renderGrid();
-  showToast(`"${name}" community created! 🎉`);
-}
-
-/* ── Helpers ── */
-function catIcon(cat) {
-  return { gaming:'🎮', creative:'🎨', competitive:'🏆', roleplay:'🎭', social:'💬' }[cat] || '🌍';
-}
-function fmtNum(n) {
-  if (n >= 1000) return (n/1000).toFixed(n>=10000?0:1).replace(/\.0$/,'') + 'K';
-  return n.toString();
-}
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function showToast(msg) {
-  if (typeof window.showNotification === 'function') { window.showNotification(msg); return; }
-  const t = document.createElement('div');
-  t.textContent = msg;
-  Object.assign(t.style, {
-    position:'fixed',bottom:'24px',right:'24px',zIndex:'9999',
-    background:'var(--card)',border:'1px solid rgba(167,139,250,.3)',
-    borderRadius:'12px',padding:'12px 18px',fontWeight:'800',fontSize:'.85rem',
-    color:'var(--text)',boxShadow:'0 8px 32px rgba(0,0,0,.4)',
-    transform:'translateY(20px)',opacity:'0',transition:'all .3s',
-  });
-  document.body.appendChild(t);
-  requestAnimationFrame(() => { t.style.transform='translateY(0)'; t.style.opacity='1'; });
-  setTimeout(() => { t.style.opacity='0'; t.style.transform='translateY(10px)'; setTimeout(()=>t.remove(),300); }, 3000);
-}
-</script>
 <script src="effects.js"></script>
 <script src="sound.js"></script>
 <script src="settings.js"></script>
+<script src="quick-access.js"></script>
+<script src="friends-local.js"></script>
+<script src="theme-switcher.js"></script>
+<script>
+/* ── Sidebar toggle ── */
+const toggle = document.getElementById('sidebarToggle');
+const sidebar = document.getElementById('sidebar');
+if (toggle && sidebar) {
+  toggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+  document.addEventListener('click', e => {
+    if (window.innerWidth <= 900 && !sidebar.contains(e.target) && !toggle.contains(e.target))
+      sidebar.classList.remove('open');
+  });
+}
+
+/* ── Default communities (shown offline) ── */
+const DEFAULT_COMMUNITIES = [
+  { id:'dc1', icon:'⚔️', name:'Blade Warriors',      cat:'competitive', desc:'Elite PvP fighters competing for the top spots on the global leaderboard. Clan Wars every weekend!', members:3241, tag:'hot' },
+  { id:'dc2', icon:'🎨', name:'Creative Builders',    cat:'creative',    desc:'A chill community for game creators, designers, and Studio enthusiasts. Share your builds!',            members:1876, tag:'new' },
+  { id:'dc3', icon:'🐉', name:'Dragon Riders Guild',  cat:'roleplay',    desc:'Epic fantasy roleplay set in the Eylox universe. Quests, lore, and dragon-back adventures await.',    members:2103, tag:'' },
+  { id:'dc4', icon:'🚀', name:'Space Explorers',      cat:'gaming',      desc:'Adventurers who love exploration games. Weekly game nights and daily challenge runs together.',         members:4512, tag:'hot' },
+  { id:'dc5', icon:'🧩', name:'Puzzle Masters',       cat:'gaming',      desc:'We live for brain teasers, logic games, and escape rooms. Join us for daily puzzle challenges!',        members:987,  tag:'' },
+  { id:'dc6', icon:'👥', name:'Eylox Social Lounge',  cat:'social',      desc:'The chill hangout spot. Chat, make friends, and just vibe. Everyone is welcome here.',                 members:6784, tag:'hot' },
+  { id:'dc7', icon:'🏎️', name:'Speed Racers',         cat:'competitive', desc:'Racing game fanatics. Fastest lap times and tournament brackets every Friday night.',                    members:1432, tag:'' },
+  { id:'dc8', icon:'🎭', name:'Eylox Theater Co.',    cat:'roleplay',    desc:'Improv, storytelling, and creative writing. Build worlds together with our collaborative stories.',      members:654,  tag:'new' },
+  { id:'dc9', icon:'🏗️', name:'Block Architects',     cat:'creative',    desc:'Dedicated to Block World and all building games. Share blueprints, vote on best builds weekly.',        members:2890, tag:'' },
+  { id:'dc10',icon:'🌊', name:'Ocean Explorers',      cat:'gaming',      desc:'Ocean Quest and water-world game lovers. Dive deep into underwater adventures with the crew.',          members:1120, tag:'new' },
+];
+
+const CAT_LABELS = { gaming:'🎮 Gaming', creative:'🎨 Creative', competitive:'⚔️ Competitive', roleplay:'🎭 Roleplay', social:'👥 Social' };
+
+let currentCat = 'all';
+let searchQuery = '';
+let communities = [];
+let joinedIds = new Set();
+
+/* ── Storage helpers ── */
+function loadData() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('eylox_communities') || 'null');
+    communities = saved ? saved : [...DEFAULT_COMMUNITIES];
+  } catch { communities = [...DEFAULT_COMMUNITIES]; }
+  try {
+    const jIds = JSON.parse(localStorage.getItem('eylox_joined_communities') || '[]');
+    joinedIds = new Set(jIds);
+  } catch { joinedIds = new Set(); }
+}
+
+function saveData() {
+  try {
+    localStorage.setItem('eylox_communities', JSON.stringify(communities));
+    localStorage.setItem('eylox_joined_communities', JSON.stringify([...joinedIds]));
+  } catch {}
+}
+
+function getUser() {
+  try { return JSON.parse(localStorage.getItem('eylox_user') || 'null'); } catch { return null; }
+}
+
+/* ── Render ── */
+function getFiltered() {
+  let list = communities;
+  if (currentCat === 'mine') list = list.filter(c => joinedIds.has(c.id));
+  else if (currentCat !== 'all') list = list.filter(c => c.cat === currentCat);
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    list = list.filter(c => c.name.toLowerCase().includes(q) || (c.desc||'').toLowerCase().includes(q));
+  }
+  return list;
+}
+
+function renderGrid() {
+  const list = getFiltered();
+  const grid = document.getElementById('commGrid');
+
+  if (list.length === 0) {
+    grid.innerHTML = `<div class="comm-empty"><div class="comm-empty-icon">${currentCat === 'mine' ? '🤷' : '🔍'}</div>${currentCat === 'mine' ? 'You haven\'t joined any communities yet.' : 'No communities found.'}</div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(c => {
+    const isJoined = joinedIds.has(c.id);
+    const tagClass = c.tag === 'hot' ? 'hot' : c.tag === 'new' ? 'new' : '';
+    const tagLabel = c.tag === 'hot' ? '🔥 Hot' : c.tag === 'new' ? '✨ New' : '';
+    return `
+      <div class="comm-card ${isJoined ? 'joined-card' : ''}">
+        <div class="comm-card-header">
+          <div class="comm-card-icon">${c.icon}</div>
+          <div class="comm-card-info">
+            <h3>${c.name}</h3>
+            <div class="comm-card-cat">${CAT_LABELS[c.cat] || c.cat}</div>
+          </div>
+        </div>
+        <div class="comm-card-desc">${c.desc}</div>
+        <div class="comm-card-stats">
+          <div class="comm-card-stat">
+            <div class="comm-card-stat-val">${c.members.toLocaleString()}</div>
+            <div class="comm-card-stat-lbl">Members</div>
+          </div>
+          <div class="comm-card-stat">
+            <div class="comm-card-stat-val">${Math.floor(c.members * 0.08)}</div>
+            <div class="comm-card-stat-lbl">Online</div>
+          </div>
+          <div class="comm-card-stat">
+            <div class="comm-card-stat-val">${isJoined ? '✅' : '🔓'}</div>
+            <div class="comm-card-stat-lbl">${isJoined ? 'Joined' : 'Open'}</div>
+          </div>
+        </div>
+        <button class="comm-join-btn ${isJoined ? 'joined' : ''}" data-id="${c.id}">
+          ${isJoined ? '✓ Joined — Leave' : '+ Join Community'}
+        </button>
+        ${tagLabel ? `<div class="comm-badge-tag ${tagClass}">${tagLabel}</div>` : ''}
+      </div>`;
+  }).join('');
+
+  /* Attach join button listeners */
+  grid.querySelectorAll('.comm-join-btn').forEach(btn => {
+    btn.addEventListener('click', e => toggleJoin(e.target.dataset.id));
+  });
+}
+
+function updateHero() {
+  document.getElementById('statTotalComm').textContent = communities.length;
+  document.getElementById('statMyComm').textContent = joinedIds.size;
+  const totalMembers = communities.reduce((s, c) => s + (c.members || 0), 0);
+  document.getElementById('statTotalMembers').textContent = totalMembers >= 1000 ? (totalMembers/1000).toFixed(1)+'K' : totalMembers;
+}
+
+function updateSidebarCoins() {
+  const u = getUser();
+  if (!u) return;
+  const sc = document.getElementById('sidebarEylux');
+  const st = document.getElementById('sidebarEyltrophs');
+  const tc = document.getElementById('topbarEylux');
+  const tt = document.getElementById('topbarEyltrophs');
+  if (sc) sc.textContent = (u.coins||0).toLocaleString();
+  if (st) st.textContent = (u.Eyltrophs||0).toLocaleString();
+  if (tc) tc.textContent = (u.coins||0).toLocaleString();
+  if (tt) tt.textContent = (u.Eyltrophs||0).toLocaleString();
+}
+
+/* ── Join / leave ── */
+function toggleJoin(id) {
+  const u = getUser();
+  if (!u || !u.username) { alert('Please log in to join communities.'); return; }
+
+  const comm = communities.find(c => c.id === id);
+  if (!comm) return;
+
+  if (joinedIds.has(id)) {
+    joinedIds.delete(id);
+    comm.members = Math.max(0, (comm.members || 0) - 1);
+    /* Update achievement data */
+    try {
+      const usr = getUser();
+      usr.communitiesJoined = Math.max(0, (usr.communitiesJoined || 0) - 1);
+      localStorage.setItem('eylox_user', JSON.stringify(usr));
+    } catch {}
+  } else {
+    joinedIds.add(id);
+    comm.members = (comm.members || 0) + 1;
+    /* Update achievement data */
+    try {
+      const usr = getUser();
+      usr.communitiesJoined = (usr.communitiesJoined || 0) + 1;
+      localStorage.setItem('eylox_user', JSON.stringify(usr));
+    } catch {}
+  }
+
+  saveData();
+  updateHero();
+  renderGrid();
+}
+
+/* ── Create community ── */
+function openCreate() {
+  const u = getUser();
+  if (!u || !u.username) { alert('Please log in to create a community.'); return; }
+  document.getElementById('createModal').classList.add('show');
+}
+
+function closeCreate() {
+  document.getElementById('createModal').classList.remove('show');
+  document.getElementById('newCommName').value = '';
+  document.getElementById('newCommDesc').value = '';
+  document.getElementById('newCommIcon').value = '🎮';
+}
+
+document.getElementById('createBtn').addEventListener('click', openCreate);
+document.getElementById('closeModal').addEventListener('click', closeCreate);
+document.getElementById('createModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('createModal')) closeCreate();
+});
+
+document.getElementById('submitCreate').addEventListener('click', () => {
+  const name = document.getElementById('newCommName').value.trim();
+  const desc = document.getElementById('newCommDesc').value.trim();
+  const cat  = document.getElementById('newCommCat').value;
+  const icon = document.getElementById('newCommIcon').value.trim() || '🎮';
+
+  if (!name) { alert('Please enter a community name.'); return; }
+
+  const newComm = {
+    id: 'user_' + Date.now(),
+    icon, name, cat,
+    desc: desc || 'A new Eylox community!',
+    members: 1,
+    tag: 'new'
+  };
+
+  communities.unshift(newComm);
+  joinedIds.add(newComm.id);
+  saveData();
+  closeCreate();
+  updateHero();
+  renderGrid();
+
+  /* Notify */
+  if (window.showToast) showToast('🌐 Community created!', 'success');
+  else alert('✅ Community "' + name + '" created!');
+});
+
+/* ── Search & tabs ── */
+document.getElementById('commSearch').addEventListener('input', e => {
+  searchQuery = e.target.value;
+  if (currentCat !== 'clans') renderGrid();
+});
+
+document.getElementById('commTabs').addEventListener('click', e => {
+  const tab = e.target.closest('.comm-tab');
+  if (!tab) return;
+  document.querySelectorAll('.comm-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  currentCat = tab.dataset.cat;
+
+  const grid  = document.getElementById('commGrid');
+  const panel = document.getElementById('clanPanel');
+  const actionBar = document.querySelector('.comm-action-bar');
+  if (currentCat === 'clans') {
+    grid.style.display = 'none';
+    if (actionBar) actionBar.style.display = 'none';
+    panel.classList.add('show');
+    renderClanPanel();
+  } else {
+    grid.style.display = '';
+    if (actionBar) actionBar.style.display = '';
+    panel.classList.remove('show');
+    renderGrid();
+  }
+});
+
+/* ── Init ── */
+document.addEventListener('DOMContentLoaded', () => {
+  loadData();
+  updateHero();
+  renderGrid();
+  updateSidebarCoins();
+  // Auto-open clans tab if URL hash says so
+  if (location.hash === '#clans') {
+    const clanTab = document.querySelector('[data-cat="clans"]');
+    if (clanTab) clanTab.click();
+  }
+});
+
+/* ══════════════════════════════════════════
+   ──  CLAN SYSTEM  ──
+   ══════════════════════════════════════════ */
+
+function getClans() { try { return JSON.parse(localStorage.getItem('eylox_clans')||'[]'); } catch { return []; } }
+function saveClans(c) { try { localStorage.setItem('eylox_clans', JSON.stringify(c)); } catch {} }
+function getBattleHistory() { try { return JSON.parse(localStorage.getItem('eylox_battle_history')||'[]'); } catch { return []; } }
+function saveBattleHistory(h) { try { localStorage.setItem('eylox_battle_history', JSON.stringify(h.slice(-20))); } catch {} }
+
+function getMyClan() {
+  const u = getUser();
+  if (!u || !u.username) return null;
+  return getClans().find(c => c.leader === u.username || (c.members||[]).includes(u.username)) || null;
+}
+
+function renderClanPanel() {
+  const clan = getMyClan();
+  document.getElementById('noClanSection').style.display  = clan ? 'none' : '';
+  document.getElementById('myClanSection').style.display  = clan ? '' : 'none';
+  if (clan) populateMyClan(clan);
+}
+
+function populateMyClan(clan) {
+  const u = getUser();
+  document.getElementById('clanIconBig').textContent   = clan.icon || '⚔️';
+  document.getElementById('clanNameBig').textContent   = clan.name;
+  document.getElementById('clanTagBig').textContent    = '[' + (clan.tag||'CLN') + ']';
+  document.getElementById('clanDescBig').textContent   = clan.desc || '';
+  document.getElementById('clanRoleBig').textContent   = clan.leader === u?.username ? '👑 Leader' : '⚔️ Member';
+  document.getElementById('clanWins').textContent      = clan.wins    || 0;
+  document.getElementById('clanLosses').textContent    = clan.losses  || 0;
+  document.getElementById('clanMembers').textContent   = (clan.members||[]).length || 1;
+  document.getElementById('clanTrophies').textContent  = clan.Eyltrophs || 0;
+
+  // Members list
+  const ml = document.getElementById('clanMembersList');
+  const members = clan.members || [clan.leader];
+  ml.innerHTML = members.map(m => `
+    <div class="clan-member-row">
+      <div class="clan-member-av">🎮</div>
+      <div class="clan-member-name">${m}</div>
+      <span class="clan-member-badge ${m === clan.leader ? 'cmb-leader' : 'cmb-member'}">${m === clan.leader ? '👑 Leader' : '⚔️ Member'}</span>
+    </div>`).join('');
+
+  // Battle cooldown
+  const cd = parseInt(localStorage.getItem('eylox_battle_cd') || '0');
+  const cdLeft = cd - Date.now();
+  const btn = document.getElementById('battleBtn');
+  const cdMsg = document.getElementById('battleCooldownMsg');
+  if (cdLeft > 0) {
+    const mins = Math.ceil(cdLeft / 60000);
+    cdMsg.style.display = '';
+    cdMsg.textContent = '⏳ Next battle available in ' + mins + ' min' + (mins !== 1 ? 's' : '');
+    btn.disabled = true;
+  } else {
+    cdMsg.style.display = 'none';
+    btn.disabled = false;
+  }
+
+  // Battle history
+  const bh = getBattleHistory().filter(b => b.clanId === clan.id).reverse().slice(0,5);
+  const bhl = document.getElementById('battleHistoryList');
+  if (!bh.length) {
+    bhl.innerHTML = '<div style="color:rgba(167,139,250,.4);font-size:.82rem;text-align:center;padding:10px">No battles yet. Hit the battle button!</div>';
+  } else {
+    bhl.innerHTML = bh.map(b => `
+      <div class="clan-bh-row">
+        <span style="font-size:1.1rem">${b.result === 'win' ? '🏆' : '💀'}</span>
+        <span class="${b.result === 'win' ? 'cbl-win' : 'cbl-loss'}">${b.result === 'win' ? 'Victory' : 'Defeat'}</span>
+        <span style="flex:1;color:rgba(167,139,250,.55)">vs ${b.opponent}</span>
+        <span style="color:#fbbf24;font-weight:800">+${b.reward} 🪙</span>
+        <span style="color:rgba(167,139,250,.4);font-size:.72rem">${new Date(b.time).toLocaleDateString()}</span>
+      </div>`).join('');
+  }
+}
+
+/* ── Battle ── */
+const ENEMY_CLANS = ['Shadow Blades','Iron Wolves','Dragon Slayers','Storm Raiders','Night Hawks','Crimson Fist','Void Walkers','Steel Phoenix'];
+
+function startBattle() {
+  const clan = getMyClan();
+  if (!clan) return;
+  const btn = document.getElementById('battleBtn');
+  const progress = document.getElementById('battleProgress');
+  const bar = document.getElementById('battleBarFill');
+  const statusTxt = document.getElementById('battleStatusTxt');
+  const resultCard = document.getElementById('battleResult');
+
+  btn.disabled = true;
+  resultCard.style.display = 'none';
+  progress.style.display = 'block';
+  bar.style.width = '0%';
+
+  const enemy = ENEMY_CLANS[Math.floor(Math.random() * ENEMY_CLANS.length)];
+  const phases = ['Sending scouts…','Enemy spotted!','Clash begins!','Fighting hard…','Final push!'];
+  let phase = 0;
+  statusTxt.textContent = 'Preparing for battle vs ' + enemy + '…';
+
+  let pct = 0;
+  const interval = setInterval(() => {
+    pct += 2 + Math.random() * 3;
+    if (pct > 100) pct = 100;
+    bar.style.width = pct + '%';
+    if (pct >= (phase + 1) * 20 && phase < phases.length) {
+      statusTxt.textContent = phases[phase++];
+    }
+    if (pct >= 100) {
+      clearInterval(interval);
+      resolveBattle(clan, enemy);
+    }
+  }, 60);
+}
+
+function resolveBattle(clan, enemy) {
+  const progress = document.getElementById('battleProgress');
+  const resultCard = document.getElementById('battleResult');
+
+  const win = Math.random() < 0.58; // 58% win rate
+  const reward = win ? (50 + Math.floor(Math.random() * 100)) : (10 + Math.floor(Math.random() * 20));
+  const trophy = win ? (1 + Math.floor(Math.random() * 2)) : 0;
+
+  // Update result UI
+  progress.style.display = 'none';
+  resultCard.className = 'clan-result-card ' + (win ? 'win' : 'loss');
+  resultCard.style.display = 'block';
+  document.getElementById('resultEmoji').textContent  = win ? '🏆' : '💀';
+  document.getElementById('resultTitle').textContent  = win ? 'Victory!' : 'Defeat!';
+  document.getElementById('resultDesc').textContent   = (win ? 'You crushed ' : 'You were beaten by ') + enemy + '!';
+  document.getElementById('resultReward').textContent = '+' + reward + ' 🪙' + (trophy ? '  +' + trophy + ' 🏆' : '');
+
+  // Update clan stats
+  const clans = getClans();
+  const idx = clans.findIndex(c => c.id === clan.id);
+  if (idx !== -1) {
+    if (win) { clans[idx].wins = (clans[idx].wins||0) + 1; clans[idx].Eyltrophs = (clans[idx].Eyltrophs||0) + trophy; }
+    else      { clans[idx].losses = (clans[idx].losses||0) + 1; }
+    saveClans(clans);
+  }
+
+  // Award user coins + Eyltrophs
+  try {
+    const u = JSON.parse(localStorage.getItem('eylox_user')||'{}');
+    u.coins    = Math.min((u.coins||0) + reward, 1e9);
+    u.Eyltrophs = (u.Eyltrophs||0) + trophy;
+    if (win) u.wins = (u.wins||0) + 1;
+    localStorage.setItem('eylox_user', JSON.stringify(u));
+    if (u.username) localStorage.setItem('eylox_userdata_'+u.username, JSON.stringify(u));
+    updateSidebarCoins();
+  } catch {}
+
+  // Save battle history
+  const history = getBattleHistory();
+  history.push({ clanId: clan.id, opponent: enemy, result: win?'win':'loss', reward, time: Date.now() });
+  saveBattleHistory(history);
+
+  // Set cooldown (30 min)
+  localStorage.setItem('eylox_battle_cd', String(Date.now() + 30 * 60 * 1000));
+
+  // Coin burst effect
+  if (win) { window.EyloxCoinBurst?.(reward); window.EyloxCoinRain?.(Math.min(20,Math.floor(reward/10))); }
+
+  // Re-render after 1.5s to refresh stats
+  setTimeout(() => { renderClanPanel(); }, 1500);
+}
+
+/* ── Create Clan ── */
+function openCreateClanModal() {
+  const u = getUser();
+  if (!u || !u.username) { alert('Please log in first!'); return; }
+  document.getElementById('createClanModal').classList.add('show');
+}
+
+function submitCreateClan() {
+  const icon = document.getElementById('newClanIcon').value.trim() || '⚔️';
+  const name = document.getElementById('newClanName').value.trim();
+  const tag  = document.getElementById('newClanTag').value.trim().toUpperCase();
+  const desc = document.getElementById('newClanDesc').value.trim();
+  const u    = getUser();
+
+  if (!name) { alert('Please enter a clan name!'); return; }
+  if (!tag)  { alert('Please enter a clan tag!'); return; }
+  if (!u || !u.username) { alert('Please log in first!'); return; }
+
+  const clans = getClans();
+  if (clans.find(c => c.leader === u.username || (c.members||[]).includes(u.username))) {
+    alert('You are already in a clan! Leave your current clan first.'); return;
+  }
+
+  const clan = { id: 'clan_'+Date.now(), icon, name, tag, desc, leader: u.username, members: [u.username], wins: 0, losses: 0, Eyltrophs: 0, createdAt: Date.now() };
+  clans.push(clan);
+  saveClans(clans);
+
+  document.getElementById('createClanModal').classList.remove('show');
+  window.EyloxToast?.('⚔️ Clan "' + name + '" created!', 'success', 3000);
+  renderClanPanel();
+}
+
+/* ── Invite Friends ── */
+function openInviteFriendsModal() {
+  const friends = (() => { try { return JSON.parse(localStorage.getItem('eylox_friends')||'[]'); } catch { return []; } })();
+  const clan = getMyClan();
+  const existing = clan ? (clan.members||[]) : [];
+  const el = document.getElementById('inviteFriendsList');
+
+  if (!friends.length) {
+    el.innerHTML = '<div style="color:rgba(167,139,250,.4);text-align:center;padding:14px;font-size:.85rem">No friends yet. <a href="friends.html" style="color:#a78bfa">Add friends first!</a></div>';
+  } else {
+    el.innerHTML = friends.map(f => {
+      const already = existing.includes(f.username);
+      return `<div class="clan-inv-row">
+        <div style="font-size:1.3rem">${f.avatar||'🎮'}</div>
+        <div style="font-weight:800;font-size:.88rem;color:var(--text)">${f.username}</div>
+        <button class="clan-inv-btn ${already?'added':''}" onclick="inviteToClan('${f.username}',this)" ${already?'disabled':''}>
+          ${already ? '✓ In Clan' : '+ Invite'}
+        </button>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('inviteFriendsModal').classList.add('show');
+}
+
+function inviteToClan(username, btn) {
+  const clans = getClans();
+  const u = getUser();
+  const idx = clans.findIndex(c => c.leader === u?.username);
+  if (idx === -1) { alert('Only the clan leader can invite members.'); return; }
+  if (!(clans[idx].members||[]).includes(username)) {
+    clans[idx].members = clans[idx].members || [];
+    clans[idx].members.push(username);
+    saveClans(clans);
+    btn.textContent = '✓ In Clan';
+    btn.classList.add('added');
+    btn.disabled = true;
+    window.EyloxToast?.('🤝 ' + username + ' invited to the clan!', 'success', 2500);
+    renderClanPanel();
+  }
+}
+
+/* ── Leave / Disband ── */
+function leaveClan() {
+  const u = getUser();
+  const clan = getMyClan();
+  if (!clan || !u) return;
+
+  const isLeader = clan.leader === u.username;
+  const msg = isLeader ? 'Leaving will DISBAND the clan. Continue?' : 'Leave this clan?';
+  if (!confirm(msg)) return;
+
+  const clans = getClans();
+  if (isLeader) {
+    const filtered = clans.filter(c => c.id !== clan.id);
+    saveClans(filtered);
+  } else {
+    const idx = clans.findIndex(c => c.id === clan.id);
+    if (idx !== -1) {
+      clans[idx].members = (clans[idx].members||[]).filter(m => m !== u.username);
+      saveClans(clans);
+    }
+  }
+  window.EyloxToast?.('You left the clan.', 'warn', 2500);
+  renderClanPanel();
+}
+
+/* ── Browse existing clans to join ── */
+function showJoinClanList() {
+  const el = document.getElementById('joinClanList');
+  const allClans = getClans();
+  const u = getUser();
+  const myClan = getMyClan();
+  if (myClan) { alert('You are already in a clan!'); return; }
+  el.style.display = '';
+
+  if (!allClans.length) {
+    el.innerHTML = '<div style="color:rgba(167,139,250,.4);text-align:center;padding:16px;font-size:.85rem">No clans exist yet. Be the first to create one!</div>';
+    return;
+  }
+  el.innerHTML = '<div style="font-weight:900;font-size:.85rem;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.8px">Available Clans</div>' +
+    allClans.map(c => `
+      <div style="display:flex;align-items:center;gap:12px;background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.12);border-radius:12px;padding:14px 16px;margin-bottom:8px">
+        <div style="font-size:1.8rem">${c.icon}</div>
+        <div style="flex:1">
+          <div style="font-weight:800;color:var(--text)">${c.name} <span style="font-size:.72rem;color:#a78bfa;font-weight:900">[${c.tag}]</span></div>
+          <div style="font-size:.75rem;color:var(--muted)">${(c.members||[]).length} members · ${c.wins||0} wins</div>
+        </div>
+        <button onclick="joinExistingClan('${c.id}')" style="background:linear-gradient(135deg,#a78bfa,#7c3aed);border:none;color:#fff;border-radius:9px;padding:7px 16px;font-weight:800;font-size:.8rem;cursor:pointer">Join</button>
+      </div>`).join('');
+}
+
+function joinExistingClan(clanId) {
+  const u = getUser();
+  if (!u || !u.username) { alert('Please log in!'); return; }
+  const clans = getClans();
+  const idx = clans.findIndex(c => c.id === clanId);
+  if (idx === -1) return;
+  clans[idx].members = clans[idx].members || [];
+  if (!clans[idx].members.includes(u.username)) clans[idx].members.push(u.username);
+  saveClans(clans);
+  window.EyloxToast?.('⚔️ Joined ' + clans[idx].name + '!', 'success', 3000);
+  renderClanPanel();
+}
+
+/* ── Logout & Settings ── */
+function eyloxLogout() {
+  if (!confirm('Log out of Eylox?')) return;
+  ['eylox_token','eylox_user','eylox_guest'].forEach(k => localStorage.removeItem(k));
+  window.location.href = 'landing.html';
+}
+
+function openSettingsPanel() { window.location.href = 'settings.html'; }
+</script>
+<script src="premium.js"></script>
+<script src="creator-pass.js"></script>
+<script src="floating-actions.js"></script>
+  <script src="tooltip.js"></script>
+<script src="sw-register.js"></script>
+<!-- v2.0 Improvements -->
+<script src="currencies.js"></script>
+  <script src="platform-improvements.js"></script>
+<script src="clan-system.js"></script>
+<script src="season-pass.js"></script>
+<script src="video-call.js"></script>
+<script src="offline.js" defer></script>
 </body>
 </html>

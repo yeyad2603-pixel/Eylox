@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:#000;overflow:hidden;font-family:'Nunito',sans-serif}
+body{background:#000000;overflow:hidden;font-family:'Nunito',sans-serif}
 canvas{display:block}
 
 #back-btn{
@@ -69,7 +69,7 @@ canvas{display:block}
 
 /* End screens */
 .end-screen{
-  position:fixed;inset:0;background:rgba(0,0,0,.88);
+  position:fixed;inset:0;background:rgba(0,0,0,.92);
   display:none;flex-direction:column;align-items:center;justify-content:center;
   z-index:400;color:#fff;font-family:'Fredoka One',cursive;
   backdrop-filter:blur(12px)
@@ -110,7 +110,24 @@ canvas{display:block}
 
 #ctrl-hint{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.35);font-size:.65rem;font-weight:700;pointer-events:none;white-space:nowrap;z-index:5}
 @media(pointer:coarse){#ctrl-hint{display:none}}
+/* Pause */
+#pause-scr{position:fixed;inset:0;background:rgba(0,0,0,.78);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:500;backdrop-filter:blur(10px);font-family:'Fredoka One',cursive;color:#fff}
+#pause-scr h2{font-size:2.8rem;color:#FFD700;margin-bottom:6px;text-shadow:0 0 28px rgba(255,215,0,.5)}
+#pause-scr p{color:rgba(255,255,255,.5);margin-bottom:24px;font-size:.9rem}
+.pscr-btn{padding:13px 44px;border:none;border-radius:16px;font-size:1.15rem;font-family:'Fredoka One',cursive;cursor:pointer;transition:transform .18s;margin:5px;pointer-events:all;display:block;width:230px;text-align:center}
+.pscr-btn.res{background:linear-gradient(135deg,#D4AF37,#FFD700);color:#1a1000;box-shadow:0 4px 20px rgba(255,215,0,.4)}
+.pscr-btn.qut{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);color:#fde68a}
+.pscr-btn:hover{transform:scale(1.05)}
+#pfab{position:fixed;top:14px;right:130px;z-index:50;pointer-events:all;background:rgba(0,0,0,.65);border:1.5px solid rgba(255,215,0,.35);color:rgba(255,215,0,.8);border-radius:12px;padding:7px 13px;cursor:pointer;font-size:.95rem;font-family:'Fredoka One',cursive;transition:all .18s}
+#pfab:hover{background:rgba(80,70,0,.7);color:#FFD700}
+/* Coin toast */
+@keyframes cfl3d{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-54px)}}
+.ct3d{position:fixed;bottom:200px;left:50%;z-index:300;font-family:'Fredoka One',cursive;font-size:1.05rem;pointer-events:none;animation:cfl3d 1.4s ease-out forwards;white-space:nowrap;text-shadow:0 2px 8px rgba(0,0,0,.5);color:#FFD700}
+/* Radar */
+#radar-pill{transition:background .4s}
 </style>
+<script src="audit-loader.js" defer></script>
+  <script src="debug-dashboard.js" defer></script>
 </head>
 <body>
 <canvas id="c"></canvas>
@@ -123,7 +140,18 @@ canvas{display:block}
   </div>
   <div id="hud-right">
     <div class="pill">🪙&nbsp;<span class="val" id="hud-coins">0</span></div>
+    <div class="pill" id="hud-pb-wrap" style="display:none">🏆&nbsp;<span style="font-size:.68rem;color:rgba(255,255,255,.55)">BEST&nbsp;</span><span class="val" id="hud-pb">—</span></div>
+    <div class="pill" id="radar-pill">📡&nbsp;<span class="val" id="radar-dist">—</span></div>
+    <div class="pill" id="hud-boost-pill" style="display:none;background:rgba(245,158,11,.25);border-color:rgba(245,158,11,.5);color:#fde68a">⚡&nbsp;<span class="val" id="hud-boost-timer">2×</span></div>
   </div>
+</div>
+
+<button id="pfab" onclick="togglePause()">⏸</button>
+<div id="pause-scr">
+  <h2>⏸ PAUSED</h2>
+  <p>Press P or tap Resume to continue</p>
+  <button class="pscr-btn res" onclick="togglePause()">▶ Resume</button>
+  <button class="pscr-btn qut" onclick="location.href='games.html'">← Quit to Games</button>
 </div>
 
 <div id="dig-prompt">⛏ Press E to Dig!</div>
@@ -133,9 +161,12 @@ canvas{display:block}
 <div class="end-screen" id="win-screen">
   <h1 style="color:#FFD700;text-shadow:0 0 40px #FFD700">🎉 Island Cleared!</h1>
   <p class="end-stat">Time Left: <span id="w-time">—</span></p>
-  <p class="end-stat">Coins Earned: <span id="w-coins">—</span> 🪙</p>
+  <p class="end-stat">Eylux Earned: <span id="w-coins">—</span> 🪙</p>
+  <p class="end-stat" id="w-pb-line" style="display:none">🏆 <span id="w-pb-txt" style="color:#FFD700"></span></p>
+  <p class="end-stat" id="w-streak-line" style="display:none">🔥 Streak Bonus: +<span id="w-streak-val">0</span> 🪙</p>
   <div id="end-btns">
     <button class="ebtn p" onclick="location.reload()">🔄 Play Again</button>
+    <button class="ebtn s" id="w-share-btn">📣 Share</button>
     <button class="ebtn s" onclick="location.href='games.html'">← Games</button>
   </div>
 </div>
@@ -185,6 +216,77 @@ camera.position.set(0, 12, 16);
 
 function onResize(){ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); }
 window.addEventListener('resize', onResize); onResize();
+
+// ─── Procedural textures (256px high-quality) ───
+function makeTexture(col) {
+  const S = 256;
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = S;
+  const ctx = cv.getContext('2d');
+  const r = (col >> 16) & 255, g = (col >> 8) & 255, b = col & 255;
+  const C = (dr,dg,db,a=1) => `rgba(${Math.min(255,Math.max(0,r+dr))},${Math.min(255,Math.max(0,g+dg))},${Math.min(255,Math.max(0,b+db))},${a})`;
+  ctx.fillStyle = `rgb(${r},${g},${b})`; ctx.fillRect(0,0,S,S);
+
+  if (g > r*1.1 && g > b*1.1) {
+    for(let py=0;py<S;py++){for(let px=0;px<S;px+=2){const n=(Math.sin(px*.11+py*.07)*Math.cos(py*.09-px*.05))*22;ctx.fillStyle=C(n|0,(n*.5)|0,0);ctx.fillRect(px,py,2,1);}}
+    for(let i=0;i<60;i++){const px=(i*53+i*i*7)%S,py=(i*71+i*3)%S,s=-30+(i%4)*8;ctx.fillStyle=C(s,s-15,0,.28);ctx.beginPath();ctx.ellipse(px,py,5+i%7,3+i%4,(i*.4)%Math.PI,0,Math.PI*2);ctx.fill();}
+    for(let i=0;i<18;i++){const px=(i*97+25)%(S-4),py=(i*71+18)%(S-4);ctx.fillStyle=[' rgba(255,255,160,0.6)','rgba(255,150,150,0.45)','rgba(160,230,255,0.45)'][i%3];ctx.beginPath();ctx.arc(px,py,2.5,0,Math.PI*2);ctx.fill();}
+  } else if (r>155&&g>115&&b<65) {
+    const gd=ctx.createLinearGradient(0,0,S,S);gd.addColorStop(0,'rgba(255,255,180,0.45)');gd.addColorStop(.4,'rgba(200,150,0,.0)');gd.addColorStop(.7,'rgba(150,100,0,.16)');gd.addColorStop(1,'rgba(255,240,100,.3)');ctx.fillStyle=gd;ctx.fillRect(0,0,S,S);
+    for(let i=0;i<1800;i++){const px=(i*73+i*i*3)%S,py=(i*61+i*7)%S,sh=((i*17)%50)-25;ctx.fillStyle=C(sh,sh*.7|0,0,.45);ctx.beginPath();ctx.arc(px,py,.7+i%2,0,Math.PI*2);ctx.fill();}
+    ctx.strokeStyle=`rgba(255,220,80,0.12)`;ctx.lineWidth=0.5;for(let i=0;i<S;i+=6){ctx.beginPath();ctx.moveTo(0,i);ctx.lineTo(S,i);ctx.stroke();}
+  } else if (r>g&&r>b&&b<105&&g<105) {
+    for(let py=0;py<S;py++){const n=Math.sin(py*.16+Math.sin(py*.04)*5)*15+Math.sin(py*.55)*5;ctx.fillStyle=`rgb(${Math.min(255,r+(n|0))},${Math.min(255,g+((n*.55)|0))},${b})`;ctx.fillRect(0,py,S,1);}
+    ctx.strokeStyle='rgba(0,0,0,.2)';ctx.lineWidth=1.8;[S*.33,S*.67].forEach(y=>{ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(S,y);ctx.stroke();});
+    ctx.strokeStyle='rgba(0,0,0,.22)';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(S*.6,S*.38,18,10,.28,0,Math.PI*2);ctx.stroke();
+  } else if (r>115&&g>115&&b>115&&Math.abs(r-g)<28&&Math.abs(g-b)<28) {
+    const bw=48,bh=24;
+    for(let row=0;row<S/bh+1;row++){const off=row%2===0?0:bw/2;for(let col=-1;col<S/bw+1;col++){const bx=col*bw+off,by=row*bh,sh=((col*3+row*7)%34)-17;ctx.fillStyle=C(sh,sh,sh);ctx.fillRect(bx+3,by+3,bw-6,bh-6);ctx.fillStyle='rgba(255,255,255,.07)';ctx.fillRect(bx+3,by+3,bw-6,3);ctx.fillStyle='rgba(0,0,0,.1)';ctx.fillRect(bx+3,by+bh-6,bw-6,3);}}
+    const gd=ctx.createLinearGradient(0,0,0,S);gd.addColorStop(0,'rgba(255,255,255,.06)');gd.addColorStop(1,'rgba(0,0,0,.07)');ctx.fillStyle=gd;ctx.fillRect(0,0,S,S);
+  } else if (b>r&&b>g) {
+    ctx.fillStyle='rgba(210,235,255,.3)';ctx.fillRect(0,0,S,S);
+    const pts=Array.from({length:9},(_,i)=>({x:(i*79+44)%S,y:(i*67+22)%S}));
+    ctx.strokeStyle='rgba(140,200,255,.75)';ctx.lineWidth=1.2;pts.forEach((a,i)=>{const b2=pts[(i+1)%pts.length];ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b2.x,b2.y);ctx.stroke();});
+    for(let i=0;i<30;i++){const px=(i*79)%S,py=(i*61)%S;ctx.fillStyle=`rgba(255,255,255,${.15+i%4*.07})`;ctx.beginPath();ctx.arc(px,py,1+i%3,0,Math.PI*2);ctx.fill();}
+    const gd=ctx.createLinearGradient(0,0,S,S);gd.addColorStop(0,'rgba(255,255,255,.26)');gd.addColorStop(1,'rgba(160,210,255,.18)');ctx.fillStyle=gd;ctx.fillRect(0,0,S,S);
+  } else if (r>55&&r<175&&g>28&&g<115&&b<68) {
+    for(let py=0;py<S;py++){const n=Math.sin(py*.15+Math.sin(py*.04)*6)*16+Math.sin(py*.55)*5;ctx.fillStyle=`rgb(${Math.min(255,r+(n|0))},${Math.min(255,g+((n*.55)|0))},${b})`;ctx.fillRect(0,py,S,1);}
+    ctx.strokeStyle='rgba(0,0,0,.2)';ctx.lineWidth=2;[S*.33,S*.67].forEach(y=>{ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(S,y);ctx.stroke();});
+    ctx.strokeStyle='rgba(0,0,0,.22)';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(S*.62,S*.38,18,10,.28,0,Math.PI*2);ctx.stroke();
+  } else if (r>175&&g<65&&b>175) {
+    const rg=ctx.createRadialGradient(S/2,S/2,0,S/2,S/2,S*.72);rg.addColorStop(0,'rgba(255,255,255,.32)');rg.addColorStop(1,'rgba(0,0,0,.28)');ctx.fillStyle=rg;ctx.fillRect(0,0,S,S);
+    ctx.strokeStyle='rgba(255,255,255,.2)';ctx.lineWidth=.9;for(let i=0;i<S;i+=22){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i,S);ctx.stroke();ctx.beginPath();ctx.moveTo(0,i);ctx.lineTo(S,i);ctx.stroke();}
+    for(let y=0;y<S;y+=22)for(let x=0;x<S;x+=22){ctx.fillStyle='rgba(255,255,255,.15)';ctx.beginPath();ctx.arc(x,y,2,0,Math.PI*2);ctx.fill();}
+  } else {
+    const gd=ctx.createLinearGradient(0,0,S,S);gd.addColorStop(0,'rgba(255,255,200,.48)');gd.addColorStop(.32,'rgba(200,150,0,.0)');gd.addColorStop(.65,'rgba(140,95,0,.14)');gd.addColorStop(1,'rgba(255,240,120,.38)');ctx.fillStyle=gd;ctx.fillRect(0,0,S,S);
+    ctx.strokeStyle='rgba(255,235,80,.16)';ctx.lineWidth=.5;for(let i=0;i<S;i+=5){ctx.beginPath();ctx.moveTo(0,i);ctx.lineTo(S,i);ctx.stroke();}
+  }
+
+  const ao=ctx.createRadialGradient(S*.5,S*.5,S*.22,S*.5,S*.5,S*.76);
+  ao.addColorStop(0,'rgba(0,0,0,0)');ao.addColorStop(1,'rgba(0,0,0,0.25)');
+  ctx.fillStyle=ao; ctx.fillRect(0,0,S,S);
+
+  const tex=new THREE.CanvasTexture(cv);
+  tex.wrapS=tex.wrapT=THREE.RepeatWrapping;
+  return tex;
+}
+
+function addTexturesToScene() {
+  scene.traverse(obj => {
+    if (!obj.isMesh || !obj.material?.isMeshLambertMaterial || obj.material.map) return;
+    if (!obj.material.visible) return;
+    const col = obj.material.color.getHex();
+    const cr = (col >> 16) & 255, cg = (col >> 8) & 255, cb = col & 255;
+    if ((cr + cg + cb) / 3 > 215) return; // skip near-white (clouds)
+    const tex = makeTexture(col);
+    if (!obj.geometry.boundingBox) obj.geometry.computeBoundingBox();
+    const sz = new THREE.Vector3();
+    obj.geometry.boundingBox?.getSize(sz);
+    tex.repeat.set(Math.max(1, sz.x / 4), Math.max(1, sz.z / 4));
+    obj.material.map = tex;
+    obj.material.needsUpdate = true;
+  });
+}
 
 // ─── Lights ───
 const sun = new THREE.DirectionalLight(0xFFF5CC, 2.8);
@@ -399,18 +501,18 @@ downRay.ray.direction.set(0,-1,0);
 // ════════════════════════════════════════════════════
 const TOTAL_TIME=180; // 3 minutes
 let timeLeft=TOTAL_TIME, foundCount=0, gameCoins=0;
+let gamePaused = false;
+const _pbKeyT = 'eylox_hs_treasure3d';
+(function(){ try { const b=JSON.parse(localStorage.getItem('eylox_coin_boost')||'null'); if(b&&b.expires>Date.now()){const pill=document.getElementById('hud-boost-pill'),timer=document.getElementById('hud-boost-timer');if(pill)pill.style.display='';function upd(){const r=Math.max(0,b.expires-Date.now());if(timer)timer.textContent='⚡ '+Math.ceil(r/60000)+'m';if(r<=0&&pill)pill.style.display='none';}upd();setInterval(upd,10000);}}catch{} })();
+let _pbCoinsT = localStorage.getItem(_pbKeyT) ? +localStorage.getItem(_pbKeyT) : null;
+(()=>{ try { const _u=JSON.parse(localStorage.getItem('eylox_user')||'null'); const _s=JSON.parse(localStorage.getItem('eylox_game_sessions')||'[]'); _s.push({id:'treasure-hunt-3d',user:_u?.username||'Player',title:'Treasure Hunt 3D',t:Date.now()}); localStorage.setItem('eylox_game_sessions',JSON.stringify(_s.slice(-500))); if(_u){_u.gamesPlayed=(_u.gamesPlayed||0)+1;localStorage.setItem('eylox_user',JSON.stringify(_u));if(_u.username)localStorage.setItem('eylox_userdata_'+_u.username,JSON.stringify(_u));} } catch {} })();
 
 // ════════════════════════════════════════════════════
 // INPUT
 // ════════════════════════════════════════════════════
 const keys=new Set();
-window.addEventListener('keydown',e=>keys.add(e.code));
+window.addEventListener('keydown',e=>{ keys.add(e.code); if(e.code==='KeyE') tryDig(); if(e.code==='KeyP'&&!gameEnded) togglePause(); });
 window.addEventListener('keyup',  e=>keys.delete(e.code));
-
-// Dig on E
-window.addEventListener('keydown',e=>{
-  if(e.code==='KeyE') tryDig();
-});
 
 let camTheta=Math.PI,camPhi=.35,camDist=12;
 let dragging=false,prevMX=0,prevMY=0;
@@ -444,6 +546,11 @@ const hudCoins=document.getElementById('hud-coins');
 const progBar=document.getElementById('prog-bar');
 const timerPill=document.getElementById('timer-pill');
 const digPrompt=document.getElementById('dig-prompt');
+const hudPbWrap=document.getElementById('hud-pb-wrap');
+const hudPbEl=document.getElementById('hud-pb');
+const radarDist=document.getElementById('radar-dist');
+const radarPill=document.getElementById('radar-pill');
+if(_pbCoinsT!==null){hudPbWrap.style.display='';hudPbEl.textContent=_pbCoinsT+' 🪙';}
 
 function fmt(s){const m=Math.floor(s/60);return `${m}:${String(Math.floor(s%60)).padStart(2,'0')}`;}
 
@@ -477,15 +584,72 @@ function tryDig(){
   hudCoins.textContent=gameCoins;
   progBar.style.width=`${(foundCount/TOTAL)*100}%`;
   showFindBanner();
+  showCoinToast('+50 🪙');
   if(foundCount>=TOTAL) setTimeout(showWin,800);
+}
+
+function togglePause(){
+  gamePaused=!gamePaused;
+  document.getElementById('pause-scr').style.display=gamePaused?'flex':'none';
+  document.getElementById('pfab').textContent=gamePaused?'▶':'⏸';
+}
+function showCoinToast(msg){
+  const el=document.createElement('div');
+  el.className='ct3d';
+  el.textContent=msg;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1500);
 }
 
 function showWin(){
   gameEnded=true;
   document.getElementById('w-time').textContent=fmt(timeLeft);
-  document.getElementById('w-coins').textContent=gameCoins;
+
+  // Streak bonus
+  let bonusCoins=0;
+  try{
+    const log=JSON.parse(localStorage.getItem('eylox_login_log')||'[]');
+    const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
+    if(log.includes(yesterday)){
+      bonusCoins=Math.round(gameCoins*0.25);
+      document.getElementById('w-streak-line').style.display='';
+      document.getElementById('w-streak-val').textContent=bonusCoins;
+    }
+  }catch{}
+
+  const totalCoins=gameCoins+bonusCoins;
+  document.getElementById('w-coins').textContent=totalCoins;
   document.getElementById('win-screen').style.display='flex';
-  try{const u=JSON.parse(localStorage.getItem('eylox_user')||'{}');if(u.username)localStorage.setItem('eylox_hs_treasure3d',gameCoins);}catch{}
+
+  // Share button
+  document.getElementById('w-share-btn').onclick=()=>{
+    const txt=`💎 Treasure Hunt 3D — found all treasures with ${fmt(timeLeft)} left and ${totalCoins} coins! Play on Eylox!`;
+    if(navigator.share) navigator.share({title:'Eylox Treasure Hunt',text:txt}).catch(()=>{});
+    else navigator.clipboard?.writeText(txt).then(()=>showCoinToast('📋 Copied!'));
+  };
+
+  try{
+    const u=JSON.parse(localStorage.getItem('eylox_user')||'{}');
+    const prev=+(localStorage.getItem(_pbKeyT)||0);
+    const newBest=totalCoins>prev;
+    if(newBest){
+      localStorage.setItem(_pbKeyT,totalCoins);
+      _pbCoinsT=totalCoins;
+      hudPbEl.textContent=totalCoins+' 🪙'; hudPbWrap.style.display='';
+      document.getElementById('w-pb-line').style.display='';
+      document.getElementById('w-pb-txt').textContent='New Best Score! 🎉';
+    }else if(prev>0){
+      document.getElementById('w-pb-line').style.display='';
+      document.getElementById('w-pb-txt').textContent='Best: '+prev+' 🪙';
+    }
+    u.coins=Math.min((u.coins||0)+totalCoins,1e9);
+    localStorage.setItem('eylox_user',JSON.stringify(u));
+    if(u.username){try{const lb=JSON.parse(localStorage.getItem('eylox_lb_entries')||'[]');const prevBest=lb.filter(e=>e.user===u.username&&e.gameId==='treasure-hunt-3d').reduce((b,e)=>Math.max(b,e.score),0);lb.push({user:u.username,avatar:u.avatar||'🎮',score:totalCoins,game:'Treasure Hunt 3D',gameId:'treasure-hunt-3d',ts:Date.now()});localStorage.setItem('eylox_lb_entries',JSON.stringify(lb.slice(-300)));if(totalCoins>prevBest){u.wins=(u.wins||0)+1;localStorage.setItem('eylox_user',JSON.stringify(u));localStorage.setItem('eylox_userdata_'+u.username,JSON.stringify(u));}}catch{}}
+    const entry={id:'treasure-hunt-3d',title:'Treasure Hunt 3D',thumb:'💎',genre:'adventure',playedAt:Date.now()};
+    const r=JSON.parse(localStorage.getItem('eylox_recently_played')||'[]');
+    r.unshift(entry);localStorage.setItem('eylox_recently_played',JSON.stringify(r.slice(0,10)));
+    localStorage.setItem('eylox_pending_notif',JSON.stringify({title:'💎 Treasure Hunt Complete!',body:`Found all treasures and earned ${totalCoins} Eylux!`,type:'game',ts:Date.now()}));
+  }catch{}
 }
 
 function showLose(){
@@ -494,6 +658,9 @@ function showLose(){
   document.getElementById('l-coins').textContent=gameCoins;
   document.getElementById('lose-screen').style.display='flex';
 }
+
+// Apply procedural textures to all scene meshes
+addTexturesToScene();
 
 // ════════════════════════════════════════════════════
 // GAME LOOP
@@ -504,7 +671,7 @@ let animT=0;
 (function loop(){
   requestAnimationFrame(loop);
   const dt=Math.min(clock.getDelta(),.05);
-  if(!gameEnded) update(dt);
+  if(!gameEnded && !gamePaused) update(dt);
   renderer.render(scene,camera);
 })();
 
@@ -558,19 +725,26 @@ function update(dt){
     onGround=false;
   }
 
-  // ─── Spot proximity ───
+  // ─── Spot proximity + radar ───
   nearSpotIdx=-1;
-  let nearDist=Infinity;
+  let nearDist=Infinity, closestDist=Infinity;
   spots.forEach((sp,i)=>{
     if(sp.found) return;
     const dx=avatar.position.x-sp.x, dz=avatar.position.z-sp.z;
     const d=Math.sqrt(dx*dx+dz*dz);
+    if(d<closestDist) closestDist=d;
     if(d<2.8&&d<nearDist){nearDist=d;nearSpotIdx=i;}
-    // Animate beam + light flicker
     sp.beam.rotation.y+=dt*1.5;
     sp.pl.intensity=.8+Math.sin(Date.now()*.003+sp.idx)*.4;
   });
   digPrompt.style.display=nearSpotIdx>=0?'block':'none';
+  // Radar: show distance + colour-code (green=close, red=far)
+  if(closestDist<Infinity){
+    const pct=Math.max(0,Math.min(1,1-(closestDist-2)/25));
+    const r=Math.round(255*(1-pct)), g=Math.round(255*pct);
+    radarDist.textContent=closestDist<3?'HERE!':(Math.round(closestDist)+'m');
+    radarPill.style.background=`rgba(${r},${g},0,.35)`;
+  }
 
   // ─── Limb animation ───
   animT+=dt*(moving?7:2);
@@ -596,6 +770,18 @@ function update(dt){
   // ─── Ocean shimmer ───
   oceanLight.intensity=1+Math.sin(Date.now()*.001)*.3;
 }
+</script>
+<script src="party-system.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => { if (window.EyloxParty?.setGame) window.EyloxParty.setGame('Treasure Hunt 3D'); }, 800);
+});
+</script>
+<script src="party-system.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => { if (window.EyloxParty?.setGame) window.EyloxParty.setGame('Treasure Hunt 3D'); }, 800);
+});
 </script>
 </body>
 </html>

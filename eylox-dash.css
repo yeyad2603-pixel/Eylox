@@ -1,0 +1,799 @@
+/* ============================================================
+   EYLOX DASH — Offline Game Stylesheet
+   Full-screen canvas runner that replaces the offline screen
+   ============================================================ */
+
+/* ── Overlay container ── */
+#eylox-dash-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: #03010c;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Fredoka One', 'Nunito', cursive, sans-serif;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#eylox-dash-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ── Canvas ── */
+#eylox-dash-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: none;
+}
+
+/* ── HUD — top bar ── */
+#ed-hud {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  pointer-events: none;
+  z-index: 10;
+  background: linear-gradient(to bottom, rgba(3,1,12,0.85) 0%, transparent 100%);
+}
+
+.ed-hud-left, .ed-hud-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.ed-hud-score {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.6rem;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(168, 85, 247, 0.8);
+  letter-spacing: 1px;
+  line-height: 1;
+}
+
+.ed-hud-best {
+  font-size: 0.72rem;
+  font-weight: 900;
+  color: rgba(167, 139, 250, 0.55);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  line-height: 1;
+  font-family: 'Nunito', sans-serif;
+}
+
+.ed-hud-coins {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(253, 230, 138, 0.08);
+  border: 1px solid rgba(253, 230, 138, 0.2);
+  border-radius: 99px;
+  padding: 5px 13px 5px 9px;
+}
+
+.ed-hud-coins-icon { font-size: 1rem; }
+.ed-hud-coins-val {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1rem;
+  color: #fde68a;
+  text-shadow: 0 0 12px rgba(253, 230, 138, 0.6);
+}
+
+.ed-hud-world {
+  font-size: 0.72rem;
+  font-weight: 900;
+  color: rgba(167, 139, 250, 0.7);
+  letter-spacing: 1px;
+  font-family: 'Nunito', sans-serif;
+}
+
+/* ── Power-up bar ── */
+#ed-powerup-bar {
+  position: absolute;
+  top: 65px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.ed-powerup-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 99px;
+  padding: 4px 12px 4px 8px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 900;
+  animation: edPillPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  border: 1px solid currentColor;
+}
+
+.ed-powerup-pill .pu-icon { font-size: 0.85rem; }
+.ed-powerup-pill .pu-timer {
+  width: 28px;
+  height: 3px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.ed-powerup-pill .pu-timer-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: currentColor;
+  transition: width 0.1s linear;
+}
+
+@keyframes edPillPop {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* ── Notification toasts ── */
+#ed-notifications {
+  position: absolute;
+  top: 110px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  z-index: 11;
+  pointer-events: none;
+}
+
+.ed-notif {
+  background: rgba(8, 4, 22, 0.92);
+  border-radius: 99px;
+  padding: 7px 18px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1rem;
+  color: #fff;
+  white-space: nowrap;
+  animation: edNotifIn 0.35s cubic-bezier(0.34, 1.4, 0.64, 1) both,
+             edNotifOut 0.3s ease 1.8s both;
+  border: 1px solid rgba(255,255,255,0.1);
+  text-shadow: 0 0 20px rgba(168, 85, 247, 0.8);
+}
+
+@keyframes edNotifIn {
+  from { opacity: 0; transform: translateY(-16px) scale(0.85); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes edNotifOut {
+  to { opacity: 0; transform: translateY(-8px); }
+}
+
+/* ── Splash screen ── */
+#ed-splash {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  background: radial-gradient(ellipse at 50% 40%, rgba(124, 58, 237, 0.18) 0%, transparent 65%);
+  transition: opacity 0.5s ease;
+}
+
+#ed-splash.hidden { opacity: 0; pointer-events: none; }
+
+.ed-splash-signal {
+  font-size: 3.5rem;
+  margin-bottom: 20px;
+  animation: edFloat 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.8));
+}
+
+@keyframes edFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.ed-splash-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  color: #fff;
+  text-align: center;
+  margin-bottom: 8px;
+  text-shadow: 0 0 40px rgba(168, 85, 247, 0.7);
+}
+
+.ed-splash-sub {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: rgba(167, 139, 250, 0.55);
+  text-align: center;
+  margin-bottom: 4px;
+  font-family: 'Nunito', sans-serif;
+}
+
+.ed-splash-tagline {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  color: #a78bfa;
+  text-align: center;
+  margin-bottom: 48px;
+  animation: edPulseText 2s ease-in-out infinite;
+}
+
+@keyframes edPulseText {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; text-shadow: 0 0 30px rgba(167, 139, 250, 0.9); }
+}
+
+.ed-splash-mascot {
+  margin-bottom: 40px;
+}
+
+.ed-splash-play {
+  background: linear-gradient(135deg, #7c3aed, #a855f7, #c084fc);
+  color: #fff;
+  border: none;
+  border-radius: 99px;
+  padding: 16px 56px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.4rem;
+  cursor: pointer;
+  box-shadow: 0 0 40px rgba(124, 58, 237, 0.6), 0 8px 32px rgba(0,0,0,0.4);
+  transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+  animation: edPlayPulse 2s ease-in-out infinite;
+  letter-spacing: 1px;
+}
+
+.ed-splash-play:hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 0 60px rgba(168, 85, 247, 0.8), 0 12px 40px rgba(0,0,0,0.5);
+  filter: brightness(1.1);
+}
+
+.ed-splash-play:active {
+  transform: scale(0.97);
+}
+
+@keyframes edPlayPulse {
+  0%, 100% { box-shadow: 0 0 40px rgba(124, 58, 237, 0.5), 0 8px 32px rgba(0,0,0,0.4); }
+  50% { box-shadow: 0 0 70px rgba(168, 85, 247, 0.9), 0 8px 32px rgba(0,0,0,0.4); }
+}
+
+.ed-splash-hint {
+  margin-top: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(167, 139, 250, 0.35);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-family: 'Nunito', sans-serif;
+}
+
+/* ── Game Over screen ── */
+#ed-gameover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  background: rgba(3, 1, 12, 0.75);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+#ed-gameover.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.ed-go-card {
+  background: rgba(10, 5, 26, 0.96);
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  border-radius: 24px;
+  padding: 36px 40px;
+  text-align: center;
+  max-width: 360px;
+  width: 90%;
+  animation: edCardIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.7), 0 0 60px rgba(124, 58, 237, 0.15);
+}
+
+@keyframes edCardIn {
+  from { transform: scale(0.85) translateY(24px); opacity: 0; }
+  to   { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.ed-go-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 2rem;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.ed-go-distance {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: rgba(167, 139, 250, 0.5);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-family: 'Nunito', sans-serif;
+  margin-bottom: 20px;
+}
+
+.ed-go-score-row {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.ed-go-stat {
+  background: rgba(167, 139, 250, 0.06);
+  border: 1px solid rgba(167, 139, 250, 0.15);
+  border-radius: 14px;
+  padding: 14px 20px;
+  min-width: 90px;
+}
+
+.ed-go-stat-val {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.6rem;
+  color: #a78bfa;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.ed-go-stat-lbl {
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: rgba(167, 139, 250, 0.45);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-family: 'Nunito', sans-serif;
+}
+
+.ed-go-new-best {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(135deg, rgba(253,230,138,0.12), rgba(251,191,36,0.06));
+  border: 1px solid rgba(251,191,36,0.35);
+  border-radius: 99px;
+  padding: 5px 14px;
+  font-size: 0.7rem;
+  font-weight: 900;
+  color: #fbbf24;
+  letter-spacing: 1px;
+  font-family: 'Nunito', sans-serif;
+  margin-bottom: 20px;
+  animation: edShine 1.5s ease-in-out infinite;
+}
+
+@keyframes edShine {
+  0%, 100% { box-shadow: none; }
+  50% { box-shadow: 0 0 20px rgba(251,191,36,0.4); }
+}
+
+.ed-go-rewards {
+  background: rgba(74, 222, 128, 0.05);
+  border: 1px solid rgba(74, 222, 128, 0.15);
+  border-radius: 12px;
+  padding: 10px 16px;
+  margin-bottom: 22px;
+  font-size: 0.78rem;
+  color: rgba(134, 239, 172, 0.8);
+  font-weight: 800;
+  font-family: 'Nunito', sans-serif;
+}
+
+.ed-go-play-btn {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  color: #fff;
+  border: none;
+  border-radius: 99px;
+  padding: 14px 40px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 6px 24px rgba(124, 58, 237, 0.5);
+  transition: transform 0.15s, filter 0.15s;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.ed-go-play-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+.ed-go-quit-btn {
+  background: transparent;
+  color: rgba(167, 139, 250, 0.5);
+  border: 1px solid rgba(167, 139, 250, 0.15);
+  border-radius: 99px;
+  padding: 10px 28px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  width: 100%;
+}
+
+.ed-go-quit-btn:hover { color: rgba(167,139,250,0.8); border-color: rgba(167,139,250,0.35); }
+
+/* ── Reconnect overlay ── */
+#ed-reconnect {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  background: rgba(3, 1, 12, 0.88);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+#ed-reconnect.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.ed-rc-icon { font-size: 3rem; margin-bottom: 16px; animation: edFloat 2s ease-in-out infinite; }
+.ed-rc-title { font-family: 'Fredoka One', cursive; font-size: 1.8rem; color: #4ade80; margin-bottom: 8px; }
+.ed-rc-sub {
+  font-size: 0.82rem; font-weight: 700; color: rgba(134,239,172,0.6);
+  font-family: 'Nunito', sans-serif; margin-bottom: 28px;
+}
+
+.ed-rc-bar {
+  width: 200px; height: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 99px; overflow: hidden;
+}
+.ed-rc-bar-fill {
+  height: 100%; border-radius: 99px;
+  background: linear-gradient(90deg, #4ade80, #22c55e);
+  animation: edBarFill 1.5s ease-in-out forwards;
+}
+@keyframes edBarFill { from { width: 0%; } to { width: 100%; } }
+
+/* ── Touch controls ── */
+#ed-touch-controls {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 140px;
+  display: none;
+  z-index: 15;
+  pointer-events: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  #ed-touch-controls { display: flex; }
+}
+
+.ed-touch-left, .ed-touch-right {
+  flex: 1;
+  pointer-events: all;
+  display: flex;
+  align-items: flex-end;
+  padding: 20px;
+}
+
+.ed-touch-btn {
+  background: rgba(167, 139, 250, 0.08);
+  border: 2px solid rgba(167, 139, 250, 0.2);
+  border-radius: 16px;
+  width: 64px; height: 64px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+  transition: background 0.1s, transform 0.1s;
+  cursor: pointer;
+}
+
+.ed-touch-btn:active, .ed-touch-btn.pressed {
+  background: rgba(167, 139, 250, 0.2);
+  transform: scale(0.93);
+}
+
+.ed-touch-right { justify-content: flex-end; gap: 10px; }
+
+/* ── World transition flash ── */
+#ed-world-flash {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 25;
+  transition: opacity 0.15s;
+}
+
+#ed-world-flash.flash { opacity: 0.35; }
+
+/* ── Boss warning banner ── */
+#ed-boss-warning {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(2rem, 6vw, 4rem);
+  color: #ef4444;
+  text-align: center;
+  text-shadow: 0 0 40px rgba(239, 68, 68, 0.9), 0 0 80px rgba(239, 68, 68, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 22;
+  transition: opacity 0.3s, transform 0.3s;
+  letter-spacing: 2px;
+}
+
+#ed-boss-warning.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  animation: edBossWarn 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes edBossWarn {
+  from { text-shadow: 0 0 30px rgba(239,68,68,0.7); }
+  to   { text-shadow: 0 0 60px rgba(239,68,68,1), 0 0 100px rgba(239,68,68,0.6); }
+}
+
+/* ── Pause overlay ── */
+#ed-pause-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(3,1,12,0.6);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 20;
+  transition: opacity 0.3s;
+  font-family: 'Fredoka One', cursive;
+  font-size: 2.5rem;
+  color: rgba(167,139,250,0.8);
+  letter-spacing: 4px;
+}
+#ed-pause-overlay.visible { opacity: 1; }
+
+/* ── HUD level badge ── */
+.ed-hud-level {
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.1);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  border-radius: 99px;
+  padding: 3px 10px;
+  letter-spacing: 0.5px;
+  font-family: 'Nunito', sans-serif;
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+/* ── Splash: settings gear ── */
+.ed-settings-gear {
+  position: absolute;
+  top: 20px; right: 20px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: rgba(167, 139, 250, 0.08);
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  color: rgba(167, 139, 250, 0.8);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: transform 0.4s ease, background 0.15s;
+}
+.ed-settings-gear:hover { background: rgba(167,139,250,0.18); transform: rotate(45deg); }
+
+/* ── Splash: level badge ── */
+.ed-level-badge {
+  position: absolute;
+  top: 20px; left: 20px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.85rem;
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.08);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  border-radius: 99px;
+  padding: 6px 16px;
+}
+
+/* ── Splash: trail selector ── */
+.ed-trail-selector {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+  background: rgba(167, 139, 250, 0.05);
+  border: 1px solid rgba(167, 139, 250, 0.15);
+  border-radius: 16px;
+  padding: 8px 14px;
+}
+
+.ed-trail-arrow {
+  background: transparent;
+  border: none;
+  color: rgba(167, 139, 250, 0.7);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.15s, transform 0.15s;
+}
+.ed-trail-arrow:hover { color: #fff; transform: scale(1.15); }
+
+.ed-trail-info { text-align: center; min-width: 150px; }
+.ed-trail-name {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.95rem;
+  color: #a78bfa;
+}
+.ed-trail-hint {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: rgba(167, 139, 250, 0.4);
+  font-family: 'Nunito', sans-serif;
+  margin-top: 2px;
+}
+
+/* ── Splash: daily mission panel ── */
+.ed-mission-panel {
+  margin-top: 22px;
+  background: rgba(74, 222, 128, 0.04);
+  border: 1px solid rgba(74, 222, 128, 0.15);
+  border-radius: 14px;
+  padding: 12px 20px;
+  text-align: center;
+  max-width: 320px;
+}
+.ed-mission-head {
+  font-size: 0.7rem;
+  font-weight: 900;
+  color: rgba(134, 239, 172, 0.8);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-family: 'Nunito', sans-serif;
+  margin-bottom: 4px;
+}
+.ed-mission-desc {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.75);
+  font-weight: 700;
+  font-family: 'Nunito', sans-serif;
+  margin-bottom: 8px;
+}
+.ed-mission-bar {
+  width: 100%; height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.ed-mission-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4ade80, #22c55e);
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+.ed-mission-status {
+  font-size: 0.68rem;
+  font-weight: 900;
+  color: #86efac;
+  font-family: 'Nunito', sans-serif;
+}
+
+/* ── Settings panel ── */
+#ed-settings-panel {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(3, 1, 12, 0.85);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+#ed-settings-panel.visible { opacity: 1; pointer-events: all; }
+
+.ed-settings-card {
+  background: rgba(10, 5, 26, 0.96);
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  border-radius: 20px;
+  padding: 28px 32px;
+  width: 90%;
+  max-width: 340px;
+  animation: edCardIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ed-settings-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.4rem;
+  color: #fff;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.ed-settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(167, 139, 250, 0.1);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.8);
+}
+
+.ed-toggle, .ed-keybind-btn {
+  background: rgba(167, 139, 250, 0.1);
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  border-radius: 8px;
+  color: rgba(167, 139, 250, 0.9);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 0.75rem;
+  padding: 6px 14px;
+  cursor: pointer;
+  min-width: 74px;
+  transition: background 0.15s, color 0.15s;
+}
+.ed-toggle.on { background: rgba(74, 222, 128, 0.2); border-color: #4ade80; color: #4ade80; }
+.ed-keybind-btn.listening { background: rgba(251, 191, 36, 0.2); border-color: #fbbf24; color: #fbbf24; }
+.ed-toggle:hover, .ed-keybind-btn:hover { filter: brightness(1.2); }
+
+.ed-settings-close {
+  width: 100%;
+  margin-top: 22px;
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  color: #fff;
+  border: none;
+  border-radius: 99px;
+  padding: 12px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.ed-settings-close:hover { transform: translateY(-2px); }
+
+/* ── Colorblind mode ── */
+body.ed-colorblind #eylox-dash-overlay { filter: url(#ed-cb-filter); }
+
+/* ── Accessibility: reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .ed-splash-signal, .ed-splash-tagline, .ed-splash-play,
+  .ed-go-new-best, .ed-notif { animation: none; }
+}

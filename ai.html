@@ -1,333 +1,1099 @@
-<!DOCTYPE html>
-<html lang="en">
+﻿<!DOCTYPE html>
+<html lang="en" data-page="ai">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>🤖 AI Gaming — Eylox</title>
-  <link rel="stylesheet" href="style.css"/>
-  <script>
-    try {
-      const hasSession = localStorage.getItem('eylox_token') || localStorage.getItem('eylox_guest') || localStorage.getItem('eylox_user');
-      if (!hasSession) window.location.replace('landing.html');
-    } catch {}
-  </script>
-  <style>
-    .ai-hero { background: linear-gradient(135deg,#0d0520 0%,#1a0840 50%,#0d1a40 100%); border: 1px solid var(--border2,#3a2480); border-radius: 20px; padding: 40px 36px; margin-bottom: 28px; position: relative; overflow: hidden; }
-    .ai-hero::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse at 70% 50%, rgba(167,139,250,.12) 0%, transparent 70%); pointer-events:none; }
-    .ai-hero-title { font-family:'Fredoka One',cursive; font-size: clamp(1.8rem,4vw,2.8rem); color: var(--text,#f0e8ff); margin-bottom: 8px; }
-    .ai-hero-sub { color: var(--muted,#9d8ec7); font-weight: 700; font-size: .95rem; }
-    .ai-badge { display:inline-flex; align-items:center; gap:6px; background: rgba(167,139,250,.15); border: 1px solid rgba(167,139,250,.3); border-radius: 99px; padding: 4px 14px; font-size: .78rem; font-weight: 800; color: #c4b5fd; margin-bottom: 16px; }
-    .ai-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-    .ai-card { background: var(--card,#160a38); border: 1px solid var(--border2,#3a2480); border-radius: 16px; padding: 22px; transition: transform .2s, box-shadow .2s; cursor: pointer; }
-    .ai-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(124,58,237,.25); }
-    .ai-card-icon { font-size: 2rem; margin-bottom: 10px; }
-    .ai-card-title { font-family:'Fredoka One',cursive; font-size: 1.05rem; color: var(--text,#f0e8ff); margin-bottom: 6px; }
-    .ai-card-desc { font-size: .8rem; color: var(--muted,#9d8ec7); font-weight: 700; line-height: 1.5; }
-    .ai-card-tag { display:inline-block; background: rgba(74,222,128,.15); color: #4ade80; border: 1px solid rgba(74,222,128,.25); border-radius: 99px; font-size: .68rem; font-weight: 900; padding: 2px 10px; margin-top: 10px; }
-    .ai-card-tag.purple { background: rgba(167,139,250,.15); color: #a78bfa; border-color: rgba(167,139,250,.25); }
-    .ai-card-tag.pink { background: rgba(244,114,182,.15); color: #f472b6; border-color: rgba(244,114,182,.25); }
-    .section-header { display:flex; align-items:center; gap:10px; margin: 28px 0 16px; }
-    .section-title { font-family:'Fredoka One',cursive; font-size: 1.3rem; color: var(--text,#f0e8ff); }
-    .ai-stat-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
-    .ai-stat { background: var(--card,#160a38); border: 1px solid var(--border2,#3a2480); border-radius: 14px; padding: 18px; text-align: center; }
-    .ai-stat-val { font-family:'Fredoka One',cursive; font-size: 1.6rem; color: var(--purple,#a78bfa); }
-    .ai-stat-lbl { font-size: .72rem; color: var(--muted,#9d8ec7); font-weight: 700; margin-top: 4px; }
-    .ai-chat { background: var(--card,#160a38); border: 1px solid var(--border2,#3a2480); border-radius: 16px; overflow: hidden; }
-    .ai-chat-msgs { padding: 20px; min-height: 220px; max-height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-    .ai-msg { display: flex; gap: 10px; align-items: flex-start; }
-    .ai-msg.user { flex-direction: row-reverse; }
-    .ai-msg-av { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#7c3aed,#ec4899); display:flex; align-items:center; justify-content:center; font-size:.9rem; flex-shrink:0; }
-    .ai-msg.user .ai-msg-av { background: linear-gradient(135deg,#059669,#4ade80); }
-    .ai-msg-bubble { background: rgba(167,139,250,.1); border: 1px solid rgba(167,139,250,.2); border-radius: 12px; padding: 10px 14px; font-size: .83rem; font-weight: 700; color: var(--text,#f0e8ff); max-width: 75%; line-height: 1.5; }
-    .ai-msg.user .ai-msg-bubble { background: rgba(74,222,128,.1); border-color: rgba(74,222,128,.2); }
-    .ai-chat-input { display: flex; gap: 10px; padding: 14px; border-top: 1px solid var(--border2,#3a2480); }
-    .ai-chat-input input { flex: 1; background: rgba(167,139,250,.07); border: 1px solid var(--border2,#3a2480); border-radius: 99px; padding: 10px 16px; color: var(--text,#f0e8ff); font-family:'Nunito',sans-serif; font-weight: 700; font-size: .85rem; outline: none; }
-    .ai-chat-input input:focus { border-color: var(--purple,#a78bfa); }
-    .ai-chat-input button { background: linear-gradient(135deg,#7c3aed,#a78bfa); border: none; border-radius: 99px; padding: 10px 20px; color: #fff; font-family:'Nunito',sans-serif; font-weight: 800; font-size: .85rem; cursor: pointer; transition: transform .15s; }
-    .ai-chat-input button:hover { transform: scale(1.05); }
-    .rec-game { display: flex; align-items: center; gap: 14px; background: var(--card,#160a38); border: 1px solid var(--border2,#3a2480); border-radius: 14px; padding: 16px; margin-bottom: 12px; transition: border-color .2s; cursor: pointer; text-decoration: none; }
-    .rec-game:hover { border-color: var(--purple,#a78bfa); }
-    .rec-game-thumb { width: 52px; height: 52px; border-radius: 12px; display:flex; align-items:center; justify-content:center; font-size: 1.8rem; flex-shrink: 0; }
-    .rec-game-name { font-family:'Fredoka One',cursive; font-size: 1rem; color: var(--text,#f0e8ff); }
-    .rec-game-reason { font-size: .75rem; color: var(--muted,#9d8ec7); font-weight: 700; margin-top: 3px; }
-    .rec-game-score { margin-left: auto; font-family:'Fredoka One',cursive; font-size: 1.1rem; color: var(--purple,#a78bfa); flex-shrink:0; }
-    .ai-insight { background: linear-gradient(135deg,rgba(124,58,237,.12),rgba(236,72,153,.08)); border: 1px solid rgba(167,139,250,.25); border-radius: 14px; padding: 18px 20px; margin-bottom: 12px; }
-    .ai-insight-title { font-family:'Fredoka One',cursive; font-size: .95rem; color: var(--text,#f0e8ff); margin-bottom: 6px; }
-    .ai-insight-text { font-size: .8rem; color: var(--muted,#9d8ec7); font-weight: 700; line-height: 1.5; }
-    .ai-insight-bar { height: 6px; background: rgba(167,139,250,.15); border-radius: 99px; margin-top: 10px; overflow: hidden; }
-    .ai-insight-fill { height: 100%; background: linear-gradient(90deg,#7c3aed,#a78bfa); border-radius: 99px; transition: width 1s ease; }
-    .refresh-btn { background: rgba(167,139,250,.12); border: 1px solid rgba(167,139,250,.25); color: var(--purple,#a78bfa); border-radius: 99px; padding: 6px 16px; font-family:'Nunito',sans-serif; font-weight: 800; font-size: .78rem; cursor: pointer; transition: background .15s; }
-    .refresh-btn:hover { background: rgba(167,139,250,.25); }
-    .friend-suggest { display: flex; align-items: center; gap: 12px; background: var(--card,#160a38); border: 1px solid var(--border2,#3a2480); border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; }
-    .fs-av { width: 42px; height: 42px; border-radius: 50%; display:flex; align-items:center; justify-content:center; font-size: 1.2rem; flex-shrink:0; }
-    .fs-name { font-family:'Fredoka One',cursive; font-size: .95rem; color: var(--text,#f0e8ff); }
-    .fs-match { font-size: .72rem; color: var(--muted,#9d8ec7); font-weight: 700; }
-    .fs-add { margin-left: auto; background: rgba(74,222,128,.15); border: 1px solid rgba(74,222,128,.3); color: #4ade80; border-radius: 99px; padding: 5px 14px; font-size: .75rem; font-weight: 800; cursor: pointer; }
-  </style>
-</head>
-<body data-page="ai">
-<div class="app-shell">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>EYLOX — AI Gaming AI Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<script src="security.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#000000;--surface:#0d1428;--card:#111c35;--card2:#162040;
+  --border:rgba(99,102,241,.22);--border2:rgba(99,102,241,.1);
+  --text:#f0f4ff;--muted:#7f8fb8;
+  --purple:#a78bfa;--purple2:#7c3aed;--purple3:#6d28d9;
+  --blue:#60a5fa;--blue2:#3b82f6;--cyan:#22d3ee;--cyan2:#06b6d4;
+  --green:#4ade80;--green2:#16a34a;--yellow:#fbbf24;--red:#f87171;
+  --grad-title:linear-gradient(135deg,#c4b5fd,#818cf8,#38bdf8);
+  --grad-gen:linear-gradient(135deg,#3b82f6,#06b6d4);
+  --grad-pub:linear-gradient(135deg,#16a34a,#4ade80);
+  --sidebar-w:218px;--top-h:60px;
+}
+html,body{height:100%;font-family:'Nunito',sans-serif;overflow:hidden;background:var(--bg);color:var(--text)}
 
-  <!-- SIDEBAR -->
+/* ── BG CANVAS ── */
+#bgCanvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* ── LAYOUT ── */
+.app{display:flex;height:100vh;position:relative;z-index:1}
+
+/* ══════════════ SIDEBAR — Standard Platform Style ══════════════ */
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:rgba(10,5,26,.95);
+  border-right:1px solid rgba(167,139,250,.1);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  display:flex;flex-direction:column;
+  z-index:100;transition:transform .3s;
+  overflow-y:auto;overflow-x:hidden;
+  scrollbar-width:none;
+}
+.sidebar::-webkit-scrollbar{display:none}
+.sidebar-logo{
+  display:flex;align-items:center;gap:10px;
+  padding:20px 16px 16px;
+  text-decoration:none;
+  font-family:'Fredoka One',cursive;font-size:1.35rem;
+  color:#f0e8ff;letter-spacing:.3px;
+}
+.sidebar-logo-icon{font-size:1.5rem;filter:drop-shadow(0 0 8px rgba(167,139,250,.5))}
+.sidebar-logo-text{background:linear-gradient(135deg,#c4b5fd,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sidebar-section-label{
+  font-size:.6rem;font-weight:900;letter-spacing:1.8px;
+  color:rgba(167,139,250,.38);text-transform:uppercase;
+  padding:10px 16px 4px;
+}
+.sidebar-nav ul{list-style:none;padding:0;margin:0}
+.sidebar-link{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;margin:1px 8px;border-radius:10px;
+  color:rgba(167,139,250,.65);font-size:.84rem;font-weight:800;
+  text-decoration:none;transition:all .18s;
+  background:none;border:none;cursor:pointer;width:calc(100% - 16px);
+  text-align:left;font-family:'Nunito',sans-serif;
+}
+.sidebar-link:hover{background:rgba(167,139,250,.1);color:#e0d4ff}
+.sidebar-link.active,.sidebar-link[aria-current="page"]{
+  background:linear-gradient(90deg,rgba(124,58,237,.22),rgba(167,139,250,.1));
+  color:#f0e8ff;
+  box-shadow:inset 3px 0 0 #a78bfa;
+}
+.s-icon{font-size:1.05rem;width:20px;text-align:center;flex-shrink:0}
+.s-label{flex:1}
+.s-soon{
+  font-size:.58rem;font-weight:900;letter-spacing:.5px;
+  padding:2px 7px;border-radius:99px;flex-shrink:0;
+}
+.s-badge{
+  background:#e94560;color:#fff;border-radius:50%;
+  width:18px;height:18px;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:.65rem;font-weight:800;flex-shrink:0;
+}
+.sidebar-divider{height:1px;background:rgba(167,139,250,.08);margin:8px 16px}
+.sidebar-coins{
+  display:flex;align-items:center;gap:10px;
+  margin:8px 12px 12px;padding:11px 14px;
+  background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);
+  border-radius:12px;
+}
+.coins-amount{font-family:'Fredoka One',cursive;font-size:1.1rem;color:#f59e0b;line-height:1}
+.coins-label{font-size:.6rem;font-weight:900;color:rgba(245,158,11,.5);text-transform:uppercase;letter-spacing:.8px;margin-top:1px}
+@keyframes mascotFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+/* ══════════════ MAIN ══════════════ */
+.main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+
+/* ── TOPBAR ── */
+.topbar{
+  height:var(--top-h);flex-shrink:0;
+  background:rgba(6,11,24,.88);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border2);
+  display:flex;align-items:center;padding:0 20px;gap:12px;
+  position:relative;z-index:50;
+}
+.tb-menu{background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;padding:6px;border-radius:8px;transition:color .15s;display:none}
+.tb-menu:hover{color:var(--text)}
+.tb-spacer{flex:1}
+.tb-right{display:flex;align-items:center;gap:8px}
+.tb-cur{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.05);border:1px solid var(--border2);
+  border-radius:99px;padding:6px 14px;cursor:pointer;
+  transition:background .15s;
+}
+.tb-cur:hover{background:rgba(255,255,255,.09)}
+.tb-cur-icon{font-size:.9rem}
+.tb-cur-val{font-family:'Fredoka One',cursive;font-size:.88rem;color:var(--text)}
+.tb-bell{
+  background:rgba(255,255,255,.05);border:1px solid var(--border2);
+  border-radius:50%;width:36px;height:36px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:background .15s;font-size:.9rem;position:relative;
+}
+.tb-bell:hover{background:rgba(255,255,255,.1)}
+.tb-bell-dot{
+  position:absolute;top:6px;right:6px;width:7px;height:7px;
+  border-radius:50%;background:#f87171;border:1.5px solid var(--bg);
+}
+.tb-profile{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.05);border:1px solid var(--border2);
+  border-radius:99px;padding:5px 12px 5px 5px;
+  cursor:pointer;transition:background .15s;
+}
+.tb-profile:hover{background:rgba(255,255,255,.1)}
+.tb-av{
+  width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(135deg,#7c3aed,#ec4899);
+  display:flex;align-items:center;justify-content:center;font-size:.9rem;
+  border:2px solid rgba(167,139,250,.3);
+}
+.tb-uname{font-size:.8rem;font-weight:800;color:var(--text)}
+.tb-caret{font-size:.65rem;color:var(--muted)}
+
+/* ── CONTENT ── */
+.content{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  padding:24px 28px 32px;scrollbar-width:thin;
+  scrollbar-color:rgba(99,102,241,.3) transparent;
+}
+.content::-webkit-scrollbar{width:5px}
+.content::-webkit-scrollbar-track{background:transparent}
+.content::-webkit-scrollbar-thumb{background:rgba(99,102,241,.3);border-radius:3px}
+
+/* ── STUDIO HERO ── */
+.studio-hero{text-align:center;padding:10px 0 24px;position:relative}
+.sh-sparkles-row{
+  display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:4px;
+}
+.sh-spark{
+  font-size:1.2rem;animation:sparkSpin 3s linear infinite;
+  filter:drop-shadow(0 0 6px rgba(251,191,36,.7));
+}
+.sh-spark:nth-child(2){animation-delay:-1.5s;animation-direction:reverse}
+@keyframes sparkSpin{0%,100%{transform:scale(1) rotate(0deg)}50%{transform:scale(1.3) rotate(180deg)}}
+.sh-title{
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(2rem,4vw,3rem);line-height:1.1;
+  background:var(--grad-title);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 30px rgba(129,140,248,.5));
+  margin-bottom:6px;letter-spacing:.5px;
+}
+.sh-sub{
+  font-size:.9rem;font-weight:800;
+  color:rgba(200,210,255,.55);letter-spacing:.3px;
+}
+
+/* ── STUDIO GRID ── */
+.studio-grid{
+  display:grid;grid-template-columns:1fr 360px;gap:16px;
+  align-items:start;margin-bottom:16px;
+}
+.studio-left{display:flex;flex-direction:column;gap:16px;min-width:0}
+.studio-right{display:flex;flex-direction:column;gap:16px}
+
+/* ── STEP CARDS ── */
+.step-card{
+  background:rgba(13,20,40,.75);
+  border:1px solid rgba(99,102,241,.18);
+  border-radius:18px;padding:18px 18px 20px;
+  backdrop-filter:blur(12px);
+  position:relative;overflow:hidden;
+  transition:border-color .2s,box-shadow .2s;
+}
+.step-card::before{
+  content:'';position:absolute;inset:0;border-radius:inherit;
+  background:radial-gradient(ellipse at 50% 0%,rgba(99,102,241,.06) 0%,transparent 65%);
+  pointer-events:none;
+}
+.step-card:hover{border-color:rgba(99,102,241,.32);box-shadow:0 0 30px rgba(99,102,241,.08)}
+.step-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.step-num{
+  width:28px;height:28px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fredoka One',cursive;font-size:.88rem;
+}
+.sn-blue{background:rgba(59,130,246,.2);border:2px solid #3b82f6;color:#60a5fa}
+.sn-green{background:rgba(74,222,128,.15);border:2px solid #4ade80;color:#4ade80}
+.sn-yellow{background:rgba(251,191,36,.15);border:2px solid #fbbf24;color:#fbbf24}
+.step-title{font-size:.78rem;font-weight:900;color:var(--muted);letter-spacing:.8px;text-transform:uppercase}
+
+/* ── STEP ROW (1+2) ── */
+.step-row{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:start}
+.step-arrow-wrap{display:flex;align-items:center;justify-content:center;padding-top:50px}
+.step-arrow{font-size:1.6rem;color:rgba(99,102,241,.4);font-weight:900;animation:arrowPulse 2s ease-in-out infinite}
+@keyframes arrowPulse{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:.7;transform:scale(1.15)}}
+
+/* ── STEP 1 ── */
+.idea-input{
+  width:100%;min-height:88px;resize:vertical;
+  background:rgba(255,255,255,.04);border:1px solid rgba(99,102,241,.22);
+  border-radius:12px;padding:12px 14px;color:var(--text);
+  font-family:'Nunito',sans-serif;font-size:.86rem;font-weight:700;
+  outline:none;transition:border-color .2s,box-shadow .2s;margin-bottom:10px;
+}
+.idea-input:focus{border-color:rgba(99,102,241,.6);box-shadow:0 0 0 3px rgba(99,102,241,.12)}
+.idea-input::placeholder{color:rgba(127,143,184,.45)}
+.ex-label{font-size:.68rem;font-weight:900;color:rgba(127,143,184,.5);letter-spacing:.8px;text-transform:uppercase;margin-bottom:7px}
+.ex-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+.ex-btn{
+  padding:6px 10px;border-radius:9px;border:1px solid rgba(99,102,241,.2);
+  background:rgba(99,102,241,.07);color:var(--muted);
+  font-family:'Nunito',sans-serif;font-size:.74rem;font-weight:800;
+  cursor:pointer;transition:all .16s;text-align:left;
+}
+.ex-btn:hover{background:rgba(99,102,241,.16);border-color:rgba(99,102,241,.4);color:var(--text)}
+.gen-btn{
+  width:100%;padding:13px;border:none;border-radius:13px;cursor:pointer;
+  background:var(--grad-gen);
+  color:#fff;font-family:'Fredoka One',cursive;font-size:1.05rem;
+  box-shadow:0 4px 20px rgba(59,130,246,.35);
+  transition:transform .15s,box-shadow .15s,filter .15s;
+  position:relative;overflow:hidden;
+}
+.gen-btn::before{
+  content:'';position:absolute;top:-50%;left:-60%;width:40%;height:200%;
+  background:rgba(255,255,255,.15);transform:skewX(-20deg);
+  animation:btnShine 3s ease-in-out infinite;
+}
+@keyframes btnShine{0%{left:-60%}100%{left:160%}}
+.gen-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(59,130,246,.5);filter:brightness(1.08)}
+.gen-btn:active{transform:translateY(0)}
+.gen-btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+
+/* ── STEP 2 ── */
+.ai-robot-wrap{
+  display:flex;align-items:center;justify-content:center;
+  position:relative;height:90px;margin:4px 0 10px;
+}
+.ai-robot-icon{
+  font-size:3.2rem;z-index:2;position:relative;
+  filter:drop-shadow(0 0 16px rgba(6,182,212,.6));
+  animation:robotBob 2.5s ease-in-out infinite;
+}
+@keyframes robotBob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-8px) scale(1.04)}}
+.ai-ring{position:absolute;border-radius:50%;border:1.5px solid;animation:ringPulse 2s ease-in-out infinite;opacity:0}
+.r1{width:60px;height:60px;border-color:rgba(6,182,212,.5);animation-delay:0s}
+.r2{width:85px;height:85px;border-color:rgba(99,102,241,.4);animation-delay:.5s}
+.r3{width:110px;height:110px;border-color:rgba(167,139,250,.3);animation-delay:1s}
+@keyframes ringPulse{0%{transform:scale(.7);opacity:.7}100%{transform:scale(1.3);opacity:0}}
+.checklist{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.ck-item{
+  display:flex;align-items:center;gap:8px;
+  font-size:.78rem;font-weight:800;color:var(--muted);
+  transition:color .3s;
+}
+.ck-item.done{color:var(--green)}
+.ck-circle{
+  width:18px;height:18px;border-radius:50%;flex-shrink:0;
+  border:2px solid rgba(127,143,184,.3);background:transparent;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;transition:all .3s;
+}
+.ck-item.done .ck-circle{background:var(--green);border-color:var(--green);color:#000}
+.prog-wrap{display:flex;align-items:center;gap:8px}
+.prog-bar{flex:1;height:7px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;width:0%;border-radius:99px;background:var(--grad-gen);transition:width .4s ease;box-shadow:0 0 8px rgba(6,182,212,.5)}
+.prog-pct{font-family:'Fredoka One',cursive;font-size:.82rem;color:var(--cyan);width:36px;text-align:right;flex-shrink:0}
+
+/* ── STEP 3 ── */
+.game-thumb{
+  border-radius:12px;overflow:hidden;position:relative;
+  aspect-ratio:16/9;background:#1a0a00;margin-bottom:12px;
+  border:1px solid rgba(255,100,0,.2);
+  box-shadow:0 0 20px rgba(255,100,0,.12);
+}
+.game-thumb-bg{
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom,#3a1200 0%,#7a1e00 30%,#ff4500 55%,#ff6b00 70%,#ff4500 100%);
+}
+.gt-lava{
+  position:absolute;bottom:0;left:0;right:0;height:38%;
+  background:linear-gradient(to top,#ff2200,#ff6b00);
+  animation:lavaWave 3s ease-in-out infinite;
+}
+@keyframes lavaWave{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.08)}}
+.gt-platform{position:absolute;background:linear-gradient(to bottom,#666,#444);border-radius:4px}
+.gt-plat1{width:30%;height:12%;left:5%;bottom:40%}
+.gt-plat2{width:22%;height:10%;left:38%;bottom:52%}
+.gt-plat3{width:26%;height:11%;right:6%;bottom:38%}
+.gt-player{
+  position:absolute;bottom:38%;left:22%;
+  width:8%;aspect-ratio:1/1.4;
+  background:linear-gradient(to bottom,#cc2200,#881100);
+  border-radius:4px 4px 0 0;
+}
+.gt-player::before{content:'';position:absolute;top:-40%;left:10%;width:80%;aspect-ratio:1;background:#ffccaa;border-radius:50%}
+.gt-glow{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 40%,rgba(255,120,0,.18) 0%,transparent 60%);
+  pointer-events:none;
+}
+.gt-title-overlay{
+  position:absolute;top:10px;left:0;right:0;text-align:center;
+  font-family:'Fredoka One',cursive;font-size:.9rem;color:#fff;
+  text-shadow:0 0 10px rgba(255,100,0,.8),0 2px 4px rgba(0,0,0,.8);
+  letter-spacing:.5px;
+}
+.gt-controls{
+  position:absolute;left:6px;top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:5px;
+}
+.gt-ctrl-btn{
+  width:28px;height:28px;border-radius:8px;
+  background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.15);
+  display:flex;align-items:center;justify-content:center;font-size:.8rem;
+  cursor:pointer;backdrop-filter:blur(4px);transition:background .15s;
+}
+.gt-ctrl-btn:hover{background:rgba(0,0,0,.8)}
+.preview-meta{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pv-stats{display:flex;gap:10px}
+.pv-stat{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,.05);border:1px solid var(--border2);
+  border-radius:99px;padding:5px 10px;
+  font-family:'Fredoka One',cursive;font-size:.84rem;
+}
+.pv-stat-coin{color:var(--yellow)}
+.pv-stat-win{color:#e879f9}
+.pv-btns{display:flex;gap:7px}
+.play-btn{
+  padding:9px 22px;border:none;border-radius:10px;cursor:pointer;
+  background:var(--grad-pub);color:#fff;
+  font-family:'Fredoka One',cursive;font-size:.92rem;
+  box-shadow:0 4px 16px rgba(22,163,74,.4);
+  transition:transform .15s,box-shadow .15s;
+}
+.play-btn:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(22,163,74,.55)}
+.fs-btn{
+  width:36px;height:36px;border-radius:10px;border:1px solid var(--border);
+  background:rgba(255,255,255,.05);color:var(--muted);
+  font-size:.9rem;cursor:pointer;transition:background .15s;
+  display:flex;align-items:center;justify-content:center;
+}
+.fs-btn:hover{background:rgba(255,255,255,.1)}
+
+/* ── STEP 4 REWARDS ── */
+.reward-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.reward-card{
+  border-radius:14px;padding:16px 12px;text-align:center;cursor:pointer;
+  border:2px solid rgba(99,102,241,.15);background:rgba(255,255,255,.03);
+  transition:all .2s cubic-bezier(.34,1.56,.64,1);position:relative;
+}
+.reward-card:hover{transform:translateY(-3px)}
+.reward-card.rw-sel-wins{border-color:#fbbf24;background:rgba(251,191,36,.08);box-shadow:0 0 20px rgba(251,191,36,.2)}
+.reward-card.rw-sel-coins{border-color:#fb923c;background:rgba(251,146,60,.08);box-shadow:0 0 20px rgba(251,146,60,.2)}
+.reward-card.rw-sel-both{border-color:#22d3ee;background:rgba(34,211,238,.1);box-shadow:0 0 24px rgba(34,211,238,.25)}
+.rw-best-badge{
+  position:absolute;top:-10px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;
+  font-size:.58rem;font-weight:900;padding:3px 10px;border-radius:99px;letter-spacing:.5px;white-space:nowrap;
+}
+.rw-icon{font-size:2rem;margin-bottom:6px;display:block}
+.rw-name{font-family:'Fredoka One',cursive;font-size:.84rem;color:var(--text);margin-bottom:4px}
+.rw-desc{font-size:.68rem;font-weight:700;color:var(--muted);line-height:1.4}
+
+/* ── STEP 5 PUBLISH ── */
+.pub-btn{
+  width:100%;padding:16px;border:none;border-radius:14px;cursor:pointer;
+  background:var(--grad-pub);color:#fff;
+  font-family:'Fredoka One',cursive;font-size:1.05rem;
+  box-shadow:0 6px 24px rgba(22,163,74,.4);
+  transition:transform .15s,box-shadow .15s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-bottom:10px;position:relative;overflow:hidden;
+}
+.pub-btn::before{content:'';position:absolute;top:-50%;left:-60%;width:40%;height:200%;background:rgba(255,255,255,.15);transform:skewX(-20deg);animation:btnShine 3s ease-in-out infinite}
+.pub-btn:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(22,163,74,.55)}
+.pub-sub{font-size:.74rem;font-weight:700;color:var(--muted);text-align:center;margin-bottom:14px;line-height:1.5}
+.auto-tools{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px}
+.at-item{
+  display:flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border2);
+  border-radius:9px;padding:8px 10px;
+  font-size:.74rem;font-weight:800;color:var(--muted);
+  transition:border-color .2s,color .2s;
+}
+.at-item:hover{border-color:rgba(99,102,241,.3);color:var(--text)}
+.at-icon{font-size:.9rem}
+.pub-live{
+  display:none;
+  background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.25);
+  border-radius:12px;padding:14px;text-align:center;
+  animation:liveIn .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes liveIn{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.pl-check{font-size:1.6rem;margin-bottom:6px;filter:drop-shadow(0 0 8px rgba(74,222,128,.6))}
+.pl-title{font-family:'Fredoka One',cursive;font-size:.95rem;color:var(--green);letter-spacing:.3px}
+.pl-sub{font-size:.72rem;font-weight:700;color:rgba(74,222,128,.55)}
+
+/* ── FOOTER ROW ── */
+.footer-row{
+  background:rgba(13,20,40,.65);border:1px solid var(--border2);
+  border-radius:18px;padding:18px 20px;
+  display:grid;grid-template-columns:200px 1fr auto;gap:20px;align-items:center;
+  margin-bottom:16px;backdrop-filter:blur(12px);
+}
+.mascot-wrap{display:flex;align-items:center;gap:12px}
+.mascot-bot{font-size:3.2rem;filter:drop-shadow(0 0 14px rgba(99,102,241,.5));animation:mascotFloat 3s ease-in-out infinite;flex-shrink:0}
+.mascot-bubble{background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:12px;padding:10px 12px}
+.mb-name{font-family:'Fredoka One',cursive;font-size:.84rem;color:var(--purple);margin-bottom:3px}
+.mb-text{font-size:.72rem;font-weight:700;color:var(--muted);line-height:1.4}
+.howto-wrap{}
+.ht-title{font-size:.65rem;font-weight:900;color:rgba(99,102,241,.5);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.ht-steps{display:flex;align-items:center;gap:6px}
+.ht-step{text-align:center}
+.ht-num{
+  width:22px;height:22px;border-radius:50%;
+  background:rgba(99,102,241,.18);border:1.5px solid rgba(99,102,241,.4);
+  color:var(--blue);font-family:'Fredoka One',cursive;font-size:.76rem;
+  display:flex;align-items:center;justify-content:center;margin:0 auto 4px;
+}
+.ht-step-name{font-family:'Fredoka One',cursive;font-size:.72rem;color:var(--text);margin-bottom:2px}
+.ht-step-desc{font-size:.63rem;font-weight:700;color:var(--muted);max-width:80px;line-height:1.3}
+.ht-arr{color:rgba(99,102,241,.35);font-size:1rem;flex-shrink:0}
+.fg-wrap{}
+.fg-title{font-size:.65rem;font-weight:900;color:rgba(99,102,241,.5);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.fg-sections{display:flex;gap:12px}
+.fg-sec-name{font-size:.65rem;font-weight:900;color:var(--muted);margin-bottom:5px;white-space:nowrap}
+.fg-thumbs{display:flex;gap:4px}
+.fg-thumb{
+  width:36px;height:36px;border-radius:6px;border:1px solid var(--border2);
+  background:linear-gradient(135deg,#1a0a2e,#2a1060);
+}
+.fg-thumb.t1{background:linear-gradient(135deg,#7a1e00,#cc4400)}
+.fg-thumb.t2{background:linear-gradient(135deg,#0c2340,#1a4060)}
+.fg-thumb.t3{background:linear-gradient(135deg,#1a3a0a,#2a6010)}
+.fg-thumb.t4{background:linear-gradient(135deg,#2a0a3a,#501070)}
+.fg-thumb.t5{background:linear-gradient(135deg,#0a1a3a,#103070)}
+.fg-thumb.t6{background:linear-gradient(135deg,#3a0a10,#600020)}
+
+/* ── TAGLINE ── */
+.studio-tagline{
+  text-align:center;padding:8px 0 4px;
+  font-size:.74rem;font-weight:900;letter-spacing:.8px;
+  color:rgba(127,143,184,.35);
+}
+.tag-eylox{
+  background:var(--grad-title);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  font-family:'Fredoka One',cursive;font-size:.86rem;
+}
+.tag-part{margin:0 3px}
+
+/* ── CONFETTI ── */
+@keyframes cfFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+#cfContainer{position:fixed;inset:0;pointer-events:none;z-index:9999}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1100px){
+  .studio-grid{grid-template-columns:1fr 320px}
+  .footer-row{grid-template-columns:180px 1fr}
+  .fg-wrap{display:none}
+}
+@media(max-width:900px){
+  .studio-grid{grid-template-columns:1fr}
+  .step-row{grid-template-columns:1fr;gap:12px}
+  .step-arrow-wrap{display:none}
+  .footer-row{grid-template-columns:1fr}
+  .tb-menu{display:flex}
+  :root{--sidebar-w:218px}
+  .sidebar{position:fixed;top:0;bottom:0;left:0;z-index:200;transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main-area{width:100%}
+}
+@media(max-width:600px){
+  .reward-grid{grid-template-columns:1fr}
+  .auto-tools{grid-template-columns:1fr}
+  .content{padding:16px}
+}
+</style>
+<script src="audit-loader.js" defer></script>
+  <script src="debug-dashboard.js" defer></script>
+  <script src="api.js"></script>
+  <script src="ai-builder.js"></script>
+</head>
+<body>
+<canvas id="bgCanvas"></canvas>
+<div id="cfContainer"></div>
+
+<div class="app">
+  <!-- ══════════════ SIDEBAR ══════════════ -->
   <aside class="sidebar" id="sidebar">
     <a href="index.html" class="sidebar-logo">
       <span class="sidebar-logo-icon">🎮</span>
       <span class="sidebar-logo-text">Eylox</span>
     </a>
     <p class="sidebar-section-label">Menu</p>
-    <nav class="sidebar-nav"><ul>
-      <li><a href="index.html"    class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
-      <li><a href="games.html"    class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
-      <li><a href="friends.html"  class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span></a></li>
-      <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
-      <li><a href="profile.html"  class="sidebar-link"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
-    </ul></nav>
+    <nav class="sidebar-nav" aria-label="Main navigation">
+      <ul>
+        <li><a href="index.html"        class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
+        <li><a href="games.html"        class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
+        <li><a href="leaderboard.html"  class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
+        <li><a href="achievements.html" class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
+        <li><a href="events.html"       class="sidebar-link"><span class="s-icon">🎯</span><span class="s-label">Live Events</span></a></li>
+        <li><a href="communities.html"  class="sidebar-link"><span class="s-icon">🌐</span><span class="s-label">Communities</span></a></li>
+        <li><a href="friends.html"      class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span></a></li>
+        <li><a href="profile.html"      class="sidebar-link"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
+        <li><a href="messages.html"     class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
+      </ul>
+    </nav>
     <div class="sidebar-divider"></div>
     <p class="sidebar-section-label">More</p>
-    <nav class="sidebar-nav"><ul>
-      <li><a href="leaderboard.html"  class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
-      <li><a href="achievements.html" class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
-      <li><a href="communities.html"  class="sidebar-link"><span class="s-icon">🌍</span><span class="s-label">Communities</span></a></li>
-      <li><a href="live-events.html"  class="sidebar-link"><span class="s-icon">⚡</span><span class="s-label">Live Events</span></a></li>
-      <li><a href="shop.html"         class="sidebar-link"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
-      <li><a href="ai.html"           class="sidebar-link active"><span class="s-icon">🤖</span><span class="s-label">AI Gaming</span></a></li>
-      <li><a href="#" class="sidebar-link" id="settingsBtn"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></a></li>
-      <li><a href="#" class="sidebar-link" id="logoutBtn"><span class="s-icon">🚪</span><span class="s-label">Logout</span></a></li>
-    </ul></nav>
+    <nav class="sidebar-nav" aria-label="Secondary navigation">
+      <ul>
+        <li><a href="shop.html"         class="sidebar-link"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
+        <li><a href="ai.html"           class="sidebar-link active" aria-current="page"><span class="s-icon">🤖</span><span class="s-label">Eylox Studio</span><span class="s-soon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff">AI</span></a></li>
+        <li><a href="my-games.html"     class="sidebar-link"><span class="s-icon">🎮</span><span class="s-label">My Games</span></a></li>
+        <li><a href="dev-hub.html"      class="sidebar-link"><span class="s-icon">🔧</span><span class="s-label">Dev Hub</span></a></li>
+        <li><a href="assets.html"       class="sidebar-link"><span class="s-icon">🎒</span><span class="s-label">Inventory</span></a></li>
+        <li><a href="subscription.html" class="sidebar-link"><span class="s-icon">💎</span><span class="s-label">Subscription</span></a></li>
+        <li><button class="sidebar-link sb-action" onclick="location.href='settings.html'"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></button></li>
+      </ul>
+    </nav>
     <div class="sidebar-coins">
-      <span class="coins-icon">💰</span>
-      <div><div class="coins-amount" id="sideCoins">—</div><div class="coins-label">Eylux</div></div>
+      <span>💰</span>
+      <div>
+        <div class="coins-amount" id="aiSidebarCoins">0</div>
+        <div class="coins-label">Eylux</div>
+      </div>
     </div>
   </aside>
 
-  <!-- MAIN -->
+  <!-- ══════════════ MAIN ══════════════ -->
   <div class="main-area">
-    <div class="topbar">
-      <button class="topbar-menu" id="menuBtn">☰</button>
-      <div class="topbar-right">
-        <span class="topbar-avatar" id="topAv">🤖</span>
-        <span class="topbar-name" id="topName">Player</span>
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="tb-menu" id="tbMenuBtn" onclick="toggleSidebar()">☰</button>
+      <div class="tb-spacer"></div>
+      <div class="tb-right">
+        <div class="tb-cur" title="Coins">
+          <span class="tb-cur-icon">🪙</span>
+          <span class="tb-cur-val" id="tbCoins">0</span>
+        </div>
+        <div class="tb-cur" title="Gems" style="display:none" id="tbGemWrap">
+          <span class="tb-cur-icon">💎</span>
+          <span class="tb-cur-val" id="tbGems">0</span>
+        </div>
+        <button class="tb-bell"><span>🔔</span><span class="tb-bell-dot"></span></button>
+        <div class="tb-profile" onclick="location.href='profile.html'">
+          <div class="tb-av" id="tbAv">🎮</div>
+          <span class="tb-uname" id="tbName">Player</span>
+          <span class="tb-caret">▾</span>
+        </div>
       </div>
-    </div>
+    </header>
 
-    <div class="content" style="padding:20px 24px;max-width:1100px;margin:0 auto">
+    <!-- CONTENT -->
+    <main class="content" id="content">
 
-      <!-- Hero -->
-      <div class="ai-hero">
-        <div class="ai-badge">🤖 Powered by Eylox AI</div>
-        <div class="ai-hero-title">🤖 AI-Powered Gaming</div>
-        <div class="ai-hero-sub">Personalized recommendations, smart matchmaking, and intelligent game discovery</div>
+      <!-- Studio hero -->
+      <div class="studio-hero">
+        <div class="sh-sparkles-row">
+          <span class="sh-spark">✨</span>
+          <span class="sh-spark" style="font-size:.9rem">⭐</span>
+          <span class="sh-spark">✨</span>
+        </div>
+        <h1 class="sh-title">AI GAMING AI STUDIO</h1>
+        <p class="sh-sub">Create & publish real games instantly with AI!</p>
       </div>
 
-      <!-- Stats -->
-      <div class="ai-stat-row" id="aiStats">
-        <div class="ai-stat"><div class="ai-stat-val" id="statGames">0</div><div class="ai-stat-lbl">Games Played</div></div>
-        <div class="ai-stat"><div class="ai-stat-val" id="statScore">0</div><div class="ai-stat-lbl">Best Score</div></div>
-        <div class="ai-stat"><div class="ai-stat-val" id="statCoins">0</div><div class="ai-stat-lbl">Coins Earned</div></div>
-        <div class="ai-stat"><div class="ai-stat-val" id="statMatch">98%</div><div class="ai-stat-lbl">AI Match Rate</div></div>
-      </div>
+      <!-- Studio grid -->
+      <div class="studio-grid">
 
-      <!-- Recommendations -->
-      <div class="section-header">
-        <span style="font-size:1.4rem">🎯</span>
-        <span class="section-title">Recommended for You</span>
-        <button class="refresh-btn" onclick="refreshRecs()" style="margin-left:auto">↻ Refresh</button>
-      </div>
-      <div id="recsContainer"></div>
+        <!-- ════ LEFT COLUMN ════ -->
+        <div class="studio-left">
 
-      <!-- AI Chat -->
-      <div class="section-header">
-        <span style="font-size:1.4rem">💬</span>
-        <span class="section-title">Ask the AI Gaming Assistant</span>
-      </div>
-      <div class="ai-chat">
-        <div class="ai-chat-msgs" id="chatMsgs">
-          <div class="ai-msg">
-            <div class="ai-msg-av">🤖</div>
-            <div class="ai-msg-bubble">Hey there! I'm your AI gaming assistant. Ask me anything — which game to play next, how to improve your score, or what events are happening! 🎮</div>
+          <!-- Steps 1 + 2 -->
+          <div class="step-row">
+
+            <!-- Step 1 -->
+            <div class="step-card">
+              <div class="step-hdr">
+                <div class="step-num sn-blue">1</div>
+                <div class="step-title">Describe your game idea ✨</div>
+              </div>
+              <textarea class="idea-input" id="ideaInput" placeholder="Describe your game idea..."></textarea>
+              <div class="ex-label">Try these examples:</div>
+              <div class="ex-grid">
+                <button class="ex-btn" onclick="fillIdea('Obby with lava 🌋')">🌋 Obby with lava</button>
+                <button class="ex-btn" onclick="fillIdea('Car racing game 🏎️')">🏎️ Car racing game</button>
+                <button class="ex-btn" onclick="fillIdea('2D fighting game ⚔️')">⚔️ 2D fighting game</button>
+                <button class="ex-btn" onclick="fillIdea('Pet simulator 🐾')">🐾 Pet simulator</button>
+                <button class="ex-btn" onclick="fillIdea('Horror escape 👻')">👻 Horror escape</button>
+                <button class="ex-btn" onclick="fillIdea('Battle royale 💥')">💥 Battle royale</button>
+              </div>
+              <button class="gen-btn" id="genBtn" onclick="startGeneration()">✨ Generate Game</button>
+            </div>
+
+            <!-- Arrow -->
+            <div class="step-arrow-wrap">
+              <div class="step-arrow">&rsaquo;&rsaquo;</div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step-card">
+              <div class="step-hdr">
+                <div class="step-num sn-blue">2</div>
+                <div class="step-title">AI is creating your game…</div>
+              </div>
+              <div class="ai-robot-wrap">
+                <div class="ai-ring r1"></div>
+                <div class="ai-ring r2"></div>
+                <div class="ai-ring r3"></div>
+                <div class="ai-robot-icon" id="aiRobotIcon">🤖</div>
+              </div>
+              <div class="checklist" id="checklist">
+                <div class="ck-item" id="ck0"><div class="ck-circle"></div>Building Terrain 🏔️</div>
+                <div class="ck-item" id="ck1"><div class="ck-circle"></div>Writing Scripts 📜</div>
+                <div class="ck-item" id="ck2"><div class="ck-circle"></div>Designing UI 🎨</div>
+                <div class="ck-item" id="ck3"><div class="ck-circle"></div>Adding Music 🎵</div>
+                <div class="ck-item" id="ck4"><div class="ck-circle"></div>Adding Effects ✨</div>
+              </div>
+              <div class="prog-wrap">
+                <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+                <span class="prog-pct" id="progPct">0%</span>
+              </div>
+            </div>
+
+          </div><!-- /step-row -->
+
+          <!-- Step 4: Rewards -->
+          <div class="step-card">
+            <div class="step-hdr">
+              <div class="step-num sn-yellow">4</div>
+              <div class="step-title">Game Rewards</div>
+            </div>
+            <div style="font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:12px">Choose what players can earn in your game!</div>
+            <div class="reward-grid">
+              <div class="reward-card" id="rw-wins" onclick="selectReward('wins')">
+                <span class="rw-icon">🏆</span>
+                <div class="rw-name">WINS ONLY</div>
+                <div class="rw-desc">Players earn wins for playing!</div>
+              </div>
+              <div class="reward-card" id="rw-coins" onclick="selectReward('Eylux')">
+                <span class="rw-icon">💰</span>
+                <div class="rw-name">COINS ONLY</div>
+                <div class="rw-desc">Players earn coins for playing!</div>
+              </div>
+              <div class="reward-card" id="rw-both" onclick="selectReward('both')" style="padding-top:22px">
+                <div class="rw-best-badge">BEST CHOICE</div>
+                <span class="rw-icon">💎</span>
+                <div class="rw-name">WINS + COINS</div>
+                <div class="rw-desc">Players earn wins and coins!</div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /studio-left -->
+
+        <!-- ════ RIGHT COLUMN ════ -->
+        <div class="studio-right">
+
+          <!-- Step 3: Preview -->
+          <div class="step-card">
+            <div class="step-hdr">
+              <div class="step-num sn-green">3</div>
+              <div class="step-title">Your game is ready!</div>
+            </div>
+            <div class="game-thumb">
+              <div class="game-thumb-bg"></div>
+              <div class="gt-lava"></div>
+              <div class="gt-platform gt-plat1"></div>
+              <div class="gt-platform gt-plat2"></div>
+              <div class="gt-platform gt-plat3"></div>
+              <div class="gt-player"></div>
+              <div class="gt-glow"></div>
+              <iframe id="gtLiveFrame" sandbox="allow-scripts allow-same-origin" class="gt-live-frame"></iframe>
+              <div class="gt-title-overlay" id="gtTitle">Describe a game and generate it</div>
+              <div class="gt-controls">
+                <div class="gt-ctrl-btn">🛒</div>
+                <div class="gt-ctrl-btn">🎁</div>
+              </div>
+            </div>
+            <div class="preview-meta">
+              <div class="pv-stats" id="pvStats" style="display:none">
+                <span class="pv-stat" id="pvGenreStat"></span>
+              </div>
+              <div class="pv-btns">
+                <button class="play-btn" onclick="playGame()">▶ PLAY</button>
+                <button class="fs-btn" title="Fullscreen" onclick="toggleFS()">⛶</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 5: Publish -->
+          <div class="step-card">
+            <div class="step-hdr">
+              <div class="step-num sn-green">5</div>
+              <div class="step-title">Publish your game</div>
+            </div>
+            <button class="pub-btn" id="pubBtn" onclick="publishGame()">
+              🌐&nbsp; Publish to Discover
+            </button>
+            <div class="pub-sub">Your game will be published and visible to millions of players!</div>
+            <div class="auto-tools">
+              <div class="at-item"><span class="at-icon">🖼️</span> Auto Thumbnail</div>
+              <div class="at-item"><span class="at-icon">📝</span> Auto Description</div>
+              <div class="at-item"><span class="at-icon">🏷️</span> Auto Tags</div>
+              <div class="at-item"><span class="at-icon">📂</span> Auto Category</div>
+            </div>
+            <div class="pub-live" id="pubLive">
+              <div class="pl-check">✅</div>
+              <div class="pl-title">YOUR GAME IS NOW LIVE!</div>
+              <div class="pl-sub">It has been published to the Discover page!</div>
+              <a href="games.html" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;border:none;border-radius:99px;padding:8px 20px;font-family:'Fredoka One',cursive;font-size:.82rem;text-decoration:none;transition:opacity .18s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">🔍 View in Discover</a>
+            </div>
+          </div>
+
+        </div><!-- /studio-right -->
+      </div><!-- /studio-grid -->
+
+      <!-- ════ FOOTER ROW ════ -->
+      <div class="footer-row">
+        <div class="mascot-wrap">
+          <div class="mascot-bot">🤖</div>
+          <div class="mascot-bubble">
+            <div class="mb-name">Hi! I'm EYLOX AI!</div>
+            <div class="mb-text">I'll help you create, publish and grow your games!</div>
           </div>
         </div>
-        <div class="ai-chat-input">
-          <input id="chatIn" placeholder="Ask me anything about gaming..." onkeydown="if(event.key==='Enter')sendChat()"/>
-          <button onclick="sendChat()">Send ▶</button>
+
+        <div class="howto-wrap">
+          <div class="ht-title">How to create and publish your game</div>
+          <div class="ht-steps">
+            <div class="ht-step">
+              <div class="ht-num">1</div>
+              <div class="ht-step-name">Describe</div>
+              <div class="ht-step-desc">Type your game idea in the box.</div>
+            </div>
+            <div class="ht-arr">›</div>
+            <div class="ht-step">
+              <div class="ht-num">2</div>
+              <div class="ht-step-name">Generate</div>
+              <div class="ht-step-desc">AI builds your game instantly!</div>
+            </div>
+            <div class="ht-arr">›</div>
+            <div class="ht-step">
+              <div class="ht-num">3</div>
+              <div class="ht-step-name">Customize</div>
+              <div class="ht-step-desc">Choose rewards and test your game.</div>
+            </div>
+            <div class="ht-arr">›</div>
+            <div class="ht-step">
+              <div class="ht-num">4</div>
+              <div class="ht-step-name">Publish</div>
+              <div class="ht-step-desc">Go live on Discover!</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="fg-wrap">
+          <div class="fg-title">Your game will appear in</div>
+          <div class="fg-sections">
+            <div>
+              <div class="fg-sec-name">🔥 Trending</div>
+              <div class="fg-thumbs"><div class="fg-thumb t1"></div><div class="fg-thumb t2"></div></div>
+            </div>
+            <div>
+              <div class="fg-sec-name">⭐ New Games</div>
+              <div class="fg-thumbs"><div class="fg-thumb t3"></div><div class="fg-thumb t4"></div></div>
+            </div>
+            <div>
+              <div class="fg-sec-name">👍 Recommended</div>
+              <div class="fg-thumbs"><div class="fg-thumb t5"></div></div>
+            </div>
+            <div>
+              <div class="fg-sec-name">👥 Friends</div>
+              <div class="fg-thumbs"><div class="fg-thumb t6"></div></div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Gaming Insights -->
-      <div class="section-header">
-        <span style="font-size:1.4rem">📊</span>
-        <span class="section-title">Your Gaming Insights</span>
-      </div>
-      <div id="insightsContainer"></div>
-
-      <!-- Suggested Friends -->
-      <div class="section-header">
-        <span style="font-size:1.4rem">👥</span>
-        <span class="section-title">Suggested Friends</span>
-      </div>
-      <div id="friendsContainer"></div>
-
-      <!-- Feature Cards -->
-      <div class="section-header">
-        <span style="font-size:1.4rem">✨</span>
-        <span class="section-title">AI Features</span>
-      </div>
-      <div class="ai-grid">
-        <div class="ai-card" onclick="alert('🎯 Smart Matchmaking finds you the best opponents based on your skill level and play style!')">
-          <div class="ai-card-icon">🎯</div>
-          <div class="ai-card-title">Smart Matchmaking</div>
-          <div class="ai-card-desc">Get matched with players of similar skill and play style for the best competitive experience.</div>
-          <span class="ai-card-tag">Active</span>
-        </div>
-        <div class="ai-card" onclick="alert('📈 Skill Analysis tracks your performance across all games and identifies areas to improve!')">
-          <div class="ai-card-icon">📈</div>
-          <div class="ai-card-title">Skill Analysis</div>
-          <div class="ai-card-desc">Deep analysis of your gaming patterns, strengths, and improvement areas across every genre.</div>
-          <span class="ai-card-tag purple">Analyzing</span>
-        </div>
-        <div class="ai-card" onclick="alert('🎮 Game Discovery uses AI to recommend hidden gems you\'ll love based on your history!')">
-          <div class="ai-card-icon">🎮</div>
-          <div class="ai-card-title">Game Discovery</div>
-          <div class="ai-card-desc">AI-powered discovery of games you'll love, before you even know you want them.</div>
-          <span class="ai-card-tag">Active</span>
-        </div>
-        <div class="ai-card" onclick="alert('🤖 AI Coach watches your gameplay and gives real-time tips to boost your score!')">
-          <div class="ai-card-icon">🤖</div>
-          <div class="ai-card-title">AI Coach</div>
-          <div class="ai-card-desc">Get real-time coaching tips during gameplay to improve your strategies and reactions.</div>
-          <span class="ai-card-tag pink">Coming Soon</span>
-        </div>
-        <div class="ai-card" onclick="alert('🎁 Reward Optimizer finds you the best events and challenges for maximum coins!')">
-          <div class="ai-card-icon">🎁</div>
-          <div class="ai-card-title">Reward Optimizer</div>
-          <div class="ai-card-desc">Maximize your coins and rewards by participating in the highest-value events at the right time.</div>
-          <span class="ai-card-tag">Active</span>
-        </div>
-        <div class="ai-card" onclick="alert('🌐 Social AI suggests friends who match your gaming preferences and schedule!')">
-          <div class="ai-card-icon">🌐</div>
-          <div class="ai-card-title">Social AI</div>
-          <div class="ai-card-desc">Find friends who match your play style, schedule, and favorite game genres automatically.</div>
-          <span class="ai-card-tag purple">Active</span>
-        </div>
+      <!-- Tagline -->
+      <div class="studio-tagline">
+        ✨&nbsp;
+        <span class="tag-part">CREATE ANY GAME.</span>
+        <span class="tag-part">PUBLISH ANY GAME.</span>
+        <span class="tag-part">BECOME ANYTHING.</span>
+        <span class="tag-part">ONLY ON</span>
+        <span class="tag-eylox">EYLOX.</span>
       </div>
 
-    </div>
-  </div>
-</div>
+    </main>
+  </div><!-- /main-area -->
+</div><!-- /app -->
 
+<script src="premium.js"></script>
 <script>
-'use strict';
-/* ── Auth & init ── */
-const _user = (() => { try { return JSON.parse(localStorage.getItem('eylox_user')||'null'); } catch { return null; } })() || { username:'Player', avatar:'🎮', coins:0 };
-document.getElementById('topName').textContent = _user.username;
-document.getElementById('topAv').textContent   = _user.avatar || '🎮';
-document.getElementById('sideCoins').textContent = (_user.coins || 0).toLocaleString();
-
-document.getElementById('logoutBtn').addEventListener('click', e => {
-  e.preventDefault();
-  ['eylox_token','eylox_guest','eylox_user','eylox_is_owner'].forEach(k => localStorage.removeItem(k));
-  location.href = 'landing.html';
-});
-
-/* ── Stats ── */
-const recentlyPlayed = (() => { try { return JSON.parse(localStorage.getItem('eylox_recently_played')||'[]'); } catch { return []; } })();
-document.getElementById('statGames').textContent = recentlyPlayed.length || Math.floor(Math.random()*20)+3;
-document.getElementById('statCoins').textContent = (_user.coins || 0).toLocaleString();
-document.getElementById('statScore').textContent = (Math.floor(Math.random()*50000)+5000).toLocaleString();
-
-/* ── Recommendations ── */
-const GAME_CATALOG = [
-  { id:'ninja-dash',    title:'Ninja Dash',    icon:'🥷', genre:'action',    reason:'Based on your action game history', score:98 },
-  { id:'sky-riders',    title:'Sky Riders',    icon:'🚀', genre:'racing',    reason:'Trending with your friends', score:95 },
-  { id:'puzzle-palace', title:'Puzzle Palace',  icon:'🧩', genre:'puzzle',    reason:'Great for skill building', score:92 },
-  { id:'ocean-quest',   title:'Ocean Quest',   icon:'🌊', genre:'adventure', reason:'You\'d love the adventure genre', score:90 },
-  { id:'dragon-escape', title:'Dragon Escape', icon:'🐉', genre:'action',    reason:'High replay value match', score:88 },
-  { id:'space-blaster', title:'Space Blaster', icon:'👾', genre:'action',    reason:'Top rated this week', score:87 },
-  { id:'block-kingdom', title:'Block Kingdom', icon:'🏰', genre:'building',  reason:'Relaxing & creative', score:85 },
-  { id:'farm-friends',  title:'Farm Friends',  icon:'🚜', genre:'casual',    reason:'Popular with your level', score:83 },
-];
-
-function refreshRecs() {
-  const shuffled = [...GAME_CATALOG].sort(() => Math.random()-.5).slice(0,4);
-  document.getElementById('recsContainer').innerHTML = shuffled.map(g => `
-    <a class="rec-game" href="game.html?id=${g.id}&title=${encodeURIComponent(g.title)}&genre=${g.genre}&thumb=${encodeURIComponent(g.icon)}">
-      <div class="rec-game-thumb" style="background:linear-gradient(135deg,#1e0a48,#3a1080)">${g.icon}</div>
-      <div>
-        <div class="rec-game-name">${g.title}</div>
-        <div class="rec-game-reason">🤖 ${g.reason}</div>
-      </div>
-      <div class="rec-game-score">${g.score}%</div>
-    </a>`).join('');
-}
-refreshRecs();
-
-/* ── Insights ── */
-const INSIGHTS = [
-  { title:'🎯 Best Genre: Action', text:'You perform 42% better in action games than any other genre. Your reaction time puts you in the top 15% of players!', pct: 85 },
-  { title:'⏰ Peak Hours: Evening', text:'Your win rate jumps to 73% when you play between 7–10 PM. The AI recommends scheduling ranked play during these hours.', pct: 73 },
-  { title:'📈 Improving Fast', text:'Your average score has increased by 38% over the last 7 days. You\'re on track to reach Expert rank within 2 weeks!', pct: 62 },
-  { title:'🏆 Trophy Hunter', text:'You\'ve completed 8 out of 24 available achievements. The AI suggests targeting the Ninja Dash speed run next for easy coins.', pct: 33 },
-];
-document.getElementById('insightsContainer').innerHTML = INSIGHTS.map(ins => `
-  <div class="ai-insight">
-    <div class="ai-insight-title">${ins.title}</div>
-    <div class="ai-insight-text">${ins.text}</div>
-    <div class="ai-insight-bar"><div class="ai-insight-fill" style="width:${ins.pct}%"></div></div>
-  </div>`).join('');
-
-/* ── Suggested Friends ── */
-const SUGGESTED = [
-  { name:'SpeedRacer99', av:'🏎️', bg:'linear-gradient(135deg,#b45309,#fbbf24)', match:'94% match — Both love Racing & Action games' },
-  { name:'PuzzleKing',   av:'🧩', bg:'linear-gradient(135deg,#1d4ed8,#60a5fa)', match:'91% match — Similar playtimes and genres' },
-  { name:'DragonSlayer', av:'🐉', bg:'linear-gradient(135deg,#7c3aed,#a78bfa)', match:'89% match — Both chasing Dragon Escape records' },
-];
-document.getElementById('friendsContainer').innerHTML = SUGGESTED.map(f => `
-  <div class="friend-suggest">
-    <div class="fs-av" style="background:${f.bg}">${f.av}</div>
-    <div>
-      <div class="fs-name">${f.name}</div>
-      <div class="fs-match">🤖 ${f.match}</div>
-    </div>
-    <button class="fs-add" onclick="this.textContent='✅ Added!';this.disabled=true">+ Add</button>
-  </div>`).join('');
-
-/* ── AI Chat ── */
-const AI_REPLIES = {
-  'best game':   'Based on your history, I recommend 🥷 Ninja Dash right now — your reaction time stats suggest you\'d crush the leaderboard!',
-  'coins':       'The fastest way to earn coins is playing daily challenges (+500 coins) and entering the Weekly Race event. You could earn 3000+ coins this week!',
-  'score':       'To improve your score in action games: focus on combo chains — they multiply your points by up to 5x. Also try playing between 7–10 PM when your focus peaks!',
-  'friends':     'I found 3 players with 90%+ compatibility with you! Check the Suggested Friends section below. Add them for bonus social coins!',
-  'events':      'There are 5 active events right now! The Ninja Dash Championship ends in 5 days and has a 5000 coin prize pool. You have time to enter!',
-  'recommend':   'My top pick for you today is 🥷 Ninja Dash (98% match). Based on your evening play pattern, jump in around 8 PM for your best performance!',
-  'help':        'I can help you with: game recommendations, score tips, event info, coin strategies, and friend suggestions. What do you need? 🎮',
-};
-function sendChat() {
-  const inp = document.getElementById('chatIn');
-  const val = inp.value.trim();
-  if (!val) return;
-  const msgs = document.getElementById('chatMsgs');
-  msgs.innerHTML += `<div class="ai-msg user"><div class="ai-msg-av">👤</div><div class="ai-msg-bubble">${val}</div></div>`;
-  inp.value = '';
-  const lower = val.toLowerCase();
-  let reply = 'Great question! I\'m analyzing your gaming profile for the best answer... 🤖 Based on your data, I suggest checking out the Live Events page for today\'s challenges!';
-  for (const [key, resp] of Object.entries(AI_REPLIES)) {
-    if (lower.includes(key)) { reply = resp; break; }
+/* ══════════════════════════════════════════
+   STAR BACKGROUND
+══════════════════════════════════════════ */
+(function(){
+  const cv = document.getElementById('bgCanvas');
+  const cx = cv.getContext('2d');
+  let W, H;
+  const stars = [];
+  function resize(){
+    W = cv.width = window.innerWidth;
+    H = cv.height = window.innerHeight;
   }
-  setTimeout(() => {
-    msgs.innerHTML += `<div class="ai-msg"><div class="ai-msg-av">🤖</div><div class="ai-msg-bubble">${reply}</div></div>`;
-    msgs.scrollTop = msgs.scrollHeight;
-  }, 700);
-  msgs.scrollTop = msgs.scrollHeight;
+  resize();
+  window.addEventListener('resize', resize);
+  for(let i=0;i<220;i++) stars.push({
+    x: Math.random()*100, y: Math.random()*100,
+    r: Math.random()*1.4+.2,
+    o: Math.random()*.65+.15,
+    sp: Math.random()*.008+.002,
+    tw: Math.random()*Math.PI*2,
+    tws: (Math.random()-.5)*.03,
+  });
+  function draw(){
+    cx.clearRect(0,0,W,H);
+    // Dark navy base
+    cx.fillStyle='#060b18'; cx.fillRect(0,0,W,H);
+    // Nebula 1 — purple
+    const g1=cx.createRadialGradient(W*.15,H*.25,0,W*.15,H*.25,W*.35);
+    g1.addColorStop(0,'rgba(99,102,241,.07)'); g1.addColorStop(1,'transparent');
+    cx.fillStyle=g1; cx.fillRect(0,0,W,H);
+    // Nebula 2 — cyan
+    const g2=cx.createRadialGradient(W*.85,H*.65,0,W*.85,H*.65,W*.3);
+    g2.addColorStop(0,'rgba(6,182,212,.05)'); g2.addColorStop(1,'transparent');
+    cx.fillStyle=g2; cx.fillRect(0,0,W,H);
+    // Nebula 3 — deep purple center
+    const g3=cx.createRadialGradient(W*.5,H*.5,0,W*.5,H*.5,W*.4);
+    g3.addColorStop(0,'rgba(124,58,237,.04)'); g3.addColorStop(1,'transparent');
+    cx.fillStyle=g3; cx.fillRect(0,0,W,H);
+    // Stars
+    stars.forEach(s=>{
+      s.y -= s.sp; if(s.y<0){s.y=100;s.x=Math.random()*100;}
+      s.tw += s.tws;
+      const x=s.x/100*W, y=s.y/100*H;
+      const op=s.o*(0.7+0.3*Math.sin(s.tw));
+      cx.beginPath(); cx.arc(x,y,s.r,0,Math.PI*2);
+      cx.fillStyle=`rgba(220,230,255,${op})`; cx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ══════════════════════════════════════════
+   USER DATA
+══════════════════════════════════════════ */
+(function(){
+  try{
+    const u=JSON.parse(localStorage.getItem('eylox_user')||'null');
+    if(u){
+      document.getElementById('tbName').textContent = u.username||'Player';
+      document.getElementById('tbCoins').textContent = (u.coins||0).toLocaleString();
+      const av=document.getElementById('tbAv');
+      if(av) av.textContent = u.avatar||'🎮';
+    }
+    const gems = parseInt(localStorage.getItem('eylox_gems')||'0');
+    if(gems>0){
+      document.getElementById('tbGems').textContent = gems.toLocaleString();
+      document.getElementById('tbGemWrap').style.display='flex';
+    }
+  }catch{}
+})();
+
+/* ══════════════════════════════════════════
+   SIDEBAR TOGGLE (mobile)
+══════════════════════════════════════════ */
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
 }
 
-/* ── Sidebar toggle ── */
-document.getElementById('menuBtn').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+/* ══════════════════════════════════════════
+   EXAMPLE IDEAS
+══════════════════════════════════════════ */
+const GAME_NAMES = {
+  'lava':    'LAVA ADVENTURE OBBY',
+  'car':     'NEON DRIFT RACING',
+  'racing':  'NEON DRIFT RACING',
+  'fight':   'SHADOW BRAWL ARENA',
+  'pet':     'COSMIC PET SIMULATOR',
+  'horror':  'SHADOW ESCAPE HORROR',
+  'battle':  'STORM ROYALE ARENA',
+  'royale':  'STORM ROYALE ARENA',
+};
+function fillIdea(text){
+  document.getElementById('ideaInput').value = text;
+  document.getElementById('ideaInput').focus();
+}
+function getGameTitle(idea){
+  const low = idea.toLowerCase();
+  for(const[k,v] of Object.entries(GAME_NAMES)) if(low.includes(k)) return v;
+  const words = idea.replace(/[^a-zA-Z\s]/g,'').trim().toUpperCase().split(/\s+/);
+  return (words.slice(0,4).join(' ')||'EPIC ADVENTURE GAME');
+}
+
+/* ══════════════════════════════════════════
+   GENERATION — actually builds a real, playable game
+   via EyloxAIBuilder (ai-builder.js), the same template
+   engine used by the home page's Instant Game button.
+══════════════════════════════════════════ */
+let _generating = false;
+let _lastGenerated = null; // { key, label, icon, title, html } — the real generated game
+function startGeneration(){
+  if(_generating) return;
+  const idea = document.getElementById('ideaInput').value.trim();
+  if(!idea){ document.getElementById('ideaInput').focus(); return; }
+  if(!window.EyloxAIBuilder){ alert('Game generator failed to load — try refreshing the page.'); return; }
+  _generating = true;
+
+  const btn = document.getElementById('genBtn');
+  btn.textContent = '⏳ AI is working…';
+  btn.disabled = true;
+
+  // Reset checklist
+  for(let i=0;i<5;i++){
+    const el=document.getElementById('ck'+i);
+    if(el){ el.classList.remove('done'); el.querySelector('.ck-circle').textContent=''; }
+  }
+  document.getElementById('progFill').style.width='0%';
+  document.getElementById('progPct').textContent='0%';
+  document.getElementById('pubLive').style.display='none';
+
+  // Visual progress steps while the (near-instant) real build runs
+  const timeline = [
+    {delay:150, step:0, pct:20},
+    {delay:300, step:1, pct:40},
+    {delay:450, step:2, pct:60},
+    {delay:600, step:3, pct:80},
+  ];
+  timeline.forEach(({delay,step,pct})=>{
+    setTimeout(()=>{
+      const el=document.getElementById('ck'+step);
+      if(el){ el.classList.add('done'); el.querySelector('.ck-circle').textContent='✓'; }
+      document.getElementById('progFill').style.width=pct+'%';
+      document.getElementById('progPct').textContent=pct+'%';
+    }, delay);
+  });
+
+  EyloxAIBuilder.buildGame(idea, null).then(result => {
+    _lastGenerated = result;
+    for(let i=0;i<5;i++){
+      const el=document.getElementById('ck'+i);
+      if(el){ el.classList.add('done'); el.querySelector('.ck-circle').textContent='✓'; }
+    }
+    document.getElementById('progFill').style.width='100%';
+    document.getElementById('progPct').textContent='100%';
+
+    document.getElementById('gtTitle').textContent = result.title || getGameTitle(idea);
+    const frame = document.getElementById('gtLiveFrame');
+    frame.srcdoc = result.html;
+    frame.style.display = 'block';
+    const genreStat = document.getElementById('pvGenreStat');
+    genreStat.textContent = `${result.icon} ${result.label}`;
+    document.getElementById('pvStats').style.display = '';
+
+    btn.textContent = '✨ Re-Generate';
+    btn.disabled = false;
+    _generating = false;
+    if(window.innerWidth<900){
+      document.querySelector('.studio-right')?.scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
+  });
+}
+
+/* ══════════════════════════════════════════
+   REWARD SELECTION
+══════════════════════════════════════════ */
+let _reward = 'both';
+selectReward('both'); // default
+function selectReward(type){
+  _reward = type;
+  ['wins','Eylux','both'].forEach(t=>{
+    const el=document.getElementById('rw-'+t);
+    if(el) el.className = 'reward-card' + (t===type?' rw-sel-'+t:'');
+  });
+}
+
+/* ══════════════════════════════════════════
+   PLAY GAME — plays the actual generated game, not a
+   query-string-driven fake render.
+══════════════════════════════════════════ */
+function playGame(){
+  if(!_lastGenerated){ document.getElementById('ideaInput').focus(); return; }
+  const w = window.open('', '_blank');
+  if(w){ w.document.write(_lastGenerated.html); w.document.close(); }
+}
+function toggleFS(){
+  if(document.fullscreenElement) document.exitFullscreen();
+  else document.querySelector('.game-thumb')?.requestFullscreen?.();
+}
+
+/* ══════════════════════════════════════════
+   PUBLISH — really creates + publishes the project via the
+   backend (POST /api/projects, PUT scene, POST .../publish),
+   the same real pipeline as the Studio and home-page Instant
+   Game button. No more writing a fabricated game object
+   straight to localStorage.
+══════════════════════════════════════════ */
+async function publishGame(){
+  if(!_lastGenerated){ alert('Generate a game first.'); return; }
+  if(typeof getToken !== 'function' || !getToken()){
+    alert('Log in to publish your game for real.');
+    return;
+  }
+  const btn = document.getElementById('pubBtn');
+  btn.textContent = '⏳ Publishing…';
+  btn.disabled = true;
+
+  try{
+    const title = document.getElementById('gtTitle').textContent.trim() || _lastGenerated.title;
+    const project = await request('POST', '/projects', {
+      name: title,
+      description: `AI-generated ${_lastGenerated.label} — built from: "${document.getElementById('ideaInput').value.trim()}"`,
+    }, true);
+    if(!project) throw new Error('Server unreachable');
+    await request('PUT', '/projects/' + project.id, {
+      scene: { type: 'html-template', html: _lastGenerated.html },
+    }, true);
+    const pub = await request('POST', '/projects/' + project.id + '/publish', null, true);
+    if(!pub) throw new Error('Server unreachable');
+
+    document.getElementById('pubLive').style.display='block';
+    const link = document.getElementById('pubLive').querySelector('a');
+    if(link){ link.href = `game.html?id=${project.id}`; link.textContent = '▶ Play Your Published Game'; link.target = '_blank'; }
+    btn.textContent = '✅ Published!';
+    spawnConfetti();
+  }catch(err){
+    btn.textContent = '❌ Failed — try again';
+    setTimeout(()=>{ btn.textContent = '🌐 Publish to Discover'; btn.disabled = false; }, 2200);
+    return;
+  }
+}
+
+/* ══════════════════════════════════════════
+   CONFETTI
+══════════════════════════════════════════ */
+function spawnConfetti(){
+  const colors=['#a78bfa','#60a5fa','#f472b6','#fbbf24','#4ade80','#fb923c','#e879f9','#22d3ee'];
+  const cf = document.getElementById('cfContainer');
+  for(let i=0;i<100;i++){
+    const el=document.createElement('div');
+    const sz=5+Math.random()*9;
+    el.style.cssText=`
+      position:fixed;top:-15px;
+      left:${Math.random()*100}vw;
+      width:${sz}px;height:${sz*(Math.random()>.5?.6:1)}px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      border-radius:${Math.random()>.5?'50%':'3px'};
+      animation:cfFall ${1.8+Math.random()*1.5}s ${Math.random()*1.2}s cubic-bezier(.25,.46,.45,.94) forwards;
+      pointer-events:none;
+    `;
+    cf.appendChild(el);
+    setTimeout(()=>el.remove(),(3.5+Math.random())*1000);
+  }
+}
+
+/* Load sidebar coins from localStorage */
+(function(){
+  try {
+    const u = JSON.parse(localStorage.getItem('eylox_user')||'{}');
+    const el = document.getElementById('aiSidebarCoins');
+    if(el) el.textContent = (u.coins||0).toLocaleString();
+  } catch {}
+})();
 </script>
-<script src="notifications.js"></script>
-<script src="admin-button.js"></script>
-<script src="studio-button.js"></script>
-<script src="effects.js"></script>
-<script src="sound.js"></script>
-<script src="settings.js"></script>
 </body>
 </html>

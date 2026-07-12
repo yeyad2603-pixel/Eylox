@@ -698,7 +698,10 @@ function showAuthGate() {
    OWNER SYSTEM
 ══════════════════════════════════════════════════ */
 function isOwner() {
-  return localStorage.getItem('eylox_is_owner') === 'true';
+  try {
+    const u = JSON.parse(localStorage.getItem('eylox_user') || 'null');
+    return !!(u && u.isOwner === true);
+  } catch { return false; }
 }
 
 function injectOwnerBadge() {

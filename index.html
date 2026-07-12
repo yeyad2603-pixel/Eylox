@@ -1,1089 +1,1466 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>∞ Eylox — Home</title>
+  <title>Eylox — Home</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-192x192.png" />
+  <meta name="theme-color" content="#7c3aed" />
   <link rel="stylesheet" href="style.css" />
-  <script>
-    /* Redirect to landing only if there is truly no session at all */
-    try {
-      const hasSession = localStorage.getItem('eylox_token') ||
-                         localStorage.getItem('eylox_guest') ||
-                         localStorage.getItem('eylox_user');
-      if (!hasSession) window.location.replace('landing.html');
-    } catch {}
-  </script>
+  <link rel="stylesheet" href="ads.css" />
+  <link rel="stylesheet" href="eylox-dash.css" />
+  <style>
+    /* ── Landing sections ── */
+    .lp-stats-bar{display:flex;align-items:center;justify-content:center;gap:28px;padding:20px 24px;background:rgba(167,139,250,.04);border:1px solid rgba(167,139,250,.12);border-radius:16px;margin-bottom:28px;flex-wrap:wrap}
+    .lp-stat{display:flex;flex-direction:column;align-items:center}
+    .lp-stat-num{font-family:'Fredoka One',cursive;font-size:1.45rem;color:#a78bfa;line-height:1}
+    .lp-stat-lbl{font-size:.6rem;font-weight:900;color:rgba(167,139,250,.45);letter-spacing:1.3px;margin-top:3px}
+    .lp-stat-sep{color:rgba(167,139,250,.2);font-size:1.4rem;align-self:center}
+    /* Hero */
+    .lp-hero{position:relative;background:transparent;border:none;border-radius:20px;padding:56px 32px 40px;text-align:center;overflow:hidden;margin-bottom:28px}
+    .lp-hero-stars{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+    .lp-star-dot{position:absolute;background:rgba(255,255,255,.45);border-radius:50%}
+    .lp-badge-pill{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(245,158,11,.06));border:1px solid rgba(245,158,11,.38);color:#fbbf24;border-radius:99px;padding:6px 18px;font-size:.68rem;font-weight:900;letter-spacing:1.3px;margin-bottom:20px}
+    .lp-hero-title{font-family:'Fredoka One',cursive;font-size:clamp(2rem,5vw,3.4rem);line-height:1.12;color:#fff;margin-bottom:14px}
+    .lp-typed-word{color:#38bdf8;display:inline-block;transition:opacity .3s,transform .3s}
+    .lp-hero-sub{font-size:.92rem;color:rgba(167,139,250,.58);font-weight:600;max-width:480px;margin:0 auto 28px;line-height:1.6}
+    .lp-hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:36px}
+    .lp-btn-primary{background:linear-gradient(135deg,#a78bfa,#8b5cf6);color:#fff;border:none;border-radius:99px;padding:13px 28px;font-family:'Fredoka One',cursive;font-size:.93rem;cursor:pointer;box-shadow:0 4px 18px rgba(124,58,237,.4);transition:opacity .2s}
+    .lp-btn-primary:hover{opacity:.85}
+    .lp-btn-outline{background:rgba(167,139,250,.08);color:#a78bfa;border:1px solid rgba(167,139,250,.32);border-radius:99px;padding:13px 28px;font-family:'Fredoka One',cursive;font-size:.93rem;cursor:pointer;transition:background .2s}
+    .lp-btn-outline:hover{background:rgba(167,139,250,.18)}
+    .lp-game-strip{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+    .lp-game-pill{display:flex;flex-direction:column;align-items:center;gap:5px;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.15);border-radius:14px;padding:12px 16px;min-width:82px;transition:border-color .2s}
+    .lp-game-pill:hover{border-color:rgba(167,139,250,.35)}
+    .lp-game-pill-icon{font-size:1.85rem}
+    .lp-game-pill-name{font-size:.68rem;font-weight:800;color:var(--text)}
+    .lp-game-pill-stars{color:#f59e0b;font-size:.65rem;letter-spacing:-1px}
+    /* Viral */
+    .lp-viral{display:grid;grid-template-columns:1fr 210px;gap:40px;align-items:center;background:transparent;border:none;border-radius:20px;padding:48px 40px;margin-bottom:28px;overflow:hidden}
+    @media(max-width:720px){.lp-viral{grid-template-columns:1fr}}
+    .lp-viral-badge{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(167,139,250,.35);color:#a78bfa;border-radius:99px;padding:5px 14px;font-size:.67rem;font-weight:900;letter-spacing:1.2px;margin-bottom:16px}
+    .lp-viral h2{font-family:'Fredoka One',cursive;font-size:clamp(1.8rem,3vw,2.6rem);color:#fff;margin-bottom:12px;line-height:1.1}
+    .lp-viral-desc{font-size:.86rem;color:rgba(167,139,250,.62);font-weight:600;line-height:1.6;margin-bottom:26px;max-width:460px}
+    .lp-viral-feats{display:flex;flex-direction:column;gap:14px;margin-bottom:30px}
+    .lp-feat-row{display:flex;align-items:flex-start;gap:12px}
+    .lp-feat-icon{font-size:1.2rem;flex-shrink:0;margin-top:1px}
+    .lp-feat-title{font-weight:800;font-size:.86rem;color:var(--text)}
+    .lp-feat-sub{font-size:.76rem;color:rgba(167,139,250,.52);margin-top:2px}
+    /* Phone mockup */
+    .lp-phone{width:190px;background:linear-gradient(160deg,#1e0b54,#0d1535);border:1.5px solid rgba(167,139,250,.3);border-radius:22px;padding:18px 14px;box-shadow:0 0 40px rgba(124,58,237,.3);flex-shrink:0}
+    .lp-ph-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+    .lp-ph-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#ec4899);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+    .lp-ph-name{font-weight:800;font-size:.82rem;color:var(--text)}
+    .lp-ph-score{font-size:.68rem;color:var(--muted)}
+    .lp-ph-gain{font-size:.9rem;font-weight:900;color:#4ade80;margin-bottom:6px}
+    .lp-ph-sub{font-size:.68rem;color:rgba(167,139,250,.45);margin-bottom:8px}
+    .lp-ph-lvlup{background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(99,102,241,.14));border:1px solid rgba(167,139,250,.32);border-radius:11px;padding:9px 10px;text-align:center;margin-bottom:10px}
+    .lp-ph-lvlup-lbl{font-size:.6rem;font-weight:900;color:rgba(167,139,250,.55);letter-spacing:1px;margin-bottom:2px}
+    .lp-ph-lvlup-val{font-family:'Fredoka One',cursive;font-size:1.05rem;color:#fbbf24}
+    .lp-ph-icons{display:flex;justify-content:space-around;padding:6px 0;margin-bottom:8px;font-size:1rem}
+    .lp-ph-coins{display:flex;align-items:center;gap:7px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.22);border-radius:9px;padding:7px 11px;font-size:.76rem;font-weight:800;color:#fbbf24}
+    /* Feature cards */
+    .lp-why-label{text-align:center;font-size:.65rem;font-weight:900;letter-spacing:2.5px;color:rgba(167,139,250,.38);margin-bottom:20px}
+    .lp-feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
+    @media(max-width:720px){.lp-feat-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:480px){.lp-feat-grid{grid-template-columns:1fr}}
+    .lp-feat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px 18px;transition:border-color .2s,transform .2s}
+    .lp-feat-card:hover{border-color:rgba(167,139,250,.38);transform:translateY(-3px)}
+    .lp-fc-icon{font-size:1.75rem;margin-bottom:10px}
+    .lp-fc-title{font-weight:900;font-size:.88rem;color:var(--text);margin-bottom:6px}
+    .lp-fc-desc{font-size:.76rem;color:rgba(167,139,250,.52);line-height:1.5}
+    /* EPIC */
+    .lp-epic{position:relative;background:transparent;border:none;border-radius:20px;padding:60px 32px 44px;text-align:center;overflow:hidden;margin-bottom:8px}
+    .lp-epic-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(167,139,250,.14),rgba(99,102,241,.08));border:1px solid rgba(167,139,250,.28);color:#a78bfa;border-radius:99px;padding:6px 18px;font-size:.67rem;font-weight:900;letter-spacing:1.5px;margin-bottom:18px}
+    .lp-epic-title{font-family:'Fredoka One',cursive;font-size:clamp(2rem,5vw,3.2rem);color:#fff;margin-bottom:14px;line-height:1.15}
+    .lp-epic-word{color:#f59e0b}
+    .lp-epic-sub{font-size:.88rem;color:rgba(167,139,250,.58);font-weight:600;max-width:500px;margin:0 auto 28px;line-height:1.6}
+    .lp-prog-wrap{max-width:460px;margin:0 auto 30px}
+    .lp-prog-hdr{display:flex;justify-content:space-between;font-size:.76rem;font-weight:800;color:rgba(167,139,250,.62);margin-bottom:8px}
+    .lp-prog-bar{height:12px;border-radius:99px;background:rgba(167,139,250,.1);overflow:hidden}
+    .lp-prog-fill{height:100%;width:40%;border-radius:99px;background:linear-gradient(90deg,#a78bfa,#ec4899)}
+    .lp-countdown{display:flex;gap:18px;justify-content:center;margin-bottom:30px;flex-wrap:wrap;align-items:flex-start}
+    .lp-cd-unit{display:flex;flex-direction:column;align-items:center;gap:4px}
+    .lp-cd-num{font-family:'Fredoka One',cursive;font-size:2.8rem;color:#38bdf8;line-height:1}
+    .lp-cd-lbl{font-size:.58rem;font-weight:900;color:rgba(167,139,250,.42);letter-spacing:1.5px}
+    .lp-cd-col{font-family:'Fredoka One',cursive;font-size:2.4rem;color:rgba(167,139,250,.28);line-height:1;padding-top:4px}
+    .lp-notify-row{display:flex;gap:10px;max-width:420px;margin:0 auto 24px}
+    .lp-notify-input{flex:1;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.22);border-radius:12px;padding:12px 16px;color:var(--text);font-family:'Nunito',sans-serif;font-size:.86rem;outline:none;min-width:0}
+    .lp-notify-input:focus{border-color:rgba(167,139,250,.5)}
+    .lp-notify-input::placeholder{color:rgba(167,139,250,.32)}
+    .lp-notify-btn{background:linear-gradient(135deg,#f59e0b,#d97706);color:#1a1040;border:none;border-radius:12px;padding:12px 20px;font-family:'Fredoka One',cursive;font-size:.86rem;cursor:pointer;white-space:nowrap;transition:opacity .2s;font-weight:900}
+    .lp-notify-btn:hover{opacity:.88}
+    .lp-chips-row{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-bottom:26px}
+    .lp-chip{background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.17);border-radius:99px;padding:6px 13px;font-size:.73rem;font-weight:800;color:rgba(167,139,250,.68)}
+    .lp-footer-line{font-size:.76rem;color:rgba(167,139,250,.38);font-weight:700}
+    .lp-footer-line a{color:rgba(167,139,250,.6);text-decoration:none}
+    .lp-footer-line a:hover{color:#a78bfa}
+  </style>
+<script src="audit-loader.js" defer></script>
+  <script src="debug-dashboard.js" defer></script>
 </head>
 <body data-page="home">
-<div class="app-shell">
 
-  <!-- ══════════ SIDEBAR ══════════ -->
-  <aside class="sidebar" id="sidebar">
-    <a href="index.html" class="sidebar-logo">
-      <span class="sidebar-logo-icon">🎮</span>
-      <span class="sidebar-logo-text">Eylox</span>
-    </a>
-    <p class="sidebar-section-label">Menu</p>
-    <nav class="sidebar-nav"><ul>
-      <li><a href="index.html"    class="sidebar-link active"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
-      <li><a href="games.html"    class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
-      <li><a href="friends.html"  class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span><span class="s-badge" style="display:none">0</span></a></li>
-      <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
-      <li><a href="profile.html"  class="sidebar-link"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
-    </ul></nav>
-    <div class="sidebar-divider"></div>
-    <p class="sidebar-section-label">More</p>
-    <nav class="sidebar-nav"><ul>
-      <li><a href="leaderboard.html"  class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
-      <li><a href="achievements.html" class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
-      <li><a href="communities.html"  class="sidebar-link"><span class="s-icon">🌍</span><span class="s-label">Communities</span></a></li>
-      <li><a href="live-events.html"  class="sidebar-link"><span class="s-icon">⚡</span><span class="s-label">Live Events</span></a></li>
-      <li><a href="shop.html"         class="sidebar-link"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
-      <li><a href="#" class="sidebar-link" id="settingsBtn"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></a></li>
-      <li><a href="#" class="sidebar-link" id="logoutBtn"><span class="s-icon">🚪</span><span class="s-label">Logout</span></a></li>
-    </ul></nav>
-    <div class="sidebar-coins">
-      <img src="eylux-coin.png" class="coins-icon-img" alt="Eylux" />
-      <div><div class="coins-amount">—</div><div class="coins-label">Eylux</div></div>
+<!-- Page progress bar -->
+<div id="pageProgressBar"></div>
+
+<!-- Toast container -->
+<div id="toastContainer"></div>
+
+<!-- Sidebar overlay (mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- Search overlay -->
+<div class="search-overlay" id="searchOverlay" role="dialog" aria-label="Search">
+  <div class="search-overlay-box">
+    <div class="search-overlay-input-wrap">
+      <span style="font-size:1.2rem">🔍</span>
+      <input type="search" class="search-overlay-input" id="searchOverlayInput" placeholder="Search games, players, friends…" autocomplete="off" />
+      <button onclick="closeSearchOverlay()" aria-label="Close search" style="background:none;border:none;color:var(--muted);font-size:1rem;cursor:pointer;padding:4px">✕</button>
     </div>
-    <div class="sidebar-coins sidebar-trophies">
-      <span class="coins-icon">🏆</span>
-      <div><div class="trophies-amount">—</div><div class="coins-label">Trophies</div></div>
-    </div>
-  </aside>
-
-  <!-- ══════════ MAIN ══════════ -->
-  <div class="main-area">
-
-    <header class="topbar">
-      <button class="menu-btn" id="menuBtn" aria-label="Toggle menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
-      <div class="search-wrap">
-        <span class="search-icon">🔍</span>
-        <input type="search" class="search-input" placeholder="Search games…" aria-label="Search games" />
-      </div>
-      <div class="topbar-right">
-        <button class="tb-btn" id="notifBellBtn" aria-label="Notifications">🔔<span class="notif-dot"></span></button>
-        <div class="tb-coins"><img src="eylux-coin.png" class="tb-coin-img" alt="EC"> <span id="topbarCoins">—</span></div>
-        <div class="tb-trophies"><span class="tb-trophy-icon">🏆</span> <span id="topbarTrophies">—</span></div>
-        <a href="admin.html" class="tb-btn" id="adminBtn" style="display:none;position:relative;background:linear-gradient(135deg,#78350f,#f59e0b,#fde68a);color:#1a0800;border-radius:99px;padding:7px 16px;font-size:.8rem;font-weight:900;text-decoration:none;gap:6px;align-items:center;letter-spacing:.3px;box-shadow:0 4px 20px rgba(245,158,11,.55),0 0 0 2px rgba(253,230,138,.25);border:none;font-family:var(--font-head);overflow:visible;width:auto;height:auto;flex-shrink:0;transition:transform .18s,box-shadow .18s;" onmouseover="this.style.transform='scale(1.08) translateY(-2px)';this.style.boxShadow='0 8px 32px rgba(245,158,11,.8),0 0 0 3px rgba(253,230,138,.4)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(245,158,11,.55),0 0 0 2px rgba(253,230,138,.25)'">
-          <span style="animation:crown-spin 4s linear infinite;display:inline-block">👑</span> Admin
-          <span style="position:absolute;top:-4px;right:-4px;width:10px;height:10px;background:#4ade80;border-radius:50%;border:2px solid var(--bg);box-shadow:0 0 6px #4ade80"></span>
-        </a>
-        <a href="profile.html" class="tb-avatar" aria-label="My Profile">🎮<span class="online-dot"></span></a>
-      </div>
-    </header>
-
-    <main class="page-content">
-
-      <!-- Welcome Banner -->
-      <div class="welcome-banner">
-        <div class="welcome-text">
-          <h1>Welcome back, <span class="welcome-name">Player! 👋</span></h1>
-          <p>Ready to play? <a href="friends.html" style="color:var(--purple);text-decoration:none;font-weight:800">Check your friends</a> and discover new games!</p>
-          <div id="streakBadge" style="display:none;margin-top:10px;display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(253,230,138,.1));border:1px solid rgba(245,158,11,.35);border-radius:99px;padding:5px 14px;font-size:.8rem;font-weight:800;color:#fde68a"></div>
-        </div>
-        <div class="welcome-art">🚀</div>
-      </div>
-
-      <!-- Friends Online -->
-      <div class="section">
-        <div class="section-header">
-          <h2 class="section-title">🤝 Friends Online</h2>
-          <a href="friends.html" class="section-link">See all →</a>
-        </div>
-        <div class="friends-row" id="friends-row">
-          <!-- Populated by friends-local.js on DOMContentLoaded -->
-        </div>
-      </div>
-
-      <!-- Continue Playing -->
-      <div class="section">
-        <div class="section-header">
-          <h2 class="section-title">▶️ Continue Playing</h2>
-          <a href="games.html" class="section-link">All games →</a>
-        </div>
-        <div class="games-grid lg" id="continue-grid">
-          <!-- Populated by features.js when logged in -->
-          <div class="game-card" data-game-id="sky-riders"><div class="card-thumb" data-img="sky-riders"></div><div class="card-body"><span class="card-badge b-racing">Racing</span><h3 class="card-title">Sky Riders</h3><div class="card-meta">👥 120K <span class="dot"></span> ⭐ 4.8</div><button class="btn-play" data-id="sky-riders" data-title="Sky Riders" data-thumb="🚀" data-genre="racing">▶ Resume</button></div></div>
-          <div class="game-card" data-game-id="block-kingdom"><div class="card-thumb" data-img="block-kingdom"></div><div class="card-body"><span class="card-badge b-building">Building</span><h3 class="card-title">Block Kingdom</h3><div class="card-meta">👥 98K <span class="dot"></span> ⭐ 4.7</div><button class="btn-play" data-id="block-kingdom" data-title="Block Kingdom" data-thumb="🏰" data-genre="building">▶ Resume</button></div></div>
-          <div class="game-card" data-game-id="ninja-dash"><div class="card-thumb" data-img="ninja-dash"></div><div class="card-body"><span class="card-badge b-action">Action</span><h3 class="card-title">Ninja Dash</h3><div class="card-meta">👥 75K <span class="dot"></span> ⭐ 4.6</div><button class="btn-play" data-id="ninja-dash" data-title="Ninja Dash" data-thumb="🥷" data-genre="action">▶ Resume</button></div></div>
-        </div>
-      </div>
-
-      <!-- Daily Challenge Banner -->
-      <div class="daily-challenge-banner">
-        <div class="dcb-left">
-          <div class="dcb-tag">🔥 DAILY CHALLENGE</div>
-          <h3 class="dcb-title">Can you survive <span>100 seconds</span> in Ninja Dash?</h3>
-          <p class="dcb-desc">Complete today's challenge for <strong>+500 💰 bonus coins</strong> and the exclusive <strong>🏅 Daily Hero</strong> badge.</p>
-          <div class="dcb-actions">
-            <button class="btn-play dcb-btn" data-id="ninja-dash" data-title="Ninja Dash" data-thumb="🥷" data-genre="action">⚡ Accept Challenge</button>
-            <div class="dcb-timer" id="dcbTimer">Resets in <strong id="dcbCountdown">—</strong></div>
-          </div>
-        </div>
-        <div class="dcb-right" aria-hidden="true">🥷<span class="dcb-vs">VS</span>⏱️</div>
-      </div>
-
-      <!-- Hot Right Now -->
-      <div class="section">
-        <div class="section-header">
-          <h2 class="section-title">🔥 Hot Right Now</h2>
-          <a href="games.html" class="section-link">See all →</a>
-        </div>
-        <div class="hot-scroll-row" id="hot-row">
-          <div class="hot-card" data-game-id="ninja-dash"><div class="hot-rank">1</div><div class="hot-thumb" data-img="ninja-dash"></div><div class="hot-info"><span class="hot-title">Ninja Dash</span><span class="hot-players">👥 12.4K playing</span></div><button class="btn-play hot-btn" data-id="ninja-dash" data-title="Ninja Dash" data-thumb="🥷" data-genre="action">▶</button></div>
-          <div class="hot-card" data-game-id="sky-riders"><div class="hot-rank">2</div><div class="hot-thumb" data-img="sky-riders"></div><div class="hot-info"><span class="hot-title">Sky Riders</span><span class="hot-players">👥 9.1K playing</span></div><button class="btn-play hot-btn" data-id="sky-riders" data-title="Sky Riders" data-thumb="🚀" data-genre="racing">▶</button></div>
-          <div class="hot-card" data-game-id="dragon-escape"><div class="hot-rank">3</div><div class="hot-thumb" data-img="dragon-escape"></div><div class="hot-info"><span class="hot-title">Dragon Escape</span><span class="hot-players">👥 7.8K playing</span></div><button class="btn-play hot-btn" data-id="dragon-escape" data-title="Dragon Escape" data-thumb="🐉" data-genre="survival">▶</button></div>
-          <div class="hot-card" data-game-id="puzzle-palace"><div class="hot-rank">4</div><div class="hot-thumb" data-img="puzzle-palace"></div><div class="hot-info"><span class="hot-title">Puzzle Palace</span><span class="hot-players">👥 6.2K playing</span></div><button class="btn-play hot-btn" data-id="puzzle-palace" data-title="Puzzle Palace" data-thumb="🧩" data-genre="puzzle">▶</button></div>
-          <div class="hot-card" data-game-id="ocean-quest"><div class="hot-rank">5</div><div class="hot-thumb" data-img="ocean-quest"></div><div class="hot-info"><span class="hot-title">Ocean Quest</span><span class="hot-players">👥 5.5K playing</span></div><button class="btn-play hot-btn" data-id="ocean-quest" data-title="Ocean Quest" data-thumb="🌊" data-genre="adventure">▶</button></div>
-          <div class="hot-card" data-game-id="block-kingdom"><div class="hot-rank">6</div><div class="hot-thumb" data-img="block-kingdom"></div><div class="hot-info"><span class="hot-title">Block Kingdom</span><span class="hot-players">👥 4.9K playing</span></div><button class="btn-play hot-btn" data-id="block-kingdom" data-title="Block Kingdom" data-thumb="🏰" data-genre="building">▶</button></div>
-        </div>
-      </div>
-
-      <!-- Daily Spin Wheel -->
-      <div id="spinSection" style="background:linear-gradient(135deg,rgba(167,139,250,.14),rgba(236,72,153,.1));border:1px solid rgba(167,139,250,.25);border-radius:var(--r-lg);padding:24px 28px;margin-bottom:28px;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
-        <div style="flex:1;min-width:200px">
-          <div style="font-size:.7rem;font-weight:900;letter-spacing:1.5px;color:var(--purple);text-transform:uppercase;margin-bottom:6px">🎡 DAILY FREE SPIN</div>
-          <h3 style="font-family:var(--font-head);font-size:1.4rem;margin-bottom:4px">Spin for FREE coins!</h3>
-          <p style="color:var(--muted);font-size:.84rem;font-weight:700">Win up to <strong style="color:var(--yellow)">1,000 🪙</strong> every day. Resets at midnight.</p>
-          <div id="spinCooldown" style="margin-top:10px;font-size:.8rem;font-weight:800;color:var(--muted)"></div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:12px;flex-shrink:0">
-          <div id="spinWheel" style="position:relative;width:120px;height:120px">
-            <canvas id="spinCanvas" width="120" height="120" style="border-radius:50%;cursor:pointer"></canvas>
-          </div>
-          <button id="spinBtn" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;border:none;border-radius:99px;padding:10px 28px;font-family:var(--font-body);font-weight:900;font-size:.88rem;cursor:pointer;transition:transform .15s;box-shadow:0 4px 18px rgba(124,58,237,.45)">🎡 SPIN!</button>
-        </div>
-      </div>
-
-      <!-- Top Players Leaderboard -->
-      <div class="section">
-        <div class="section-header">
-          <h2 class="section-title">🏆 Top Players This Week</h2>
-          <a href="leaderboard.html" class="section-link">Full board →</a>
-        </div>
-        <div class="leaderboard-list">
-          <div class="lb-row lb-gold">  <span class="lb-pos">🥇</span><div class="lb-av" style="background:linear-gradient(135deg,#7c3aed,#ec4899)">🦁</div><div class="lb-info"><span class="lb-name">NinjaKing99</span><span class="lb-sub">Ninja Dash · 42,810 pts</span></div><span class="lb-coins">💰 8,400</span></div>
-          <div class="lb-row lb-silver"><span class="lb-pos">🥈</span><div class="lb-av" style="background:linear-gradient(135deg,#0ea5e9,#6366f1)">🐯</div><div class="lb-info"><span class="lb-name">StarBlaster_X</span><span class="lb-sub">Space Blaster · 38,200 pts</span></div><span class="lb-coins">💰 6,100</span></div>
-          <div class="lb-row lb-bronze"><span class="lb-pos">🥉</span><div class="lb-av" style="background:linear-gradient(135deg,#059669,#0ea5e9)">🐼</div><div class="lb-info"><span class="lb-name">DragonSlayer</span><span class="lb-sub">Dragon Escape · 31,500 pts</span></div><span class="lb-coins">💰 4,800</span></div>
-          <div class="lb-row"><span class="lb-pos lb-num">4</span><div class="lb-av" style="background:linear-gradient(135deg,#d97706,#f43f5e)">🦊</div><div class="lb-info"><span class="lb-name">PuzzleWizard</span><span class="lb-sub">Puzzle Palace · 28,900 pts</span></div><span class="lb-coins">💰 3,200</span></div>
-          <div class="lb-row"><span class="lb-pos lb-num">5</span><div class="lb-av" style="background:linear-gradient(135deg,#7c3aed,#0ea5e9)">🤖</div><div class="lb-info"><span class="lb-name">OceanRunner</span><span class="lb-sub">Ocean Quest · 24,100 pts</span></div><span class="lb-coins">💰 2,700</span></div>
-        </div>
-      </div>
-
-      <!-- Recommended Games -->
-      <div class="section">
-        <div class="section-header">
-          <h2 class="section-title">🌟 Recommended For You</h2>
-          <a href="games.html" class="section-link">Browse all →</a>
-        </div>
-        <div class="games-grid" id="recommended-grid">
-          <!-- Populated by features.js -->
-          <div class="game-card" data-game-id="ninja-dash"><div class="card-thumb" data-img="ninja-dash"></div><div class="card-body"><span class="card-badge b-action">Action</span><h3 class="card-title">Ninja Dash</h3><div class="card-meta">👥 75K <span class="dot"></span> ⭐ 4.8</div><button class="btn-play" data-id="ninja-dash" data-title="Ninja Dash" data-thumb="🥷" data-genre="action">▶ Play Now</button></div></div>
-          <div class="game-card" data-game-id="puzzle-palace"><div class="card-thumb" data-img="puzzle-palace"></div><div class="card-body"><span class="card-badge b-puzzle">Puzzle</span><h3 class="card-title">Puzzle Palace</h3><div class="card-meta">👥 52K <span class="dot"></span> ⭐ 4.4</div><button class="btn-play" data-id="puzzle-palace" data-title="Puzzle Palace" data-thumb="🧩" data-genre="puzzle">▶ Play Now</button></div></div>
-          <div class="game-card" data-game-id="dragon-escape"><div class="card-thumb" data-img="dragon-escape"></div><div class="card-body"><span class="card-badge b-survival">Survival</span><h3 class="card-title">Dragon Escape</h3><div class="card-meta">👥 47K <span class="dot"></span> ⭐ 4.6</div><button class="btn-play" data-id="dragon-escape" data-title="Dragon Escape" data-thumb="🐉" data-genre="survival">▶ Play Now</button></div></div>
-          <div class="game-card" data-game-id="ocean-quest"><div class="card-thumb" data-img="ocean-quest"></div><div class="card-body"><span class="card-badge b-adventure">Adventure</span><h3 class="card-title">Ocean Quest</h3><div class="card-meta">👥 64K <span class="dot"></span> ⭐ 4.6</div><button class="btn-play" data-id="ocean-quest" data-title="Ocean Quest" data-thumb="🌊" data-genre="adventure">▶ Play Now</button></div></div>
-          <div class="game-card" data-game-id="block-kingdom"><div class="card-thumb" data-img="block-kingdom"></div><div class="card-body"><span class="card-badge b-building">Building</span><h3 class="card-title">Block Kingdom</h3><div class="card-meta">👥 98K <span class="dot"></span> ⭐ 4.7</div><button class="btn-play" data-id="block-kingdom" data-title="Block Kingdom" data-thumb="🏰" data-genre="building">▶ Play Now</button></div></div>
-          <div class="game-card" data-game-id="farm-friends"><div class="card-thumb" data-img="farm-friends"></div><div class="card-body"><span class="card-badge b-roleplay">Roleplay</span><h3 class="card-title">Farm Friends</h3><div class="card-meta">👥 75K <span class="dot"></span> ⭐ 4.6</div><button class="btn-play" data-id="farm-friends" data-title="Farm Friends" data-thumb="🌻" data-genre="roleplay">▶ Play Now</button></div></div>
-        </div>
-      </div>
-
-
-
-      <!-- ══════════════════════════════════════════════
-           EPIC HYPE SECTION — THE FUTURE OF GAMING
-      ══════════════════════════════════════════════ -->
-
-      <!-- Live Stats Bar -->
-      <div class="hype-stats-bar">
-        <div class="hype-stat"><span class="hype-stat-num" data-target="10482">0</span><span class="hype-stat-label">Players Online</span></div>
-        <div class="hype-stat-div"></div>
-        <div class="hype-stat"><span class="hype-stat-num" data-target="16">0</span><span class="hype-stat-label">Playable Games</span></div>
-        <div class="hype-stat-div"></div>
-        <div class="hype-stat"><span class="hype-stat-num" data-target="4910230">0</span><span class="hype-stat-label">Games Played</span></div>
-        <div class="hype-stat-div"></div>
-        <div class="hype-stat"><span class="hype-stat-num">∞</span><span class="hype-stat-label">Fun Guaranteed</span></div>
-      </div>
-
-      <!-- Cinematic Feature Showcase -->
-      <div class="hype-showcase">
-        <canvas id="hypeCanvas" class="hype-canvas" aria-hidden="true"></canvas>
-        <div class="hype-showcase-inner">
-          <div class="hype-badge-pill">🔥 THE HOTTEST GAMING PLATFORM OF 2026</div>
-          <h2 class="hype-title">
-            <span class="hype-title-line1">Play. Win. Become</span>
-            <span class="hype-title-line2">A <span class="hype-word-cycle" id="hypeWord">Legend</span>.</span>
-          </h2>
-          <p class="hype-desc">16 handcrafted games. Zero downloads. Infinite bragging rights.<br>This is the game platform the world has been waiting for.</p>
-          <div class="hype-cta-row">
-            <a href="games.html" class="hype-btn-primary">🚀 Play Free Now</a>
-            <a href="#hypeNotify" class="hype-btn-ghost">📬 Get Notified</a>
-          </div>
-          <!-- Floating game cards 3D showcase -->
-          <div class="hype-float-cards" aria-hidden="true">
-            <div class="hf-card hf-c1"><div class="hf-thumb">🥷</div><div class="hf-name">Ninja Dash</div><div class="hf-stars">⭐⭐⭐⭐⭐</div></div>
-            <div class="hf-card hf-c2"><div class="hf-thumb">🚀</div><div class="hf-name">Sky Riders</div><div class="hf-stars">⭐⭐⭐⭐⭐</div></div>
-            <div class="hf-card hf-c3"><div class="hf-thumb">🌊</div><div class="hf-name">Ocean Quest</div><div class="hf-stars">⭐⭐⭐⭐⭐</div></div>
-            <div class="hf-card hf-c4"><div class="hf-thumb">💀</div><div class="hf-name">Haunted House</div><div class="hf-stars">⭐⭐⭐⭐⭐</div></div>
-            <div class="hf-card hf-c5"><div class="hf-thumb">🐉</div><div class="hf-name">Dragon Escape</div><div class="hf-stars">⭐⭐⭐⭐⭐</div></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Why YouTubers Love Eylox -->
-      <div class="hype-creator-section">
-        <div class="hype-creator-inner">
-          <div class="hype-creator-left">
-            <div class="hype-creator-badge">🎬 FOR CONTENT CREATORS</div>
-            <h3 class="hype-creator-title">Made to Go Viral</h3>
-            <p class="hype-creator-desc">Every Eylox game is built for clips. Screen shake. Coin explosions. Epic comebacks. Whether you're a small channel or a mega creator — Eylox is your next banger video.</p>
-            <div class="hype-creator-perks">
-              <div class="hype-perk"><span class="hype-perk-icon">⚡</span><div><strong>Instant hype moments</strong><br><span>Every game is clip-worthy</span></div></div>
-              <div class="hype-perk"><span class="hype-perk-icon">🏆</span><div><strong>Leaderboard challenges</strong><br><span>Challenge your viewers to beat your score</span></div></div>
-              <div class="hype-perk"><span class="hype-perk-icon">💰</span><div><strong>Coin economy</strong><br><span>Earn Eylox coins, flex on your audience</span></div></div>
-              <div class="hype-perk"><span class="hype-perk-icon">🎮</span><div><strong>Zero friction</strong><br><span>Play in any browser, no download</span></div></div>
-            </div>
-            <a href="games.html" class="hype-btn-primary" style="display:inline-flex;margin-top:8px">🎬 Start Playing</a>
-          </div>
-          <div class="hype-creator-right">
-            <div class="hype-phone-mockup">
-              <div class="hype-phone-screen">
-                <div class="hype-phone-topbar">🎮 Eylox</div>
-                <div class="hype-phone-game">
-                  <div class="hype-phone-score">Score: <strong>9,840</strong></div>
-                  <div class="hype-phone-canvas-fake">
-                    <div class="hype-fx-coin hfc1">+🪙50</div>
-                    <div class="hype-fx-coin hfc2">+🪙20</div>
-                    <div class="hype-fx-coin hfc3">LEVEL UP!</div>
-                    <div class="hype-char">🥷</div>
-                    <div class="hype-obs hob1">🪨</div>
-                    <div class="hype-obs hob2">⚡</div>
-                  </div>
-                  <div class="hype-phone-coins">💰 <strong>1,240</strong> Eylux</div>
-                </div>
-              </div>
-              <div class="hype-phone-glow"></div>
-            </div>
-            <!-- Fake viewer reactions -->
-            <div class="hype-reactions" aria-hidden="true">
-              <div class="hype-react hr1">😱 insane score!!</div>
-              <div class="hype-react hr2">💀 HOW</div>
-              <div class="hype-react hr3">🔥🔥🔥</div>
-              <div class="hype-react hr4">this game is craaazy</div>
-              <div class="hype-react hr5">W game fr</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Feature Grid -->
-      <div class="hype-features-grid-section">
-        <div class="hype-fg-label">WHY EYLOX HITS DIFFERENT</div>
-        <div class="hype-fg-grid">
-          <div class="hype-fg-card hfg-purple">
-            <div class="hfg-icon">🎮</div>
-            <h4>16 Unique Games</h4>
-            <p>Every game has its own engine, mechanics, and feel. Not the same game reskinned — real variety.</p>
-          </div>
-          <div class="hype-fg-card hfg-blue">
-            <div class="hfg-icon">💰</div>
-            <h4>Eylox Coin Economy</h4>
-            <p>Win coins in every game. They update live on screen. Flex your balance in your profile.</p>
-          </div>
-          <div class="hype-fg-card hfg-pink">
-            <div class="hfg-icon">🔥</div>
-            <h4>Daily Streaks</h4>
-            <p>Come back every day to build your streak. The longer you play, the bigger the legend.</p>
-          </div>
-          <div class="hype-fg-card hfg-green">
-            <div class="hfg-icon">📱</div>
-            <h4>Any Device</h4>
-            <p>Phone, tablet, laptop, or TV. Full touch controls on mobile. Zero compromise.</p>
-          </div>
-          <div class="hype-fg-card hfg-yellow">
-            <div class="hfg-icon">👑</div>
-            <h4>Owner Access</h4>
-            <p>100+ Roblox-style admin commands. Ban, give coins, announce to the world. Real power.</p>
-          </div>
-          <div class="hype-fg-card hfg-teal">
-            <div class="hfg-icon">🚀</div>
-            <h4>Always Growing</h4>
-            <p>New games, features, and events dropping constantly. This is only the beginning.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Epic Coming Soon / Notify -->
-      <div class="hype-coming-soon" id="hypeNotify">
-        <canvas id="csCanvas" class="hype-cs-canvas" aria-hidden="true"></canvas>
-        <div class="hype-cs-inner">
-          <div class="hype-cs-rocket">🚀</div>
-          <div class="hype-cs-tag">NEXT LEVEL INCOMING</div>
-          <h2 class="hype-cs-title">Something <span class="hype-cs-epic">EPIC</span> is Coming</h2>
-          <p class="hype-cs-sub">Multiplayer battles. Global leaderboards. Seasonal events.<br>500+ games. Creator tournaments. The biggest update in Eylox history.</p>
-
-          <!-- Animated progress -->
-          <div class="hype-cs-progress-wrap">
-            <div class="hype-cs-prog-labels">
-              <span>Build Progress</span><strong id="csPercent">0%</strong>
-            </div>
-            <div class="hype-cs-prog-track">
-              <div class="hype-cs-prog-fill" id="csProgFill"></div>
-              <div class="hype-cs-prog-glow"></div>
-            </div>
-          </div>
-
-          <!-- Countdown -->
-          <div class="hype-countdown">
-            <div class="hype-cd-block"><span class="hype-cd-num" id="cdDays">00</span><span class="hype-cd-label">Days</span></div>
-            <div class="hype-cd-sep">:</div>
-            <div class="hype-cd-block"><span class="hype-cd-num" id="cdHours">00</span><span class="hype-cd-label">Hours</span></div>
-            <div class="hype-cd-sep">:</div>
-            <div class="hype-cd-block"><span class="hype-cd-num" id="cdMins">00</span><span class="hype-cd-label">Mins</span></div>
-            <div class="hype-cd-sep">:</div>
-            <div class="hype-cd-block"><span class="hype-cd-num" id="cdSecs">00</span><span class="hype-cd-label">Secs</span></div>
-          </div>
-
-          <!-- Notify form -->
-          <form class="hype-notify-form" id="hypeNotifyForm">
-            <input type="email" id="hypeEmail" class="hype-notify-input" placeholder="your@email.com" required />
-            <button type="submit" class="hype-notify-btn">🔔 Notify Me</button>
-          </form>
-          <p class="hype-notify-thanks" id="hypeNotifyThanks">🎉 You're on the list! See you at launch!</p>
-
-          <!-- Feature chips -->
-          <div class="hype-cs-chips">
-            <span class="hype-cs-chip">🕹️ 500+ Games</span>
-            <span class="hype-cs-chip">👥 Multiplayer</span>
-            <span class="hype-cs-chip">🏆 Tournaments</span>
-            <span class="hype-cs-chip">🌍 Global Leaderboards</span>
-            <span class="hype-cs-chip">💸 Free to Play</span>
-            <span class="hype-cs-chip">🛡️ 100% Safe</span>
-          </div>
-          <p class="hype-cs-foot">© 2026 Eylox · Made with ❤️ for the world · <a href="games.html" style="color:var(--purple)">Play Now →</a></p>
-        </div>
-      </div>
-
-    </main>
+    <div class="search-results" id="searchResults"></div>
   </div>
 </div>
 
-<style>
-@keyframes crown-spin { 0%,80%,100%{transform:rotate(0deg)} 85%{transform:rotate(-20deg)} 92%{transform:rotate(15deg)} 96%{transform:rotate(-8deg)} }
+  <div class="app-shell">
 
-/* ── Daily Challenge Banner ── */
-.daily-challenge-banner {
-  display: flex; align-items: center; justify-content: space-between; gap: 20px;
-  background: linear-gradient(135deg, rgba(245,158,11,.22) 0%, rgba(239,68,68,.18) 60%, rgba(124,58,237,.15) 100%);
-  border: 1.5px solid rgba(245,158,11,.4); border-radius: 20px;
-  padding: 28px 32px; margin-bottom: 36px; position: relative; overflow: hidden;
-  box-shadow: 0 6px 32px rgba(245,158,11,.15);
-}
-.daily-challenge-banner::before {
-  content: ''; position: absolute; inset: 0;
-  background: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(245,158,11,.03) 20px, rgba(245,158,11,.03) 21px);
-  pointer-events: none;
-}
-.dcb-left { position: relative; z-index: 1; flex: 1; }
-.dcb-tag {
-  display: inline-block; padding: 3px 12px; border-radius: 99px; margin-bottom: 10px;
-  background: rgba(245,158,11,.2); border: 1px solid rgba(245,158,11,.5);
-  color: #fde68a; font-size: .7rem; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase;
-}
-.dcb-title {
-  font-family: var(--font-head); font-size: clamp(1.1rem,2.5vw,1.55rem); color: var(--text);
-  margin-bottom: 8px; line-height: 1.25;
-}
-.dcb-title span { color: #fbbf24; }
-.dcb-desc { color: var(--muted); font-size: .88rem; font-weight: 700; margin-bottom: 16px; line-height: 1.5; }
-.dcb-desc strong { color: var(--text); }
-.dcb-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-.dcb-btn { width: auto; padding: 12px 24px; font-size: .88rem; background: linear-gradient(135deg,#d97706,#f59e0b,#fde68a); color: #1a0800; box-shadow: 0 4px 20px rgba(245,158,11,.5); }
-.dcb-timer { color: var(--muted); font-size: .8rem; font-weight: 700; }
-.dcb-timer strong { color: var(--yellow); }
-.dcb-right {
-  font-size: 3.5rem; flex-shrink: 0; display: flex; align-items: center; gap: 12px;
-  animation: dcb-float 2.5s ease-in-out infinite; position: relative; z-index: 1;
-}
-.dcb-vs { font-family: var(--font-head); font-size: 1.2rem; color: var(--muted); }
-@keyframes dcb-float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    <!-- ====================== SIDEBAR ====================== -->
+    <aside class="sidebar" id="sidebar">
 
-/* ── Hot scroll row ── */
-.hot-scroll-row {
-  display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none;
-}
-.hot-scroll-row::-webkit-scrollbar { display: none; }
-.hot-card {
-  min-width: 220px; display: flex; align-items: center; gap: 12px;
-  background: var(--card); border: 1px solid var(--border); border-radius: 14px;
-  padding: 12px 14px; transition: transform .2s, border-color .2s;
-  flex-shrink: 0;
-}
-.hot-card:hover { transform: translateY(-3px); border-color: rgba(167,139,250,.4); }
-.hot-rank { font-family: var(--font-head); font-size: 1.1rem; color: var(--muted); width: 20px; flex-shrink: 0; }
-.hot-thumb { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
-.hot-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.hot-title { font-family: var(--font-head); font-size: .88rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.hot-players { font-size: .72rem; font-weight: 700; color: var(--muted); }
-.hot-btn { width: 32px; height: 32px; min-width: 32px; padding: 0; font-size: .8rem; border-radius: 50%; margin: 0; flex-shrink: 0; }
+      <a href="index.html" class="sidebar-logo">
+        <span class="sidebar-logo-icon">🎮</span>
+        <span class="sidebar-logo-text">Eylox</span>
+      </a>
 
-/* ── Leaderboard ── */
-.leaderboard-list { display: flex; flex-direction: column; gap: 8px; }
-.lb-row {
-  display: flex; align-items: center; gap: 12px;
-  background: var(--card); border: 1px solid var(--border); border-radius: 14px;
-  padding: 12px 16px; transition: transform .18s, border-color .18s;
-}
-.lb-row:hover { transform: translateX(4px); border-color: rgba(167,139,250,.35); }
-.lb-gold   { border-color: rgba(245,158,11,.4); background: linear-gradient(90deg,rgba(245,158,11,.1),var(--card)); }
-.lb-silver { border-color: rgba(156,163,175,.3); background: linear-gradient(90deg,rgba(156,163,175,.08),var(--card)); }
-.lb-bronze { border-color: rgba(180,83,9,.3); background: linear-gradient(90deg,rgba(180,83,9,.1),var(--card)); }
-.lb-pos { font-size: 1.3rem; flex-shrink: 0; width: 28px; text-align: center; }
-.lb-num { font-family: var(--font-head); font-size: 1rem; color: var(--muted); }
-.lb-av { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
-.lb-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
-.lb-name { font-family: var(--font-head); font-size: .95rem; color: var(--text); }
-.lb-sub  { font-size: .72rem; font-weight: 700; color: var(--muted); }
-.lb-coins { font-size: .82rem; font-weight: 800; color: var(--yellow); white-space: nowrap; flex-shrink: 0; }
+      <p class="sidebar-section-label">Menu</p>
+      <nav class="sidebar-nav" aria-label="Main navigation">
+        <ul>
+          <li>
+            <a href="index.html" class="sidebar-link active" aria-current="page">
+              <span class="s-icon">🏠</span><span class="s-label">Home</span>
+            </a>
+          </li>
+          <li>
+            <a href="games.html" class="sidebar-link">
+              <span class="s-icon">🔭</span><span class="s-label">Discover</span>
+            </a>
+          </li>
+          <li>
+            <a href="leaderboard.html" class="sidebar-link">
+              <span class="s-icon">🏆</span><span class="s-label">Leaderboards</span>
+            </a>
+          </li>
+          <li>
+            <a href="achievements.html" class="sidebar-link">
+              <span class="s-icon">🎖️</span><span class="s-label">Achievements</span>
+            </a>
+          </li>
+          <li><a href="events.html" class="sidebar-link"><span class="s-icon">🎯</span><span class="s-label">Live Events</span></a></li>
+          <li>
+            <a href="communities.html" class="sidebar-link">
+              <span class="s-icon">🌐</span><span class="s-label">Communities</span>
+            </a>
+          </li>
+          <li>
+            <a href="friends.html" class="sidebar-link">
+              <span class="s-icon">🤝</span><span class="s-label">Friends</span>
+              <span class="s-badge" id="friendReqBadge" style="display:none">0</span>
+            </a>
+          </li>
+          <li>
+            <a href="profile.html" class="sidebar-link">
+              <span class="s-icon">👤</span><span class="s-label">Profile</span>
+            </a>
+          </li>
+          <li>
+            <a href="messages.html" class="sidebar-link">
+              <span class="s-icon">💬</span><span class="s-label">Messages</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
 
-@media (max-width:600px) {
-  .daily-challenge-banner { padding: 20px 18px; }
-  .dcb-right { display: none; }
-  .lb-sub { display: none; }
-}
+      <div class="sidebar-divider"></div>
 
-/* ══════════════════════════════════════════════
-   HYPE SECTION STYLES
-══════════════════════════════════════════════ */
+      <!-- Quick Access — hardcoded for index.html (quick-access.js skips injection here via sb-qa-injected) -->
+      <div class="sb-qa-injected">
+      <p class="sidebar-section-label">⚡ Quick Access</p>
+      <nav class="sidebar-nav">
+        <ul>
+          <li>
+            <button class="sidebar-link sb-action" onclick="sbQuickPlay()">
+              <span class="s-icon">🎲</span><span class="s-label">Random Game</span>
+            </button>
+          </li>
+          <li>
+            <a href="#" class="sidebar-link" onclick="document.getElementById('dailyMissionsCard')?.scrollIntoView({behavior:'smooth'});return false;">
+              <span class="s-icon">🎯</span><span class="s-label">Daily Missions</span>
+              <span class="s-badge" id="sb-qa-missions-badge" style="display:none">!</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="sidebar-link" onclick="if(window.EyloxSeasonPass){EyloxSeasonPass.open();}else if(window.openSeasonPass){openSeasonPass();}return false;">
+              <span class="s-icon">🏅</span><span class="s-label">Season Pass</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="sidebar-link" onclick="document.querySelector('.clan-wars-section')?.scrollIntoView({behavior:'smooth'});return false;">
+              <span class="s-icon">⚔️</span><span class="s-label">Clan Wars</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      </div>
 
-/* Stats bar */
-.hype-stats-bar {
-  display: flex; align-items: center; justify-content: center;
-  gap: 0; flex-wrap: wrap;
-  background: linear-gradient(90deg, rgba(124,58,237,.18), rgba(236,72,153,.18));
-  border: 1px solid rgba(167,139,250,.25); border-radius: 16px;
-  padding: 18px 32px; margin: 24px 0;
-  backdrop-filter: blur(10px);
-}
-.hype-stat { display: flex; flex-direction: column; align-items: center; padding: 0 28px; gap: 2px; }
-.hype-stat-num {
-  font-family: var(--font-head); font-size: 1.9rem; font-weight: 900;
-  background: linear-gradient(135deg, #a78bfa, #60a5fa, #f472b6);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  line-height: 1;
-}
-.hype-stat-label { font-size: .7rem; font-weight: 800; color: var(--muted); letter-spacing: .8px; text-transform: uppercase; }
-.hype-stat-div { width: 1px; height: 40px; background: var(--border); }
+      <div class="sidebar-divider"></div>
 
-/* Cinematic showcase */
-.hype-showcase {
-  position: relative; overflow: hidden; border-radius: 24px;
-  min-height: 520px; margin: 0 0 24px;
-  background: radial-gradient(ellipse at 50% 0%, #1a0050 0%, #07011a 70%);
-  border: 1px solid rgba(167,139,250,.2);
-  display: flex; align-items: center; justify-content: center;
-}
-.hype-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-.hype-showcase-inner {
-  position: relative; z-index: 2; text-align: center;
-  padding: 60px 32px 280px; max-width: 700px; margin: 0 auto;
-}
-.hype-badge-pill {
-  display: inline-block; padding: 6px 18px; border-radius: 99px;
-  background: linear-gradient(135deg, rgba(245,158,11,.2), rgba(250,204,21,.1));
-  border: 1px solid rgba(245,158,11,.4); color: #fde68a;
-  font-size: .72rem; font-weight: 900; letter-spacing: 1px; margin-bottom: 20px;
-  animation: badge-pulse 2.5s ease-in-out infinite;
-}
-@keyframes badge-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.4)} 50%{box-shadow:0 0 0 8px rgba(245,158,11,0)} }
-.hype-title { font-family: var(--font-head); line-height: 1.1; margin-bottom: 20px; }
-.hype-title-line1 { display: block; font-size: clamp(2rem,5vw,3.2rem); color: var(--text); }
-.hype-title-line2 {
-  display: block; font-size: clamp(2.6rem,7vw,4.4rem);
-  background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 40%, #f472b6 80%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-}
-.hype-word-cycle { display: inline-block; }
-.hype-desc { color: var(--muted); font-size: 1.05rem; line-height: 1.7; margin-bottom: 32px; }
-.hype-cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 0; }
-.hype-btn-primary {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 14px 32px; border-radius: 99px;
-  background: linear-gradient(135deg, #7c3aed, #a78bfa);
-  color: #fff; font-family: var(--font-head); font-size: 1rem; font-weight: 800;
-  text-decoration: none; border: none; cursor: pointer;
-  box-shadow: 0 8px 32px rgba(124,58,237,.45);
-  transition: transform .18s, box-shadow .18s;
-}
-.hype-btn-primary:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 14px 40px rgba(124,58,237,.65); }
-.hype-btn-ghost {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 14px 32px; border-radius: 99px;
-  background: rgba(167,139,250,.08); border: 1.5px solid rgba(167,139,250,.4);
-  color: var(--purple); font-family: var(--font-head); font-size: 1rem; font-weight: 800;
-  text-decoration: none; cursor: pointer;
-  transition: background .18s, transform .18s;
-}
-.hype-btn-ghost:hover { background: rgba(167,139,250,.18); transform: translateY(-2px); }
+      <p class="sidebar-section-label">More</p>
+      <nav class="sidebar-nav" aria-label="Secondary navigation">
+        <ul>
+          <li>
+            <a href="shop.html" class="sidebar-link">
+              <span class="s-icon">🛒</span><span class="s-label">Shop</span>
+            </a>
+          </li>
+          <li>
+            <a href="ai.html" class="sidebar-link">
+              <span class="s-icon">🤖</span><span class="s-label">Eylox Studio</span>
+              <span class="s-soon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff">AI</span>
+            </a>
+          </li>
+          <li>
+            <a href="subscription.html" class="sidebar-link">
+              <span class="s-icon">💎</span><span class="s-label">Subscription</span>
+            </a>
+          </li>
+          <li>
+            <button class="sidebar-link sb-action" onclick="openSettingsPanel()">
+              <span class="s-icon">⚙️</span><span class="s-label">Settings</span>
+            </button>
+          </li>
+          <li>
+            <button class="sidebar-link sb-action" onclick="eyloxLogout()" style="color:#f87171">
+              <span class="s-icon">🚪</span><span class="s-label">Log Out</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
 
-/* Floating 3D game cards */
-.hype-float-cards {
-  position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%);
-  width: 680px; height: 240px; pointer-events: none;
-}
-.hf-card {
-  position: absolute; width: 110px;
-  background: rgba(15,4,40,.9); border: 1px solid rgba(167,139,250,.3);
-  border-radius: 16px; padding: 14px 10px;
-  text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.6);
-  backdrop-filter: blur(8px); transform-style: preserve-3d;
-  animation: hf-float linear infinite;
-}
-.hf-thumb { font-size: 2rem; margin-bottom: 6px; }
-.hf-name { font-size: .72rem; font-weight: 800; color: var(--text); margin-bottom: 4px; }
-.hf-stars { font-size: .6rem; }
-.hf-c1 { left: 0; bottom: 0; animation-duration: 4.5s; animation-delay: 0s; }
-.hf-c2 { left: 130px; bottom: 40px; animation-duration: 5s; animation-delay: .7s; }
-.hf-c3 { left: 260px; bottom: 60px; animation-duration: 4.2s; animation-delay: 1.2s; }
-.hf-c4 { left: 390px; bottom: 30px; animation-duration: 5.3s; animation-delay: .3s; }
-.hf-c5 { left: 520px; bottom: 10px; animation-duration: 4.8s; animation-delay: 1.6s; }
-@keyframes hf-float { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-14px) rotate(2deg)} }
+      <!-- Coins -->
+      <div class="sidebar-coins">
+        <span>💰</span>
+        <div>
+          <div class="coins-amount">0</div>
+          <div class="coins-label">Eylux</div>
+        </div>
+      </div>
 
-/* Creator section */
-.hype-creator-section {
-  border-radius: 24px; overflow: hidden;
-  background: linear-gradient(135deg, rgba(15,4,40,.95) 0%, rgba(7,1,26,.95) 100%);
-  border: 1px solid rgba(167,139,250,.18); margin-bottom: 24px;
-}
-.hype-creator-inner { display: flex; gap: 0; min-height: 440px; }
-.hype-creator-left { flex: 1; padding: 52px 48px; min-width: 0; }
-.hype-creator-badge {
-  display: inline-block; padding: 5px 14px; border-radius: 99px;
-  background: rgba(244,114,182,.15); border: 1px solid rgba(244,114,182,.3);
-  color: var(--pink); font-size: .7rem; font-weight: 900; letter-spacing: 1px; margin-bottom: 16px;
-}
-.hype-creator-title { font-family: var(--font-head); font-size: clamp(1.8rem,4vw,2.8rem); color: var(--text); margin-bottom: 12px; line-height: 1.1; }
-.hype-creator-desc { color: var(--muted); font-size: .95rem; line-height: 1.7; margin-bottom: 28px; }
-.hype-creator-perks { display: flex; flex-direction: column; gap: 16px; margin-bottom: 28px; }
-.hype-perk { display: flex; align-items: flex-start; gap: 14px; }
-.hype-perk-icon { font-size: 1.4rem; flex-shrink: 0; width: 36px; height: 36px; background: rgba(167,139,250,.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
-.hype-perk strong { display: block; font-size: .88rem; color: var(--text); font-weight: 800; margin-bottom: 1px; }
-.hype-perk span { font-size: .8rem; color: var(--muted); }
-.hype-creator-right {
-  width: 380px; flex-shrink: 0; background: radial-gradient(ellipse at 50% 30%, rgba(124,58,237,.25) 0%, rgba(7,1,26,0) 70%);
-  display: flex; align-items: center; justify-content: center; position: relative; padding: 40px 20px;
-}
-/* Phone mockup */
-.hype-phone-mockup { position: relative; z-index: 2; }
-.hype-phone-screen {
-  width: 200px; background: #0a021e; border-radius: 32px; border: 3px solid rgba(167,139,250,.35);
-  overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.8), 0 0 0 1px rgba(167,139,250,.15);
-}
-.hype-phone-topbar { background: rgba(124,58,237,.3); padding: 10px 16px; font-size: .78rem; font-weight: 800; color: var(--purple); border-bottom: 1px solid rgba(167,139,250,.2); }
-.hype-phone-game { padding: 14px; min-height: 260px; position: relative; overflow: hidden; background: linear-gradient(180deg, #080014 0%, #160024 100%); }
-.hype-phone-score { font-size: .72rem; font-weight: 800; color: var(--muted); margin-bottom: 12px; }
-.hype-phone-coins { font-size: .72rem; font-weight: 800; color: var(--yellow); position: absolute; bottom: 12px; left: 14px; }
-.hype-phone-canvas-fake { position: relative; height: 180px; }
-.hype-char { position: absolute; font-size: 1.6rem; bottom: 10px; left: 20px; animation: char-run .4s ease-in-out infinite alternate; }
-@keyframes char-run { 0%{transform:translateY(0)} 100%{transform:translateY(-5px)} }
-.hype-obs { position: absolute; font-size: 1.3rem; bottom: 10px; animation: obs-move 1.8s linear infinite; }
-.hob1 { animation-delay: 0s; }
-.hob2 { animation-delay: .9s; }
-@keyframes obs-move { 0%{right:-30px} 100%{right:200px} }
-.hype-fx-coin { position: absolute; font-size: .72rem; font-weight: 900; color: var(--yellow); opacity: 0; animation: fc-pop 2s ease-in-out infinite; }
-.hfc1 { top: 20px; left: 30px; animation-delay: 0s; }
-.hfc2 { top: 60px; left: 80px; animation-delay: .9s; }
-.hfc3 { top: 100px; left: 20px; color: var(--green); font-size: .7rem; animation-delay: 1.7s; }
-@keyframes fc-pop { 0%{opacity:0;transform:translateY(0)} 20%{opacity:1} 70%{opacity:1;transform:translateY(-24px)} 100%{opacity:0;transform:translateY(-32px)} }
-.hype-phone-glow { position: absolute; inset: -20px; background: radial-gradient(ellipse at 50% 80%, rgba(124,58,237,.35) 0%, transparent 70%); border-radius: 50%; pointer-events: none; animation: pg-pulse 3s ease-in-out infinite; }
-@keyframes pg-pulse { 0%,100%{opacity:.6} 50%{opacity:1} }
-/* Chat reactions */
-.hype-reactions { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 8px; }
-.hype-react {
-  background: rgba(15,4,40,.9); border: 1px solid rgba(167,139,250,.2);
-  border-radius: 99px; padding: 5px 12px; font-size: .72rem; font-weight: 800;
-  color: var(--text); white-space: nowrap; opacity: 0;
-  animation: react-pop 5s ease-in-out infinite;
-}
-.hr1{animation-delay:0s} .hr2{animation-delay:1s} .hr3{animation-delay:2s} .hr4{animation-delay:3s} .hr5{animation-delay:4s}
-@keyframes react-pop { 0%{opacity:0;transform:translateX(20px)} 10%{opacity:1;transform:translateX(0)} 80%{opacity:1} 100%{opacity:0} }
+      <!-- Trophies card -->
+      <div id="sidebar-trophy-card" style="margin-top:10px;background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(251,191,36,.06));border:1px solid rgba(245,158,11,.28);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:default;transition:border-color .2s" onmouseover="this.style.borderColor='rgba(245,158,11,.5)'" onmouseout="this.style.borderColor='rgba(245,158,11,.28)'">
+        <div style="font-size:2rem;flex-shrink:0;filter:drop-shadow(0 0 6px rgba(245,158,11,.5))">🏆</div>
+        <div style="flex:1;min-width:0">
+          <div class="Eyltrophs-amount" style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#f59e0b;line-height:1">0</div>
+          <div style="font-size:.6rem;font-weight:900;color:rgba(245,158,11,.55);text-transform:uppercase;letter-spacing:.05em;margin-top:2px">Eyltrophs</div>
+        </div>
+      </div>
 
-/* Feature grid */
-.hype-features-grid-section { margin-bottom: 24px; }
-.hype-fg-label { text-align: center; font-size: .7rem; font-weight: 900; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 20px; }
-.hype-fg-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-.hype-fg-card {
-  border-radius: 18px; padding: 28px 24px; position: relative; overflow: hidden;
-  transition: transform .2s, box-shadow .2s; cursor: default;
-  border: 1px solid transparent;
-}
-.hype-fg-card:hover { transform: translateY(-5px) scale(1.02); }
-.hfg-purple { background: linear-gradient(135deg, rgba(124,58,237,.25), rgba(139,92,246,.1)); border-color: rgba(124,58,237,.3); }
-.hfg-blue   { background: linear-gradient(135deg, rgba(37,99,235,.25), rgba(96,165,250,.1)); border-color: rgba(59,130,246,.3); }
-.hfg-pink   { background: linear-gradient(135deg, rgba(219,39,119,.25), rgba(244,114,182,.1)); border-color: rgba(236,72,153,.3); }
-.hfg-green  { background: linear-gradient(135deg, rgba(5,150,105,.25), rgba(74,222,128,.1)); border-color: rgba(16,185,129,.3); }
-.hfg-yellow { background: linear-gradient(135deg, rgba(217,119,6,.25), rgba(253,230,138,.1)); border-color: rgba(245,158,11,.3); }
-.hfg-teal   { background: linear-gradient(135deg, rgba(13,148,136,.25), rgba(45,212,191,.1)); border-color: rgba(20,184,166,.3); }
-.hfg-icon { font-size: 2rem; margin-bottom: 12px; }
-.hype-fg-card h4 { font-family: var(--font-head); font-size: 1.05rem; color: var(--text); margin-bottom: 8px; }
-.hype-fg-card p { font-size: .82rem; color: var(--muted); line-height: 1.6; }
+    </aside><!-- /sidebar -->
 
-/* Coming Soon epic section */
-.hype-coming-soon {
-  position: relative; overflow: hidden; border-radius: 28px;
-  min-height: 680px; display: flex; align-items: center; justify-content: center;
-  background: radial-gradient(ellipse at 50% 0%, #200060 0%, #0a0024 50%, #07011a 100%);
-  border: 1.5px solid rgba(167,139,250,.25);
-  box-shadow: 0 0 120px rgba(124,58,237,.3);
-  margin-bottom: 24px;
-}
-.hype-cs-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-.hype-cs-inner { position: relative; z-index: 2; text-align: center; padding: 64px 32px 56px; max-width: 680px; }
-.hype-cs-rocket { font-size: 72px; display: block; margin-bottom: 16px; animation: cs-rocket 3s ease-in-out infinite; }
-@keyframes cs-rocket { 0%,100%{transform:translateY(0) rotate(-5deg)} 50%{transform:translateY(-18px) rotate(5deg)} }
-.hype-cs-tag {
-  display: inline-block; padding: 5px 18px; border-radius: 99px; margin-bottom: 18px;
-  background: linear-gradient(135deg, rgba(245,158,11,.2), rgba(250,204,21,.1));
-  border: 1px solid rgba(245,158,11,.5); color: #fde68a;
-  font-size: .72rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase;
-}
-.hype-cs-title {
-  font-family: var(--font-head); font-size: clamp(2.2rem,6vw,3.8rem);
-  color: var(--text); margin-bottom: 16px; line-height: 1.1;
-}
-.hype-cs-epic {
-  background: linear-gradient(90deg, #f59e0b, #f472b6, #a78bfa);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  animation: epic-glow 2s ease-in-out infinite;
-}
-@keyframes epic-glow { 0%,100%{filter:brightness(1)} 50%{filter:brightness(1.3)} }
-.hype-cs-sub { color: var(--muted); font-size: 1rem; line-height: 1.7; margin-bottom: 36px; }
-/* Progress bar */
-.hype-cs-progress-wrap { margin-bottom: 36px; }
-.hype-cs-prog-labels { display: flex; justify-content: space-between; font-size: .82rem; color: var(--muted); margin-bottom: 8px; font-weight: 700; }
-.hype-cs-prog-labels strong { color: var(--purple); font-size: .92rem; }
-.hype-cs-prog-track { height: 14px; background: rgba(167,139,250,.1); border-radius: 99px; overflow: hidden; position: relative; border: 1px solid rgba(167,139,250,.15); }
-.hype-cs-prog-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #7c3aed, #a78bfa, #f472b6); width: 0; transition: width 2.5s cubic-bezier(.22,.61,.36,1); }
-.hype-cs-prog-glow { position: absolute; top: 0; right: 0; width: 40px; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,.4)); animation: prog-glow-sweep 2s ease-in-out infinite; }
-@keyframes prog-glow-sweep { 0%{right:100%;opacity:0} 20%{opacity:1} 100%{right:-10%;opacity:0} }
-/* Countdown */
-.hype-countdown { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 36px; flex-wrap: wrap; }
-.hype-cd-block { display: flex; flex-direction: column; align-items: center; padding: 0 16px; }
-.hype-cd-num {
-  font-family: var(--font-head); font-size: clamp(2rem,6vw,3.2rem); font-weight: 900;
-  background: linear-gradient(135deg, #a78bfa, #60a5fa);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  line-height: 1;
-}
-.hype-cd-label { font-size: .65rem; font-weight: 900; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
-.hype-cd-sep { font-family: var(--font-head); font-size: 2.5rem; color: var(--purple); opacity: .5; margin-bottom: 20px; }
-/* Notify form */
-.hype-notify-form { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 10px; }
-.hype-notify-input {
-  flex: 1; min-width: 200px; max-width: 320px; padding: 13px 20px; border-radius: 99px;
-  background: rgba(167,139,250,.08); border: 1.5px solid rgba(167,139,250,.3);
-  color: var(--text); font-family: var(--font-body); font-size: .92rem; outline: none;
-  transition: border-color .18s;
-}
-.hype-notify-input:focus { border-color: var(--purple); }
-.hype-notify-input::placeholder { color: var(--muted); }
-.hype-notify-btn {
-  padding: 13px 28px; border-radius: 99px; border: none;
-  background: linear-gradient(135deg, #7c3aed, #a78bfa);
-  color: #fff; font-family: var(--font-head); font-size: .95rem; cursor: pointer;
-  box-shadow: 0 6px 24px rgba(124,58,237,.4); transition: transform .15s, box-shadow .15s;
-}
-.hype-notify-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(124,58,237,.6); }
-.hype-notify-thanks { display: none; color: var(--green); font-size: .9rem; font-weight: 800; margin-bottom: 20px; }
-/* Chips */
-.hype-cs-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 24px 0 20px; }
-.hype-cs-chip {
-  background: rgba(167,139,250,.1); border: 1px solid rgba(167,139,250,.2);
-  border-radius: 99px; padding: 6px 16px; font-size: .78rem; font-weight: 800; color: var(--muted);
-  transition: background .15s, color .15s;
-}
-.hype-cs-chip:hover { background: rgba(167,139,250,.2); color: var(--text); }
-.hype-cs-foot { font-size: .78rem; color: var(--muted); margin-top: 8px; }
+    <!-- ====================== MAIN AREA ====================== -->
+    <div class="main-area">
 
-/* Responsive */
-@media (max-width: 900px) {
-  .hype-creator-inner { flex-direction: column; }
-  .hype-creator-right { width: 100%; min-height: 300px; }
-  .hype-fg-grid { grid-template-columns: repeat(2, 1fr); }
-  .hype-float-cards { display: none; }
-  .hype-showcase-inner { padding-bottom: 60px; }
-  .hype-stats-bar { gap: 12px; padding: 14px 16px; }
-  .hype-stat { padding: 0 12px; }
-  .hype-stat-div { display: none; }
-  .hype-reactions { display: none; }
-}
-@media (max-width: 600px) {
-  .hype-fg-grid { grid-template-columns: 1fr; }
-  .hype-creator-left { padding: 32px 24px; }
-  .hype-cs-inner { padding: 48px 20px 40px; }
-  .hype-showcase-inner { padding: 40px 20px 40px; }
-}
-</style>
+      <!-- TOPBAR -->
+      <header class="topbar" id="topbar">
+        <button class="menu-btn" id="sidebarToggle" aria-label="Toggle sidebar" data-tip="topbar-hamburger">
+          <span></span><span></span><span></span>
+        </button>
 
-<script>
-/* ── Daily challenge countdown ── */
-(function(){
-  function tickDcb() {
-    const now = new Date();
-    const midnight = new Date(now); midnight.setHours(24,0,0,0);
-    const diff = midnight - now;
-    const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
-    const el = document.getElementById('dcbCountdown');
-    if (el) el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-  }
-  tickDcb(); setInterval(tickDcb, 1000);
-})();
+        <div class="search-wrap" id="searchWrap" data-tip="topbar-search">
+          <span class="search-icon">🔍</span>
+          <input type="search" class="search-input" id="searchInput" placeholder="Search games, players…" aria-label="Search" readonly style="cursor:pointer" />
+        </div>
 
-/* ── Hype section scripts ── */
-(function() {
+        <div class="topbar-right">
+          <div class="tb-level" id="tbLevel" data-tip="tb-level">⭐ <span id="topbarLevel">1</span></div>
 
-  /* ── Animated counter ── */
-  function animateCount(el, target, duration) {
-    const start = performance.now();
-    const isInfinity = el.textContent === '∞';
-    if (isInfinity) return;
-    function step(now) {
-      const t = Math.min((now - start) / duration, 1);
-      const ease = 1 - Math.pow(1 - t, 4);
-      const v = Math.floor(ease * target);
-      el.textContent = v.toLocaleString();
-      if (t < 1) requestAnimationFrame(step);
-      else el.textContent = target.toLocaleString();
-    }
-    requestAnimationFrame(step);
-  }
+          <button class="topbar-icon-btn" id="notifBtn" aria-label="Notifications" data-tip="notif-btn">
+            🔔<span class="notif-badge" style="display:none">0</span>
+          </button>
 
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (!e.isIntersecting) return;
-      e.target.querySelectorAll('.hype-stat-num[data-target]').forEach(el => {
-        animateCount(el, +el.dataset.target, 2200);
-      });
-      obs.unobserve(e.target);
-    });
-  }, { threshold: 0.3 });
-  const statsBar = document.querySelector('.hype-stats-bar');
-  if (statsBar) obs.observe(statsBar);
+          <div class="tb-Eyltrophs" aria-label="Trophies" data-tip="tb-Eyltrophs">
+            🏆 <span id="topbarEyltrophs">0</span>
+          </div>
 
-  /* ── Word cycling ── */
-  const words = ['Legend','Champion','Hero','Unstoppable','Epic','Iconic'];
-  let wi = 0;
-  const wordEl = document.getElementById('hypeWord');
-  if (wordEl) {
-    setInterval(() => {
-      wordEl.style.opacity = '0';
-      wordEl.style.transform = 'translateY(8px)';
-      setTimeout(() => {
-        wi = (wi + 1) % words.length;
-        wordEl.textContent = words[wi];
-        wordEl.style.transition = 'opacity .4s, transform .4s';
-        wordEl.style.opacity = '1';
-        wordEl.style.transform = 'translateY(0)';
-      }, 300);
-      wordEl.style.transition = 'opacity .3s, transform .3s';
-    }, 2000);
-  }
+          <div class="tb-coins" aria-label="Coins" data-tip="tb-coins">
+            💰 <span id="topbarEylux">0</span>
+          </div>
 
-  /* ── Particle canvas (showcase) ── */
-  const hc = document.getElementById('hypeCanvas');
-  if (hc) {
-    const ctx = hc.getContext('2d');
-    let pts = [];
-    function resize() { hc.width = hc.offsetWidth; hc.height = hc.offsetHeight; pts = Array.from({length:90},()=>({x:Math.random()*hc.width,y:Math.random()*hc.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.8+.5,a:Math.random()})); }
-    function draw() {
-      ctx.clearRect(0,0,hc.width,hc.height);
-      pts.forEach(p => {
-        p.x += p.vx; p.y += p.vy;
-        if (p.x<0) p.x=hc.width; if (p.x>hc.width) p.x=0;
-        if (p.y<0) p.y=hc.height; if (p.y>hc.height) p.y=0;
-        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-        ctx.fillStyle = `rgba(167,139,250,${p.a*.6})`; ctx.fill();
-      });
-      pts.forEach((p,i) => {
-        for (let j=i+1;j<pts.length;j++) {
-          const dx=p.x-pts[j].x, dy=p.y-pts[j].y, d=Math.sqrt(dx*dx+dy*dy);
-          if (d<100) { ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(pts[j].x,pts[j].y); ctx.strokeStyle=`rgba(167,139,250,${.12*(1-d/100)})`; ctx.lineWidth=.8; ctx.stroke(); }
-        }
-      });
-      requestAnimationFrame(draw);
-    }
-    resize(); draw();
-    window.addEventListener('resize', resize);
-  }
+          <a href="profile.html" class="tb-avatar" id="tbAvatar" aria-label="My profile" data-tip="topbar-profile">
+            🎮<span class="online-dot" aria-hidden="true"></span>
+          </a>
+        </div>
+      </header><!-- /topbar -->
 
-  /* ── Coming Soon particle canvas ── */
-  const csc = document.getElementById('csCanvas');
-  if (csc) {
-    const ctx2 = csc.getContext('2d');
-    let stars = [];
-    function resize2() { csc.width=csc.offsetWidth; csc.height=csc.offsetHeight; stars=Array.from({length:120},()=>({x:Math.random()*csc.width,y:Math.random()*csc.height,s:Math.random()*2+.5,v:Math.random()*.5+.3,o:Math.random()})); }
-    function draw2() {
-      ctx2.clearRect(0,0,csc.width,csc.height);
-      stars.forEach(s=>{
-        s.y+=s.v; if(s.y>csc.height){s.y=0;s.x=Math.random()*csc.width;}
-        s.o=.3+.7*Math.abs(Math.sin(Date.now()/1000+s.x));
-        ctx2.beginPath(); ctx2.arc(s.x,s.y,s.s,0,Math.PI*2);
-        ctx2.fillStyle=`rgba(200,180,255,${s.o*0.7})`; ctx2.fill();
-      });
-      requestAnimationFrame(draw2);
-    }
-    resize2(); draw2();
-    window.addEventListener('resize',resize2);
-  }
+      <!-- PAGE CONTENT -->
+      <main class="page-content" id="main-content">
 
-  /* ── Progress bar animate on scroll ── */
-  const progFill = document.getElementById('csProgFill');
-  const progPct  = document.getElementById('csPercent');
-  if (progFill) {
-    const pObs = new IntersectionObserver(entries => {
-      if (!entries[0].isIntersecting) return;
-      progFill.style.width = '40%';
-      let p = 0;
-      const t = setInterval(() => { p++; if (progPct) progPct.textContent = p+'%'; if(p>=40) clearInterval(t); }, 30);
-      pObs.disconnect();
-    }, { threshold: 0.3 });
-    const csSection = document.querySelector('.hype-coming-soon');
-    if (csSection) pObs.observe(csSection);
-  }
+        <!-- Welcome Banner (today-stats.js injects widget AFTER this) -->
+        <section class="welcome-banner" aria-labelledby="welcome-heading">
+          <div class="welcome-text">
+            <h1 id="welcome-heading">
+              Welcome back, <span class="welcome-name">Player! 👋</span>
+            </h1>
+            <p>Ready for today's adventure? Check your daily missions!</p>
+          </div>
+          <div class="welcome-art" aria-hidden="true">🚀</div>
+        </section>
 
-  /* ── Countdown to launch date ── */
-  const LAUNCH = new Date('2026-09-01T00:00:00');
-  function tickCd() {
-    const diff = LAUNCH - Date.now();
-    if (diff <= 0) return;
-    const d = Math.floor(diff/864e5), h = Math.floor((diff%864e5)/36e5), m = Math.floor((diff%36e5)/6e4), s = Math.floor((diff%6e4)/1e3);
-    const pad = n => String(n).padStart(2,'0');
-    const dEl=document.getElementById('cdDays'),hEl=document.getElementById('cdHours'),mEl=document.getElementById('cdMins'),sEl=document.getElementById('cdSecs');
-    if(dEl)dEl.textContent=pad(d); if(hEl)hEl.textContent=pad(h); if(mEl)mEl.textContent=pad(m); if(sEl)sEl.textContent=pad(s);
-  }
-  tickCd(); setInterval(tickCd, 1000);
+        <!-- Friends Online -->
+        <section class="section" aria-labelledby="friends-heading">
+          <div class="section-header">
+            <h2 id="friends-heading" class="section-title">🤝 Friends Online</h2>
+            <a href="friends.html" class="section-link">See all →</a>
+          </div>
+          <div class="friends-row" id="friends-row" role="list">
+            <div class="friend-pill" role="listitem">
+              <div class="friend-pic" style="background:linear-gradient(135deg,#7c3aed,#ec4899)">🐱<span class="friend-status online"></span></div>
+              <span class="friend-name">Alex</span>
+            </div>
+            <div class="friend-pill" role="listitem">
+              <div class="friend-pic" style="background:linear-gradient(135deg,#0ea5e9,#6366f1)">🦊<span class="friend-status online"></span></div>
+              <span class="friend-name">Riley</span>
+            </div>
+            <div class="friend-pill" role="listitem">
+              <div class="friend-pic" style="background:linear-gradient(135deg,#059669,#0ea5e9)">🐼<span class="friend-status online"></span></div>
+              <span class="friend-name">Sam</span>
+            </div>
+            <div class="friend-pill" role="listitem">
+              <div class="friend-pic" style="background:linear-gradient(135deg,#d97706,#f43f5e)">🐸<span class="friend-status away"></span></div>
+              <span class="friend-name">Jordan</span>
+            </div>
+            <div class="friend-pill" role="listitem">
+              <div class="friend-pic" style="background:linear-gradient(135deg,#db2777,#9333ea)">🦋<span class="friend-status away"></span></div>
+              <span class="friend-name">Casey</span>
+            </div>
+            <div class="friend-pill" role="listitem">
+              <div class="friend-pic" style="background:linear-gradient(135deg,#0d9488,#3b82f6)">🐉<span class="friend-status offline"></span></div>
+              <span class="friend-name">Morgan</span>
+            </div>
+            <a href="friends.html" class="friend-pill" role="listitem">
+              <div class="add-friend-pic">➕</div>
+              <span class="friend-name">Add</span>
+            </a>
+          </div>
+        </section>
 
-  /* ── Notify form ── */
-  const nf = document.getElementById('hypeNotifyForm');
-  if (nf) {
-    nf.addEventListener('submit', e => {
-      e.preventDefault();
-      nf.style.display = 'none';
-      const t = document.getElementById('hypeNotifyThanks');
-      if (t) t.style.display = 'block';
-      /* Confetti burst */
-      for (let i=0;i<40;i++) spawnConfetti();
-    });
-  }
+        <!-- Continue Playing -->
+        <section class="section" aria-labelledby="continue-heading">
+          <div class="section-header">
+            <h2 id="continue-heading" class="section-title">▶️ Continue Playing</h2>
+            <a href="games.html" class="section-link">See all →</a>
+          </div>
+          <div class="games-grid continue-grid" id="continue-grid">
+            <div class="game-card" data-game-id="turbo-riders">
+              <div class="card-thumb t-yellow">🏎️<div class="card-play-overlay">▶</div></div>
+              <div class="card-body">
+                <span class="card-badge b-racing">Racing</span>
+                <h3 class="card-title">Turbo Riders</h3>
+                <div class="card-meta">👥 210K · 👍 97%</div>
+                <div class="card-last">
+                  <span class="cl-time">2h ago</span>
+                  <span class="cl-level" data-tier="low">⭐ Lv 8</span>
+                </div>
+                <button class="btn-play" onclick="window.location.href='games.html'">▶ Resume</button>
+              </div>
+            </div>
+            <div class="game-card" data-game-id="block-world">
+              <div class="card-thumb t-teal">🏗️<div class="card-play-overlay">▶</div></div>
+              <div class="card-body">
+                <span class="card-badge b-building">Building</span>
+                <h3 class="card-title">Block World</h3>
+                <div class="card-meta">👥 155K · 👍 95%</div>
+                <div class="card-last">
+                  <span class="cl-time">Yesterday</span>
+                  <span class="cl-stat">🏗️ 12 builds</span>
+                </div>
+                <button class="btn-play" onclick="window.location.href='games.html'">▶ Resume</button>
+              </div>
+            </div>
+            <div class="game-card" data-game-id="sky-quest">
+              <div class="card-thumb t-blue">🌤️<div class="card-play-overlay">▶</div></div>
+              <div class="card-body">
+                <span class="card-badge b-adventure">Adventure</span>
+                <h3 class="card-title">Sky Quest</h3>
+                <div class="card-meta">👥 120K · 👍 98%</div>
+                <div class="card-last">
+                  <span class="cl-time">3d ago</span>
+                  <span class="cl-level" data-tier="high">✦ Lv 24</span>
+                </div>
+                <button class="btn-play" onclick="window.location.href='games.html'">▶ Resume</button>
+              </div>
+            </div>
+          </div>
+        </section>
 
-  function spawnConfetti() {
-    const el = document.createElement('div');
-    const colors = ['#a78bfa','#60a5fa','#f472b6','#fde68a','#4ade80'];
-    el.style.cssText = `position:fixed;top:60%;left:${40+Math.random()*20}%;width:8px;height:8px;border-radius:${Math.random()>0.5?'50%':'2px'};background:${colors[Math.floor(Math.random()*colors.length)]};pointer-events:none;z-index:9999;animation:conf-fall 1.5s ease-out forwards`;
-    const kx = (Math.random()-.5)*300, ky = -200-Math.random()*200;
-    const style = document.createElement('style');
-    const id = 'cf'+Date.now()+Math.random();
-    el.id = id;
-    style.textContent = `@keyframes conf-fall{0%{transform:translate(0,0) rotate(0deg);opacity:1}100%{transform:translate(${kx}px,${ky}px) rotate(${Math.random()*720}deg);opacity:0}}`;
-    document.head.appendChild(style);
-    document.body.appendChild(el);
-    setTimeout(()=>{el.remove();style.remove();},1600);
-  }
+        <!-- Recommended Games -->
+        <section class="section" aria-labelledby="rec-heading">
+          <div class="section-header">
+            <h2 id="rec-heading" class="section-title">🌟 Recommended For You</h2>
+            <a href="games.html" class="section-link">Browse all →</a>
+          </div>
+          <div class="games-grid" id="recommended-grid">
+            <div class="game-card" data-game-id="ninja-dash">
+              <div class="card-thumb t-purple">⚡<div class="card-play-overlay">▶</div></div>
+              <div class="card-body">
+                <span class="card-badge b-action">Action</span>
+                <h3 class="card-title">Ninja Dash</h3>
+                <div class="card-meta">👥 89K · 👍 94%</div>
+                <button class="btn-play" onclick="window.location.href='games.html?id=ninja-dash'">▶ Play Now</button>
+              </div>
+            </div>
+            <div class="game-card" data-game-id="puzzle-palace">
+              <div class="card-thumb t-green">🧩<div class="card-play-overlay">▶</div></div>
+              <div class="card-body">
+                <span class="card-badge b-puzzle">Puzzle</span>
+                <h3 class="card-title">Puzzle Palace</h3>
+                <div class="card-meta">👥 73K · 👍 92%</div>
+                <button class="btn-play" onclick="window.location.href='games.html?id=puzzle-palace'">▶ Play Now</button>
+              </div>
+            </div>
+            <div class="game-card" data-game-id="dragon-escape">
+              <div class="card-thumb t-pink">🐉<div class="card-play-overlay">▶</div></div>
+              <div class="card-body">
+                <span class="card-badge b-adventure">Adventure</span>
+                <h3 class="card-title">Dragon Escape</h3>
+                <div class="card-meta">👥 62K · 👍 88%</div>
+                <button class="btn-play" onclick="window.location.href='games.html?id=dragon-escape'">▶ Play Now</button>
+              </div>
+            </div>
+            <div class="game-card" data-game-id="sky-riders">
+              <div class="card-thumb t-blue">🚀<div class="card-play-overlay">▶</div></div>
+              <div class="card-body">
+                <span class="card-badge b-racing">Racing</span>
+                <h3 class="card-title">Sky Riders</h3>
+                <div class="card-meta">👥 97K · 👍 91%</div>
+                <button class="btn-play" onclick="window.location.href='games.html?id=sky-riders'">▶ Play Now</button>
+              </div>
+            </div>
+            <div class="game-card" data-game-id="block-kingdom">
+              <div class="card-thumb t-teal">🏰<div class="card-play-overlay">▶</div></div>
+              <div class="card-body">
+                <span class="card-badge b-building">Building</span>
+                <h3 class="card-title">Block Kingdom</h3>
+                <div class="card-meta">👥 190K · 👍 99%</div>
+                <button class="btn-play" onclick="window.location.href='games.html?id=block-kingdom'">▶ Play Now</button>
+              </div>
+            </div>
+            <div class="game-card" data-game-id="ocean-quest">
+              <div class="card-thumb t-indigo">🌊<div class="card-play-overlay">▶</div></div>
+              <div class="card-body">
+                <span class="card-badge b-adventure">Adventure</span>
+                <h3 class="card-title">Ocean Quest</h3>
+                <div class="card-meta">👥 81K · 👍 93%</div>
+                <button class="btn-play" onclick="window.location.href='games.html?id=ocean-quest'">▶ Play Now</button>
+              </div>
+            </div>
+            <div class="game-card" data-game-id="space-blaster">
+              <div class="card-thumb t-purple">👾<div class="card-play-overlay">▶</div></div>
+              <div class="card-body">
+                <span class="card-badge b-action">Action</span>
+                <h3 class="card-title">Space Blaster</h3>
+                <div class="card-meta">👥 112K · 👍 96%</div>
+                <button class="btn-play" onclick="window.location.href='games.html?id=space-blaster'">▶ Play Now</button>
+              </div>
+            </div>
+            <div class="game-card" data-game-id="farm-friends">
+              <div class="card-thumb t-green">🌻<div class="card-play-overlay">▶</div></div>
+              <div class="card-body">
+                <span class="card-badge b-building">Building</span>
+                <h3 class="card-title">Farm Friends</h3>
+                <div class="card-meta">👥 68K · 👍 90%</div>
+                <button class="btn-play" onclick="window.location.href='games.html?id=farm-friends'">▶ Play Now</button>
+              </div>
+            </div>
+          </div>
+        </section>
 
-})();
-</script>
+        <!-- 3D Worlds -->
+        <section class="section" aria-labelledby="worlds-heading">
+          <div class="section-header">
+            <h2 id="worlds-heading" class="section-title">🌍 3D Worlds</h2>
+            <a href="games.html" class="section-link">See all →</a>
+          </div>
+          <div class="games-grid">
+            <div class="game-card" data-game-id="city-builder-3d">
+              <div class="card-thumb t-indigo">🏙️<div class="card-play-overlay">▶</div></div>
+              <div class="card-body">
+                <span class="card-badge b-building">3D World</span>
+                <h3 class="card-title">City Builder 3D</h3>
+                <div class="card-meta">👥 203K · 👍 98%</div>
+                <button class="btn-play" onclick="window.location.href='game3d-city.html'">▶ Enter World</button>
+              </div>
+            </div>
+            <div class="game-card" data-game-id="pirate-cove-3d">
+              <div class="card-thumb t-yellow">🏴‍☠️<div class="card-play-overlay">▶</div></div>
+              <div class="card-body">
+                <span class="card-badge b-adventure">3D World</span>
+                <h3 class="card-title">Pirate Cove 3D</h3>
+                <div class="card-meta">👥 178K · 👍 97%</div>
+                <button class="btn-play" onclick="window.location.href='game3d-pirate.html'">▶ Enter World</button>
+              </div>
+            </div>
+            <div class="game-card" data-game-id="obby-3d">
+              <div class="card-thumb t-pink">🎪<div class="card-play-overlay">▶</div></div>
+              <div class="card-body">
+                <span class="card-badge b-action">3D Obby</span>
+                <h3 class="card-title">Mega Obby</h3>
+                <div class="card-meta">👥 391K · 👍 99%</div>
+                <button class="btn-play" onclick="window.location.href='game3d-obby.html'">▶ Enter World</button>
+              </div>
+            </div>
+            <div class="game-card" data-game-id="treasure-3d">
+              <div class="card-thumb t-teal">💎<div class="card-play-overlay">▶</div></div>
+              <div class="card-body">
+                <span class="card-badge b-adventure">3D World</span>
+                <h3 class="card-title">Treasure Island 3D</h3>
+                <div class="card-meta">👥 142K · 👍 96%</div>
+                <button class="btn-play" onclick="window.location.href='game3d-treasure.html'">▶ Enter World</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Daily Missions (missions.js renders to #missions-widget-home) -->
+        <section class="section" id="dailyMissionsCard" aria-labelledby="missions-heading">
+          <div class="section-header">
+            <h2 id="missions-heading" class="section-title">🎯 Daily Missions</h2>
+            <span class="section-link" id="missionsReset" style="font-size:.8rem;color:rgba(167,139,250,.6)">Resets in 12h</span>
+          </div>
+          <div id="missions-widget-home">
+            <div style="color:rgba(167,139,250,.4);text-align:center;padding:24px 0;font-size:.9rem">Loading missions…</div>
+          </div>
+        </section>
+
+        <!-- Spin Wheel (spin-wheel.js targets #spinCanvas, #spinBtn, #spinCooldown) -->
+        <section id="spinWheelCard" aria-labelledby="spin-heading" style="
+          background:linear-gradient(160deg,#1a0830 0%,#2a1050 60%,#0d1a2e 100%);
+          border:1px solid rgba(167,139,250,.18);border-radius:20px;
+          padding:28px 32px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;
+          margin-bottom:24px;position:relative;overflow:hidden;
+        ">
+          <!-- Left content -->
+          <div style="flex:1;min-width:220px">
+            <div style="font-size:.72rem;font-weight:900;color:#f59e0b;letter-spacing:1.5px;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+              🎰 DAILY FREE SPIN
+            </div>
+            <h2 id="spin-heading" style="font-family:var(--font-head);font-size:clamp(1.6rem,3vw,2.2rem);color:#fff;margin-bottom:8px;line-height:1.1">
+              Spin for FREE coins!
+            </h2>
+            <p style="font-size:.88rem;color:rgba(180,160,220,.65);font-weight:600;margin-bottom:14px;line-height:1.5">
+              Win up to <strong style="color:#fbbf24">1,000</strong> 💰 every day. Resets at midnight.
+            </p>
+            <div id="spinAvailText" style="font-size:.85rem;font-weight:800;color:#4ade80;display:none">
+              ✅ Free spin available!
+            </div>
+            <span id="spinCooldown" style="font-size:.82rem;font-weight:700;color:rgba(167,139,250,.55)"></span>
+          </div>
+          <!-- Right: wheel + button -->
+          <div style="display:flex;flex-direction:column;align-items:center;gap:14px;flex-shrink:0">
+            <canvas id="spinCanvas" width="200" height="200" style="border-radius:50%;box-shadow:0 0 28px rgba(124,58,237,.5)"></canvas>
+            <button id="spinBtn" style="
+              background:linear-gradient(135deg,#a78bfa,#8b5cf6);border:none;
+              color:#fff;padding:11px 28px;border-radius:99px;
+              font-family:var(--font-head);font-size:1rem;
+              cursor:pointer;letter-spacing:1px;transition:opacity .2s;
+              box-shadow:0 4px 18px rgba(124,58,237,.4);
+            " onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+              🎰 SPIN!
+            </button>
+          </div>
+        </section>
+
+        <!-- Season Pass (#spBar, #spTiers, #spLevelLabel, #spXpLabel) -->
+        <section class="section" id="seasonPassCard" aria-labelledby="season-heading">
+          <div class="section-header">
+            <h2 id="season-heading" class="section-title">🏅 Season Pass</h2>
+            <span id="spLevelLabel" style="font-size:.85rem;font-weight:700;color:#a78bfa">Level 1</span>
+          </div>
+          <div style="padding:4px 0 12px">
+            <div style="display:flex;justify-content:space-between;font-size:.8rem;color:rgba(167,139,250,.65);margin-bottom:6px">
+              <span>Season XP</span>
+              <span id="spXpLabel">0 / 500</span>
+            </div>
+            <div style="height:10px;border-radius:99px;background:rgba(167,139,250,.1);overflow:hidden">
+              <div id="spBar" style="height:100%;border-radius:99px;background:linear-gradient(90deg,#a78bfa,#60a5fa);width:0%;transition:width .4s ease"></div>
+            </div>
+          </div>
+          <div class="games-grid" id="spTiers">
+            <!-- Season tier rewards injected by features.js / season-pass.js -->
+            <div style="background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2);border-radius:12px;padding:16px;text-align:center;color:rgba(167,139,250,.6);font-size:.85rem">🎁 Earn XP to unlock tier rewards!</div>
+          </div>
+        </section>
+
+        <!-- Clan Wars (.clan-wars-section referenced by quick-access.js) -->
+        <section class="section clan-wars-section" aria-labelledby="clan-heading" style="padding:0">
+          <div id="clan-wars-widget">
+            <div style="position:relative;background:linear-gradient(160deg,#0d0520 0%,#140830 50%,#080d1e 100%);border:1px solid rgba(167,139,250,.12);border-radius:18px;overflow:hidden" id="clanHomeCard">
+              <!-- dot bg -->
+              <div style="position:absolute;inset:0;pointer-events:none" id="clanHomeDots"></div>
+              <div style="position:relative;padding:36px 28px 0;text-align:center">
+                <div style="font-size:3rem;margin-bottom:10px">⚔️</div>
+                <div style="font-family:var(--font-head);font-size:1.15rem;color:#c4b5fd;margin-bottom:6px" id="clanHomeName">Join a Clan!</div>
+                <div style="font-size:.84rem;color:rgba(167,139,250,.52);font-weight:600;margin-bottom:20px" id="clanHomeSub">Compete with other clans for coins and glory.</div>
+              </div>
+              <a href="communities.html" id="clanHomeBtn" style="display:block;margin:0;padding:16px;background:linear-gradient(90deg,#d97706,#f59e0b,#fbbf24);color:#1a1040;font-family:var(--font-head);font-size:1rem;font-weight:900;text-align:center;text-decoration:none;letter-spacing:.5px;transition:opacity .2s" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'" id="clanFindBtn">Find a Clan</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- ─── World Plaza ─── -->
+        <div id="worldPlazaSection"></div>
+
+        <!-- ─── Top Players ─── -->
+        <section class="section" aria-labelledby="top-players-heading">
+          <div class="section-header">
+            <h2 id="top-players-heading" class="section-title">🏆 Top Players</h2>
+            <a href="leaderboard.html" class="section-link">Full Leaderboard →</a>
+          </div>
+          <div id="homeLbList" style="display:flex;flex-direction:column;gap:8px">
+            <div style="color:var(--muted);text-align:center;padding:16px;font-size:.85rem">Loading rankings…</div>
+          </div>
+        </section>
+
+        <!-- ─── Featured Communities ─── -->
+        <section class="section" aria-labelledby="featured-comm-heading">
+          <div class="section-header">
+            <h2 id="featured-comm-heading" class="section-title">🌐 Featured Communities</h2>
+            <a href="communities.html" class="section-link">All Communities →</a>
+          </div>
+          <div id="homeCommGrid" class="games-grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">
+            <div style="color:var(--muted);text-align:center;padding:16px;font-size:.85rem">Loading communities…</div>
+          </div>
+        </section>
+
+        <!-- ─── Achievement Highlights ─── -->
+        <section class="section" aria-labelledby="ach-home-heading">
+          <div class="section-header">
+            <h2 id="ach-home-heading" class="section-title">🎖️ Your Achievements</h2>
+            <a href="achievements.html" class="section-link">View All →</a>
+          </div>
+          <div id="homeAchWrap">
+            <div style="color:var(--muted);text-align:center;padding:16px;font-size:.85rem">Loading achievements…</div>
+          </div>
+        </section>
+
+        <!-- More Hot Games -->
+        <section class="section" aria-labelledby="hot-heading">
+          <div class="section-header">
+            <h2 id="hot-heading" class="section-title">🔥 More Hot Games</h2>
+            <a href="games.html" class="section-link">Browse all →</a>
+          </div>
+          <div class="games-grid" id="more-games-grid">
+            <div class="game-card" data-game-id="haunted-house">
+              <div class="card-thumb t-pink">👻<div class="card-play-overlay">▶</div></div>
+              <div class="card-body">
+                <span class="card-badge b-adventure">Adventure</span>
+                <h3 class="card-title">Haunted House</h3>
+                <div class="card-meta">👥 54K · 👍 86%</div>
+                <button class="btn-play" onclick="window.location.href='games.html?id=haunted-house'">▶ Play Now</button>
+              </div>
+            </div>
+            <div class="game-card" data-game-id="race-city">
+              <div class="card-thumb t-yellow">🏙️<div class="card-play-overlay">▶</div></div>
+              <div class="card-body">
+                <span class="card-badge b-racing">Racing</span>
+                <h3 class="card-title">Race City</h3>
+                <div class="card-meta">👥 78K · 👍 89%</div>
+                <button class="btn-play" onclick="window.location.href='games.html?id=race-city'">▶ Play Now</button>
+              </div>
+            </div>
+            <div class="game-card" data-game-id="jungle-run">
+              <div class="card-thumb t-green">🌿<div class="card-play-overlay">▶</div></div>
+              <div class="card-body">
+                <span class="card-badge b-adventure">Adventure</span>
+                <h3 class="card-title">Jungle Run</h3>
+                <div class="card-meta">👥 91K · 👍 92%</div>
+                <button class="btn-play" onclick="window.location.href='games.html?id=jungle-run'">▶ Play Now</button>
+              </div>
+            </div>
+            <div class="game-card" data-game-id="candy-chaos">
+              <div class="card-thumb t-pink">🍬<div class="card-play-overlay">▶</div></div>
+              <div class="card-body">
+                <span class="card-badge b-puzzle">Puzzle</span>
+                <h3 class="card-title">Candy Chaos</h3>
+                <div class="card-meta">👥 67K · 👍 87%</div>
+                <button class="btn-play" onclick="window.location.href='games.html?id=candy-chaos'">▶ Play Now</button>
+              </div>
+            </div>
+            <div class="game-card" data-game-id="ice-fortress">
+              <div class="card-thumb t-blue">❄️<div class="card-play-overlay">▶</div></div>
+              <div class="card-body">
+                <span class="card-badge b-building">Building</span>
+                <h3 class="card-title">Ice Fortress</h3>
+                <div class="card-meta">👥 83K · 👍 91%</div>
+                <button class="btn-play" onclick="window.location.href='games.html?id=ice-fortress'">▶ Play Now</button>
+              </div>
+            </div>
+            <div class="game-card" data-game-id="logic-lab">
+              <div class="card-thumb t-indigo">🔬<div class="card-play-overlay">▶</div></div>
+              <div class="card-body">
+                <span class="card-badge b-puzzle">Puzzle</span>
+                <h3 class="card-title">Logic Lab</h3>
+                <div class="card-meta">👥 45K · 👍 95%</div>
+                <button class="btn-play" onclick="window.location.href='games.html?id=logic-lab'">▶ Play Now</button>
+              </div>
+            </div>
+            <div class="game-card" data-game-id="pirate-bay">
+              <div class="card-thumb t-yellow">🏴‍☠️<div class="card-play-overlay">▶</div></div>
+              <div class="card-body">
+                <span class="card-badge b-adventure">Adventure</span>
+                <h3 class="card-title">Pirate Bay</h3>
+                <div class="card-meta">👥 72K · 👍 88%</div>
+                <button class="btn-play" onclick="window.location.href='games.html?id=pirate-bay'">▶ Play Now</button>
+              </div>
+            </div>
+            <div class="game-card" data-game-id="treasure-hunt">
+              <div class="card-thumb t-teal">💎<div class="card-play-overlay">▶</div></div>
+              <div class="card-body">
+                <span class="card-badge b-adventure">Adventure</span>
+                <h3 class="card-title">Treasure Hunt</h3>
+                <div class="card-meta">👥 59K · 👍 85%</div>
+                <button class="btn-play" onclick="window.location.href='games.html?id=treasure-hunt'">▶ Play Now</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ─── Stats Bar ─── -->
+        <section class="lp-stats-bar">
+          <div class="lp-stat"><span class="lp-stat-num" id="lpStatPlayers">10,482</span><span class="lp-stat-lbl">PLAYERS ONLINE</span></div>
+          <div class="lp-stat-sep">|</div>
+          <div class="lp-stat"><span class="lp-stat-num">16</span><span class="lp-stat-lbl">PLAYABLE GAMES</span></div>
+          <div class="lp-stat-sep">|</div>
+          <div class="lp-stat"><span class="lp-stat-num" id="lpStatGames">4,910,230</span><span class="lp-stat-lbl">GAMES PLAYED</span></div>
+          <div class="lp-stat-sep">|</div>
+          <div class="lp-stat"><span class="lp-stat-num" style="color:#ec4899">∞</span><span class="lp-stat-lbl">FUN GUARANTEED</span></div>
+        </section>
+
+        <!-- ─── Hero ─── -->
+        <section class="lp-hero">
+          <div class="lp-hero-stars" id="lpHeroStars"></div>
+          <div class="lp-badge-pill">🔥 THE HOTTEST GAMING PLATFORM OF 2026</div>
+          <div class="lp-hero-title">
+            Play. Win. Become<br>
+            <span class="lp-typed-word" id="lpTyped">A Legend</span>
+          </div>
+          <p class="lp-hero-sub">16 handcrafted games. Zero downloads. Infinite bragging rights.<br>This is the game platform the world has been waiting for.</p>
+          <div class="lp-hero-btns">
+            <button class="lp-btn-primary" onclick="window.location.href='games.html'">🚀 Play Free Now</button>
+            <button id="instant-game-btn" class="lp-btn-outline" onclick="EyloxInstantGame()" style="background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.4);color:#f59e0b">⚡ Instant Game</button>
+            <button class="lp-btn-outline" onclick="document.querySelector('.lp-epic').scrollIntoView({behavior:'smooth'})">🔔 Get Notified</button>
+          </div>
+          <div class="lp-game-strip">
+            <div class="lp-game-pill"><div class="lp-game-pill-icon">⚡</div><div class="lp-game-pill-name">Ninja Dash</div><div class="lp-game-pill-stars">★★★★★</div></div>
+            <div class="lp-game-pill"><div class="lp-game-pill-icon">🚀</div><div class="lp-game-pill-name">Sky Riders</div><div class="lp-game-pill-stars">★★★★★</div></div>
+            <div class="lp-game-pill"><div class="lp-game-pill-icon">🌊</div><div class="lp-game-pill-name">Ocean Quest</div><div class="lp-game-pill-stars">★★★★★</div></div>
+            <div class="lp-game-pill"><div class="lp-game-pill-icon">👻</div><div class="lp-game-pill-name">Haunted House</div><div class="lp-game-pill-stars">★★★★★</div></div>
+            <div class="lp-game-pill"><div class="lp-game-pill-icon">🐉</div><div class="lp-game-pill-name">Dragon Escape</div><div class="lp-game-pill-stars">★★★★★</div></div>
+          </div>
+        </section>
+
+        <!-- ─── Made to Go Viral ─── -->
+        <section class="lp-viral">
+          <div>
+            <div class="lp-viral-badge">🎬 FOR CONTENT CREATORS</div>
+            <h2>Made to Go Viral</h2>
+            <p class="lp-viral-desc">Every Eylox game is built for clips. Screen shake. Coin explosions. Epic comebacks. Whether you're a small channel or a mega creator — Eylox is your next banger video.</p>
+            <div class="lp-viral-feats">
+              <div class="lp-feat-row"><div class="lp-feat-icon">⚡</div><div><div class="lp-feat-title">Instant hype moments</div><div class="lp-feat-sub">Every game is clip-worthy</div></div></div>
+              <div class="lp-feat-row"><div class="lp-feat-icon">🏆</div><div><div class="lp-feat-title">Leaderboard challenges</div><div class="lp-feat-sub">Challenge your viewers to beat your score</div></div></div>
+              <div class="lp-feat-row"><div class="lp-feat-icon">🪙</div><div><div class="lp-feat-title">Coin economy</div><div class="lp-feat-sub">Earn Eylox coins, flex on your audience</div></div></div>
+              <div class="lp-feat-row"><div class="lp-feat-icon">🌀</div><div><div class="lp-feat-title">Zero friction</div><div class="lp-feat-sub">Play in any browser, no download</div></div></div>
+            </div>
+            <button class="lp-btn-primary" onclick="window.location.href='games.html'">▶ Start Playing</button>
+          </div>
+          <div class="lp-phone">
+            <div class="lp-ph-header">
+              <div class="lp-ph-avatar">🎮</div>
+              <div><div class="lp-ph-name">Eylox</div><div class="lp-ph-score">Score: 9,840</div></div>
+            </div>
+            <div class="lp-ph-gain">+50 🪙</div>
+            <div class="lp-ph-sub">+20 ↑ <span style="color:#a78bfa">craaazy</span></div>
+            <div class="lp-ph-lvlup">
+              <div class="lp-ph-lvlup-lbl">LEVEL UP!</div>
+              <div class="lp-ph-lvlup-val">⚡ Level 12</div>
+            </div>
+            <div class="lp-ph-icons"><span>⚡</span><span>🏆</span><span>👤</span></div>
+            <div class="lp-ph-coins"><span>💰</span><span>1,240 Eylux</span></div>
+          </div>
+        </section>
+
+        <!-- ─── Why Eylox Hits Different ─── -->
+        <div class="lp-why-label">WHY EYLOX HITS DIFFERENT</div>
+        <div class="lp-feat-grid">
+          <div class="lp-feat-card"><div class="lp-fc-icon">🎮</div><div class="lp-fc-title">16 Unique Games</div><div class="lp-fc-desc">Every game has its own engine, mechanics, and feel. Not the same game reskinned — real variety.</div></div>
+          <div class="lp-feat-card"><div class="lp-fc-icon">🪙</div><div class="lp-fc-title">Eylox Coin Economy</div><div class="lp-fc-desc">Win coins in every game. They update live on screen. Flex your balance in your profile.</div></div>
+          <div class="lp-feat-card"><div class="lp-fc-icon">🔥</div><div class="lp-fc-title">Daily Streaks</div><div class="lp-fc-desc">Come back every day to build your streak. The longer you play, the bigger the legend.</div></div>
+          <div class="lp-feat-card"><div class="lp-fc-icon">📱</div><div class="lp-fc-title">Any Device</div><div class="lp-fc-desc">Phone, tablet, laptop, or TV. Full touch controls on mobile. Zero compromise.</div></div>
+          <div class="lp-feat-card"><div class="lp-fc-icon">👑</div><div class="lp-fc-title">Owner Access</div><div class="lp-fc-desc">100+ Roblox-style admin commands. Ban, give coins, announce to the world. Real power.</div></div>
+          <div class="lp-feat-card"><div class="lp-fc-icon">🚀</div><div class="lp-fc-title">Always Growing</div><div class="lp-fc-desc">New games, features, and events dropping constantly. This is only the beginning.</div></div>
+        </div>
+
+        <!-- ─── Something EPIC is Coming ─── -->
+        <section class="lp-epic">
+          <div class="lp-hero-stars" id="lpEpicStars"></div>
+          <div style="font-size:3.5rem;margin-bottom:16px;position:relative">🚀</div>
+          <div class="lp-epic-badge">✨ NEXT LEVEL INCOMING</div>
+          <div class="lp-epic-title">Something <span class="lp-epic-word">EPIC</span> is<br>Coming</div>
+          <p class="lp-epic-sub">Multiplayer battles. Global leaderboards. Seasonal events. 500+ games. Creator tournaments. The biggest update in Eylox history.</p>
+          <div class="lp-prog-wrap">
+            <div class="lp-prog-hdr"><span>Build Progress</span><span>40%</span></div>
+            <div class="lp-prog-bar"><div class="lp-prog-fill"></div></div>
+          </div>
+          <div class="lp-countdown">
+            <div class="lp-cd-unit"><div class="lp-cd-num" id="cdDays">150</div><div class="lp-cd-lbl">DAYS</div></div>
+            <div class="lp-cd-col">:</div>
+            <div class="lp-cd-unit"><div class="lp-cd-num" id="cdHours">08</div><div class="lp-cd-lbl">HOURS</div></div>
+            <div class="lp-cd-col">:</div>
+            <div class="lp-cd-unit"><div class="lp-cd-num" id="cdMins">21</div><div class="lp-cd-lbl">MINS</div></div>
+            <div class="lp-cd-col">:</div>
+            <div class="lp-cd-unit"><div class="lp-cd-num" id="cdSecs">56</div><div class="lp-cd-lbl">SECS</div></div>
+          </div>
+          <div class="lp-notify-row">
+            <input type="email" class="lp-notify-input" id="lpEmail" placeholder="your@email.com"/>
+            <button class="lp-notify-btn" onclick="lpNotify()">🔔 Notify Me</button>
+          </div>
+          <div class="lp-chips-row">
+            <span class="lp-chip">🎮 500+ Games</span>
+            <span class="lp-chip">🤝 Multiplayer</span>
+            <span class="lp-chip">🏆 Tournaments</span>
+            <span class="lp-chip">🌐 Global Leaderboards</span>
+            <span class="lp-chip">✅ Free to Play</span>
+            <span class="lp-chip">🔒 100% Safe</span>
+          </div>
+          <div class="lp-footer-line">© 2026 Eylox · Made with ❤️ for the world. <a href="games.html">Play Now →</a></div>
+        </section>
+
+      </main><!-- /page-content -->
+
+      <!-- Mobile Bottom Nav -->
+      <nav class="bottom-nav" aria-label="Mobile navigation">
+        <a href="index.html" class="bn-item active">
+          <span class="bn-icon">🏠</span>Home
+        </a>
+        <a href="leaderboard.html" class="bn-item">
+          <span class="bn-icon">🏆</span>Leaderboard
+        </a>
+        <a href="communities.html" class="bn-item">
+          <span class="bn-icon">🌐</span>Communities
+        </a>
+        <a href="achievements.html" class="bn-item">
+          <span class="bn-icon">🎖️</span>Achievements
+        </a>
+        <a href="profile.html" class="bn-item">
+          <span class="bn-icon">👤</span>Profile
+        </a>
+      </nav>
+
+    </div><!-- /main-area -->
+  </div><!-- /app-shell -->
+
+  <!-- ===== JS Modules ===== -->
+  <script src="api.js"></script>
+  <script src="wow.js"></script>
+  
 <script src="security.js"></script>
-<script src="api.js"></script>
-<script src="script.js"></script>
-<script src="features.js"></script>
-<script src="notifications.js"></script>
-<script src="polish.js"></script>
-<script src="admin-button.js"></script>
-<script src="studio-button.js"></script>
-<script src="extras.js"></script>
-<script src="custom-games.js"></script>
-<script src="thumbnails.js"></script>
-<script src="friends-local.js"></script>
-<script>
-// Show admin button only for the Owner account
-(function() {
-  if (localStorage.getItem('eylox_is_owner') === 'true') {
-    const btn = document.getElementById('adminBtn');
-    if (btn) btn.style.display = 'flex';
-  }
-})();
-
-// Show streak badge
-(function() {
-  const streak = parseInt(localStorage.getItem('eylox_streak') || '0');
-  const el = document.getElementById('streakBadge');
-  if (el && streak > 0) {
-    const fire = streak >= 7 ? '🔥🔥' : streak >= 3 ? '🔥' : '✨';
-    el.textContent = fire + ' ' + streak + '-day streak!';
-    el.style.display = 'inline-flex';
-  }
-})();
-</script>
-
-<script>
-/* ══════════════════════════════════════════════════
-   DAILY SPIN WHEEL
-══════════════════════════════════════════════════ */
-(function() {
-  const REWARDS = [
-    { label:'50 🪙',   coins:50,   color:'#4a1080' },
-    { label:'100 🪙',  coins:100,  color:'#7c3aed' },
-    { label:'200 🪙',  coins:200,  color:'#059669' },
-    { label:'75 🪙',   coins:75,   color:'#1e40af' },
-    { label:'500 🪙',  coins:500,  color:'#b45309' },
-    { label:'150 🪙',  coins:150,  color:'#be185d' },
-    { label:'1000 🪙', coins:1000, color:'#7f1d1d' },
-    { label:'25 🪙',   coins:25,   color:'#374151' },
-  ];
-
-  const canvas = document.getElementById('spinCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const cx = 60, cy = 60, r = 58;
-  const slice = (Math.PI * 2) / REWARDS.length;
-  let angle = 0, spinning = false;
-
-  function drawWheel(rot) {
-    ctx.clearRect(0, 0, 120, 120);
-    REWARDS.forEach((seg, i) => {
-      const start = rot + i * slice;
-      const end   = start + slice;
-      ctx.beginPath();
-      ctx.moveTo(cx, cy);
-      ctx.arc(cx, cy, r, start, end);
-      ctx.closePath();
-      ctx.fillStyle = seg.color;
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(255,255,255,.15)';
-      ctx.lineWidth = 1;
-      ctx.stroke();
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.rotate(start + slice / 2);
-      ctx.textAlign = 'right';
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 8px Nunito,sans-serif';
-      ctx.fillText(seg.label, r - 6, 3);
-      ctx.restore();
-    });
-    /* Pointer arrow */
-    ctx.beginPath();
-    ctx.moveTo(cx, cy - r - 2);
-    ctx.lineTo(cx - 6, cy - r + 10);
-    ctx.lineTo(cx + 6, cy - r + 10);
-    ctx.closePath();
-    ctx.fillStyle = '#fde68a';
-    ctx.fill();
-  }
-
-  drawWheel(angle);
-
-  function checkCooldown() {
-    const last = parseInt(localStorage.getItem('eylox_last_spin') || '0');
-    const now  = Date.now();
-    const ms   = 24 * 3600 * 1000;
-    if (now - last < ms) {
-      const left = ms - (now - last);
-      const h = Math.floor(left / 3600000);
-      const m = Math.floor((left % 3600000) / 60000);
-      document.getElementById('spinCooldown').textContent = `⏳ Next spin in ${h}h ${m}m`;
-      document.getElementById('spinBtn').disabled = true;
-      document.getElementById('spinBtn').style.opacity = '.45';
-      document.getElementById('spinBtn').style.cursor = 'not-allowed';
-      return false;
-    }
-    document.getElementById('spinCooldown').textContent = '✅ Free spin available!';
-    return true;
-  }
-
-  checkCooldown();
-
-  /* ── Auto-trigger pending spin from Extra Spin boost ── */
-  if (localStorage.getItem('eylox_pending_spin') === '1') {
-    localStorage.removeItem('eylox_pending_spin');
-    localStorage.removeItem('eylox_last_spin'); // bypass cooldown for bonus spin
-    checkCooldown();
-    setTimeout(() => document.getElementById('spinBtn').click(), 600);
-  }
-
-  document.getElementById('spinBtn').addEventListener('click', () => {
-    if (spinning || !checkCooldown()) return;
-    spinning = true;
-    document.getElementById('spinBtn').disabled = true;
-    window.EyloxSFX?.spin();
-
-    /* Pick random winner */
-    const winIdx = Math.floor(Math.random() * REWARDS.length);
-    /* Rare 1000 coin = 5% chance; re-roll toward it */
-    const totalSpins = 5 + Math.random() * 3; /* 5-8 full rotations */
-    const targetAngle = angle + (Math.PI * 2 * totalSpins) +
-      (-winIdx * slice - angle % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
-
-    const start = Date.now();
-    const duration = 4200;
-    const startAngle = angle;
-
-    function easeOut(t) { return 1 - Math.pow(1 - t, 4); }
-
-    function tick() {
-      const elapsed = Date.now() - start;
-      const t = Math.min(elapsed / duration, 1);
-      angle = startAngle + (targetAngle - startAngle) * easeOut(t);
-      drawWheel(angle);
-      if (t < 1) { requestAnimationFrame(tick); return; }
-
-      /* Done — award coins */
-      const reward = REWARDS[winIdx];
-      try {
-        const u = JSON.parse(localStorage.getItem('eylox_user') || 'null');
-        if (u) {
-          u.coins = Math.min((u.coins || 0) + reward.coins, 1000000000);
-          localStorage.setItem('eylox_user', JSON.stringify(u));
+  <script src="device-compat.js"></script>
+  <script src="graphics.js"></script>
+  <script src="controller.js"></script>
+  <script src="anticheat.js"></script>
+  <script src="ranked.js"></script>
+  <script src="ai-builder.js"></script>
+  <script src="world-engine.js"></script>
+  <script src="live-events.js"></script>
+  <script src="creator-economy.js"></script>
+  <script src="game-rewards.js"></script>
+  <script src="ai-core.js"></script>
+  <script src="ai-recommendations.js"></script>
+  <script src="tutorial-robot.js"></script>
+  <script src="platform-polish.js"></script>
+  <script src="features.js"></script>
+  <script src="script.js"></script>
+  <script src="effects.js"></script>
+  <script src="polish.js"></script>
+  <script src="quick-access.js"></script>
+  <script src="missions.js"></script>
+  <script src="daily-rewards.js"></script>
+  <script>window._spinWheelInit = false;</script>
+  <script src="spin-wheel.js"></script>
+  <script src="live-feed.js"></script>
+  <script src="today-stats.js"></script>
+  <script src="game-hub.js"></script>
+  <script src="gaming-fortune.js"></script>
+  <script src="thumbnails.js"></script>
+  <script src="admin-button.js"></script>
+  <script src="studio-button.js"></script>
+  <script src="custom-games.js"></script>
+  <script src="recently-played.js"></script>
+  <script src="search-overlay.js"></script>
+  <script src="daily-challenge.js"></script>
+  <script src="friends-local.js"></script>
+  <script src="game-ratings.js"></script>
+  <script src="pro-tips.js"></script>
+  <script src="heatmap.js"></script>
+  <script src="floating-dock.js"></script>
+  <script src="floating-actions.js"></script>
+  <script src="achievement-popup.js"></script>
+  <script src="messages-local.js"></script>
+  <script src="seasonal-events.js"></script>
+  <script src="theme-switcher.js"></script>
+  <script src="game-stats.js"></script>
+  <script src="streak-calendar.js"></script>
+  <script src="quick-challenge.js"></script>
+  <script src="player-card.js"></script>
+  <script src="combo-meter.js"></script>
+  <script src="xp-events.js"></script>
+  <script src="notifications.js"></script>
+  <script src="platform-enhancements.js"></script>
+  <script src="user-persist.js"></script>
+  <script src="ranks.js"></script>
+  <script src="level-badge.js"></script>
+  <script src="coin-boost.js"></script>
+  <script src="settings.js"></script>
+  <script src="sound.js"></script>
+  <script src="i18n.js"></script>
+  <script src="party-system.js"></script>
+  <script src="globalchat.js"></script>
+  <script src="owner-theme.js"></script>
+  <script src="extras-menu.js"></script>
+  <script src="extras.js"></script>
+  <script src="session-tracker.js"></script>
+  <script src="api-enhanced.js"></script>
+  <script src="world-plaza.js"></script>
+  <script>
+  /* ── Instant Game Button ── */
+  function EyloxInstantGame() {
+    const btn = document.getElementById('instant-game-btn');
+    if (btn) { btn.textContent = '⏳ Generating...'; btn.disabled = true; }
+    const prompts = [
+      'make a space shooter', 'make a racing game', 'make a platformer',
+      'make a clicker game', 'make a puzzle game'
+    ];
+    const prompt = prompts[Math.floor(Math.random() * prompts.length)];
+    if (window.EyloxAIBuilder) {
+      EyloxAIBuilder.buildGame(prompt, null).then(result => {
+        if (btn) { btn.textContent = '⚡ Instant Game'; btn.disabled = false; }
+        const overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px';
+        overlay.innerHTML = `
+          <div style="width:100%;max-width:800px;background:#000000;border:1px solid rgba(167,139,250,.3);border-radius:20px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.8)">
+            <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid rgba(167,139,250,.15)">
+              <span style="font-size:1.2rem">${result.icon}</span>
+              <span style="font-weight:900;color:#fff;flex:1">${result.title}</span>
+              <button id="instant-save-publish-btn" style="background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:99px;padding:5px 14px;color:#fff;font-weight:800;font-size:.85rem;cursor:pointer">💾 Save &amp; Publish</button>
+              <button onclick="this.closest('div[style]').remove()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:99px;padding:4px 12px;color:rgba(255,255,255,.5);cursor:pointer">✕ Close</button>
+            </div>
+            <iframe srcdoc="${result.html.replace(/"/g, '&quot;')}" sandbox="allow-scripts allow-same-origin" style="width:100%;height:min(500px,70vh);border:none;display:block"></iframe>
+            <div id="instant-save-publish-status" style="padding:0 16px 14px;font-size:.8rem;font-weight:700;color:rgba(167,139,250,.7);text-align:center"></div>
+          </div>
+        `;
+        overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+        document.body.appendChild(overlay);
+        const savePublishBtn = document.getElementById('instant-save-publish-btn');
+        const statusEl = document.getElementById('instant-save-publish-status');
+        if (savePublishBtn) {
+          savePublishBtn.addEventListener('click', () => saveAndPublishInstantGame(result, savePublishBtn, statusEl));
         }
-        /* Update all coin displays */
-        const fmt = Number(u?.coins || 0).toLocaleString();
-        document.querySelectorAll('.tb-coins span,.coins-amount').forEach(el => el.textContent = fmt);
-        /* Notification */
-        if (typeof Notifs !== 'undefined') {
-          Notifs.push('🎡 Daily Spin!', `You won 🪙 ${reward.coins.toLocaleString()} coins from the spin wheel! Come back tomorrow for another spin!`, 'reward');
+        if (window.EyloxMeta) EyloxMeta.addXP(25, 'instant_game');
+      });
+    } else {
+      if (btn) { btn.textContent = '⚡ Instant Game'; btn.disabled = false; }
+      window.location.href = 'ai.html#builder';
+    }
+  }
+
+  /* Really persists an AI-generated template game: creates a real project
+     via POST /api/projects (storing the generated HTML as-is), then really
+     publishes it via POST /api/projects/:id/publish so anyone can play it
+     back later from game.html?id=... — no localStorage-only bookkeeping. */
+  async function saveAndPublishInstantGame(result, btn, statusEl) {
+    if (typeof getToken !== 'function' || !getToken()) {
+      statusEl.textContent = '🔒 Log in to save and publish this game for real.';
+      return;
+    }
+    btn.disabled = true;
+    btn.textContent = '⏳ Saving…';
+    statusEl.textContent = '';
+    try {
+      const project = await request('POST', '/projects', {
+        name: result.title || result.label,
+        description: `AI-generated ${result.label} — instantly built from a prompt.`,
+      }, true);
+      if (!project) throw new Error('Server unreachable');
+      await request('PUT', '/projects/' + project.id, {
+        scene: { type: 'html-template', html: result.html },
+      }, true);
+      const pub = await request('POST', '/projects/' + project.id + '/publish', null, true);
+      if (!pub) throw new Error('Server unreachable');
+      btn.textContent = '✅ Published';
+      statusEl.innerHTML = `🎉 Live for real — <a href="game.html?id=${project.id}" target="_blank" style="color:#a78bfa">play it here</a>`;
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = '💾 Save & Publish';
+      statusEl.textContent = '❌ ' + (err.message || "Couldn't save — try again.");
+    }
+  }
+
+  /* ── Home: Top Players mini-leaderboard ── */
+  (function renderHomeLb() {
+    const el = document.getElementById('homeLbList');
+    if (!el) return;
+    const users = [];
+    for (let key in localStorage) {
+      if (key.startsWith('eylox_userdata_')) {
+        try {
+          const d = JSON.parse(localStorage[key]);
+          const uname = key.replace('eylox_userdata_', '');
+          users.push({ username: uname, avatar: d.avatar||'🎮', Eyltrophs: d.Eyltrophs||0, wins: d.wins||0, coins: d.coins||0, score:(d.Eyltrophs||0)*15+(d.wins||0)*10+(d.coins||0) });
+        } catch {}
+      }
+    }
+    try {
+      const u = JSON.parse(localStorage.getItem('eylox_user')||'null');
+      if (u && u.username && !users.find(x=>x.username===u.username))
+        users.push({ username:u.username, avatar:u.avatar||'🎮', Eyltrophs:u.Eyltrophs||0, wins:u.wins||0, coins:u.coins||0, score:(u.Eyltrophs||0)*15+(u.wins||0)*10+(u.coins||0) });
+    } catch {}
+    const ranked = users.sort((a,b)=>b.score-a.score).slice(0,5);
+    if (!ranked.length) { el.innerHTML='<div style="color:var(--muted);text-align:center;padding:16px;font-size:.85rem">No rankings yet — start playing to appear here!</div>'; return; }
+    const medals = ['🥇','🥈','🥉'];
+    el.innerHTML = ranked.map((p,i)=>`
+      <a href="leaderboard.html" style="display:flex;align-items:center;gap:12px;background:rgba(167,139,250,.07);border:1px solid var(--border);border-radius:12px;padding:12px 16px;text-decoration:none;color:var(--text);transition:background .18s" onmouseover="this.style.background='rgba(167,139,250,.14)'" onmouseout="this.style.background='rgba(167,139,250,.07)'">
+        <div style="font-size:1.3rem;width:28px;text-align:center">${medals[i]||'#'+(i+1)}</div>
+        <div style="font-size:1.4rem">${p.avatar}</div>
+        <div style="flex:1">
+          <div style="font-weight:800;font-size:.92rem">${p.username}</div>
+          <div style="font-size:.75rem;color:var(--muted)">${p.wins} wins · ${p.Eyltrophs} Eyltrophs</div>
+        </div>
+        <div style="font-weight:900;color:var(--blue);font-size:.88rem">${p.score.toLocaleString()} pts</div>
+      </a>`).join('');
+  })();
+
+  /* ── Home: Featured Communities ── */
+  (function renderHomeComm() {
+    const el = document.getElementById('homeCommGrid');
+    if (!el) return;
+    let comms = [];
+    try { comms = JSON.parse(localStorage.getItem('eylox_communities')||'[]'); } catch {}
+    const defaults = [
+      { id:'dc1', icon:'⚔️', name:'Blade Warriors', cat:'Competitive', members:1420, desc:'Elite PvP fighters competing for glory and coins.' },
+      { id:'dc2', icon:'🎨', name:'Creative Builders', cat:'Creative', members:892, desc:'Share your wildest builds and creations.' },
+      { id:'dc3', icon:'🐉', name:'Dragon Riders Guild', cat:'Roleplay', members:654, desc:'Epic fantasy roleplay adventures await.' },
+    ];
+    const show = (comms.length ? comms.slice(0,3) : defaults);
+    let joined = [];
+    try { joined = JSON.parse(localStorage.getItem('eylox_joined_communities')||'[]'); } catch {}
+    el.innerHTML = show.map(c=>`
+      <a href="communities.html" style="display:flex;flex-direction:column;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);padding:18px;text-decoration:none;color:var(--text);transition:transform .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(167,139,250,.4)'" onmouseout="this.style.transform='';this.style.borderColor='var(--border)'">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:2rem">${c.icon||'🌐'}</div>
+          <div>
+            <div style="font-weight:800;font-size:.95rem">${c.name}</div>
+            <div style="font-size:.72rem;color:var(--purple);font-weight:800">${c.cat||'Community'}</div>
+          </div>
+          ${joined.includes(c.id)?'<span style="margin-left:auto;font-size:.68rem;background:rgba(74,222,128,.18);color:#4ade80;border:1px solid rgba(74,222,128,.3);border-radius:99px;padding:2px 8px;font-weight:800">Joined</span>':''}
+        </div>
+        <div style="font-size:.8rem;color:var(--muted);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${c.desc||''}</div>
+        <div style="font-size:.75rem;color:var(--muted);font-weight:700">👥 ${(c.members||0).toLocaleString()} members</div>
+      </a>`).join('');
+  })();
+
+  /* ── Home: Achievement Highlights ── */
+  (function renderHomeAch() {
+    const el = document.getElementById('homeAchWrap');
+    if (!el) return;
+    let u = {};
+    try { u = JSON.parse(localStorage.getItem('eylox_user')||'{}') || {}; } catch {}
+    const ACHS = [
+      { id:'first_game', icon:'🎮', name:'First Steps', check: u=>(u.gamesPlayed||0)>=1 },
+      { id:'first_win',  icon:'🏆', name:'First Victory', check: u=>(u.wins||0)>=1 },
+      { id:'games10',    icon:'🕹️', name:'Gamer', check: u=>(u.gamesPlayed||0)>=10 },
+      { id:'first_friend',icon:'🤝',name:'Friendship', check: u=>(u.friendCount||0)>=1 },
+      { id:'coins100',   icon:'💰', name:'Pocket Change', check: u=>(u.coins||0)>=100 },
+      { id:'early_adopt',icon:'🚀', name:'Early Adopter', check: ()=>true },
+      { id:'daily7',     icon:'🔥', name:'On Fire', check: u=>(u.loginStreak||0)>=7 },
+      { id:'coins1000',  icon:'💎', name:'Coin Collector', check: u=>(u.coins||0)>=1000 },
+    ];
+    const unlocked = ACHS.filter(a=>a.check(u));
+    const locked   = ACHS.filter(a=>!a.check(u));
+    const pct = Math.round(unlocked.length / ACHS.length * 100);
+    el.innerHTML = `
+      <div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;font-size:.8rem;font-weight:800;color:var(--muted);margin-bottom:6px">
+          <span>${unlocked.length} / ${ACHS.length} unlocked</span><span>${pct}%</span>
+        </div>
+        <div style="height:8px;border-radius:99px;background:rgba(167,139,250,.12);overflow:hidden">
+          <div style="height:100%;border-radius:99px;background:linear-gradient(90deg,var(--purple),var(--blue));width:${pct}%;transition:width .5s ease"></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        ${ACHS.map(a=>{
+          const done = a.check(u);
+          return `<a href="achievements.html" title="${a.name}" style="display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:99px;border:1px solid ${done?'rgba(167,139,250,.4)':'var(--border)'};background:${done?'rgba(167,139,250,.14)':'rgba(167,139,250,.04)'};text-decoration:none;color:${done?'var(--text)':'var(--muted)'};font-size:.78rem;font-weight:800;filter:${done?'none':'grayscale(1) opacity(.5)'};transition:filter .2s" onmouseover="this.style.filter='none'" onmouseout="this.style.filter='${done?'none':'grayscale(1) opacity(.5)'}'">
+            <span style="font-size:1.1rem">${a.icon}</span>${a.name}
+          </a>`;
+        }).join('')}
+      </div>`;
+  })();
+  </script>
+
+  <script>
+  /* ── Logout ── */
+  function eyloxLogout() {
+    if (!confirm('Log out of Eylox? Your progress is saved.')) return;
+    if (window.eyloxSaveUser) eyloxSaveUser();
+    ['eylox_token','eylox_user','eylox_guest'].forEach(k => localStorage.removeItem(k));
+    window.location.href = 'landing.html';
+  }
+
+  /* ── Settings panel ── */
+  function openSettingsPanel() { window.location.href = 'settings.html'; }
+
+
+  /* ── Clan Wars home card ── */
+  (function() {
+    const dotsEl = document.getElementById('clanHomeDots');
+    if (dotsEl) {
+      for (let i = 0; i < 30; i++) {
+        const d = document.createElement('div');
+        d.style.cssText = `position:absolute;width:${1+Math.random()*2}px;height:${1+Math.random()*2}px;background:rgba(255,255,255,${.07+Math.random()*.22});border-radius:50%;left:${Math.random()*100}%;top:${Math.random()*100}%`;
+        dotsEl.appendChild(d);
+      }
+    }
+    try {
+      const clans = JSON.parse(localStorage.getItem('eylox_clans') || '[]');
+      const u = JSON.parse(localStorage.getItem('eylox_user') || '{}');
+      const myClan = clans.find(c => c.leader === u.username || (c.members||[]).includes(u.username));
+      if (myClan) {
+        const nameEl = document.getElementById('clanHomeName');
+        const subEl  = document.getElementById('clanHomeSub');
+        const btn    = document.getElementById('clanHomeBtn');
+        if (nameEl) nameEl.textContent = myClan.icon + ' ' + myClan.name;
+        if (subEl)  subEl.textContent  = (myClan.members?.length||1) + ' members · ' + (myClan.wins||0) + ' battles won';
+        if (btn) { btn.textContent = '⚔️ Battle Now'; btn.href = 'communities.html#clans'; }
+      }
+    } catch {}
+  })();
+  </script>
+
+  <script>
+  /* ── Landing sections ── */
+  (function() {
+    // Scatter star dots in hero + epic containers
+    function makeStars(id, count) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      for (let i = 0; i < count; i++) {
+        const s = document.createElement('div');
+        s.className = 'lp-star-dot';
+        const sz = 1 + Math.random() * 2;
+        s.style.cssText = 'left:'+Math.random()*100+'%;top:'+Math.random()*100+'%;width:'+sz+'px;height:'+sz+'px;opacity:'+(0.15+Math.random()*0.5);
+        el.appendChild(s);
+      }
+    }
+    makeStars('lpHeroStars', 65);
+    makeStars('lpEpicStars', 65);
+
+    // Typed word cycle
+    const WORDS = ['A Legend', 'A Champion', 'The Best', 'Unstoppable', 'A Winner'];
+    let wi = 0;
+    const typed = document.getElementById('lpTyped');
+    if (typed) {
+      setInterval(() => {
+        wi = (wi + 1) % WORDS.length;
+        typed.style.opacity = '0';
+        typed.style.transform = 'translateY(10px)';
+        setTimeout(() => {
+          typed.textContent = WORDS[wi];
+          typed.style.opacity = '1';
+          typed.style.transform = 'translateY(0)';
+        }, 320);
+      }, 2600);
+    }
+
+    // Live countdown to 2026-10-08
+    const TARGET = new Date('2026-10-08T00:00:00');
+    function tick() {
+      const diff = TARGET - Date.now();
+      if (diff <= 0) return;
+      const fmt = n => String(n).padStart(2, '0');
+      const d = document.getElementById('cdDays');
+      const h = document.getElementById('cdHours');
+      const m = document.getElementById('cdMins');
+      const s = document.getElementById('cdSecs');
+      if (d) d.textContent = Math.floor(diff / 86400000);
+      if (h) h.textContent = fmt(Math.floor((diff % 86400000) / 3600000));
+      if (m) m.textContent = fmt(Math.floor((diff % 3600000) / 60000));
+      if (s) s.textContent = fmt(Math.floor((diff % 60000) / 1000));
+    }
+    tick();
+    setInterval(tick, 1000);
+
+    // Fluctuating online player count
+    const pEl = document.getElementById('lpStatPlayers');
+    if (pEl) {
+      let base = 10482;
+      setInterval(() => {
+        base += Math.floor((Math.random() - 0.42) * 18);
+        base = Math.max(9800, Math.min(11600, base));
+        pEl.textContent = base.toLocaleString();
+      }, 3200);
+    }
+  })();
+
+  function lpNotify() {
+    const email = document.getElementById('lpEmail')?.value.trim();
+    if (!email || !email.includes('@')) {
+      window.EyloxToast?.('Please enter a valid email!', 'warn', 2500);
+      return;
+    }
+    window.EyloxToast?.("You're on the list! 🎉", 'success', 3500);
+    document.getElementById('lpEmail').value = '';
+  }
+  </script>
+
+  <script>
+  /* ═══════════════════════════════════════════════════════════
+     EYLOX MODERN PLATFORM ENHANCEMENTS v3.0
+     - Toast notifications, sidebar toggle, search overlay,
+       notification panel, sound effects, topbar, settings
+  ═══════════════════════════════════════════════════════════ */
+  (function() {
+    'use strict';
+
+    /* ── Toast System (enhanced override of platform-enhancements.js) ── */
+    window.EyloxToast = function(msg, type, duration) {
+      type = type || 'info'; duration = duration || 3000;
+      const icons = { success:'✅', error:'❌', info:'💬', warn:'⚠️' };
+      const container = document.getElementById('toastContainer');
+      if (!container) {
+        /* Fallback: create a simple floating toast */
+        const t = document.createElement('div');
+        t.style.cssText = 'position:fixed;bottom:85px;left:50%;transform:translateX(-50%);z-index:99998;background:rgba(10,5,28,.96);border:1px solid rgba(167,139,250,.28);color:#f0e8ff;padding:11px 22px;border-radius:13px;font-size:.83rem;font-weight:800;font-family:Nunito,sans-serif;white-space:nowrap;pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.4)';
+        t.textContent = msg; document.body.appendChild(t);
+        setTimeout(() => { t.style.transition='opacity .3s'; t.style.opacity='0'; setTimeout(()=>t.remove(),400); }, duration);
+        return;
+      }
+      const toast = document.createElement('div');
+      toast.className = 'toast ' + type;
+      toast.innerHTML = '<span class="toast-icon">' + (icons[type]||'💬') + '</span><div class="toast-body"><div class="toast-title">' + msg + '</div></div>';
+      container.appendChild(toast);
+      playUiSound(type === 'success' ? 'success' : type === 'error' ? 'error' : 'notif');
+      setTimeout(() => {
+        toast.classList.add('out');
+        setTimeout(() => toast.remove(), 280);
+      }, duration);
+    };
+
+    /* ── Sound Effects ── */
+    let _ac = null;
+    function getAC() { return _ac || (_ac = new (window.AudioContext || window.webkitAudioContext)()); }
+    function playUiSound(type) {
+      try {
+        const ac = getAC();
+        if (ac.state === 'suspended') ac.resume();
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.connect(g); g.connect(ac.destination);
+        if (type === 'success') {
+          o.frequency.setValueAtTime(523, ac.currentTime);
+          o.frequency.setValueAtTime(784, ac.currentTime + .15);
+          g.gain.setValueAtTime(.15, ac.currentTime);
+          g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + .5);
+          o.start(); o.stop(ac.currentTime + .5);
+        } else if (type === 'error') {
+          o.type = 'sawtooth';
+          o.frequency.setValueAtTime(200, ac.currentTime);
+          o.frequency.setValueAtTime(160, ac.currentTime + .1);
+          g.gain.setValueAtTime(.1, ac.currentTime);
+          g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + .28);
+          o.start(); o.stop(ac.currentTime + .28);
+        } else if (type === 'notif') {
+          o.frequency.setValueAtTime(660, ac.currentTime);
+          o.frequency.setValueAtTime(880, ac.currentTime + .09);
+          g.gain.setValueAtTime(.1, ac.currentTime);
+          g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + .22);
+          o.start(); o.stop(ac.currentTime + .22);
+        } else if (type === 'click') {
+          o.frequency.setValueAtTime(1100, ac.currentTime);
+          g.gain.setValueAtTime(.06, ac.currentTime);
+          g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + .08);
+          o.start(); o.stop(ac.currentTime + .08);
         }
       } catch {}
+    }
+    window.playUiSound = playUiSound;
 
-      localStorage.setItem('eylox_last_spin', Date.now().toString());
-      spinning = false;
-      window.EyloxSFX?.win();
+    /* ── Sidebar Toggle (Mobile) ── */
+    const sidebar   = document.getElementById('sidebar');
+    const overlay   = document.getElementById('sidebarOverlay');
+    const toggleBtn = document.getElementById('sidebarToggle');
+    function openSidebar()  { sidebar?.classList.add('open'); overlay?.classList.add('open'); }
+    function closeSidebar() { sidebar?.classList.remove('open'); overlay?.classList.remove('open'); }
+    toggleBtn?.addEventListener('click', () => { playUiSound('click'); sidebar?.classList.contains('open') ? closeSidebar() : openSidebar(); });
+    overlay?.addEventListener('click', closeSidebar);
+    /* Close sidebar on nav link click (mobile) */
+    sidebar?.querySelectorAll('a,button').forEach(el => el.addEventListener('click', () => { if (window.innerWidth < 900) closeSidebar(); }));
 
-      /* Show win popup */
-      const popup = document.createElement('div');
-      popup.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.4);z-index:9999;background:linear-gradient(135deg,#1e0050,#3a0070);border:2px solid rgba(253,230,138,.5);border-radius:24px;padding:36px 48px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.6);transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .3s`;
-      popup.innerHTML = `
-        <div style="font-size:3rem;margin-bottom:10px">🎉</div>
-        <div style="font-family:'Fredoka One',cursive;font-size:1.8rem;color:#fde68a;margin-bottom:6px">+${reward.coins.toLocaleString()} 🪙</div>
-        <div style="color:rgba(255,255,255,.7);font-size:.85rem;font-weight:700">Added to your wallet!</div>
-        <button onclick="this.parentElement.remove()" style="margin-top:20px;background:rgba(167,139,250,.2);border:1px solid rgba(167,139,250,.4);color:#a78bfa;padding:9px 24px;border-radius:99px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:'Nunito',sans-serif">✓ Awesome!</button>
-      `;
-      document.body.appendChild(popup);
-      requestAnimationFrame(() => { popup.style.transform = 'translate(-50%,-50%) scale(1)'; });
+    /* ── Topbar scroll shadow ── */
+    const topbar = document.getElementById('topbar');
+    window.addEventListener('scroll', () => topbar?.classList.toggle('scrolled', window.scrollY > 8), { passive:true });
 
-      checkCooldown();
+    /* ── Update topbar stats from localStorage ── */
+    function refreshTopbarStats() {
+      try {
+        const u = JSON.parse(localStorage.getItem('eylox_user') || 'null');
+        if (!u) return;
+        const coinsEl   = document.getElementById('topbarEylux');
+        const trophyEl  = document.getElementById('topbarEyltrophs');
+        const levelEl   = document.getElementById('topbarLevel');
+        const tbAvatar  = document.getElementById('tbAvatar');
+        const sbCoins   = document.querySelector('.coins-amount');
+        const sbTrophies= document.querySelector('.Eyltrophs-amount');
+        if (coinsEl)   coinsEl.textContent   = (u.coins   || 0).toLocaleString();
+        if (trophyEl)  trophyEl.textContent  = (u.Eyltrophs|| 0).toLocaleString();
+        if (levelEl)   levelEl.textContent   = u.level    || 1;
+        if (sbCoins)   sbCoins.textContent   = (u.coins   || 0).toLocaleString();
+        if (sbTrophies)sbTrophies.textContent= (u.Eyltrophs|| 0).toLocaleString();
+        if (tbAvatar) {
+          const pic = localStorage.getItem('eylox_profile_pic');
+          tbAvatar.style.backgroundImage = pic ? `url(${pic})` : '';
+          tbAvatar.style.backgroundSize  = 'cover';
+          tbAvatar.textContent = pic ? '' : (u.avatar || '🎮');
+          if (!pic) tbAvatar.innerHTML = (u.avatar||'🎮') + '<span class="online-dot"></span>';
+        }
+        /* Welcome banner */
+        const wn = document.querySelector('.welcome-name');
+        if (wn) wn.textContent = (u.username || 'Player') + '! 👋';
+      } catch {}
+    }
+    refreshTopbarStats();
+    setInterval(refreshTopbarStats, 5000);
+
+    /* ── Notification bridge to notifications.js (Notifs) ── */
+    window.EyloxNotify = function(icon, title, sub) {
+      if (window.Notifs?.push) {
+        Notifs.push(title, sub || '', 'info');
+      }
+      EyloxToast(title, 'info', 3500);
+    };
+
+    /* ── Search Overlay ── */
+    const GAME_INDEX = [
+      { name:'Obby Course', icon:'🏃', type:'Game', url:'games.html?id=obby-course' },
+      { name:'Space Shooter', icon:'🚀', type:'Game', url:'games.html?id=space-shooter' },
+      { name:'Ninja Sword', icon:'🥷', type:'Game', url:'games.html?id=ninja-sword' },
+      { name:'Dragon Tamer', icon:'🐉', type:'Game', url:'games.html?id=dragon-tamer' },
+      { name:'Ocean Dive', icon:'🌊', type:'Game', url:'games.html?id=ocean-dive' },
+      { name:'Castle Builder', icon:'🏰', type:'Game', url:'games.html?id=castle-builder' },
+      { name:'Haunted House', icon:'👻', type:'Game', url:'games.html?id=haunted-house' },
+      { name:'Race City', icon:'🏙️', type:'Game', url:'games.html?id=race-city' },
+      { name:'Friends', icon:'🤝', type:'Page', url:'friends.html' },
+      { name:'Messages', icon:'💬', type:'Page', url:'messages.html' },
+      { name:'Profile', icon:'👤', type:'Page', url:'profile.html' },
+      { name:'Leaderboard', icon:'🏆', type:'Page', url:'leaderboard.html' },
+      { name:'Shop', icon:'🛒', type:'Page', url:'shop.html' },
+      { name:'Achievements', icon:'🎖️', type:'Page', url:'achievements.html' },
+      { name:'Live Events', icon:'🎯', type:'Page', url:'events.html' },
+      { name:'Settings', icon:'⚙️', type:'Page', url:'settings.html' },
+      { name:'AI Studio', icon:'🤖', type:'Page', url:'ai.html' },
+      { name:'EYLOX Studio', icon:'🔧', type:'Page', url:'eylox-studio.html' },
+    ];
+    const searchOverlay = document.getElementById('searchOverlay');
+    const searchOverlayInput = document.getElementById('searchOverlayInput');
+    const searchResults = document.getElementById('searchResults');
+    function openSearchOverlay() {
+      searchOverlay?.classList.add('open');
+      setTimeout(() => searchOverlayInput?.focus(), 80);
+      renderSearchResults('');
+    }
+    window.closeSearchOverlay = function() { searchOverlay?.classList.remove('open'); };
+    function renderSearchResults(q) {
+      if (!searchResults) return;
+      const matches = q.length < 1 ? GAME_INDEX.slice(0, 8) : GAME_INDEX.filter(g => g.name.toLowerCase().includes(q.toLowerCase())).slice(0, 10);
+      if (!matches.length) { const noRes = document.createElement('div'); noRes.style.cssText = 'padding:20px;text-align:center;color:var(--muted);font-weight:700'; noRes.textContent = 'No results for "' + q + '"'; searchResults.innerHTML = ''; searchResults.appendChild(noRes); return; }
+      searchResults.innerHTML = matches.map(g => `<a class="search-result-item" href="${g.url}"><span class="search-result-icon">${g.icon}</span><div><div class="search-result-name">${g.name}</div><div class="search-result-type">${g.type}</div></div></a>`).join('');
+    }
+    searchOverlayInput?.addEventListener('input', e => renderSearchResults(e.target.value));
+    searchOverlayInput?.addEventListener('keydown', e => { if (e.key === 'Escape') window.closeSearchOverlay(); });
+    document.getElementById('searchWrap')?.addEventListener('click', () => { playUiSound('click'); openSearchOverlay(); });
+    searchOverlay?.addEventListener('click', e => { if (e.target === searchOverlay) window.closeSearchOverlay(); });
+    /* Ctrl+K / Cmd+K to open search */
+    document.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); playUiSound('click'); openSearchOverlay(); }
+      if (e.key === 'Escape') { window.closeSearchOverlay(); notifPopup?.classList.remove('open'); }
+    });
+
+    /* ── Page Progress Bar ── */
+    const bar = document.getElementById('pageProgressBar');
+    if (bar) {
+      bar.style.width = '60%';
+      window.addEventListener('load', () => {
+        bar.style.width = '100%';
+        setTimeout(() => { bar.style.opacity = '0'; setTimeout(() => bar.remove(), 400); }, 350);
+      });
     }
 
-    requestAnimationFrame(tick);
-  });
+    /* ── Click sound on sidebar links ── */
+    document.querySelectorAll('.sidebar-link').forEach(link => {
+      link.addEventListener('click', () => playUiSound('click'));
+    });
 
-  canvas.addEventListener('click', () => document.getElementById('spinBtn').click());
-})();
-</script>
-<script src="effects.js"></script>
-<script src="sound.js"></script>
-<script src="settings.js"></script>
+    /* ── Button click sound on all .btn-play ── */
+    document.querySelectorAll('.btn-play').forEach(btn => {
+      btn.addEventListener('click', () => playUiSound('click'));
+    });
+
+    /* ── Daily login bonus ── */
+    try {
+      const lastBonus = localStorage.getItem('eylox_last_daily_bonus');
+      const today = new Date().toDateString();
+      if (lastBonus !== today) {
+        localStorage.setItem('eylox_last_daily_bonus', today);
+        const u = JSON.parse(localStorage.getItem('eylox_user') || 'null');
+        if (u && u.username && !localStorage.getItem('eylox_guest')) {
+          u.coins = (u.coins || 0) + 10;
+          localStorage.setItem('eylox_user', JSON.stringify(u));
+          localStorage.setItem('eylox_userdata_' + u.username, JSON.stringify(u));
+          setTimeout(() => {
+            EyloxToast('Daily login bonus: +10 🪙 Coins!', 'success', 4000);
+            if (window.Notifs?.push) Notifs.push('💰 Daily Login Bonus!', 'You earned +10 Eylux for logging in today!', 'Eylux');
+          }, 1800);
+        }
+      }
+    } catch {}
+
+  })();
+  </script>
+  <script src="premium.js"></script>
+  <script src="creator-pass.js"></script>
+  <script src="tooltip.js"></script>
+  <script src="ads.js" defer></script>
+  <script src="sw-register.js"></script>
+  <script src="offline.js" defer></script>
+  <script src="eylox-dash.js" defer></script>
+
+  <!-- v2.0 Improvements -->
+  <script src="currencies.js"></script>
+  <script src="platform-improvements.js"></script>
+  <script src="clan-system.js"></script>
+  <script src="season-pass.js"></script>
+  <script src="video-call.js"></script>
+
 </body>
 </html>

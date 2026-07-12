@@ -1,0 +1,299 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaderboards — EYLOX</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .leaderboard-container {
+      background: #1a1a2e;
+      border: 1px solid #0f3460;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+
+    .leaderboard-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .leaderboard-tab {
+      background: #0f3460;
+      border: 1px solid #533483;
+      color: #ccc;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: bold;
+    }
+
+    .leaderboard-tab:hover, .leaderboard-tab.active {
+      background: #e94560;
+      color: #fff;
+      border-color: #e94560;
+    }
+
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .leaderboard-table thead {
+      background: #0f3460;
+    }
+
+    .leaderboard-table th {
+      padding: 15px;
+      text-align: left;
+      color: #e94560;
+      font-weight: bold;
+      border-bottom: 2px solid #533483;
+    }
+
+    .leaderboard-table td {
+      padding: 15px;
+      border-bottom: 1px solid #0f3460;
+      color: #ccc;
+    }
+
+    .leaderboard-table tbody tr {
+      transition: all 0.3s;
+    }
+
+    .leaderboard-table tbody tr:hover {
+      background: #0f3460;
+    }
+
+    .rank-badge {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      line-height: 40px;
+      text-align: center;
+      font-weight: bold;
+      margin-right: 10px;
+      color: #fff;
+    }
+
+    .rank-1 { background: linear-gradient(135deg, #FFD700, #FFA500); font-size: 20px; }
+    .rank-2 { background: linear-gradient(135deg, #C0C0C0, #808080); font-size: 18px; }
+    .rank-3 { background: linear-gradient(135deg, #CD7F32, #8B4513); font-size: 16px; }
+    .rank-default { background: #533483; }
+
+    .player-name {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .player-avatar {
+      font-size: 32px;
+    }
+
+    .score-highlight {
+      color: #e94560;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      margin-top: 20px;
+    }
+
+    .pagination button {
+      background: #0f3460;
+      border: 1px solid #533483;
+      color: #ccc;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .pagination button:hover, .pagination button.active {
+      background: #e94560;
+      color: #fff;
+      border-color: #e94560;
+    }
+
+    .my-rank-card {
+      background: linear-gradient(135deg, #533483 0%, #0f3460 100%);
+      border: 2px solid #e94560;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    .my-rank-card h3 {
+      color: #e94560;
+      margin: 0 0 10px 0;
+    }
+
+    .my-rank-card p {
+      color: #ccc;
+      margin: 5px 0;
+    }
+  </style>
+<script src="audit-loader.js" defer></script>
+  <script src="debug-dashboard.js" defer></script>
+</head>
+<body>
+  <div class="main-content">
+    <div class="container">
+      <h1>🏆 Leaderboards</h1>
+
+      <!-- Tabs -->
+      <div class="leaderboard-tabs">
+        <button class="leaderboard-tab active" onclick="switchLeaderboard('wins')">Most Wins</button>
+        <button class="leaderboard-tab" onclick="switchLeaderboard('coins_earned')">Eylux Earned</button>
+        <button class="leaderboard-tab" onclick="switchLeaderboard('playtime')">Most Playtime</button>
+        <button class="leaderboard-tab" onclick="switchLeaderboard('games_created')">Games Created</button>
+        <button class="leaderboard-tab" onclick="switchLeaderboard('games_liked')">Games Liked</button>
+      </div>
+
+      <!-- My Rank -->
+      <div class="my-rank-card" id="myRankCard">
+        <h3>Your Rank</h3>
+        <p id="myRankText" style="font-size: 24px; font-weight: bold; color: #e94560;">Loading...</p>
+        <p id="myScoreText">Score: --</p>
+      </div>
+
+      <!-- Leaderboard Table -->
+      <div class="leaderboard-container">
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Player</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardBody">
+            <tr>
+              <td colspan="3" style="text-align: center; color: #888;">Loading...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" id="paginationContainer"></div>
+    </div>
+  </div>
+
+  <script src="api.js"></script>
+  <script>
+    /* Real leaderboard data — one fetch from GET /api/leaderboard (top 50,
+       includes trophies/wins/coins/level for every user), re-sorted
+       client-side per tab. `playtime`/`games_created`/`games_liked` have no
+       backend counterpart yet, so those tabs show an honest empty state
+       instead of fabricated rankings. Pagination is gone for the same
+       reason — the real endpoint doesn't paginate, so faking page counts
+       would just be more invented data. */
+    const REAL_CATEGORIES = {
+      wins:         { sortKey: 'wins',     badge: '🏆' },
+      coins_earned: { sortKey: 'coins',    badge: '💰' },
+    };
+    let currentCategory = 'wins';
+    let board = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      document.getElementById('paginationContainer').style.display = 'none';
+      try {
+        const res = await fetch('http://localhost:3001/api/leaderboard');
+        if (res.ok) board = await res.json();
+      } catch { /* server offline */ }
+      loadLeaderboard();
+      loadMyRank();
+    });
+
+    function loadLeaderboard() {
+      const container = document.getElementById('leaderboardBody');
+      const cat = REAL_CATEGORIES[currentCategory];
+
+      if (!cat) {
+        container.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#888">🚧 This category isn\'t tracked by the server yet — check back soon!</td></tr>';
+        return;
+      }
+      if (!board.length) {
+        container.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#888">No players yet</td></tr>';
+        return;
+      }
+
+      const ranked = [...board].sort((a, b) => (b[cat.sortKey]||0) - (a[cat.sortKey]||0));
+      container.innerHTML = ranked.map((entry, idx) => {
+        const rankNum = idx + 1;
+        let rankClass = 'rank-default';
+        if (rankNum === 1) rankClass = 'rank-1';
+        else if (rankNum === 2) rankClass = 'rank-2';
+        else if (rankNum === 3) rankClass = 'rank-3';
+        return `
+          <tr>
+            <td><span class="rank-badge ${rankClass}">${rankNum}</span></td>
+            <td>
+              <div class="player-name">
+                <span class="player-avatar">${entry.avatar || '🎮'}</span>
+                <strong>${entry.username}</strong>
+              </div>
+            </td>
+            <td><span class="score-highlight">${(entry[cat.sortKey]||0).toLocaleString()} ${cat.badge}</span></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function loadMyRank() {
+      const card = document.getElementById('myRankCard');
+      const cat = REAL_CATEGORIES[currentCategory];
+      let me = null;
+      try { me = JSON.parse(localStorage.getItem('eylox_user') || 'null'); } catch {}
+
+      if (!cat) {
+        card.innerHTML = '<h3>Your Rank</h3><p style="color:#888">Not tracked by the server yet</p>';
+        return;
+      }
+      if (!me || !board.length) {
+        card.innerHTML = '<h3>Your Rank</h3><p style="color:#888">Log in to see your rank</p>';
+        return;
+      }
+
+      const ranked = [...board].sort((a, b) => (b[cat.sortKey]||0) - (a[cat.sortKey]||0));
+      const idx = ranked.findIndex(u => u.username.toLowerCase() === me.username.toLowerCase());
+      if (idx === -1) {
+        card.innerHTML = '<h3>Your Rank</h3><p style="color:#888">Not yet ranked in this category</p>';
+        return;
+      }
+      card.innerHTML = `<h3>Your Rank</h3><p id="myRankText" style="font-size:24px;font-weight:bold;color:#e94560">#${idx+1}</p><p id="myScoreText">Score: ${(ranked[idx][cat.sortKey]||0).toLocaleString()}</p>`;
+    }
+
+    function switchLeaderboard(category) {
+      currentCategory = category;
+      document.querySelectorAll('.leaderboard-tab').forEach(tab => tab.classList.remove('active'));
+      event.target.classList.add('active');
+      loadLeaderboard();
+      loadMyRank();
+    }
+  </script>
+  <script src="floating-actions.js"></script>
+  <script src="tooltip.js"></script>
+
+<script src="sw-register.js"></script>
+<!-- v2.0 Improvements -->
+<script src="currencies.js"></script>
+  <script src="platform-improvements.js"></script>
+<script src="clan-system.js"></script>
+<script src="season-pass.js"></script>
+<script src="video-call.js"></script>
+<script src="offline.js" defer></script>
+</body>
+</html>

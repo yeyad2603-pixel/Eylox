@@ -1,0 +1,289 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>∞ Eylox — Help Center</title>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#7c3aed"/>
+  <link rel="stylesheet" href="style.css"/>
+  <script>
+    try {
+      const s = localStorage.getItem('eylox_token')||localStorage.getItem('eylox_guest')||localStorage.getItem('eylox_user');
+      if (!s) window.location.replace('landing.html');
+    } catch {}
+  </script>
+  <style>
+    .help-container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    .help-header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    .help-header h1 {
+      font-family: var(--font-head);
+      font-size: 2.5rem;
+      margin: 0 0 10px;
+      color: #f0e8ff;
+    }
+    .help-header p {
+      color: rgba(180,160,220,.6);
+      font-size: .95rem;
+    }
+    .faq-section {
+      margin-bottom: 40px;
+    }
+    .faq-section h2 {
+      font-size: 1.3rem;
+      color: var(--blue);
+      font-weight: 800;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .faq-item {
+      background: rgba(167,139,250,.05);
+      border: 1px solid rgba(167,139,250,.15);
+      border-radius: 12px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: all .2s;
+    }
+    .faq-item:hover {
+      background: rgba(167,139,250,.08);
+      border-color: rgba(167,139,250,.25);
+    }
+    .faq-question {
+      padding: 16px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      color: #f0e8ff;
+      user-select: none;
+    }
+    .faq-question::after {
+      content: '▼';
+      font-size: .7rem;
+      color: rgba(167,139,250,.5);
+      transition: transform .2s;
+    }
+    .faq-item.open .faq-question::after {
+      transform: rotate(180deg);
+    }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .3s;
+      padding: 0 16px;
+    }
+    .faq-item.open .faq-answer {
+      max-height: 500px;
+      padding: 0 16px 16px;
+    }
+    .faq-answer p {
+      color: rgba(180,160,220,.7);
+      line-height: 1.6;
+      margin: 0;
+      font-size: .9rem;
+    }
+    .contact-section {
+      background: linear-gradient(135deg, rgba(167,139,250,.1) 0%, rgba(167,139,250,.05) 100%);
+      border: 1px solid rgba(167,139,250,.2);
+      border-radius: 16px;
+      padding: 30px;
+      text-align: center;
+      margin-top: 50px;
+    }
+    .contact-section h3 {
+      color: var(--blue);
+      margin: 0 0 10px;
+      font-size: 1.1rem;
+    }
+    .contact-section p {
+      color: rgba(180,160,220,.6);
+      margin: 0;
+    }
+  </style>
+<script src="audit-loader.js" defer></script>
+  <script src="debug-dashboard.js" defer></script>
+</head>
+<body data-page="help">
+<div class="app-wrapper">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <span class="sidebar-logo-icon">🎮</span>
+      <span class="sidebar-logo-text">Eylox</span>
+    </a>
+
+    <p class="sidebar-section-label">Menu</p>
+    <nav class="sidebar-nav" aria-label="Main navigation">
+      <ul>
+        <li><a href="index.html" class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
+        <li><a href="games.html" class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
+        <li><a href="leaderboard.html" class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
+        <li><a href="achievements.html" class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
+        <li><a href="events.html" class="sidebar-link"><span class="s-icon">🎯</span><span class="s-label">Live Events</span></a></li>
+        <li><a href="communities.html" class="sidebar-link"><span class="s-icon">🌐</span><span class="s-label">Communities</span></a></li>
+        <li><a href="friends.html" class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span></a></li>
+        <li><a href="profile.html" class="sidebar-link"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
+        <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-divider"></div>
+
+    <p class="sidebar-section-label">More</p>
+    <nav class="sidebar-nav" aria-label="Secondary navigation">
+      <ul>
+        <li><a href="shop.html" class="sidebar-link"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
+        <li><a href="ai.html" class="sidebar-link"><span class="s-icon">🤖</span><span class="s-label">Eylox Studio</span><span class="s-soon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff">AI</span></a></li>
+        <li><a href="subscription.html" class="sidebar-link"><span class="s-icon">💎</span><span class="s-label">Subscription</span></a></li>
+        <li><a href="help.html" class="sidebar-link active" aria-current="page"><span class="s-icon">❓</span><span class="s-label">Help Center</span></a></li>
+        <li><a href="safety.html" class="sidebar-link"><span class="s-icon">🛡️</span><span class="s-label">Safety</span></a></li>
+        <li><button class="sidebar-link sb-action" onclick="openSettingsPanel()"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></button></li>
+        <li><button class="sidebar-link sb-action" onclick="eyloxLogout()" style="color:#f87171"><span class="s-icon">🚪</span><span class="s-label">Log Out</span></button></li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-coins">
+      <span>💰</span>
+      <div>
+        <div class="coins-amount" id="sidebarEylux">0</div>
+        <div class="coins-label">Eylux</div>
+      </div>
+    </div>
+    <div class="sidebar-coins" style="margin-top:8px">
+      <span>🏆</span>
+      <div>
+        <div class="Eyltrophs-amount" id="sidebarEyltrophs">0</div>
+        <div class="coins-label">Eyltrophs</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN AREA ── -->
+  <div class="main-area">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="menu-btn" id="sidebarToggle" aria-label="Toggle sidebar">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="topbar-brand" style="font-family:'Fredoka One',cursive;font-size:1.1rem;color:#a78bfa;letter-spacing:.5px">❓ Help Center</div>
+      <div class="topbar-right">
+        <div class="tb-Eyltrophs">🏆 <span id="topbarEyltrophs">0</span></div>
+        <div class="tb-coins">💰 <span id="topbarEylux">0</span></div>
+        <a href="profile.html" class="tb-avatar" aria-label="My profile">🎮<span class="online-dot"></span></a>
+      </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <main class="page-content">
+      <div class="help-container">
+      <div class="help-header">
+        <h1>❓ Help Center</h1>
+        <p>Find answers to common questions about Eylox</p>
+      </div>
+
+      <div class="faq-section">
+        <h2>Getting Started</h2>
+        <div class="faq-item">
+          <div class="faq-question">How do I create an account?</div>
+          <div class="faq-answer"><p>Visit the login page and click "Create Account". Enter your desired username and password, then confirm. You'll be ready to play immediately!</p></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">Can I play as a guest?</div>
+          <div class="faq-answer"><p>Yes! Click "Play as Guest" on the login page to start playing without creating an account. Your progress will be saved locally.</p></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">How do I reset my password?</div>
+          <div class="faq-answer"><p>Click "Forgot Password" on the login page. Follow the recovery instructions sent to your email.</p></div>
+        </div>
+      </div>
+
+      <div class="faq-section">
+        <h2>Games & Gameplay</h2>
+        <div class="faq-item">
+          <div class="faq-question">How do I earn coins?</div>
+          <div class="faq-answer"><p>Play games and complete missions to earn coins. The better you perform, the more coins you'll earn. Daily missions offer bonus rewards!</p></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">What are the 3D games?</div>
+          <div class="faq-answer"><p>Check out our 3D games like Eylox Obby, Treasure Island, Pirate Adventure, and City Explorer for immersive gameplay experiences.</p></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">Can I play offline?</div>
+          <div class="faq-answer"><p>Most games require an internet connection. However, your progress is saved locally and synced when you reconnect.</p></div>
+        </div>
+      </div>
+
+      <div class="faq-section">
+        <h2>Leaderboard & Ranking</h2>
+        <div class="faq-item">
+          <div class="faq-question">How does the leaderboard work?</div>
+          <div class="faq-answer"><p>The leaderboard ranks players by their total wins across all games. Check back daily for new rankings!</p></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">How do I increase my ranking?</div>
+          <div class="faq-answer"><p>Win games to increase your score. Each personal best in a game counts as a win. Challenge yourself across different game types!</p></div>
+        </div>
+      </div>
+
+      <div class="faq-section">
+        <h2>Friends & Clans</h2>
+        <div class="faq-item">
+          <div class="faq-question">How do I add friends?</div>
+          <div class="faq-answer"><p>Go to the Friends section and search for usernames. Click "Add Friend" to send a request.</p></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">How do I create a clan?</div>
+          <div class="faq-answer"><p>Visit the Clan Wars section and click "Create Clan". You can invite friends to join your clan and compete together!</p></div>
+        </div>
+      </div>
+
+      <div class="contact-section">
+        <h3>Still need help?</h3>
+        <p>Contact our support team or check the Safety & Privacy page for more information.</p>
+      </div>
+    </div>
+    </main>
+  </div>
+</div><!-- /app-wrapper -->
+
+<script src="security.js"></script>
+<script src="api.js"></script>
+<script src="script.js"></script>
+<script src="features.js"></script>
+<script src="notifications.js"></script>
+<script src="polish.js"></script>
+<script src="admin-button.js"></script>
+<script src="studio-button.js"></script>
+<script src="extras.js"></script>
+<script src="effects.js"></script>
+<script src="sound.js"></script>
+<script src="settings.js"></script>
+<script src="quick-access.js"></script>
+<script src="floating-actions.js"></script>
+<script src="tooltip.js"></script>
+<script>
+  document.querySelectorAll('.faq-question').forEach(q => {
+    q.addEventListener('click', function() {
+      const item = this.parentElement;
+      item.classList.toggle('open');
+    });
+  });
+  document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+    document.getElementById('sidebar')?.classList.toggle('open');
+  });
+</script>
+<script src="sw-register.js"></script>
+<script src="offline.js" defer></script>
+</body>
+</html>

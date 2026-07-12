@@ -1,0 +1,925 @@
+/* ============================================================
+   EYLOX — Video Ads System  |  ads.css  v2.0
+   YouTube-inspired · TikTok-smooth · Esports-premium
+   Glassmorphism · Neon · Cinematic · Animated
+   ============================================================ */
+
+/* ── Ad Strip Container ── */
+.eylox-ad-strip {
+  margin: 36px 0;
+  position: relative;
+  animation: strip-fade-in .5s cubic-bezier(.22,.61,.36,1) both;
+}
+@keyframes strip-fade-in {
+  from { opacity:0; transform:translateY(14px); }
+}
+
+.eylox-ad-strip-hd {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 18px;
+}
+.eylox-ad-strip-label {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .7rem; font-weight: 900; letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: #a78bfa;
+  padding: 5px 14px; border-radius: 99px;
+  background: rgba(167,139,250,.1);
+  border: 1px solid rgba(167,139,250,.22);
+  box-shadow: 0 0 14px rgba(167,139,250,.08);
+}
+.eylox-ad-strip-line {
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, rgba(167,139,250,.25), transparent);
+}
+
+.eylox-ad-strip-scroll {
+  display: flex; gap: 18px;
+  overflow-x: auto; padding-bottom: 10px;
+  scrollbar-width: thin; scrollbar-color: rgba(167,139,250,.3) transparent;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.eylox-ad-strip-scroll::-webkit-scrollbar { height: 3px; }
+.eylox-ad-strip-scroll::-webkit-scrollbar-track { background: transparent; }
+.eylox-ad-strip-scroll::-webkit-scrollbar-thumb { background: rgba(167,139,250,.3); border-radius: 99px; }
+
+/* ── Ad Grid (responsive) ── */
+.eylox-ad-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* ── Banner Ad (full-width hero) ── */
+.eylox-ad-banner {
+  width: 100%;
+  margin: 36px 0;
+}
+.eylox-ad-banner .eylox-ad {
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  border-radius: 28px;
+  min-height: 220px;
+}
+.eylox-ad-banner .ad-preview { border-radius: 28px 0 0 28px; min-height: 220px; }
+.eylox-ad-banner .ad-body    { border-radius: 0 28px 28px 0; padding: 32px 36px; }
+@media (max-width: 700px) {
+  .eylox-ad-banner .eylox-ad { grid-template-columns: 1fr; }
+  .eylox-ad-banner .ad-preview { border-radius: 28px 28px 0 0; min-height: 170px; }
+  .eylox-ad-banner .ad-body    { border-radius: 0 0 28px 28px; }
+}
+
+/* ─────────────────────────────────────────
+   ═══  AD CARD  ═══
+   Glassmorphism + Neon + Cinematic
+───────────────────────────────────────── */
+.eylox-ad {
+  min-width: 284px; max-width: 340px;
+  background: linear-gradient(160deg, rgba(20,10,50,.96) 0%, rgba(10,5,28,.97) 100%);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid rgba(167,139,250,.2);
+  border-radius: 22px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  scroll-snap-align: start;
+  transition:
+    transform .32s cubic-bezier(.34,1.4,.64,1),
+    box-shadow .32s,
+    border-color .32s;
+  flex-shrink: 0;
+  outline: none;
+}
+
+/* Neon glow on hover */
+.eylox-ad:hover,
+.eylox-ad:focus-visible {
+  transform: translateY(-10px) scale(1.022);
+  border-color: rgba(167,139,250,.5);
+  box-shadow:
+    0 24px 72px rgba(0,0,0,.75),
+    0 0 0 1px rgba(167,139,250,.12),
+    0 0 60px rgba(124,58,237,.22),
+    inset 0 1px 0 rgba(255,255,255,.07);
+}
+
+/* Spinning neon border on hover */
+.eylox-ad::before {
+  content: '';
+  position: absolute; inset: -2px; border-radius: 23px; z-index: 0;
+  background: conic-gradient(
+    from 0deg,
+    transparent 20%,
+    rgba(167,139,250,.8) 40%,
+    rgba(79,195,247,.6) 55%,
+    rgba(244,114,182,.5) 70%,
+    transparent 85%
+  );
+  opacity: 0;
+  transition: opacity .35s;
+  animation: ad-border-spin 2.4s linear infinite paused;
+}
+.eylox-ad:hover::before,
+.eylox-ad.playing::before {
+  opacity: 1;
+  animation-play-state: running;
+}
+@keyframes ad-border-spin { to { transform: rotate(360deg); } }
+
+/* Inner container covers pseudo-element */
+.eylox-ad::after {
+  content: '';
+  position: absolute; inset: 1px; border-radius: 21px;
+  background: linear-gradient(160deg, rgba(20,10,50,.97) 0%, rgba(10,5,28,.98) 100%);
+  z-index: 0;
+  pointer-events: none;
+}
+.ad-preview, .ad-body { position: relative; z-index: 1; }
+
+/* ── Canvas for hover video simulation ── */
+.ad-canvas {
+  position: absolute; inset: 0; z-index: 1;
+  width: 100%; height: 100%;
+  opacity: 0;
+  transition: opacity .45s ease;
+  border-radius: 0;
+}
+.eylox-ad.playing .ad-canvas { opacity: 1; }
+
+/* ── Preview Area ── */
+.ad-preview {
+  height: 196px;
+  position: relative;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Animated gradient background (CSS fallback / idle state) */
+.ad-preview-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background: linear-gradient(
+    135deg,
+    var(--ad-c1, #5b21b6) 0%,
+    var(--ad-c2, #7c3aed) 40%,
+    var(--ad-c3, #a855f7) 70%,
+    var(--ad-c1, #5b21b6) 100%
+  );
+  background-size: 300% 300%;
+  animation: ad-bg-idle var(--ad-dur, 9s) ease infinite;
+  transition: opacity .45s;
+}
+.eylox-ad.playing .ad-preview-bg { opacity: 0; }
+@keyframes ad-bg-idle {
+  0%   { background-position: 0% 0%; }
+  33%  { background-position: 100% 50%; }
+  66%  { background-position: 50% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+/* Scan lines (idle) */
+.ad-scan-lines {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background-image: repeating-linear-gradient(
+    0deg, rgba(0,0,0,.06) 0px, rgba(0,0,0,.06) 1px, transparent 1px, transparent 4px
+  );
+  animation: ad-scan 5s linear infinite;
+  opacity: .55; transition: opacity .3s;
+}
+.eylox-ad:hover .ad-scan-lines { animation-duration: 1.2s; opacity: .25; }
+@keyframes ad-scan { to { background-position: 0 16px; } }
+
+/* Horizontal sweep flare */
+.ad-sweep {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: linear-gradient(105deg, transparent 25%, rgba(255,255,255,.1) 50%, transparent 75%);
+  transform: translateX(-120%);
+  animation: ad-sweep 4.5s ease-in-out infinite;
+}
+.eylox-ad:hover .ad-sweep { animation-duration: 1.8s; }
+@keyframes ad-sweep {
+  0%,100% { transform: translateX(-120%); }
+  50%      { transform: translateX(120%); }
+}
+
+/* Vignette overlay */
+.ad-vignette {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,.45) 100%);
+}
+
+/* Floating particles */
+.ad-particles {
+  position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  overflow: hidden;
+}
+.ad-ptcl {
+  position: absolute; pointer-events: none;
+  font-size: 1rem; opacity: 0;
+  animation: ad-ptcl-float var(--pd, 3s) var(--pdelay, 0s) ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(255,255,255,.4));
+}
+@keyframes ad-ptcl-float {
+  0%   { opacity: 0; transform: translateY(0) scale(0) rotate(0deg); }
+  15%  { opacity: .8; transform: translateY(-15px) scale(1.1) rotate(25deg); }
+  70%  { opacity: .3; transform: translateY(-60px) scale(.7) rotate(160deg); }
+  100% { opacity: 0; transform: translateY(-95px) scale(0) rotate(340deg); }
+}
+
+/* Main icon */
+.ad-icon {
+  position: relative; z-index: 4;
+  font-size: 4.2rem;
+  filter: drop-shadow(0 0 18px rgba(0,0,0,.6)) drop-shadow(0 8px 24px rgba(0,0,0,.4));
+  animation: ad-icon-idle 3.2s ease-in-out infinite;
+  transition: transform .35s cubic-bezier(.34,1.56,.64,1), filter .35s, opacity .4s;
+  user-select: none;
+}
+.eylox-ad.playing .ad-icon { opacity: .4; transform: scale(.85); }
+.eylox-ad:hover:not(.playing) .ad-icon {
+  animation: ad-icon-play .65s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 30px rgba(255,255,255,.3)) drop-shadow(0 8px 24px rgba(0,0,0,.5));
+}
+@keyframes ad-icon-idle {
+  0%,100% { transform: translateY(0) scale(1) rotate(-2deg); }
+  50%      { transform: translateY(-9px) scale(1.07) rotate(2deg); }
+}
+@keyframes ad-icon-play {
+  from { transform: translateY(0) scale(1.0) rotate(-3deg); }
+  to   { transform: translateY(-14px) scale(1.14) rotate(4deg); }
+}
+
+/* Play overlay + button */
+.ad-play-overlay {
+  position: absolute; inset: 0; z-index: 5;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,.12);
+  transition: background .3s;
+}
+.eylox-ad:hover .ad-play-overlay { background: rgba(0,0,0,.05); }
+
+.ad-play-btn {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: rgba(255,255,255,.16);
+  backdrop-filter: blur(14px);
+  border: 2px solid rgba(255,255,255,.32);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; color: #fff;
+  transition: transform .22s, background .22s, box-shadow .22s, border-color .22s;
+  animation: play-pulse 2.2s ease-in-out infinite;
+  position: relative;
+}
+.ad-play-btn::before {
+  content: '';
+  position: absolute; inset: -8px; border-radius: 50%;
+  border: 1px solid rgba(167,139,250,.0);
+  animation: play-ring 2.2s ease-in-out infinite;
+}
+@keyframes play-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(255,255,255,.18); }
+  50%      { box-shadow: 0 0 0 12px rgba(255,255,255,0); }
+}
+@keyframes play-ring {
+  0%   { transform: scale(1); border-color: rgba(167,139,250,.0); }
+  50%  { transform: scale(1.3); border-color: rgba(167,139,250,.5); }
+  100% { transform: scale(1.6); border-color: rgba(167,139,250,.0); }
+}
+.eylox-ad:hover .ad-play-btn {
+  transform: scale(1.18);
+  background: rgba(124,58,237,.45);
+  border-color: rgba(167,139,250,.75);
+  box-shadow: 0 0 32px rgba(124,58,237,.6), 0 0 60px rgba(124,58,237,.2);
+  animation: none;
+}
+.eylox-ad.playing .ad-play-btn {
+  background: rgba(248,113,113,.3);
+  border-color: rgba(248,113,113,.6);
+  box-shadow: 0 0 20px rgba(248,113,113,.4);
+  font-size: 1rem;
+}
+
+/* NOW PLAYING indicator */
+.ad-now-playing {
+  position: absolute; bottom: 38px; left: 12px; z-index: 6;
+  display: flex; align-items: center; gap: 5px;
+  font-size: .6rem; font-weight: 900; letter-spacing: 1.2px;
+  text-transform: uppercase; color: #fff;
+  background: rgba(248,113,113,.9);
+  border-radius: 5px; padding: 3px 9px;
+  opacity: 0; transition: opacity .3s;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 12px rgba(248,113,113,.4);
+}
+.ad-now-playing::before {
+  content: '';
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #fff;
+  animation: npulse 1s ease-in-out infinite;
+}
+@keyframes npulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+.eylox-ad.playing .ad-now-playing { opacity: 1; }
+
+/* Sound toggle */
+.ad-sound-btn {
+  position: absolute; top: 12px; right: 12px; z-index: 7;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: rgba(0,0,0,.55); backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,.18);
+  color: #fff; font-size: .78rem;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; opacity: 0;
+  transition: opacity .22s, background .22s, transform .22s;
+}
+.eylox-ad:hover .ad-sound-btn,
+.eylox-ad.playing .ad-sound-btn { opacity: 1; }
+.ad-sound-btn:hover { background: rgba(124,58,237,.55); transform: scale(1.12); }
+
+/* Video progress bar */
+.ad-progress-track {
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 6;
+  height: 3px;
+  background: rgba(255,255,255,.1);
+}
+.ad-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #a78bfa, #4fc3f7, #f472b6);
+  background-size: 200% 100%;
+  animation: prog-color 4s linear infinite;
+  width: 0%; border-radius: 0 3px 3px 0;
+  box-shadow: 0 0 8px rgba(167,139,250,.7);
+  transition: width .12s linear;
+}
+@keyframes prog-color {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+.eylox-ad.playing .ad-progress-fill,
+.eylox-ad:hover .ad-progress-fill {
+  animation: ad-progress-run var(--ad-dur, 15s) linear forwards, prog-color 4s linear infinite;
+}
+@keyframes ad-progress-run {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+
+/* Duration chip */
+.ad-duration {
+  position: absolute; bottom: 8px; right: 10px; z-index: 6;
+  font-size: .6rem; font-weight: 900;
+  background: rgba(0,0,0,.75); color: #fff;
+  border-radius: 4px; padding: 2px 6px;
+  letter-spacing: .3px;
+  backdrop-filter: blur(6px);
+}
+
+/* Badges */
+.ad-badge {
+  position: absolute; top: 12px; left: 12px; z-index: 7;
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: .58rem; font-weight: 900;
+  padding: 4px 11px; border-radius: 99px;
+  letter-spacing: .8px; text-transform: uppercase;
+  backdrop-filter: blur(10px);
+  transition: transform .2s;
+}
+.eylox-ad:hover .ad-badge { transform: scale(1.06); }
+.ad-badge-trending  {
+  background: rgba(248,113,113,.9); color: #fff;
+  box-shadow: 0 0 16px rgba(248,113,113,.45);
+  animation: trending-glow 2s ease-in-out infinite;
+}
+@keyframes trending-glow {
+  0%,100% { box-shadow: 0 0 16px rgba(248,113,113,.45); }
+  50%      { box-shadow: 0 0 28px rgba(248,113,113,.75); }
+}
+.ad-badge-featured  {
+  background: rgba(251,191,36,.9); color: #1a0800;
+  box-shadow: 0 0 16px rgba(251,191,36,.4);
+}
+.ad-badge-new       {
+  background: rgba(74,222,128,.9); color: #001a08;
+  box-shadow: 0 0 16px rgba(74,222,128,.4);
+}
+.ad-badge-sponsored {
+  background: rgba(167,139,250,.9); color: #fff;
+  box-shadow: 0 0 14px rgba(167,139,250,.4);
+}
+.ad-badge-live {
+  background: rgba(248,113,113,.92); color: #fff;
+  animation: badge-live-pulse 1.3s ease-in-out infinite;
+}
+@keyframes badge-live-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(248,113,113,.6); }
+  50%      { box-shadow: 0 0 0 7px rgba(248,113,113,0); }
+}
+.ad-badge-hot {
+  background: linear-gradient(135deg, #ef4444, #f97316); color: #fff;
+  box-shadow: 0 0 16px rgba(239,68,68,.45);
+}
+.ad-badge-exclusive {
+  background: linear-gradient(135deg, #8b5cf6, #ec4899); color: #fff;
+  box-shadow: 0 0 16px rgba(139,92,246,.4);
+}
+
+/* ── Ad Body (card info below preview) ── */
+.ad-body {
+  padding: 14px 16px 18px;
+  background: transparent;
+}
+.ad-top-row {
+  display: flex; align-items: center; gap: 9px; margin-bottom: 7px;
+}
+.ad-game-icon {
+  font-size: 1.35rem; flex-shrink: 0;
+  filter: drop-shadow(0 0 6px rgba(167,139,250,.4));
+}
+.ad-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.08rem; color: #f0e8ff; line-height: 1.2;
+  flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  letter-spacing: .3px;
+}
+.ad-tagline {
+  font-size: .73rem; font-weight: 700;
+  color: rgba(180,160,220,.62);
+  margin-bottom: 12px; line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* Stats row */
+.ad-stats-row {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;
+}
+.ad-stat {
+  display: flex; align-items: center; gap: 4px;
+  font-size: .7rem; font-weight: 800;
+  color: rgba(167,139,250,.6);
+}
+.ad-stat.views { color: rgba(79,195,247,.75); }
+.ad-like-btn {
+  display: flex; align-items: center; gap: 4px;
+  font-size: .7rem; font-weight: 800;
+  color: rgba(248,113,113,.65);
+  background: none; border: none; cursor: pointer;
+  padding: 3px 8px; border-radius: 99px;
+  transition: background .15s, color .15s, transform .15s;
+  margin-left: auto;
+}
+.ad-like-btn:hover  { background: rgba(248,113,113,.12); color: #f87171; transform: scale(1.09); }
+.ad-like-btn.liked  { color: #f87171; }
+.ad-like-btn.liked span { animation: heart-pop .35s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes heart-pop { from { transform: scale(0); } to { transform: scale(1); } }
+
+/* CTA + sponsor row */
+.ad-bottom-row {
+  display: flex; align-items: center; gap: 8px;
+}
+.ad-cta-btn {
+  flex: 1; padding: 10px 14px;
+  background: linear-gradient(135deg, var(--ad-c1,#7c3aed), var(--ad-c2,#a855f7));
+  color: #fff; border: none; border-radius: 12px;
+  font-family: 'Fredoka One', cursive;
+  font-size: .92rem; cursor: pointer;
+  transition: filter .15s, transform .15s, box-shadow .15s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  position: relative; overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,.35);
+}
+.ad-cta-btn::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+  transform: translateX(-100%); transition: transform .5s;
+}
+.ad-cta-btn:hover::after { transform: translateX(100%); }
+.ad-cta-btn:hover { filter: brightness(1.18); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,58,237,.5); }
+.ad-cta-btn:active { transform: scale(.97); }
+
+.ad-sponsor-badge {
+  font-size: .6rem; font-weight: 900;
+  color: rgba(167,139,250,.5);
+  padding: 5px 9px; border-radius: 8px;
+  border: 1px solid rgba(167,139,250,.15);
+  letter-spacing: .6px; text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════
+   CREATOR SPOTLIGHT CARD
+═══════════════════════════════════════ */
+.eylox-ad.creator-ad .ad-preview { height: 140px; }
+.creator-info {
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 5;
+  padding: 10px 14px;
+  background: linear-gradient(to top, rgba(0,0,0,.92) 0%, transparent 100%);
+}
+.creator-name {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.05rem; color: #fff;
+}
+.creator-handle { font-size: .7rem; font-weight: 700; color: rgba(167,139,250,.75); margin-top: 1px; }
+.creator-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: .6rem; font-weight: 900;
+  background: rgba(251,191,36,.9); color: #1a0800;
+  border-radius: 5px; padding: 2px 9px; margin-top: 5px;
+  letter-spacing: .5px; text-transform: uppercase;
+  box-shadow: 0 0 10px rgba(251,191,36,.3);
+}
+.creator-stats-row {
+  display: flex; gap: 12px; margin-top: 10px; flex-wrap: wrap;
+}
+.creator-stat { font-size: .7rem; font-weight: 800; color: rgba(167,139,250,.65); }
+.creator-stat span { color: #e0d4ff; font-weight: 900; }
+
+/* ═══════════════════════════════════════
+   EVENT AD CARD
+═══════════════════════════════════════ */
+.eylox-ad.event-ad .ad-body { padding: 14px 16px 20px; }
+.ad-event-countdown {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(248,113,113,.08);
+  border: 1px solid rgba(248,113,113,.22);
+  border-radius: 12px; padding: 9px 14px;
+  margin-bottom: 12px;
+}
+.ad-event-cd-label {
+  font-size: .64rem; font-weight: 900;
+  color: rgba(248,113,113,.8); letter-spacing: .8px;
+  text-transform: uppercase;
+}
+.ad-event-cd-time {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.05rem; color: #f87171;
+  margin-left: auto;
+  animation: cd-pulse 1.5s ease-in-out infinite;
+}
+@keyframes cd-pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
+.ad-event-prize {
+  display: flex; align-items: center; gap: 8px;
+  font-size: .8rem; font-weight: 900;
+  color: #fbbf24; margin-bottom: 12px;
+  text-shadow: 0 0 10px rgba(251,191,36,.4);
+}
+
+/* ═══════════════════════════════════════
+   AD CAROUSEL (homepage feature)
+═══════════════════════════════════════ */
+.eylox-ad-carousel {
+  position: relative;
+  border-radius: 24px; overflow: hidden;
+  margin: 36px 0;
+}
+.eylox-ad-carousel-track {
+  display: flex;
+  transition: transform .55s cubic-bezier(.22,.61,.36,1);
+  will-change: transform;
+}
+.eylox-ad-carousel-slide {
+  min-width: 100%; flex-shrink: 0;
+}
+.eylox-ad-carousel-slide .eylox-ad {
+  min-width: 100%; max-width: 100%;
+  border-radius: 24px;
+}
+.eylox-ad-carousel-controls {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-top: 14px;
+}
+.eylox-ad-carousel-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(167,139,250,.25); border: none; cursor: pointer;
+  transition: background .25s, transform .25s, width .25s;
+  flex-shrink: 0;
+}
+.eylox-ad-carousel-dot.active {
+  background: #a78bfa;
+  width: 24px; border-radius: 4px;
+  box-shadow: 0 0 10px rgba(167,139,250,.5);
+}
+.eylox-ad-carousel-btn {
+  position: absolute; top: 50%; z-index: 10;
+  transform: translateY(-50%);
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(0,0,0,.55); backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,.15); color: #fff;
+  font-size: 1rem; cursor: pointer;
+  transition: background .2s, transform .2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.eylox-ad-carousel-btn:hover { background: rgba(124,58,237,.5); transform: translateY(-50%) scale(1.08); }
+.eylox-ad-carousel-btn.prev { left: 12px; }
+.eylox-ad-carousel-btn.next { right: 12px; }
+
+/* ═══════════════════════════════════════
+   ANALYTICS PANEL (creator tools)
+═══════════════════════════════════════ */
+.ad-analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px; margin-top: 16px;
+}
+.ad-analytics-stat {
+  background: rgba(167,139,250,.06);
+  border: 1px solid rgba(167,139,250,.15);
+  border-radius: 14px; padding: 16px;
+  text-align: center;
+  transition: background .2s;
+}
+.ad-analytics-stat:hover { background: rgba(167,139,250,.1); }
+.ad-analytics-stat-value {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.6rem; color: #a78bfa;
+  display: block; margin-bottom: 4px;
+}
+.ad-analytics-stat-label {
+  font-size: .68rem; font-weight: 900;
+  color: rgba(167,139,250,.5); letter-spacing: .8px;
+  text-transform: uppercase;
+}
+
+/* ═══════════════════════════════════════
+   FULLSCREEN CINEMATIC MODAL
+═══════════════════════════════════════ */
+.ad-cinema-overlay {
+  position: fixed; inset: 0; z-index: 9900;
+  background: rgba(0,0,0,.97);
+  backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  opacity: 0; pointer-events: none;
+  transition: opacity .35s;
+}
+.ad-cinema-overlay.open { opacity: 1; pointer-events: all; }
+
+.ad-cinema-panel {
+  width: 100%; max-width: 920px;
+  background: linear-gradient(160deg, rgba(20,10,50,.99), rgba(8,3,20,.99));
+  border: 1px solid rgba(167,139,250,.3);
+  border-radius: 32px; overflow: hidden;
+  position: relative;
+  box-shadow:
+    0 50px 140px rgba(0,0,0,.92),
+    0 0 0 1px rgba(167,139,250,.07),
+    0 0 80px rgba(124,58,237,.12);
+  animation: cinema-in .4s cubic-bezier(.34,1.56,.64,1) both;
+  max-height: 94vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.ad-cinema-panel::-webkit-scrollbar { display: none; }
+@keyframes cinema-in {
+  from { opacity:0; transform: scale(.85) translateY(24px); }
+}
+
+/* Close btn */
+.ad-cinema-close {
+  position: fixed; top: 20px; right: 20px; z-index: 10;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(255,255,255,.08); backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,.18);
+  color: #fff; font-size: 1rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .18s, transform .18s;
+}
+.ad-cinema-close:hover { background: rgba(248,113,113,.4); transform: rotate(90deg) scale(1.1); }
+
+/* Cinema canvas preview */
+.ad-cinema-preview {
+  height: 420px; position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.ad-cinema-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ad-cinema-gradient-overlay {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(0,0,0,.0) 40%, rgba(8,3,20,.95) 100%);
+}
+.ad-cinema-icon {
+  position: relative; z-index: 2;
+  font-size: 8rem;
+  filter: drop-shadow(0 0 50px rgba(255,255,255,.28));
+  animation: ad-icon-idle 2.5s ease-in-out infinite;
+}
+.ad-cinema-particles {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden;
+}
+.cinema-particle {
+  position: absolute; pointer-events: none;
+  font-size: 1.6rem; opacity: 0;
+  animation: cinema-ptcl var(--cd, 3.5s) var(--cdelay, 0s) ease-out infinite;
+  filter: drop-shadow(0 0 8px rgba(255,255,255,.3));
+}
+@keyframes cinema-ptcl {
+  0%   { opacity: 0; transform: translateY(0) scale(0) rotate(0deg); }
+  20%  { opacity: .9; transform: translateY(-20px) scale(1.1) rotate(20deg); }
+  80%  { opacity: .3; transform: translateY(-80px) scale(.7) rotate(180deg); }
+  100% { opacity: 0; transform: translateY(-130px) scale(0) rotate(340deg); }
+}
+
+/* Cinema metadata banner */
+.ad-cinema-stats-bar {
+  position: absolute; top: 16px; left: 16px; right: 60px; z-index: 3;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.ad-cinema-badge-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: .62rem; font-weight: 900;
+  padding: 4px 12px; border-radius: 99px;
+  backdrop-filter: blur(12px); letter-spacing: .8px;
+  text-transform: uppercase;
+}
+
+/* Cinema bottom info */
+.ad-cinema-bottom {
+  padding: 0 32px 32px;
+}
+.ad-cinema-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  color: #fff; margin-bottom: 8px;
+  letter-spacing: .4px;
+  text-shadow: 0 2px 20px rgba(167,139,250,.3);
+}
+.ad-cinema-desc {
+  font-size: .9rem; font-weight: 700;
+  color: rgba(180,160,220,.68); margin-bottom: 22px; line-height: 1.6;
+  max-width: 620px;
+}
+.ad-cinema-meta {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 24px; flex-wrap: wrap;
+}
+.ad-cinema-stat {
+  display: flex; align-items: center; gap: 6px;
+  font-size: .78rem; font-weight: 800;
+  color: rgba(167,139,250,.8);
+  background: rgba(167,139,250,.1);
+  border: 1px solid rgba(167,139,250,.2);
+  border-radius: 99px; padding: 6px 16px;
+  transition: background .2s;
+}
+.ad-cinema-stat:hover { background: rgba(167,139,250,.18); }
+
+/* Cinema action buttons */
+.ad-cinema-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.ad-cinema-play-btn {
+  flex: 1; padding: 15px 28px; min-width: 160px;
+  background: linear-gradient(135deg, #7c3aed, #a855f7, #ec4899);
+  background-size: 200% 200%;
+  color: #fff; border: none; border-radius: 16px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.15rem; cursor: pointer;
+  transition: filter .18s, transform .18s;
+  box-shadow: 0 10px 36px rgba(124,58,237,.5);
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  animation: cinema-btn-glow 2.8s ease-in-out infinite;
+  position: relative; overflow: hidden;
+}
+.ad-cinema-play-btn::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+  transform: translateX(-100%); transition: transform .5s;
+}
+.ad-cinema-play-btn:hover::before { transform: translateX(100%); }
+@keyframes cinema-btn-glow {
+  0%,100% { box-shadow: 0 10px 36px rgba(124,58,237,.5); }
+  50%      { box-shadow: 0 12px 48px rgba(124,58,237,.75), 0 0 0 5px rgba(124,58,237,0); }
+}
+.ad-cinema-play-btn:hover { filter: brightness(1.12); transform: translateY(-2px); }
+
+.ad-cinema-like-btn {
+  padding: 15px 22px; border-radius: 16px;
+  background: rgba(248,113,113,.1);
+  border: 1px solid rgba(248,113,113,.25);
+  color: #f87171; font-size: 1.05rem; cursor: pointer;
+  transition: background .15s, transform .15s;
+  display: flex; align-items: center; gap: 7px;
+  font-weight: 900; font-family: 'Nunito', sans-serif;
+}
+.ad-cinema-like-btn:hover { background: rgba(248,113,113,.2); transform: scale(1.04); }
+.ad-cinema-like-btn.liked {
+  color: #f87171; background: rgba(248,113,113,.18);
+  border-color: rgba(248,113,113,.5);
+  box-shadow: 0 0 20px rgba(248,113,113,.25);
+}
+
+.ad-cinema-share-btn {
+  padding: 15px 18px; border-radius: 16px;
+  background: rgba(167,139,250,.1);
+  border: 1px solid rgba(167,139,250,.22);
+  color: #a78bfa; font-size: 1.05rem; cursor: pointer;
+  transition: background .15s, transform .15s;
+  display: flex; align-items: center; gap: 7px;
+  font-weight: 900; font-family: 'Nunito', sans-serif;
+}
+.ad-cinema-share-btn:hover { background: rgba(167,139,250,.2); transform: scale(1.04); }
+
+/* ═══════════════════════════════════════
+   CREATOR TOOLS PANEL
+═══════════════════════════════════════ */
+.eylox-creator-tools {
+  background: linear-gradient(160deg, rgba(20,10,50,.95), rgba(10,5,28,.95));
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(167,139,250,.2);
+  border-radius: 22px; padding: 28px 32px;
+  margin-top: 8px;
+  box-shadow: 0 8px 40px rgba(0,0,0,.4);
+}
+.eylox-creator-tools h3 {
+  font-family: 'Fredoka One', cursive; color: #f0e8ff;
+  margin: 0 0 8px; font-size: 1.35rem; letter-spacing: .3px;
+}
+.eylox-creator-tools p {
+  font-size: .82rem; color: rgba(167,139,250,.6); margin: 0 0 22px; line-height: 1.55;
+}
+.ct-form-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 14px; margin-bottom: 16px;
+}
+@media (max-width: 640px) { .ct-form-grid { grid-template-columns: 1fr; } }
+.ct-field label {
+  display: block;
+  font-size: .7rem; font-weight: 900;
+  color: rgba(167,139,250,.55); letter-spacing: .9px;
+  text-transform: uppercase; margin-bottom: 7px;
+}
+.ct-field input, .ct-field select {
+  width: 100%; box-sizing: border-box;
+  background: rgba(167,139,250,.08);
+  border: 1px solid rgba(167,139,250,.2);
+  border-radius: 11px; padding: 11px 14px;
+  color: #f0e8ff; font-family: 'Nunito', sans-serif;
+  font-size: .88rem; outline: none;
+  transition: border-color .18s, background .18s, box-shadow .18s;
+}
+.ct-field input:focus, .ct-field select:focus {
+  border-color: rgba(167,139,250,.5);
+  background: rgba(167,139,250,.12);
+  box-shadow: 0 0 0 3px rgba(167,139,250,.08);
+}
+.ct-field select option { background: #130840; }
+.ct-launch-btn {
+  background: linear-gradient(135deg, #a78bfa, #ec4899);
+  color: #fff; border: none; border-radius: 13px;
+  padding: 13px 28px;
+  font-family: 'Fredoka One', cursive; font-size: .96rem;
+  cursor: pointer; transition: filter .15s, transform .15s, box-shadow .15s;
+  box-shadow: 0 6px 24px rgba(167,139,250,.35);
+}
+.ct-launch-btn:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 10px 32px rgba(167,139,250,.5); }
+.ct-feedback {
+  font-size: .8rem; font-weight: 800; padding: 8px 14px;
+  border-radius: 10px; display: none; margin-left: 12px;
+}
+.ct-campaigns-hd {
+  font-size: .7rem; font-weight: 900;
+  color: rgba(167,139,250,.42); letter-spacing: 1.1px;
+  text-transform: uppercase; margin-bottom: 10px;
+  margin-top: 20px; padding-top: 18px;
+  border-top: 1px solid rgba(167,139,250,.1);
+}
+.ct-campaign-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  background: rgba(167,139,250,.05);
+  border: 1px solid rgba(167,139,250,.1);
+  border-radius: 12px; margin-bottom: 8px;
+  transition: background .18s;
+}
+.ct-campaign-row:hover { background: rgba(167,139,250,.09); }
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+@media (max-width: 640px) {
+  .eylox-ad-row { grid-template-columns: 1fr; }
+  .eylox-ad { min-width: 100%; max-width: 100%; }
+  .ad-cinema-panel { border-radius: 22px; }
+  .ad-cinema-bottom { padding: 0 22px 26px; }
+  .ad-cinema-preview { height: 260px; }
+  .ad-cinema-icon { font-size: 5.5rem; }
+  .eylox-creator-tools { padding: 20px 18px; }
+}
+@media (max-width: 900px) {
+  .eylox-ad-row { grid-template-columns: repeat(auto-fill, minmax(248px,1fr)); }
+  .ad-cinema-panel { max-width: 98vw; }
+}
+
+/* ── Shimmer loading state ── */
+.eylox-ad-loading .ad-preview-bg {
+  background: linear-gradient(90deg, rgba(167,139,250,.05) 25%, rgba(167,139,250,.12) 50%, rgba(167,139,250,.05) 75%) !important;
+  background-size: 200% 100% !important;
+  animation: skel-wave 1.6s ease infinite !important;
+}
+@keyframes skel-wave { 0%,100%{background-position:0% 0%} 50%{background-position:100% 0%} }
+
+/* ── Swipe hint on mobile ── */
+@media (pointer: coarse) {
+  .eylox-ad-strip-scroll::after {
+    content: '';
+    min-width: 1px; flex-shrink: 0;
+  }
+}

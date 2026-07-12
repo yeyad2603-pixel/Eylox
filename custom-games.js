@@ -16,10 +16,10 @@
   /* Badge colour per reward type */
   const BADGE_STYLE = {
     coins:    'b-action',
-    trophies: 'b-survival',
+    Eyltrophs: 'b-survival',
     both:     'b-racing',
   };
-  const REWARD_ICON = { coins:'💰', trophies:'🏆', both:'💰🏆' };
+  const REWARD_ICON = { coins:'💰', Eyltrophs:'🏆', both:'💰🏆' };
 
   function buildCard(g) {
     const badge  = BADGE_STYLE[g.reward] || 'b-action';
@@ -31,7 +31,7 @@
           <span class="card-badge ${badge}">${g.genre || 'action'}</span>
           <h3 class="card-title">${g.title}</h3>
           <div class="card-meta">👥 ${Number(g.players||0).toLocaleString()} <span class="dot"></span> ⭐ ${g.stars||'4.5'} <span class="dot"></span> ${reward}</div>
-          <button class="btn-play" data-id="${g.id}" data-title="${g.title}" data-thumb="${g.emoji||'🎮'}" data-genre="${g.genre||'action'}" data-reward="${g.reward||'coins'}">▶ Play Now</button>
+          <button class="btn-play" data-id="${g.id}" data-title="${g.title}" data-thumb="${g.emoji||'🎮'}" data-genre="${g.genre||'action'}" data-reward="${g.reward||'Eylux'}">▶ Play Now</button>
         </div>
         <div style="position:absolute;top:8px;right:8px;background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;font-family:'Fredoka One',cursive;font-size:.6rem;font-weight:900;padding:3px 8px;border-radius:99px;letter-spacing:.5px;box-shadow:0 2px 8px rgba(124,58,237,.5)">STUDIO</div>
       </div>`;
@@ -89,7 +89,7 @@
     });
   }
 
-  /* Award coins/trophies when a custom game is played (game.html reads data-reward) */
+  /* Award coins/Eyltrophs when a custom game is played (game.html reads data-reward) */
   function hookCustomGameReward() {
     /* game.html picks up reward from URL param — handled there */
     /* Here we listen on the launch modal completion via btn-play data-reward */

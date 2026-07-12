@@ -1,0 +1,823 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Eylox — Pirate Bay 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:#000000;overflow:hidden;font-family:'Nunito',sans-serif}
+canvas{display:block}
+
+#hud{position:fixed;inset:0;pointer-events:none;z-index:10;font-family:'Fredoka One',cursive}
+.pill{
+  background:rgba(0,0,0,.58);backdrop-filter:blur(14px);
+  border:1.5px solid rgba(255,255,255,.18);border-radius:16px;
+  padding:7px 18px;color:#fff;display:flex;align-items:center;gap:8px;
+  font-size:1rem;white-space:nowrap
+}
+.pill .val{font-size:1.3rem;color:#FFD700}
+#hud-top{
+  position:absolute;top:0;left:0;right:0;
+  display:flex;align-items:flex-start;justify-content:center;
+  padding:14px 16px;gap:12px;flex-wrap:wrap;
+}
+#back-btn{
+  position:fixed;top:14px;left:14px;z-index:50;pointer-events:all;
+  background:rgba(0,0,0,.65);border:1.5px solid rgba(79,195,247,.5);
+  color:#4fc3f7;border-radius:12px;padding:7px 16px;
+  cursor:pointer;font-family:'Fredoka One',cursive;font-size:.95rem;
+  transition:all .18s;text-decoration:none;display:inline-block
+}
+#back-btn:hover{background:rgba(0,100,180,.7);color:#fff}
+#hp-bar-wrap{
+  position:fixed;bottom:60px;left:50%;transform:translateX(-50%);
+  width:220px;z-index:20;pointer-events:none;text-align:center;
+}
+#hp-label{font-family:'Fredoka One',cursive;font-size:.75rem;color:rgba(255,255,255,.6);margin-bottom:4px}
+#hp-bar-bg{height:8px;border-radius:99px;background:rgba(255,255,255,.12)}
+#hp-bar{height:100%;width:100%;border-radius:99px;background:linear-gradient(90deg,#ef4444,#f97316);transition:width .3s}
+
+#msg-banner{
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(.5);
+  background:linear-gradient(135deg,#0a3d62,#1e88e5);
+  color:#fff;border-radius:22px;padding:16px 40px;
+  font-size:1.8rem;font-family:'Fredoka One',cursive;
+  display:none;z-index:200;box-shadow:0 0 60px rgba(30,136,229,.8);
+  pointer-events:none;white-space:nowrap;
+}
+#msg-banner.show{display:block;animation:msgPop .5s ease forwards}
+@keyframes msgPop{
+  0%{transform:translate(-50%,-50%) scale(.5);opacity:0}
+  60%{transform:translate(-50%,-50%) scale(1.06);opacity:1}
+  100%{transform:translate(-50%,-50%) scale(1);opacity:1}
+}
+
+#end-screen{
+  position:fixed;inset:0;background:rgba(0,0,0,.9);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  z-index:400;color:#fff;font-family:'Fredoka One',cursive;
+  backdrop-filter:blur(14px)
+}
+#end-screen h1{font-size:clamp(2rem,7vw,4rem);color:#FFD700;text-shadow:0 0 40px #FFD700;margin-bottom:12px}
+.end-stat{font-size:1.2rem;margin:4px 0;color:#87CEEB}
+.end-stat span{color:#fff}
+#end-btns{display:flex;gap:14px;margin-top:24px;flex-wrap:wrap;justify-content:center}
+.ebtn{
+  padding:12px 34px;border:none;border-radius:14px;
+  font-size:1.1rem;font-family:'Fredoka One',cursive;
+  cursor:pointer;transition:transform .18s;pointer-events:all
+}
+.ebtn.p{background:linear-gradient(135deg,#0a3d62,#1e88e5);color:#fff;box-shadow:0 4px 24px rgba(30,136,229,.5)}
+.ebtn.s{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);color:#87CEEB}
+.ebtn:hover{transform:scale(1.06)}
+
+#mob-ctrl{
+  position:fixed;bottom:18px;left:0;right:0;
+  display:none;justify-content:space-between;align-items:flex-end;
+  padding:0 18px;z-index:20;pointer-events:none
+}
+@media(pointer:coarse){#mob-ctrl{display:flex}}
+#joy-zone{
+  width:120px;height:120px;
+  background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.25);
+  border-radius:50%;position:relative;pointer-events:all;flex-shrink:0
+}
+#joy-knob{
+  width:48px;height:48px;
+  background:rgba(79,195,247,.55);border:2px solid #4fc3f7;
+  border-radius:50%;position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);pointer-events:none
+}
+#fire-mob{
+  width:80px;height:80px;
+  background:rgba(255,100,0,.65);border:3px solid #f97316;
+  border-radius:50%;color:#fff;
+  font-family:'Fredoka One',cursive;font-size:1rem;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:all;cursor:pointer;user-select:none;
+  -webkit-tap-highlight-color:transparent
+}
+#fire-mob:active{transform:scale(.92)}
+
+#ctrl-hint{
+  position:fixed;bottom:12px;left:50%;transform:translateX(-50%);
+  color:rgba(255,255,255,.35);font-size:.65rem;font-weight:700;
+  pointer-events:none;white-space:nowrap;z-index:5
+}
+@media(pointer:coarse){#ctrl-hint{display:none}}
+/* Pause */
+#pause-scr{position:fixed;inset:0;background:rgba(0,0,0,.78);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:500;backdrop-filter:blur(10px);font-family:'Fredoka One',cursive;color:#fff}
+#pause-scr h2{font-size:2.8rem;color:#4fc3f7;margin-bottom:6px;text-shadow:0 0 28px rgba(79,195,247,.45)}
+#pause-scr p{color:rgba(255,255,255,.5);margin-bottom:24px;font-size:.9rem}
+.pscr-btn{padding:13px 44px;border:none;border-radius:16px;font-size:1.15rem;font-family:'Fredoka One',cursive;cursor:pointer;transition:transform .18s;margin:5px;pointer-events:all;display:block;width:230px;text-align:center}
+.pscr-btn.res{background:linear-gradient(135deg,#0a3d62,#1e88e5);color:#fff;box-shadow:0 4px 20px rgba(30,136,229,.4)}
+.pscr-btn.qut{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);color:#87CEEB}
+.pscr-btn:hover{transform:scale(1.05)}
+#pfab{position:fixed;top:14px;right:130px;z-index:50;pointer-events:all;background:rgba(0,0,0,.65);border:1.5px solid rgba(79,195,247,.35);color:rgba(79,195,247,.85);border-radius:12px;padding:7px 13px;cursor:pointer;font-size:.95rem;font-family:'Fredoka One',cursive;transition:all .18s}
+#pfab:hover{background:rgba(0,50,100,.7);color:#4fc3f7}
+/* Coin toast */
+@keyframes cfl3d{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-54px)}}
+.ct3d{position:fixed;bottom:200px;left:50%;z-index:300;font-family:'Fredoka One',cursive;font-size:1.05rem;pointer-events:none;animation:cfl3d 1.4s ease-out forwards;white-space:nowrap;text-shadow:0 2px 8px rgba(0,0,0,.5);color:#FFD700}
+/* Explosion flash */
+@keyframes expFlash{0%{opacity:.6}100%{opacity:0}}
+#exp-flash{position:fixed;inset:0;background:radial-gradient(ellipse at center,rgba(255,120,0,.4) 0%,transparent 65%);pointer-events:none;z-index:250;display:none}
+
+#wave-overlay{
+  position:fixed;inset:0;pointer-events:none;z-index:2;
+  background:radial-gradient(ellipse at 50% 100%,rgba(0,80,160,.18) 0%,transparent 70%);
+}
+</style>
+<script src="audit-loader.js" defer></script>
+  <script src="debug-dashboard.js" defer></script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<a id="back-btn" href="games.html">← Games</a>
+<div id="wave-overlay"></div>
+<div id="exp-flash"></div>
+<button id="pfab" onclick="togglePause()">⏸</button>
+<div id="pause-scr">
+  <h2>⏸ PAUSED</h2>
+  <p>Press P or tap Resume to continue</p>
+  <button class="pscr-btn res" onclick="togglePause()">▶ Resume</button>
+  <button class="pscr-btn qut" onclick="location.href='games.html'">← Quit to Games</button>
+</div>
+
+<div id="hud">
+  <div id="hud-top">
+    <div class="pill">☠️ Treasure&nbsp;<span class="val" id="hud-chest">0/8</span></div>
+    <div class="pill">⏱&nbsp;<span class="val" id="hud-time">90</span>s</div>
+    <div class="pill">🪙&nbsp;<span class="val" id="hud-coins">0</span></div>
+    <div class="pill" id="hud-pb-wrap" style="display:none">🏆&nbsp;<span style="font-size:.68rem;color:rgba(255,255,255,.55)">BEST&nbsp;</span><span class="val" id="hud-pb">—</span></div>
+    <div class="pill" id="hud-boost-pill" style="display:none;background:rgba(245,158,11,.25);border-color:rgba(245,158,11,.5);color:#fde68a">⚡&nbsp;<span class="val" id="hud-boost-timer">2×</span></div>
+  </div>
+</div>
+
+<div id="hp-bar-wrap">
+  <div id="hp-label">⛵ Hull Integrity</div>
+  <div id="hp-bar-bg"><div id="hp-bar"></div></div>
+</div>
+
+<div id="msg-banner">⚓ Chest Found!</div>
+
+<div id="end-screen">
+  <h1 id="end-title">☠️ Sunk!</h1>
+  <p class="end-stat">Treasure Collected: <span id="e-chest">0/8</span></p>
+  <p class="end-stat">Eylux Earned: <span id="e-coins">0</span> 🪙</p>
+  <p class="end-stat" id="e-pb-line" style="display:none">🏆 <span id="e-pb-txt" style="color:#4fc3f7"></span></p>
+  <p class="end-stat" id="e-streak-line" style="display:none">🔥 Streak Bonus: +<span id="e-streak-val">0</span> 🪙</p>
+  <div id="end-btns">
+    <button class="ebtn p" onclick="location.reload()">🔄 Sail Again</button>
+    <button class="ebtn s" id="e-share-btn">📣 Share</button>
+    <button class="ebtn s" onclick="location.href='games.html'">← Games</button>
+  </div>
+</div>
+
+<div id="mob-ctrl">
+  <div id="joy-zone"><div id="joy-knob"></div></div>
+  <div id="fire-mob">🔥 FIRE</div>
+</div>
+
+<div id="ctrl-hint">WASD / Arrows — Steer &nbsp;|&nbsp; SPACE — Fire Cannon &nbsp;|&nbsp; Mouse — Camera</div>
+
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+
+// ── Renderer
+const canvas   = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
+renderer.toneMapping       = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87CEEB);
+scene.fog = new THREE.FogExp2(0xA8D8F0, 0.008);
+
+const camera = new THREE.PerspectiveCamera(65, 1, 0.1, 800);
+
+function onResize() {
+  const w = innerWidth, h = innerHeight;
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+}
+window.addEventListener('resize', onResize);
+onResize();
+
+// ── Lighting
+const ambLight  = new THREE.AmbientLight(0x88ccff, 0.7);
+const dirLight  = new THREE.DirectionalLight(0xfff8e0, 1.6);
+dirLight.position.set(60, 80, 40);
+dirLight.castShadow = true;
+dirLight.shadow.mapSize.set(1024, 1024);
+dirLight.shadow.camera.near = 1;
+dirLight.shadow.camera.far  = 300;
+dirLight.shadow.camera.left = dirLight.shadow.camera.bottom = -120;
+dirLight.shadow.camera.right = dirLight.shadow.camera.top   =  120;
+scene.add(ambLight, dirLight);
+
+// ── Ocean
+const oceanGeo = new THREE.PlaneGeometry(500, 500, 64, 64);
+const oceanMat = new THREE.MeshStandardMaterial({
+  color: 0x0077be, roughness: 0.1, metalness: 0.3,
+  transparent: true, opacity: 0.88,
+});
+const ocean = new THREE.Mesh(oceanGeo, oceanMat);
+ocean.rotation.x = -Math.PI / 2;
+ocean.receiveShadow = true;
+scene.add(ocean);
+
+// Wave vertices stored for animation
+const oceanPos = oceanGeo.attributes.position;
+const waveData = Array.from({length: oceanPos.count}, (_, i) => ({
+  x: oceanPos.getX(i), z: oceanPos.getY(i),
+  phase: Math.random() * Math.PI * 2,
+}));
+
+// ── Island helper
+function makeIsland(x, z, r) {
+  // Base
+  const base = new THREE.Mesh(
+    new THREE.CylinderGeometry(r, r * 1.2, 1.8, 12),
+    new THREE.MeshStandardMaterial({ color: 0xc2a05a, roughness: 1 })
+  );
+  base.position.set(x, 0.6, z);
+  base.castShadow = base.receiveShadow = true;
+  scene.add(base);
+
+  // Sand top
+  const top = new THREE.Mesh(
+    new THREE.CylinderGeometry(r * 0.85, r, 0.5, 12),
+    new THREE.MeshStandardMaterial({ color: 0xf5deb3, roughness: 1 })
+  );
+  top.position.set(x, 1.65, z);
+  top.castShadow = top.receiveShadow = true;
+  scene.add(top);
+
+  // Palm tree (only on larger islands)
+  if (r > 7) {
+    const trunk = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.3, 0.5, 6, 6),
+      new THREE.MeshStandardMaterial({ color: 0x8B5E3C, roughness: 1 })
+    );
+    trunk.position.set(x + rnd(-r*.3, r*.3), 4.9, z + rnd(-r*.3, r*.3));
+    scene.add(trunk);
+    for (let i = 0; i < 6; i++) {
+      const angle = (i / 6) * Math.PI * 2;
+      const leaf = new THREE.Mesh(
+        new THREE.ConeGeometry(2.5, 1.5, 6),
+        new THREE.MeshStandardMaterial({ color: 0x2d6a2d, roughness: 0.9 })
+      );
+      leaf.position.set(x + trunk.position.x - x + Math.cos(angle)*2.2, 8.2 + Math.sin(i)*0.4, z + trunk.position.z - z + Math.sin(angle)*2.2);
+      leaf.rotation.z = (Math.PI/4) * Math.sign(Math.cos(angle));
+      scene.add(leaf);
+    }
+  }
+  return { x, z, r };
+}
+
+// ── Rock helper
+function makeRock(x, z) {
+  const size = 2 + Math.random() * 4;
+  const geo  = new THREE.DodecahedronGeometry(size, 0);
+  const rock = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: 0x666666, roughness: 0.9 }));
+  rock.position.set(x, size * 0.4, z);
+  rock.rotation.set(Math.random(), Math.random(), Math.random());
+  rock.castShadow = rock.receiveShadow = true;
+  scene.add(rock);
+  return { mesh: rock, x, z, r: size * 0.9 };
+}
+
+// ── Build world
+const ISLANDS = [
+  makeIsland(0, 0, 18),    // spawn island — big
+  makeIsland(60, 30, 10),
+  makeIsland(-50, 60, 12),
+  makeIsland(80, -60, 8),
+  makeIsland(-70, -40, 9),
+  makeIsland(30, 90, 11),
+  makeIsland(-90, 20, 7),
+  makeIsland(100, 40, 8),
+];
+
+const ROCKS = [];
+const rockPositions = [
+  [25,10],[35,-20],[-30,25],[55,50],[-55,-30],[10,-50],[70,-30],[-20,70],[90,-50],[-80,60],
+];
+rockPositions.forEach(([rx, rz]) => ROCKS.push(makeRock(rx, rz)));
+
+// ── Treasure chests
+const TREASURES = [];
+const treasurePositions = [
+  [55,20],[70,-50],[-45,55],[80,30],[25,85],[-85,15],[40,-65],[-65,-50],
+];
+
+function makeTreasure(x, z) {
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(
+    new THREE.BoxGeometry(2.4, 1.6, 1.8),
+    new THREE.MeshStandardMaterial({ color: 0x8B4513, roughness: 0.7 })
+  );
+  const lid = new THREE.Mesh(
+    new THREE.BoxGeometry(2.4, 0.7, 1.8),
+    new THREE.MeshStandardMaterial({ color: 0xA0522D, roughness: 0.7 })
+  );
+  lid.position.y = 1.15;
+  const band = new THREE.Mesh(
+    new THREE.BoxGeometry(2.5, 0.2, 1.9),
+    new THREE.MeshStandardMaterial({ color: 0xFFD700, roughness: 0.3, metalness: 0.8 })
+  );
+  band.position.y = 0.8;
+  const gem = new THREE.Mesh(
+    new THREE.OctahedronGeometry(0.3),
+    new THREE.MeshStandardMaterial({ color: 0xff3333, roughness: 0.1, metalness: 0.5, emissive: 0x330000 })
+  );
+  gem.position.set(0, 1.6, 0);
+  g.add(body, lid, band, gem);
+  g.position.set(x, 1.4, z);
+  g.castShadow = true;
+  scene.add(g);
+  return { group: g, x, z, r: 3, collected: false };
+}
+treasurePositions.forEach(([tx, tz]) => TREASURES.push(makeTreasure(tx, tz)));
+
+// ── Enemy ships
+const ENEMIES = [];
+function makeEnemy(x, z) {
+  const g = new THREE.Group();
+  // Hull
+  const hull = new THREE.Mesh(
+    new THREE.BoxGeometry(4, 2, 10),
+    new THREE.MeshStandardMaterial({ color: 0x8B0000, roughness: 0.8 })
+  );
+  const mast = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.15, 0.15, 7, 6),
+    new THREE.MeshStandardMaterial({ color: 0x4a2f1a })
+  );
+  mast.position.y = 4.5;
+  const sail = new THREE.Mesh(
+    new THREE.PlaneGeometry(3, 4),
+    new THREE.MeshStandardMaterial({ color: 0x111111, side: THREE.DoubleSide, roughness: 1 })
+  );
+  sail.position.set(0, 5.5, 0);
+  const skull = new THREE.Mesh(
+    new THREE.SphereGeometry(0.5, 8, 8),
+    new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x330000 })
+  );
+  skull.position.set(0, 8.2, 0);
+  g.add(hull, mast, sail, skull);
+  g.position.set(x, 0.8, z);
+  g.castShadow = true;
+  scene.add(g);
+  const angle = Math.random() * Math.PI * 2;
+  return { group: g, x, z, angle, speed: 6 + Math.random() * 5, r: 5 };
+}
+[[-110, -70], [110, 50], [-100, 80], [120, -50], [0, -120]].forEach(([ex, ez]) => ENEMIES.push(makeEnemy(ex, ez)));
+
+// ── Cannonballs
+const cannonballs = [];
+function makeCannonball(x, y, z, dx, dz) {
+  const mesh = new THREE.Mesh(
+    new THREE.SphereGeometry(0.4, 8, 8),
+    new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.8 })
+  );
+  mesh.position.set(x, y, z);
+  scene.add(mesh);
+  return { mesh, dx, dy: 0.02, dz, life: 120, speed: 28 };
+}
+
+// ── Player ship
+function makeShip() {
+  const g = new THREE.Group();
+  const hull = new THREE.Mesh(
+    new THREE.BoxGeometry(4, 2.4, 10),
+    new THREE.MeshStandardMaterial({ color: 0x5D3A1A, roughness: 0.7 })
+  );
+  hull.castShadow = true;
+  // Bow (pointy front)
+  const bow = new THREE.Mesh(
+    new THREE.CylinderGeometry(0, 2.5, 3, 4),
+    new THREE.MeshStandardMaterial({ color: 0x4a2f1a, roughness: 0.8 })
+  );
+  bow.rotation.x = Math.PI / 2;
+  bow.position.set(0, 0, -6.5);
+  // Mast
+  const mast = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.2, 0.2, 9, 8),
+    new THREE.MeshStandardMaterial({ color: 0x4a2f1a })
+  );
+  mast.position.y = 5.7;
+  // Sail
+  const sail = new THREE.Mesh(
+    new THREE.PlaneGeometry(4, 5.5),
+    new THREE.MeshStandardMaterial({ color: 0xf5f0e0, side: THREE.DoubleSide, roughness: 1 })
+  );
+  sail.position.set(0, 7, 0);
+  // Flag
+  const flag = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.4, 1),
+    new THREE.MeshStandardMaterial({ color: 0xffd700, side: THREE.DoubleSide, roughness: 1 })
+  );
+  flag.position.set(0.7, 10.5, 0);
+  // Deck
+  const deck = new THREE.Mesh(
+    new THREE.BoxGeometry(3.6, 0.3, 8),
+    new THREE.MeshStandardMaterial({ color: 0x7B5C3C, roughness: 1 })
+  );
+  deck.position.y = 1.35;
+  g.add(hull, bow, mast, sail, flag, deck);
+  return g;
+}
+
+const shipGroup = makeShip();
+shipGroup.position.set(0, 1, 20);
+scene.add(shipGroup);
+
+// ── Input
+const keys = {};
+let mouseX = 0, joyX = 0, joyY = 0, firing = false;
+window.addEventListener('keydown', e => { keys[e.key] = true; if(e.key==='p'||e.key==='P') togglePause(); });
+window.addEventListener('keyup',   e => { keys[e.key] = false; });
+
+// Mobile joystick
+const joyZone  = document.getElementById('joy-zone');
+const joyKnob  = document.getElementById('joy-knob');
+let joyOrigin  = null;
+joyZone.addEventListener('touchstart', e => {
+  const t = e.touches[0];
+  joyOrigin = { x: t.clientX, y: t.clientY };
+  e.preventDefault();
+}, { passive: false });
+joyZone.addEventListener('touchmove', e => {
+  if (!joyOrigin) return;
+  const t   = e.touches[0];
+  const dx  = t.clientX - joyOrigin.x;
+  const dy  = t.clientY - joyOrigin.y;
+  const max = 38;
+  const nx  = Math.max(-max, Math.min(max, dx));
+  const ny  = Math.max(-max, Math.min(max, dy));
+  joyKnob.style.transform = `translate(calc(-50% + ${nx}px), calc(-50% + ${ny}px))`;
+  joyX = nx / max;
+  joyY = ny / max;
+  e.preventDefault();
+}, { passive: false });
+joyZone.addEventListener('touchend', () => {
+  joyOrigin = null; joyX = 0; joyY = 0;
+  joyKnob.style.transform = 'translate(-50%,-50%)';
+});
+document.getElementById('fire-mob').addEventListener('touchstart', () => { firing = true; });
+document.getElementById('fire-mob').addEventListener('touchend',   () => { firing = false; });
+
+// ── Game state
+let shipVX = 0, shipVZ = 0;
+const SHIP_SPEED = 18, TURN_SPEED = 2.2, DRAG = 0.94;
+let shipAngle = 0;
+let hp = 100, maxHp = 100;
+let coinsTotal = 0, chestsCollected = 0;
+let gameTime = 90, gameOver = false, gameWon = false;
+let fireCooldown = 0;
+let cameraAngle = 0, cameraY = 0;
+let gamePaused = false, screenShake = 0;
+const _pbKeyP = 'eylox_hs_pirate3d';
+(function(){ try { const b=JSON.parse(localStorage.getItem('eylox_coin_boost')||'null'); if(b&&b.expires>Date.now()){const pill=document.getElementById('hud-boost-pill'),timer=document.getElementById('hud-boost-timer');if(pill)pill.style.display='';function upd(){const r=Math.max(0,b.expires-Date.now());if(timer)timer.textContent='⚡ '+Math.ceil(r/60000)+'m';if(r<=0&&pill)pill.style.display='none';}upd();setInterval(upd,10000);}}catch{} })();
+let _pbChestsP = localStorage.getItem(_pbKeyP) ? +localStorage.getItem(_pbKeyP) : null;
+(()=>{ try { const _u=JSON.parse(localStorage.getItem('eylox_user')||'null'); const _s=JSON.parse(localStorage.getItem('eylox_game_sessions')||'[]'); _s.push({id:'pirate-bay-3d',user:_u?.username||'Player',title:'Pirate Bay 3D',t:Date.now()}); localStorage.setItem('eylox_game_sessions',JSON.stringify(_s.slice(-500))); if(_u){_u.gamesPlayed=(_u.gamesPlayed||0)+1;localStorage.setItem('eylox_user',JSON.stringify(_u));if(_u.username)localStorage.setItem('eylox_userdata_'+_u.username,JSON.stringify(_u));} } catch {} })();
+
+// camera mouse rotation
+canvas.addEventListener('mousemove', e => {
+  mouseX = (e.clientX / innerWidth - 0.5) * 2;
+});
+
+// ── HUD helpers
+const hudChest   = document.getElementById('hud-chest');
+const hudTime    = document.getElementById('hud-time');
+const hudCoins   = document.getElementById('hud-coins');
+const hpBar      = document.getElementById('hp-bar');
+const msgBanner  = document.getElementById('msg-banner');
+const hudPbWrap  = document.getElementById('hud-pb-wrap');
+const hudPbEl    = document.getElementById('hud-pb');
+let msgTimer = 0;
+if (_pbChestsP !== null) { hudPbWrap.style.display=''; hudPbEl.textContent=_pbChestsP+'/8'; }
+
+function showMsg(text) {
+  msgBanner.textContent = text;
+  msgBanner.classList.remove('show');
+  void msgBanner.offsetWidth;
+  msgBanner.classList.add('show');
+  msgTimer = 2000;
+}
+
+function updateHUD() {
+  hudChest.textContent = `${chestsCollected}/8`;
+  hudTime.textContent  = Math.max(0, Math.ceil(gameTime));
+  hudCoins.textContent = coinsTotal;
+  hpBar.style.width    = (hp / maxHp * 100) + '%';
+  hpBar.style.background = hp > 50 ? 'linear-gradient(90deg,#22c55e,#4ade80)'
+    : hp > 25 ? 'linear-gradient(90deg,#f59e0b,#fbbf24)'
+    : 'linear-gradient(90deg,#ef4444,#f97316)';
+}
+
+// ── Utility
+function rnd(a, b) { return a + Math.random() * (b - a); }
+function dist2(ax, az, bx, bz) {
+  const dx = ax - bx, dz = az - bz;
+  return Math.sqrt(dx * dx + dz * dz);
+}
+
+// ── Award coins & save
+function awardCoins(n) {
+  coinsTotal += n;
+  try {
+    const u = JSON.parse(localStorage.getItem('eylox_user') || 'null');
+    if (u) {
+      u.coins = Math.min((u.coins || 0) + n, 1e9);
+      localStorage.setItem('eylox_user', JSON.stringify(u));
+    }
+  } catch {}
+}
+
+// ── Helper functions
+function togglePause() {
+  gamePaused = !gamePaused;
+  document.getElementById('pause-scr').style.display = gamePaused ? 'flex' : 'none';
+  document.getElementById('pfab').textContent = gamePaused ? '▶' : '⏸';
+}
+function showCoinToast(msg) {
+  const el = document.createElement('div');
+  el.className = 'ct3d';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1500);
+}
+function showHitEffect() {
+  const fl = document.getElementById('exp-flash');
+  fl.style.display = 'block';
+  fl.style.animation = 'none'; void fl.offsetWidth;
+  fl.style.animation = 'expFlash .55s ease-out forwards';
+  setTimeout(() => fl.style.display = 'none', 600);
+  // Shake the ship briefly
+  const origX = shipGroup.position.x;
+  shipGroup.position.x += (Math.random() - 0.5) * 1.5;
+  setTimeout(() => shipGroup.position.x = origX, 120);
+}
+
+// ── End game
+function triggerEnd(won) {
+  if (gameOver) return;
+  gameOver = true; gameWon = won;
+  const chestBonus = chestsCollected * 30;
+  const totalBase = coinsTotal + chestBonus;
+
+  // Streak bonus
+  let streakBonus = 0;
+  try {
+    const log = JSON.parse(localStorage.getItem('eylox_login_log') || '[]');
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    if (log.includes(yesterday)) {
+      streakBonus = Math.round(totalBase * 0.25);
+      document.getElementById('e-streak-line').style.display = '';
+      document.getElementById('e-streak-val').textContent = streakBonus;
+    }
+  } catch {}
+
+  const finalCoins = totalBase + streakBonus;
+  awardCoins(finalCoins);
+  document.getElementById('end-title').textContent = won ? '🏆 YOU WIN!' : '☠️ Ship Sunk!';
+  document.getElementById('e-chest').textContent   = `${chestsCollected}/8`;
+  document.getElementById('e-coins').textContent   = finalCoins;
+  document.getElementById('end-screen').style.display = 'flex';
+
+  // Share button
+  document.getElementById('e-share-btn').onclick = () => {
+    const txt = `☠️ Pirate Bay 3D — collected ${chestsCollected}/8 treasures and earned ${finalCoins} coins! Play on Eylox!`;
+    if (navigator.share) navigator.share({ title: 'Eylox Pirate Bay', text: txt }).catch(() => {});
+    else navigator.clipboard?.writeText(txt).then(() => showCoinToast('📋 Copied!'));
+  };
+
+  try {
+    const prev = +(localStorage.getItem(_pbKeyP) || 0);
+    const newBest = chestsCollected > prev;
+    if (newBest) {
+      localStorage.setItem(_pbKeyP, chestsCollected);
+      _pbChestsP = chestsCollected;
+      hudPbEl.textContent = chestsCollected + '/8'; hudPbWrap.style.display = '';
+      document.getElementById('e-pb-line').style.display = '';
+      document.getElementById('e-pb-txt').textContent = `New Record: ${chestsCollected} chests! 🎉`;
+    } else if (prev > 0) {
+      document.getElementById('e-pb-line').style.display = '';
+      document.getElementById('e-pb-txt').textContent = `Best: ${prev}/8 chests`;
+    }
+    const _pu = JSON.parse(localStorage.getItem('eylox_user')||'{}');
+    if(_pu.username){try{const lb=JSON.parse(localStorage.getItem('eylox_lb_entries')||'[]');const prevBest=lb.filter(e=>e.user===_pu.username&&e.gameId==='pirate-bay-3d').reduce((b,e)=>Math.max(b,e.score),0);lb.push({user:_pu.username,avatar:_pu.avatar||'🎮',score:finalCoins,game:'Pirate Bay 3D',gameId:'pirate-bay-3d',ts:Date.now()});localStorage.setItem('eylox_lb_entries',JSON.stringify(lb.slice(-300)));if(finalCoins>prevBest){_pu.wins=(_pu.wins||0)+1;localStorage.setItem('eylox_user',JSON.stringify(_pu));localStorage.setItem('eylox_userdata_'+_pu.username,JSON.stringify(_pu));}}catch{}}
+    const entry = { id:'pirate-bay-3d', title:'Pirate Bay 3D', thumb:'☠️', genre:'adventure', playedAt: Date.now() };
+    const r = JSON.parse(localStorage.getItem('eylox_recently_played') || '[]');
+    r.unshift(entry); localStorage.setItem('eylox_recently_played', JSON.stringify(r.slice(0, 10)));
+    if (won) localStorage.setItem('eylox_pending_notif', JSON.stringify({ title:'☠️ Pirate Bay Complete!', body:`Collected ${chestsCollected}/8 treasures and earned ${finalCoins} Eylux!`, type:'game', ts:Date.now() }));
+  } catch {}
+}
+
+// ── Main loop
+const clock = { prev: performance.now() };
+let elapsed = 0;
+
+function animate(now) {
+  requestAnimationFrame(animate);
+  const dt = Math.min((now - clock.prev) / 1000, 0.05);
+  clock.prev = now;
+  if (gameOver) { renderer.render(scene, camera); return; }
+  if (gamePaused) { renderer.render(scene, camera); return; }
+
+  elapsed += dt;
+  gameTime -= dt;
+  if (gameTime <= 0) { triggerEnd(chestsCollected >= 8); return; }
+
+  // ── Animate ocean waves
+  for (let i = 0; i < oceanPos.count; i++) {
+    const d = waveData[i];
+    oceanPos.setZ(i, Math.sin(d.x * 0.08 + elapsed * 1.4 + d.phase) * 0.6
+                   + Math.sin(d.z * 0.06 + elapsed * 0.9 + d.phase * 1.3) * 0.4);
+  }
+  oceanPos.needsUpdate = true;
+  oceanGeo.computeVertexNormals();
+
+  // ── Player movement
+  const steer = (keys['ArrowLeft'] || keys['a'] || keys['A'] ? -1 : 0)
+              + (keys['ArrowRight'] || keys['d'] || keys['D'] ? 1 : 0)
+              + joyX * 1.2;
+  const thrust = (keys['ArrowUp'] || keys['w'] || keys['W'] ? 1 : 0)
+               + (keys['ArrowDown'] || keys['s'] || keys['S'] ? -0.5 : 0)
+               - joyY * 1.0;
+
+  shipAngle -= steer * TURN_SPEED * dt;
+  const fwd = { x: Math.sin(shipAngle), z: Math.cos(shipAngle) };
+  shipVX += fwd.x * thrust * SHIP_SPEED * dt;
+  shipVZ += fwd.z * thrust * SHIP_SPEED * dt;
+  shipVX *= DRAG;
+  shipVZ *= DRAG;
+
+  shipGroup.position.x += shipVX * dt * 60;
+  shipGroup.position.z += shipVZ * dt * 60;
+  shipGroup.rotation.y = shipAngle;
+  // Gentle rocking
+  shipGroup.rotation.z = Math.sin(elapsed * 1.2) * 0.04;
+  shipGroup.rotation.x = Math.sin(elapsed * 0.9 + 1) * 0.025;
+  // Keep on water surface
+  shipGroup.position.y = 1 + Math.sin(elapsed * 1.2) * 0.15;
+
+  // ── Clamp to ocean
+  const maxOcean = 200;
+  shipGroup.position.x = Math.max(-maxOcean, Math.min(maxOcean, shipGroup.position.x));
+  shipGroup.position.z = Math.max(-maxOcean, Math.min(maxOcean, shipGroup.position.z));
+
+  // ── Island collisions
+  for (const isl of ISLANDS) {
+    const d = dist2(shipGroup.position.x, shipGroup.position.z, isl.x, isl.z);
+    if (d < isl.r + 4) {
+      const nx = (shipGroup.position.x - isl.x) / d;
+      const nz = (shipGroup.position.z - isl.z) / d;
+      shipGroup.position.x = isl.x + nx * (isl.r + 4);
+      shipGroup.position.z = isl.z + nz * (isl.r + 4);
+      shipVX *= -0.3; shipVZ *= -0.3;
+    }
+  }
+
+  // ── Rock collisions
+  for (const rock of ROCKS) {
+    const d = dist2(shipGroup.position.x, shipGroup.position.z, rock.x, rock.z);
+    if (d < rock.r + 3.5) {
+      const nx = (shipGroup.position.x - rock.x) / d;
+      const nz = (shipGroup.position.z - rock.z) / d;
+      shipGroup.position.x = rock.x + nx * (rock.r + 3.5);
+      shipGroup.position.z = rock.z + nz * (rock.r + 3.5);
+      shipVX *= -0.4; shipVZ *= -0.4;
+      hp -= 8;
+      screenShake = 0.35;
+      if (hp <= 0) { hp = 0; triggerEnd(false); return; }
+    }
+  }
+
+  // ── Treasure collection
+  for (const t of TREASURES) {
+    if (t.collected) continue;
+    const d = dist2(shipGroup.position.x, shipGroup.position.z, t.x, t.z);
+    if (d < 5) {
+      t.collected = true;
+      t.group.visible = false;
+      chestsCollected++;
+      awardCoins(25);
+      showMsg(`⚓ Chest ${chestsCollected} Found! +25 🪙`);
+      showCoinToast('+25 🪙');
+      if (chestsCollected >= 8) triggerEnd(true);
+    }
+    // Bobbing animation
+    if (!t.collected) t.group.position.y = 1.4 + Math.sin(elapsed * 2 + t.x) * 0.3;
+  }
+
+  // ── Enemy ship AI
+  for (const en of ENEMIES) {
+    // Patrol
+    en.angle += 0.3 * dt;
+    en.x += Math.cos(en.angle) * en.speed * dt;
+    en.z += Math.sin(en.angle) * en.speed * dt;
+    en.group.position.set(en.x, 0.8 + Math.sin(elapsed * 1.1 + en.x) * 0.1, en.z);
+    en.group.rotation.y = en.angle + Math.PI / 2;
+    en.group.rotation.z = Math.sin(elapsed * 0.9) * 0.03;
+
+    // Shoot at player occasionally
+    const dToShip = dist2(en.x, en.z, shipGroup.position.x, shipGroup.position.z);
+    if (dToShip < 60 && Math.random() < 0.008) {
+      const dx = (shipGroup.position.x - en.x) / dToShip;
+      const dz = (shipGroup.position.z - en.z) / dToShip;
+      cannonballs.push(makeCannonball(en.x, 1.5, en.z, dx, dz));
+    }
+  }
+
+  // ── Cannonballs
+  for (let i = cannonballs.length - 1; i >= 0; i--) {
+    const cb = cannonballs[i];
+    cb.mesh.position.x += cb.dx * cb.speed * dt;
+    cb.mesh.position.z += cb.dz * cb.speed * dt;
+    cb.mesh.position.y += cb.dy;
+    cb.dy -= 0.015;
+    cb.life -= dt * 60;
+    if (cb.life <= 0 || cb.mesh.position.y < 0) {
+      scene.remove(cb.mesh);
+      cannonballs.splice(i, 1);
+      continue;
+    }
+    const dToShip = dist2(cb.mesh.position.x, cb.mesh.position.z, shipGroup.position.x, shipGroup.position.z);
+    if (dToShip < 4) {
+      scene.remove(cb.mesh);
+      cannonballs.splice(i, 1);
+      hp -= 12;
+      showHitEffect();
+      if (hp <= 0) { hp = 0; triggerEnd(false); return; }
+    }
+  }
+
+  // ── Player cannon fire
+  fireCooldown = Math.max(0, fireCooldown - dt);
+  if ((keys[' '] || firing) && fireCooldown <= 0) {
+    fireCooldown = 0.55;
+    screenShake = Math.max(screenShake, 0.1);
+    cannonballs.push(makeCannonball(
+      shipGroup.position.x + Math.sin(shipAngle) * 6,
+      1.5,
+      shipGroup.position.z + Math.cos(shipAngle) * 6,
+      Math.sin(shipAngle), Math.cos(shipAngle)
+    ));
+  }
+
+  // ── Camera follow
+  cameraAngle += (mouseX * 0.8 - cameraAngle) * 0.05;
+  const camDist = 28, camHeight = 18;
+  const camOffX = Math.sin(shipAngle + cameraAngle) * camDist;
+  const camOffZ = Math.cos(shipAngle + cameraAngle) * camDist;
+  let camX = shipGroup.position.x - camOffX;
+  let camY = shipGroup.position.y + camHeight;
+  let camZ = shipGroup.position.z - camOffZ;
+  if (screenShake > 0) {
+    screenShake = Math.max(0, screenShake - dt * 5);
+    camX += (Math.random() - 0.5) * screenShake;
+    camY += (Math.random() - 0.5) * screenShake * 0.5;
+    camZ += (Math.random() - 0.5) * screenShake;
+  }
+  camera.position.set(camX, camY, camZ);
+  camera.lookAt(shipGroup.position.x, shipGroup.position.y + 2, shipGroup.position.z);
+
+  // ── Banner timer
+  if (msgTimer > 0) {
+    msgTimer -= dt * 1000;
+    if (msgTimer <= 0) msgBanner.classList.remove('show');
+  }
+
+  updateHUD();
+  renderer.render(scene, camera);
+}
+
+requestAnimationFrame(animate);
+</script>
+<script src="party-system.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => { if (window.EyloxParty?.setGame) window.EyloxParty.setGame('Pirate Bay 3D'); }, 800);
+});
+</script>
+<script src="party-system.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => { if (window.EyloxParty?.setGame) window.EyloxParty.setGame('Pirate Bay 3D'); }, 800);
+});
+</script>
+</body>
+</html>

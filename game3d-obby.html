@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:#000;overflow:hidden;font-family:'Nunito',sans-serif}
+body{background:#000000;overflow:hidden;font-family:'Nunito',sans-serif}
 canvas{display:block}
 
 /* ─── HUD ─── */
@@ -59,7 +59,7 @@ canvas{display:block}
 
 /* Win screen */
 #win-screen{
-  position:fixed;inset:0;background:rgba(0,0,0,.88);
+  position:fixed;inset:0;background:rgba(0,0,0,.92);
   display:none;flex-direction:column;align-items:center;justify-content:center;
   z-index:400;color:#fff;font-family:'Fredoka One',cursive;
   backdrop-filter:blur(12px)
@@ -117,7 +117,25 @@ canvas{display:block}
   pointer-events:none;white-space:nowrap;z-index:5
 }
 @media(pointer:coarse){#ctrl-hint{display:none}}
+/* Pause overlay */
+#pause-scr{position:fixed;inset:0;background:rgba(0,0,0,.78);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:500;backdrop-filter:blur(10px);font-family:'Fredoka One',cursive;color:#fff}
+#pause-scr h2{font-size:2.8rem;color:#FFD700;margin-bottom:6px;text-shadow:0 0 28px rgba(255,215,0,.5)}
+#pause-scr p{color:rgba(255,255,255,.5);margin-bottom:24px;font-size:.9rem}
+.pscr-btn{padding:13px 44px;border:none;border-radius:16px;font-size:1.15rem;font-family:'Fredoka One',cursive;cursor:pointer;transition:transform .18s;margin:5px;pointer-events:all;display:block;width:230px;text-align:center}
+.pscr-btn.res{background:linear-gradient(135deg,#6A0DAD,#a855f7);color:#fff;box-shadow:0 4px 20px rgba(168,85,247,.45)}
+.pscr-btn.qut{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);color:#d8b4fe}
+.pscr-btn:hover{transform:scale(1.05)}
+#pfab{position:fixed;top:14px;right:130px;z-index:50;pointer-events:all;background:rgba(0,0,0,.65);border:1.5px solid rgba(255,255,255,.22);color:rgba(255,255,255,.75);border-radius:12px;padding:7px 13px;cursor:pointer;font-size:.95rem;font-family:'Fredoka One',cursive;transition:all .18s}
+#pfab:hover{background:rgba(80,80,80,.7);color:#fff}
+/* Coin/boost toasts */
+@keyframes cfl3d{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-54px)}}
+.ct3d{position:fixed;bottom:200px;left:50%;z-index:300;font-family:'Fredoka One',cursive;font-size:1.05rem;pointer-events:none;animation:cfl3d 1.4s ease-out forwards;white-space:nowrap;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+/* Boost flash */
+@keyframes boostFlash{0%{opacity:.3}100%{opacity:0}}
+#boost-flash{position:fixed;inset:0;background:radial-gradient(ellipse at center,rgba(255,220,0,.35) 0%,transparent 70%);pointer-events:none;z-index:250;display:none}
 </style>
+<script src="audit-loader.js" defer></script>
+  <script src="debug-dashboard.js" defer></script>
 </head>
 <body>
 <canvas id="c"></canvas>
@@ -130,19 +148,32 @@ canvas{display:block}
   </div>
   <div id="hud-right">
     <div class="pill">🪙&nbsp;<span class="val" id="hud-coins">0</span></div>
+    <div class="pill" id="hud-pb-wrap" style="display:none">🏆&nbsp;<span style="font-size:.68rem;color:rgba(255,255,255,.55)">BEST&nbsp;</span><span class="val" id="hud-pb">—</span></div>
+    <div class="pill" id="hud-boost-pill" style="display:none;background:rgba(245,158,11,.25);border-color:rgba(245,158,11,.5);color:#fde68a">⚡&nbsp;<span class="val" id="hud-boost-timer">2×</span></div>
   </div>
 </div>
 
 <div id="cp-banner">🏁 Checkpoint <span id="cp-num">1</span>! ✅</div>
 <div id="death-flash"></div>
+<div id="boost-flash"></div>
+<button id="pfab" onclick="togglePause()">⏸</button>
+<div id="pause-scr">
+  <h2>⏸ PAUSED</h2>
+  <p>Press P or tap Resume to continue</p>
+  <button class="pscr-btn res" onclick="togglePause()">▶ Resume</button>
+  <button class="pscr-btn qut" onclick="location.href='games.html'">← Quit to Games</button>
+</div>
 
 <div id="win-screen">
   <h1>🎉 YOU WIN!</h1>
   <p class="win-stat">Time: <span id="w-time">—</span></p>
   <p class="win-stat">Coins Collected: <span id="w-coins">—</span> 🪙</p>
   <p class="win-stat">Checkpoints: <span id="w-cp">—</span></p>
+  <p class="win-stat" id="w-pb-line" style="display:none">🏆 <span id="w-pb-txt" style="color:#FFD700"></span></p>
+  <p class="win-stat" id="w-streak-line" style="display:none">🔥 Streak Bonus: +<span id="w-streak-val">0</span> 🪙</p>
   <div id="win-btns">
     <button class="wbtn p" onclick="location.reload()">🔄 Play Again</button>
+    <button class="wbtn s" id="w-share-btn">📣 Share</button>
     <button class="wbtn s" onclick="location.href='games.html'">← Games</button>
   </div>
 </div>
@@ -188,6 +219,179 @@ function onResize() {
 }
 window.addEventListener('resize', onResize);
 onResize();
+
+// ─── Procedural textures (256px high-quality) ───
+function makeTexture(col) {
+  const S = 256;
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = S;
+  const ctx = cv.getContext('2d');
+  const r = (col >> 16) & 255, g = (col >> 8) & 255, b = col & 255;
+  const C = (dr,dg,db,a=1) => `rgba(${Math.min(255,Math.max(0,r+dr))},${Math.min(255,Math.max(0,g+dg))},${Math.min(255,Math.max(0,b+db))},${a})`;
+
+  ctx.fillStyle = `rgb(${r},${g},${b})`;
+  ctx.fillRect(0, 0, S, S);
+
+  if (g > r * 1.1 && g > b * 1.1) {
+    // ── GRASS: organic noise + moss + flowers ──
+    for (let py = 0; py < S; py++) {
+      for (let px = 0; px < S; px += 2) {
+        const n = (Math.sin(px * 0.11 + py * 0.07) * Math.cos(py * 0.09 - px * 0.05)) * 22;
+        ctx.fillStyle = C(n|0, (n*.5)|0, 0, 1);
+        ctx.fillRect(px, py, 2, 1);
+      }
+    }
+    for (let i = 0; i < 60; i++) {
+      const px=(i*53+i*i*7)%S, py=(i*71+i*3)%S, s=-30+(i%4)*8;
+      ctx.fillStyle = C(s, s-15, 0, 0.28);
+      ctx.beginPath(); ctx.ellipse(px, py, 5+i%7, 3+i%4, (i*.4)%Math.PI, 0, Math.PI*2); ctx.fill();
+    }
+    for (let i = 0; i < 18; i++) {
+      const px=(i*97+25)%(S-4), py=(i*71+18)%(S-4);
+      ctx.fillStyle = [' rgba(255,255,160,0.6)','rgba(255,150,150,0.45)','rgba(160,230,255,0.45)'][i%3];
+      ctx.beginPath(); ctx.arc(px, py, 2.5, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.beginPath(); ctx.arc(px-1, py-1, 1, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.strokeStyle='rgba(0,0,0,0.045)'; ctx.lineWidth=0.6;
+    for(let i=0;i<S;i+=32){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i,S);ctx.stroke();ctx.beginPath();ctx.moveTo(0,i);ctx.lineTo(S,i);ctx.stroke();}
+
+  } else if (b > r * 1.15 && b > g) {
+    // ── ICE: crystalline facets + frosted sheen ──
+    ctx.fillStyle='rgba(210,235,255,0.32)'; ctx.fillRect(0,0,S,S);
+    const pts=Array.from({length:10},(_,i)=>({x:(i*79+44)%S,y:(i*67+22)%S}));
+    ctx.strokeStyle='rgba(140,200,255,0.75)'; ctx.lineWidth=1.2;
+    pts.forEach((a,i)=>{const b2=pts[(i+1)%pts.length];ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b2.x,b2.y);ctx.stroke();});
+    ctx.strokeStyle='rgba(200,230,255,0.4)'; ctx.lineWidth=0.6;
+    pts.forEach((a,i)=>{const b2=pts[(i+3)%pts.length];ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b2.x,b2.y);ctx.stroke();});
+    for(let i=0;i<30;i++){const px=(i*79)%S,py=(i*61)%S;ctx.fillStyle=`rgba(255,255,255,${0.15+i%4*.07})`;ctx.beginPath();ctx.arc(px,py,1+i%3,0,Math.PI*2);ctx.fill();}
+    const gd=ctx.createLinearGradient(0,0,S,S);
+    gd.addColorStop(0,'rgba(255,255,255,0.28)');gd.addColorStop(.5,'rgba(100,160,255,0.04)');gd.addColorStop(1,'rgba(160,210,255,0.2)');
+    ctx.fillStyle=gd; ctx.fillRect(0,0,S,S);
+
+  } else if (r > g * 1.5 && b < 90) {
+    // ── LAVA / ORANGE: glowing crack network ──
+    ctx.fillStyle='rgba(0,0,0,0.4)'; ctx.fillRect(0,0,S,S);
+    const segs=[{x:0,y:S*.4},{x:S*.2,y:S*.2},{x:S*.5,y:S*.05},{x:S*.75,y:S*.35},{x:S,y:S*.55},{x:S*.85,y:S},{x:S*.4,y:S*.9},{x:S*.1,y:S*.75},{x:0,y:S*.4}];
+    ctx.shadowColor=`rgb(255,${Math.min(255,g*2+60)},0)`; ctx.shadowBlur=12;
+    ctx.strokeStyle=`rgba(255,${Math.min(255,g+100)},20,0.95)`; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(segs[0].x,segs[0].y);
+    segs.slice(1).forEach((p,i)=>{const prev=segs[i];ctx.bezierCurveTo(prev.x+18,prev.y+22,p.x-18,p.y-18,p.x,p.y);});
+    ctx.stroke();
+    ctx.strokeStyle=`rgba(255,220,0,0.6)`; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(segs[0].x,segs[0].y);
+    segs.slice(1).forEach((p,i)=>{const prev=segs[i];ctx.bezierCurveTo(prev.x+18,prev.y+22,p.x-18,p.y-18,p.x,p.y);});
+    ctx.stroke(); ctx.shadowBlur=0;
+    for(let py=0;py<S;py+=10) for(let px=0;px<S;px+=10){const n=((px*7+py*13)%30)-15;ctx.fillStyle=`rgba(0,0,0,${0.08+Math.abs(n)/80})`;ctx.fillRect(px,py,10,10);}
+
+  } else if (b > g && r < b * 1.3) {
+    // ── PURPLE / CRYSTAL: gem facets ──
+    const gd=ctx.createLinearGradient(0,0,S,S);
+    gd.addColorStop(0,`rgba(${Math.min(255,r+80)},${g+25},${Math.min(255,b+70)},0.55)`);
+    gd.addColorStop(.38,'rgba(255,255,255,0.18)');gd.addColorStop(.65,'rgba(0,0,0,0.18)');
+    gd.addColorStop(1,`rgba(${r},${g},${Math.min(255,b+50)},0.35)`);
+    ctx.fillStyle=gd; ctx.fillRect(0,0,S,S);
+    ctx.strokeStyle='rgba(255,255,255,0.25)'; ctx.lineWidth=0.9;
+    for(let i=-S;i<S*2;i+=28){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i+S,S);ctx.stroke();}
+    ctx.strokeStyle='rgba(200,150,255,0.18)'; ctx.lineWidth=0.6;
+    for(let i=-S;i<S*2;i+=14){ctx.beginPath();ctx.moveTo(i,S);ctx.lineTo(i+S,0);ctx.stroke();}
+    const rg=ctx.createRadialGradient(S*.5,S*.35,0,S*.5,S*.35,S*.55);
+    rg.addColorStop(0,'rgba(255,255,255,0.22)');rg.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=rg; ctx.fillRect(0,0,S,S);
+
+  } else if (r>55&&r<175&&g>28&&g<115&&b<68) {
+    // ── WOOD / PLANK: realistic grain + knot ──
+    for(let py=0;py<S;py++){
+      const n=Math.sin(py*0.15+Math.sin(py*0.04)*6)*16+Math.sin(py*0.55)*5;
+      ctx.fillStyle=`rgb(${Math.min(255,r+(n|0))},${Math.min(255,g+((n*.55)|0))},${b})`;
+      ctx.fillRect(0,py,S,1);
+    }
+    ctx.strokeStyle='rgba(0,0,0,0.22)'; ctx.lineWidth=2;
+    [S*.33,S*.67].forEach(y=>{ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(S,y);ctx.stroke();});
+    ctx.strokeStyle='rgba(0,0,0,0.25)'; ctx.lineWidth=2.2;
+    ctx.beginPath(); ctx.ellipse(S*.62,S*.38,20,11,0.28,0,Math.PI*2); ctx.stroke();
+    ctx.strokeStyle='rgba(0,0,0,0.12)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.ellipse(S*.62,S*.38,12,6,0.28,0,Math.PI*2); ctx.stroke();
+    const gd=ctx.createLinearGradient(0,0,S,0);
+    gd.addColorStop(0,'rgba(255,255,255,0.06)');gd.addColorStop(.5,'rgba(0,0,0,0.04)');gd.addColorStop(1,'rgba(255,255,255,0.06)');
+    ctx.fillStyle=gd; ctx.fillRect(0,0,S,S);
+
+  } else if (r>75&&r<165&&g>75&&g<165&&b>75&&b<165) {
+    // ── STONE / COBBLE: crisp brickwork with mortar shadow ──
+    const bw=48, bh=24;
+    ctx.strokeStyle='rgba(0,0,0,0.0)'; ctx.lineWidth=0;
+    for(let row=0;row<S/bh+1;row++){
+      const off=row%2===0?0:bw/2;
+      for(let col=-1;col<S/bw+1;col++){
+        const bx=col*bw+off, by=row*bh;
+        const shade=((col*3+row*7)%34)-17;
+        ctx.fillStyle=C(shade,shade,shade);
+        ctx.fillRect(bx+3,by+3,bw-6,bh-6);
+      }
+    }
+    ctx.fillStyle=C(18,18,18); ctx.fillRect(0,0,S,S);
+    for(let row=0;row<S/bh+1;row++){
+      const off=row%2===0?0:bw/2;
+      for(let col=-1;col<S/bw+1;col++){
+        const bx=col*bw+off, by=row*bh;
+        const shade=((col*3+row*7)%34)-17;
+        ctx.fillStyle=C(shade,shade,shade);
+        ctx.fillRect(bx+3,by+3,bw-6,bh-6);
+        ctx.fillStyle='rgba(255,255,255,0.07)';
+        ctx.fillRect(bx+3,by+3,bw-6,3);
+        ctx.fillStyle='rgba(0,0,0,0.1)';
+        ctx.fillRect(bx+3,by+bh-6,bw-6,3);
+      }
+    }
+    const gd=ctx.createLinearGradient(0,0,0,S);
+    gd.addColorStop(0,'rgba(255,255,255,0.06)');gd.addColorStop(1,'rgba(0,0,0,0.07)');
+    ctx.fillStyle=gd; ctx.fillRect(0,0,S,S);
+
+  } else if (r>g*1.2&&r>b*1.2&&g>b) {
+    // ── SAND / DIRT: multi-scale grain ──
+    for(let i=0;i<2000;i++){
+      const px=(i*73+i*i*3)%S, py=(i*61+i*7)%S, shade=((i*17)%52)-26;
+      ctx.fillStyle=C(shade,shade*0.7|0,0,0.5);
+      ctx.beginPath(); ctx.arc(px,py,0.7+i%2,0,Math.PI*2); ctx.fill();
+    }
+    for(let i=0;i<200;i++){
+      const px=(i*137)%S, py=(i*113)%S;
+      ctx.fillStyle=C(15,8,0,0.25);
+      ctx.beginPath(); ctx.arc(px,py,1.5,0,Math.PI*2); ctx.fill();
+    }
+
+  } else if (r>175&&g<65&&b>175) {
+    // ── NEON / MAGIC: glow grid ──
+    const rg=ctx.createRadialGradient(S/2,S/2,0,S/2,S/2,S*.72);
+    rg.addColorStop(0,'rgba(255,255,255,0.32)');rg.addColorStop(1,'rgba(0,0,0,0.28)');
+    ctx.fillStyle=rg; ctx.fillRect(0,0,S,S);
+    ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.lineWidth=0.9;
+    for(let i=0;i<S;i+=22){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i,S);ctx.stroke();ctx.beginPath();ctx.moveTo(0,i);ctx.lineTo(S,i);ctx.stroke();}
+    for(let y=0;y<S;y+=22) for(let x=0;x<S;x+=22){ctx.fillStyle='rgba(255,255,255,0.15)';ctx.beginPath();ctx.arc(x,y,2,0,Math.PI*2);ctx.fill();}
+    ctx.fillStyle='rgba(255,255,255,0.07)'; ctx.fillRect(0,0,S,S);
+
+  } else {
+    // ── GOLD / METAL: directional sheen + fine lines ──
+    const gd=ctx.createLinearGradient(0,0,S,S);
+    gd.addColorStop(0,'rgba(255,255,200,0.5)');gd.addColorStop(.32,'rgba(200,150,0,0.0)');
+    gd.addColorStop(.65,'rgba(140,95,0,0.14)');gd.addColorStop(1,'rgba(255,240,120,0.38)');
+    ctx.fillStyle=gd; ctx.fillRect(0,0,S,S);
+    ctx.strokeStyle='rgba(255,235,80,0.16)'; ctx.lineWidth=0.5;
+    for(let i=0;i<S;i+=5){ctx.beginPath();ctx.moveTo(0,i);ctx.lineTo(S,i);ctx.stroke();}
+    const rg=ctx.createRadialGradient(S*.35,S*.3,0,S*.35,S*.3,S*.5);
+    rg.addColorStop(0,'rgba(255,255,200,0.22)');rg.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=rg; ctx.fillRect(0,0,S,S);
+  }
+
+  // ── AO border (ambient occlusion simulation) ──
+  const ao=ctx.createRadialGradient(S*.5,S*.5,S*.22,S*.5,S*.5,S*.76);
+  ao.addColorStop(0,'rgba(0,0,0,0)'); ao.addColorStop(1,'rgba(0,0,0,0.26)');
+  ctx.fillStyle=ao; ctx.fillRect(0,0,S,S);
+
+  const tex=new THREE.CanvasTexture(cv);
+  tex.wrapS=tex.wrapT=THREE.RepeatWrapping;
+  return tex;
+}
 
 // ─── Lights ───
 const sun = new THREE.DirectionalLight(0xFFFAE0, 2.5);
@@ -247,7 +451,7 @@ const DEFS = [
   // Section 3 — Narrow boards (orange)
   { x:122, y:9,  z:0,  w:2.2,h:1, d:10, col:0xFF8C00 },
   { x:132, y:10, z:0,  w:10, h:1, d:2.2,col:0xFF7000 },
-  { x:144, y:11, z:0,  w:3,  h:1, d:3,  col:0xFF5500, move:{axis:'y',range:2.5,spd:2.2} },
+  { x:144, y:11, z:0,  w:3,  h:1, d:3,  col:0xFF5500, move:{axis:'y',range:2.5,spd:2.2}, boost:true },
   { x:152, y:11, z:-5, w:4,  h:1, d:4,  col:0xFF4500 },
 
   // CHECKPOINT 3
@@ -256,7 +460,7 @@ const DEFS = [
   // Section 4 — Combo (purple)
   { x:170, y:12, z:5,  w:3.5,h:1, d:3.5,col:0xAA44FF, move:{axis:'z',range:8,spd:3.4} },
   { x:178, y:13, z:-4, w:3,  h:1, d:3,  col:0x8A2BE2 },
-  { x:186, y:14, z:0,  w:2.5,h:1, d:2.5,col:0x7B68EE, move:{axis:'x',range:6,spd:4.0} },
+  { x:186, y:14, z:0,  w:2.5,h:1, d:2.5,col:0x7B68EE, move:{axis:'x',range:6,spd:4.0}, boost:true },
   { x:194, y:15, z:5,  w:3,  h:1, d:3,  col:0x6A0DAD },
 
   // CHECKPOINT 4
@@ -287,7 +491,9 @@ const checkpointRings  = [];
 const coinObjects      = [];
 
 DEFS.forEach(def => {
-  const mat  = new THREE.MeshLambertMaterial({ color: def.col });
+  const tex = makeTexture(def.col);
+  tex.repeat.set(Math.max(1, def.w / 4), Math.max(1, def.d / 4));
+  const mat  = new THREE.MeshLambertMaterial({ map: tex });
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(def.w, def.h, def.d), mat);
   mesh.position.set(def.x, def.y, def.z);
   mesh.castShadow = mesh.receiveShadow = true;
@@ -295,6 +501,12 @@ DEFS.forEach(def => {
   scene.add(mesh);
   collidables.push(mesh);
 
+  if (def.boost) {
+    mesh.material = new THREE.MeshStandardMaterial({ color:0xFFD700, emissive:0xFFAA00, emissiveIntensity:1.8, roughness:.4 });
+    const bpl = new THREE.PointLight(0xFFDD00, 2.5, 10);
+    bpl.position.set(def.x, def.y + 1, def.z);
+    scene.add(bpl);
+  }
   if (def.move) {
     movingPlatforms.push({ mesh, def, base: new THREE.Vector3(def.x, def.y, def.z), t: Math.random()*Math.PI*2, carrying: false });
   }
@@ -438,6 +650,33 @@ const FRICTION =   0.74;
 let onGround = false, canDJ = false, jumpHeld = false;
 let isDead = false, gameWon = false;
 let gameTime = 0, gameCoins = 0, cpReached = 0, lastCP = 0;
+let gamePaused = false, speedBoostTimer = 0;
+let coyoteTimer = 0, screenShake = 0;
+const COYOTE_TIME = 0.12;
+const landingParticles = [];
+const _pbKeyO = 'eylox_hs_obby3d';
+/* Record real session so the playing counter reflects actual players */
+(()=>{ try { const _u=JSON.parse(localStorage.getItem('eylox_user')||'null'); const s=JSON.parse(localStorage.getItem('eylox_game_sessions')||'[]'); s.push({id:'obby-world-3d',user:_u?.username||'Player',title:'Obby World 3D',t:Date.now()}); localStorage.setItem('eylox_game_sessions',JSON.stringify(s.slice(-500))); if(_u){_u.gamesPlayed=(_u.gamesPlayed||0)+1;localStorage.setItem('eylox_user',JSON.stringify(_u));if(_u.username)localStorage.setItem('eylox_userdata_'+_u.username,JSON.stringify(_u));} } catch {} })();
+
+/* ── Shop boost detection ── */
+(function(){
+  try {
+    const b = JSON.parse(localStorage.getItem('eylox_coin_boost')||'null');
+    if (b && b.expires > Date.now()) {
+      const pill = document.getElementById('hud-boost-pill');
+      const timer = document.getElementById('hud-boost-timer');
+      if (pill) pill.style.display = '';
+      function updateBoostHUD() {
+        const rem = Math.max(0, b.expires - Date.now());
+        if (timer) timer.textContent = '⚡ ' + Math.ceil(rem/60000) + 'm';
+        if (rem <= 0 && pill) pill.style.display = 'none';
+      }
+      updateBoostHUD();
+      setInterval(updateBoostHUD, 10000);
+    }
+  } catch {}
+})();
+let _pbTimeO = localStorage.getItem(_pbKeyO) ? +localStorage.getItem(_pbKeyO) : null;
 
 const downRay = new THREE.Raycaster();
 downRay.ray.direction.set(0,-1,0);
@@ -446,7 +685,7 @@ downRay.ray.direction.set(0,-1,0);
 // INPUT
 // ════════════════════════════════════════════════════
 const keys = new Set();
-window.addEventListener('keydown', e => { keys.add(e.code); if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)) e.preventDefault(); });
+window.addEventListener('keydown', e => { keys.add(e.code); if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)) e.preventDefault(); if(e.code==='KeyP' && !gameWon) togglePause(); });
 window.addEventListener('keyup',   e => keys.delete(e.code));
 
 // Camera orbit
@@ -497,8 +736,13 @@ const hudTime  = document.getElementById('hud-time');
 const hudCoins = document.getElementById('hud-coins');
 const hudCp    = document.getElementById('hud-cp');
 const progBar  = document.getElementById('prog-bar');
+const hudPbWrap = document.getElementById('hud-pb-wrap');
+const hudPbEl   = document.getElementById('hud-pb');
 
 function fmt(s){const m=Math.floor(s/60);return `${m}:${String(Math.floor(s%60)).padStart(2,'0')}`;}
+
+// Show personal best in HUD
+if (_pbTimeO !== null) { hudPbWrap.style.display=''; hudPbEl.textContent=fmt(_pbTimeO); }
 
 let cpBannerT=0;
 function showCpBanner(n){
@@ -514,14 +758,55 @@ function flashDeath(){
 }
 
 function showWin(){
-  document.getElementById('w-time').textContent  = fmt(gameTime);
-  document.getElementById('w-coins').textContent = gameCoins;
-  document.getElementById('w-cp').textContent    = `${cpReached}/${TOTAL_CPS}`;
-  document.getElementById('win-screen').style.display='flex';
-  try{
-    const u=JSON.parse(localStorage.getItem('eylox_user')||'{}');
-    if(u.username){const k='eylox_hs_obby3d',b=+(localStorage.getItem(k)||Infinity);if(gameTime<b)localStorage.setItem(k,gameTime);}
-  }catch{}
+  document.getElementById('w-time').textContent = fmt(gameTime);
+  document.getElementById('w-cp').textContent   = `${cpReached}/${TOTAL_CPS}`;
+
+  // Streak bonus
+  let bonusCoins = 0;
+  try {
+    const log = JSON.parse(localStorage.getItem('eylox_login_log') || '[]');
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    if (log.includes(yesterday)) {
+      bonusCoins = Math.round(gameCoins * 0.25);
+      document.getElementById('w-streak-line').style.display = '';
+      document.getElementById('w-streak-val').textContent = bonusCoins;
+    }
+  } catch {}
+
+  const totalCoins = gameCoins + bonusCoins;
+  document.getElementById('w-coins').textContent = totalCoins;
+  document.getElementById('win-screen').style.display = 'flex';
+
+  // Share button
+  document.getElementById('w-share-btn').onclick = () => {
+    const txt = `🏃‍♂️ Obby World 3D — finished in ${fmt(gameTime)} with ${totalCoins} coins! Play on Eylox!`;
+    if (navigator.share) navigator.share({ title: 'Eylox Obby', text: txt }).catch(() => {});
+    else navigator.clipboard?.writeText(txt).then(() => showCoinToast('📋 Copied!'));
+  };
+
+  try {
+    const u = JSON.parse(localStorage.getItem('eylox_user') || '{}');
+    const prev = +(localStorage.getItem(_pbKeyO) || Infinity);
+    const newBest = gameTime < prev;
+    if (newBest) {
+      localStorage.setItem(_pbKeyO, gameTime);
+      _pbTimeO = gameTime;
+      hudPbEl.textContent = fmt(gameTime); hudPbWrap.style.display = '';
+      document.getElementById('w-pb-line').style.display = '';
+      document.getElementById('w-pb-txt').textContent = `New Best Time: ${fmt(gameTime)} 🎉`;
+    } else if (prev !== Infinity) {
+      document.getElementById('w-pb-line').style.display = '';
+      document.getElementById('w-pb-txt').textContent = `Best: ${fmt(prev)}`;
+    }
+    u.coins = Math.min((u.coins || 0) + totalCoins, 1e9);
+    localStorage.setItem('eylox_user', JSON.stringify(u));
+    /* Save real score to leaderboard */
+    try { const lb=JSON.parse(localStorage.getItem('eylox_lb_entries')||'[]'); const prevBest=lb.filter(e=>e.user===u.username&&e.gameId==='obby-world-3d').reduce((b,e)=>Math.max(b,e.score),0); lb.push({user:u.username,avatar:u.avatar||'🎮',score:totalCoins,game:'Obby World 3D',gameId:'obby-world-3d',ts:Date.now()}); localStorage.setItem('eylox_lb_entries',JSON.stringify(lb.slice(-300))); if(totalCoins>prevBest){u.wins=(u.wins||0)+1;localStorage.setItem('eylox_user',JSON.stringify(u));localStorage.setItem('eylox_userdata_'+u.username,JSON.stringify(u));} } catch {}
+    const entry = { id:'obby-world-3d', title:'Obby World 3D', thumb:'🏃‍♂️', genre:'action', playedAt: Date.now() };
+    const r = JSON.parse(localStorage.getItem('eylox_recently_played') || '[]');
+    r.unshift(entry); localStorage.setItem('eylox_recently_played', JSON.stringify(r.slice(0, 10)));
+    localStorage.setItem('eylox_pending_notif', JSON.stringify({ title:'🏃‍♂️ Obby World Cleared!', body:`Finished in ${fmt(gameTime)} and earned ${totalCoins} Eylux!`, type:'game', ts:Date.now() }));
+  } catch {}
 }
 
 // ════════════════════════════════════════════════════
@@ -533,7 +818,7 @@ let animT = 0;
 (function loop(){
   requestAnimationFrame(loop);
   const dt = Math.min(clock.getDelta(), .05);
-  if (!gameWon && !isDead) update(dt);
+  if (!gameWon && !isDead && !gamePaused) update(dt);
   renderer.render(scene, camera);
 })();
 
@@ -552,10 +837,13 @@ function update(dt){
   const wish = camR.clone().multiplyScalar(mx).add(camF.clone().multiplyScalar(-mz));
   wish.y=0;
 
+  speedBoostTimer = Math.max(0, speedBoostTimer - dt);
+  const curSpeed = speedBoostTimer > 0 ? SPEED * 2.0 : SPEED;
+
   const moving = wish.lengthSq()>.001;
   if(moving){
     wish.normalize();
-    vel.x=wish.x*SPEED; vel.z=wish.z*SPEED;
+    vel.x=wish.x*curSpeed; vel.z=wish.z*curSpeed;
     const ta=Math.atan2(wish.x,wish.z);
     let diff=ta-avatar.rotation.y;
     while(diff>Math.PI)diff-=Math.PI*2;
@@ -568,13 +856,14 @@ function update(dt){
   // ─── Jump ───
   const wj=keys.has('Space');
   if(wj&&!jumpHeld){
-    if(onGround){vel.y=JUMP_V;onGround=false;canDJ=true;}
+    if(onGround||coyoteTimer>0){vel.y=JUMP_V;onGround=false;canDJ=true;coyoteTimer=0;}
     else if(canDJ){vel.y=DJ_V;canDJ=false;}
     jumpHeld=true;
   }
   if(!wj) jumpHeld=false;
 
   // ─── Gravity + integrate ───
+  const prevVelY = vel.y;
   vel.y+=GRAVITY*dt;
   avatar.position.addScaledVector(vel,dt);
 
@@ -593,6 +882,7 @@ function update(dt){
   });
 
   // ─── Ground raycast (5-point sweep) ───
+  const wasOnGround = onGround;
   onGround=false;
   let bestY=-Infinity, bestMesh=null;
   [[.3,.3],[-.3,.3],[.3,-.3],[-.3,-.3],[0,0]].forEach(([ox,oz])=>{
@@ -611,6 +901,33 @@ function update(dt){
     const mp=movingPlatforms.find(m=>m.mesh===bestMesh);
     if(mp) mp.carrying=true;
     if(bestMesh.userData.finish&&!gameWon){gameWon=true;setTimeout(showWin,400);}
+    if(bestMesh.userData.boost&&speedBoostTimer<=0){speedBoostTimer=2.5;showBoostEffect();}
+  }
+
+  // ─── Coyote time ───
+  if(!onGround&&wasOnGround&&vel.y<=0) coyoteTimer=COYOTE_TIME;
+  else if(onGround) coyoteTimer=0;
+  else coyoteTimer=Math.max(0,coyoteTimer-dt);
+
+  // ─── Landing effects ───
+  if(!wasOnGround&&onGround&&prevVelY<-5){
+    const impact=-prevVelY;
+    if(impact>8) screenShake=Math.min(.5,(impact-8)/20)*.4;
+    spawnLandingParticles(avatar.position.clone(),impact);
+  }
+
+  // ─── Update landing particles ───
+  for(let i=landingParticles.length-1;i>=0;i--){
+    const p=landingParticles[i];
+    p.userData.life+=dt;
+    const t=p.userData.life/p.userData.maxLife;
+    p.material.opacity=1-t;
+    p.position.x+=p.userData.vx*dt;
+    p.position.y+=p.userData.vy*dt;
+    p.position.z+=p.userData.vz*dt;
+    p.userData.vy-=8*dt;
+    p.rotation.z+=dt*3;
+    if(t>=1){scene.remove(p);p.geometry.dispose();p.material.dispose();landingParticles.splice(i,1);}
   }
 
   // ─── Death zone ───
@@ -638,6 +955,7 @@ function update(dt){
       scene.remove(c.mesh);
       gameCoins++;
       hudCoins.textContent=gameCoins;
+      showCoinToast('+1 🪙');
     }
   });
 
@@ -662,6 +980,12 @@ function update(dt){
   const cy=avatar.position.y+camDist*Math.sin(camPhi)+4;
   const cz=avatar.position.z+camDist*Math.cos(camTheta)*Math.cos(camPhi);
   camera.position.lerp(new THREE.Vector3(cx,cy,cz),.1);
+  if(screenShake>0){
+    screenShake=Math.max(0,screenShake-dt*5);
+    camera.position.x+=(Math.random()-.5)*screenShake;
+    camera.position.y+=(Math.random()-.5)*screenShake;
+    camera.position.z+=(Math.random()-.5)*screenShake*.5;
+  }
   camera.lookAt(avatar.position.x, avatar.position.y+2.2, avatar.position.z);
 
   // ─── Clouds drift ───
@@ -675,6 +999,53 @@ function update(dt){
   hudTime.textContent=fmt(gameTime);
 }
 
+function togglePause(){
+  gamePaused = !gamePaused;
+  document.getElementById('pause-scr').style.display = gamePaused ? 'flex' : 'none';
+  document.getElementById('pfab').textContent = gamePaused ? '▶' : '⏸';
+}
+function showCoinToast(msg){
+  const el = document.createElement('div');
+  el.className = 'ct3d';
+  el.style.color = '#FFD700';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1500);
+}
+function showBoostEffect(){
+  const fl = document.getElementById('boost-flash');
+  fl.style.display = 'block';
+  fl.style.animation = 'none'; void fl.offsetWidth;
+  fl.style.animation = 'boostFlash .7s ease-out forwards';
+  setTimeout(() => fl.style.display = 'none', 750);
+  const el = document.createElement('div');
+  el.className = 'ct3d';
+  el.style.color = '#FFD700'; el.style.fontSize = '1.25rem';
+  el.textContent = '⚡ Speed Boost!';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1500);
+}
+function spawnLandingParticles(pos, force) {
+  const count = Math.min(14, 4 + Math.floor(force / 3));
+  for (let i = 0; i < count; i++) {
+    const size = 0.12 + Math.random() * 0.22;
+    const geo = new THREE.PlaneGeometry(size, size);
+    const mat = new THREE.MeshBasicMaterial({ color: 0xCCCCCC, transparent: true, opacity: 0.85, side: THREE.DoubleSide, depthWrite: false });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.copy(pos);
+    mesh.position.y += 0.08;
+    const angle = Math.random() * Math.PI * 2;
+    const spd = 1.8 + Math.random() * 2.4;
+    mesh.userData.vx = Math.cos(angle) * spd;
+    mesh.userData.vy = 1.2 + Math.random() * 2.2;
+    mesh.userData.vz = Math.sin(angle) * spd;
+    mesh.userData.life = 0;
+    mesh.userData.maxLife = 0.3 + Math.random() * 0.3;
+    scene.add(mesh);
+    landingParticles.push(mesh);
+  }
+}
+
 function die(){
   if(isDead) return;
   isDead=true; flashDeath();
@@ -684,6 +1055,13 @@ function die(){
     vel.set(0,0,0); isDead=false;
   },580);
 }
+</script>
+<script src="party-system.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.EyloxParty) window.EyloxParty.setGame && (window.EyloxParty._autoSet = () => window.EyloxParty.setGame('Obby World 3D'));
+  setTimeout(() => { if (window.EyloxParty?.setGame) window.EyloxParty.setGame('Obby World 3D'); }, 800);
+});
 </script>
 </body>
 </html>

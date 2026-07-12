@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -9,10 +9,10 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --purple:#a78bfa;--green:#4ade80;--pink:#f472b6;--yellow:#fde68a;
+  --purple:#c4b5fd;--green:#4ade80;--pink:#f472b6;--yellow:#fde68a;
   --blue:#60a5fa;--teal:#2dd4bf;--red:#f87171;--orange:#fb923c;
-  --bg:#07011a;--surface:#0f0428;--card:#130530;--border:#1e0a48;
-  --border2:#2a1560;--text:#f0e8ff;--muted:#9d8ec7;
+  --bg:#000000;--surface:#3a0878;--card:#2c0660;--border:rgba(167,139,250,.45);
+  --border2:#7c3aed;--text:#f0e8ff;--muted:#c4b5fd;
   --font-h:'Fredoka One',cursive;--font-b:'Nunito',sans-serif;--font-mono:'JetBrains Mono',monospace;
 }
 html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--font-b);overflow-x:hidden}
@@ -22,7 +22,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
   position:sticky;top:0;z-index:100;
   display:flex;align-items:center;gap:12px;
   padding:0 20px;height:56px;
-  background:rgba(7,1,26,.97);backdrop-filter:blur(20px);
+  background:rgba(0,0,0,.97);backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border2);
 }
 .at-logo{font-family:var(--font-h);font-size:1.3rem;color:var(--yellow);text-decoration:none;display:flex;align-items:center;gap:8px;white-space:nowrap}
@@ -38,20 +38,33 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
 
 /* ── Sidebar ── */
 .admin-sidebar{
-  width:220px;flex-shrink:0;
-  background:var(--surface);border-right:1px solid var(--border);
-  padding:16px 0;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;
+  width:280px;flex-shrink:0;
+  background:#000000;border-right:1px solid rgba(167,139,250,.3);
+  padding:20px 0;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;
+  box-shadow:4px 0 32px rgba(0,0,0,.6);
 }
-.as-section{padding:8px 16px 4px;font-size:.65rem;font-weight:900;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
+.as-section{padding:10px 20px 6px;font-size:.62rem;font-weight:900;color:rgba(196,181,253,.75);letter-spacing:1.5px;text-transform:uppercase;margin-top:10px}
 .as-link{
-  display:flex;align-items:center;gap:10px;padding:9px 18px;
-  color:var(--muted);font-size:.82rem;font-weight:800;cursor:pointer;
-  transition:background .15s,color .15s;border-left:3px solid transparent;
-  text-decoration:none;
+  display:flex;align-items:center;gap:12px;padding:11px 20px;
+  color:#d8c8f8;font-size:.88rem;font-weight:800;cursor:pointer;
+  transition:background .14s,border-color .14s;border-left:3px solid transparent;
+  text-decoration:none;border-radius:0 12px 12px 0;margin-right:10px;
 }
-.as-link:hover,.as-link.active{background:rgba(167,139,250,.1);color:var(--text);border-left-color:var(--purple)}
-.as-link .icon{font-size:1rem;flex-shrink:0;width:20px;text-align:center}
-.as-count{margin-left:auto;background:rgba(167,139,250,.18);color:var(--purple);font-size:.65rem;font-weight:900;padding:2px 7px;border-radius:99px}
+.as-link:hover{background:rgba(124,58,237,.18);border-left-color:var(--purple)}
+.as-link.active{background:rgba(124,58,237,.22);border-left-color:var(--purple);color:#fff}
+.as-link .icon{font-size:1.05rem;flex-shrink:0;width:24px;text-align:center}
+.as-count{margin-left:auto;background:rgba(124,58,237,.35);color:#e9d5ff;font-size:.62rem;font-weight:900;padding:2px 8px;border-radius:99px;min-width:20px;text-align:center}
+/* Role badge in sidebar */
+.as-role-card{margin:10px 12px;background:rgba(124,58,237,.15);border:1px solid rgba(167,139,250,.3);border-radius:12px;padding:10px 14px}
+.as-role-title{font-size:.62rem;color:rgba(196,181,253,.85);font-weight:900;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.as-role-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(167,139,250,.15)}
+.as-role-row:last-child{border-bottom:none}
+.as-role-name{font-size:.72rem;font-weight:800;color:#e0d4ff}
+.as-role-lv{font-size:.7rem;font-weight:900;padding:1px 7px;border-radius:99px}
+.lv-owner{background:rgba(245,158,11,.18);color:#f59e0b}
+.lv-admin{background:rgba(96,165,250,.18);color:#60a5fa}
+.lv-mod{background:rgba(167,139,250,.18);color:#a78bfa}
+.lv-player{background:rgba(74,222,128,.12);color:#4ade80}
 
 /* ── Main content ── */
 .admin-main{flex:1;padding:20px 24px;min-width:0}
@@ -142,7 +155,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
 }
 .log-line{display:flex;gap:8px;align-items:flex-start;animation:logIn .18s ease}
 @keyframes logIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
-.log-time{color:rgba(157,142,199,.4);flex-shrink:0;font-size:.7rem;padding-top:1px}
+.log-time{color:rgba(196,181,253,.7);flex-shrink:0;font-size:.7rem;padding-top:1px}
 .log-icon{flex-shrink:0}
 .log-text{color:var(--text);word-break:break-word}
 .log-text.ok  {color:var(--green)}
@@ -161,7 +174,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
 .players-list{display:flex;flex-direction:column;gap:6px}
 .player-row{
   display:flex;align-items:center;gap:10px;padding:8px 12px;
-  background:rgba(167,139,250,.05);border:1px solid var(--border);border-radius:10px;
+  background:rgba(124,58,237,.12);border:1px solid rgba(167,139,250,.3);border-radius:10px;
   transition:background .15s;cursor:pointer;
 }
 .player-row:hover{background:rgba(167,139,250,.12);border-color:var(--border2)}
@@ -173,7 +186,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
 .badge-player{background:rgba(74,222,128,.12);color:var(--green)}
 .badge-guest{background:rgba(157,142,199,.12);color:var(--muted)}
 .pr-actions{display:flex;gap:5px}
-.pr-act{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.18);color:var(--muted);font-size:.65rem;font-weight:800;padding:3px 8px;border-radius:99px;cursor:pointer;transition:all .15s}
+.pr-act{background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.35);color:#d8c8f8;font-size:.65rem;font-weight:800;padding:3px 8px;border-radius:99px;cursor:pointer;transition:all .15s}
 .pr-act:hover{background:rgba(244,114,182,.18);color:var(--pink);border-color:var(--pink)}
 .pr-act.green:hover{background:rgba(74,222,128,.18);color:var(--green);border-color:var(--green)}
 
@@ -216,6 +229,8 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
   .cmd-grid{grid-template-columns:1fr}
 }
 </style>
+<script src="audit-loader.js" defer></script>
+  <script src="debug-dashboard.js" defer></script>
 </head>
 <body>
 
@@ -234,15 +249,46 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
 
   <!-- Sidebar -->
   <aside class="admin-sidebar">
+
+    <!-- Role system card -->
+    <div class="as-role-card">
+      <div class="as-role-title">Role Levels</div>
+      <div class="as-role-row"><span class="as-role-name">👑 Owner</span><span class="as-role-lv lv-owner">Level 3</span></div>
+      <div class="as-role-row"><span class="as-role-name">⚡ Admin</span><span class="as-role-lv lv-admin">Level 2</span></div>
+      <div class="as-role-row"><span class="as-role-name">🛡️ Mod</span><span class="as-role-lv lv-mod">Level 1</span></div>
+      <div class="as-role-row"><span class="as-role-name">👤 Player</span><span class="as-role-lv lv-player">Level 0</span></div>
+    </div>
+
+    <div class="as-section">Data</div>
     <a class="as-link" onclick="showPlayerRegistry()"><span class="icon">🏅</span> Player Registry</a>
     <a class="as-link" onclick="showAccountHistory()"><span class="icon">📋</span> Login History</a>
-    <div class="as-section" style="margin-top:16px">Quick Tools</div>
+    <a class="as-link" onclick="showJoinLogs()"><span class="icon">📜</span> View Logs</a>
+
+    <div class="as-section">Commands</div>
+    <a class="as-link" onclick="restoreCommandView('movement')"><span class="icon">🎮</span> Player &amp; Movement</a>
+    <a class="as-link" onclick="restoreCommandView('effects')"><span class="icon">🎭</span> Effects &amp; Fun</a>
+    <a class="as-link" onclick="restoreCommandView('mod')"><span class="icon">⚖️</span> Moderation</a>
+    <a class="as-link" onclick="restoreCommandView('economy')"><span class="icon">💰</span> Economy &amp; Items</a>
+    <a class="as-link" onclick="restoreCommandView('gamemodes')"><span class="icon">👑</span> Game Modes</a>
+
+    <div class="as-section">Quick Tools</div>
     <a class="as-link" onclick="cmdQuick(':clearchat')"><span class="icon">🧹</span> Clear Chat</a>
-    <a class="as-link" onclick="cmdQuick(':day')">       <span class="icon">☀️</span> Set Day</a>
-    <a class="as-link" onclick="cmdQuick(':night')">     <span class="icon">🌙</span> Set Night</a>
+    <a class="as-link" onclick="cmdQuick(':day')"><span class="icon">☀️</span> Set Day</a>
+    <a class="as-link" onclick="cmdQuick(':night')"><span class="icon">🌙</span> Set Night</a>
     <a class="as-link" onclick="cmdQuick(':clearweather')"><span class="icon">🌤️</span> Clear Weather</a>
-    <a class="as-link" onclick="cmdQuick(':deleteall')"> <span class="icon">🧹</span> Delete All</a>
-    <a class="as-link" onclick="cmdQuick(':logs')">      <span class="icon">📜</span> View Logs</a>
+    <a class="as-link" onclick="cmdQuick(':deleteall')"><span class="icon">🗑️</span> Delete All</a>
+    <a class="as-link" onclick="cmdQuick(':coinrain')"><span class="icon">💰</span> Coin Rain</a>
+    <a class="as-link" onclick="cmdQuick(':confettiall')"><span class="icon">🎉</span> Confetti All</a>
+
+    <div class="as-section">Anti-Cheat</div>
+    <a class="as-link" onclick="showAntiCheatPanel()"><span class="icon">🛡️</span> AC Monitor <span class="as-count" id="acFlagCount">0</span></a>
+    <a class="as-link" onclick="showReports()"><span class="icon">🚨</span> Reports <span class="as-count" id="acReportCount">0</span></a>
+    <a class="as-link" onclick="showBanList()"><span class="icon">🚫</span> Ban List <span class="as-count" id="acBanCount">0</span></a>
+
+    <div class="as-section">AI Tools</div>
+    <a class="as-link" onclick="showAIModerationPanel()"><span class="icon">🤖</span> AI Moderation <span class="as-count" id="modFlagCount">0</span></a>
+    <a class="as-link" onclick="showVerificationPanel()"><span class="icon">✅</span> Verification <span class="as-count" id="verifiedCount">0</span></a>
+
   </aside>
 
   <!-- Main -->
@@ -254,6 +300,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
       <div class="stat-card"><div class="stat-val" style="color:var(--yellow)" id="st-cmds">0</div><div class="stat-lbl">⚡ Commands</div></div>
       <div class="stat-card"><div class="stat-val" style="color:var(--pink)" id="st-bans">0</div><div class="stat-lbl">🚫 Banned</div></div>
       <div class="stat-card"><div class="stat-val" style="color:var(--teal)" id="st-coins">—</div><div class="stat-lbl">🪙 My Coins</div></div>
+      <div class="stat-card"><div class="stat-val" style="color:var(--yellow)" id="st-wins">—</div><div class="stat-lbl">🏆 My Wins</div></div>
       <div class="stat-card"><div class="stat-val" style="color:var(--purple)" id="st-uptime">0m</div><div class="stat-lbl">⏱️ Uptime</div></div>
     </div>
 
@@ -294,20 +341,22 @@ html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var
 <!-- Toast container -->
 <div id="adminToast"></div>
 
+<!-- Admin dashboard — connects live backend API, player management, broadcast, economy -->
+<script src="admin-dashboard.js" defer></script>
+
 <script>
 'use strict';
 /* ══════════════════════════════════════════════════
-   OWNER GUARD
+   OWNER GUARD — only username "Eylox" may enter
 ══════════════════════════════════════════════════ */
-const OWNER_NAMES = ['owner','player123','admin'];
+const OWNER_USERNAME = 'Eylox';
 let _adminUser = null;
 try {
   const u = JSON.parse(localStorage.getItem('eylox_user') || 'null');
-  const isGuest = localStorage.getItem('eylox_guest');
-  const hasSession = localStorage.getItem('eylox_token') || isGuest || u;
+  const hasSession = localStorage.getItem('eylox_token') || localStorage.getItem('eylox_guest') || u;
   if (!hasSession) {
     document.body.innerHTML = `
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:20px;text-align:center;padding:24px">
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:20px;text-align:center;padding:24px;background:#5c0b99">
         <div style="font-size:5rem">🔒</div>
         <div style="font-family:'Fredoka One',cursive;font-size:2rem;color:#a78bfa">Not Logged In</div>
         <p style="color:#9d8ec7;font-family:Nunito,sans-serif;font-weight:700">Please log in to access the admin panel.</p>
@@ -315,12 +364,15 @@ try {
       </div>`;
     throw new Error('not logged in');
   }
-  if (localStorage.getItem('eylox_is_owner') !== 'true') {
+  /* Verify using the server-provided isOwner field (set during login, not client-writable).
+     admin-dashboard.js performs a second-layer server-side check asynchronously. */
+  const isOwnerUser = u && u.isOwner === true;
+  if (!isOwnerUser) {
     document.body.innerHTML = `
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:20px;text-align:center;padding:24px">
-        <div style="font-size:5rem">🔒</div>
-        <div style="font-family:'Fredoka One',cursive;font-size:2rem;color:#a78bfa">Access Denied</div>
-        <p style="color:#9d8ec7;font-family:Nunito,sans-serif;font-weight:700">This panel is for Owner accounts only.</p>
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:20px;text-align:center;padding:24px;background:#5c0b99">
+        <div style="font-size:5rem">🚫</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:2rem;color:#f87171">Access Denied</div>
+        <p style="color:#9d8ec7;font-family:Nunito,sans-serif;font-weight:700">The Admin Panel is exclusively for the <strong style="color:#f59e0b">Eylox</strong> owner account.</p>
         <a href="index.html" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;padding:12px 28px;border-radius:99px;text-decoration:none;font-family:Nunito,sans-serif;font-weight:800">← Back to Home</a>
       </div>`;
     throw new Error('access denied');
@@ -650,6 +702,9 @@ const COMMANDS = {
   ],
   economy: [
     /* 301–400 💰🎁 ECONOMY & ITEMS */
+    { cmd:':tokens player 100',   icon:'🪙',  desc:'Give tokens to player',           type:'ok' },
+    { cmd:':tokensall 50',        icon:'🪙',  desc:'Give tokens to all players',      type:'ok' },
+    { cmd:':removetokens player 50',icon:'📤',desc:'Remove tokens from player',       type:'warn' },
     { cmd:':coins player 1000',   icon:'💰',  desc:'Give coins to player',            type:'ok' },
     { cmd:':wins player 10',      icon:'🏆',  desc:'Give wins to player',             type:'ok' },
     { cmd:':removecoins player 500',icon:'💸',desc:'Remove coins from player',        type:'warn' },
@@ -1108,7 +1163,7 @@ const CMD_RESPONSES = {
   ':windall':           ()=> ({ msg:`🌬️ Wind on all players.`,                   type:'fun',    toast:'🌬️ Wind all' }),
   ':lavaall':           ()=> ({ msg:`🌋 Lava under all players.`,                type:'danger', toast:'🌋 Lava all!' }),
   ':meteorall':         ()=> ({ msg:`☄️ Meteor shower on all players.`,           type:'fun',    toast:'☄️ Meteor all' }),
-  ':confettiall':       ()=> ({ msg:`🎉 Confetti for all players!`,              type:'fun',    toast:'🎉 Confetti all!' }),
+  ':confettiall':       ()=>{ spawnParticleRain('🎉',80); return { msg:`🎉 Confetti explosion for all players!`, type:'fun', toast:'🎉 Confetti all!' }; },
   ':freezeeffectall':   ()=> ({ msg:`🧊 All players ice-frozen.`,                type:'fun',    toast:'🧊 Ice all' }),
   ':shockall':          ()=> ({ msg:`⚡ All players shocked!`,                   type:'fun',    toast:'⚡ Shock all' }),
   ':bigheadall':        ()=> ({ msg:`😂 Big heads on everyone.`,                 type:'fun',    toast:'😂 Bighead all' }),
@@ -1157,7 +1212,7 @@ const CMD_RESPONSES = {
   ':slowchat':          ()=> ({ msg:`🐢 Slow mode: 30s between messages.`,       type:'warn',   toast:'🐢 Slow chat' }),
   ':clearchat':         ()=>{ clearLog(); try{localStorage.removeItem('eylox_chat_log');}catch{} return { msg:`🧹 Chat cleared. Console reset.`, type:'ok', toast:'🧹 Chat cleared' }; },
   ':announce':          (_,m)=>{ showAnnounce(m||'Hello!'); return { msg:`📢 Server: "${m||'Hello!'}"`,type:'info',toast:'📢 Announced!' }; },
-  ':logs':              ()=>{ setTimeout(()=>{ try{ showAccountHistory(); }catch{} },120); return { msg:`📜 Opening Login History…`, type:'info', toast:'📜 Logs opened' }; },
+  ':logs':              ()=>{ setTimeout(()=>{ try{ showJoinLogs(); }catch{} },120); return { msg:`📜 Opening Join Logs…`, type:'info', toast:'📜 Logs opened' }; },
   ':check':             (p)=>({ msg:`🔍 ${p}: Lv.${Math.floor(Math.random()*50)+1} | ${Math.floor(Math.random()*1000)} coins | ${Math.floor(Math.random()*20)} warnings`,type:'info',toast:'🔍 Checked' }),
   ':report':            (p)=>({ msg:`🚨 Report filed for ${p}.`,                 type:'warn',   toast:'🚨 Reported' }),
   ':flag':              (p)=>({ msg:`🚩 ${p} flagged for review.`,               type:'warn',   toast:'🚩 Flagged' }),
@@ -1243,6 +1298,9 @@ const CMD_RESPONSES = {
   ':unmaintenance':     ()=> ({ msg:`✅ Maintenance mode off.`,                   type:'ok',     toast:'✅ Live again' }),
   ':serverrestartnow':  ()=> ({ msg:`🔄 Restarting server immediately…`,          type:'danger', toast:'🔄 Restart now!' }),
   /* ── 301–400 ECONOMY & ITEMS ── */
+  ':tokens':            (p,a)=>{ try{ const u=JSON.parse(localStorage.getItem('eylox_user')||'null'); if(u){ u.tokens=(u.tokens||0)+parseInt(a||100); localStorage.setItem('eylox_user',JSON.stringify(u)); spawnParticleRain('🪙',30); } }catch{} return { msg:`🪙 Gave ${a||'100'} tokens to ${p}.`, type:'ok', toast:'🪙 Tokens given!' }; },
+  ':tokensall':         (_,a)=>{ try{ const u=JSON.parse(localStorage.getItem('eylox_user')||'null'); if(u){ u.tokens=(u.tokens||0)+parseInt(a||50); localStorage.setItem('eylox_user',JSON.stringify(u)); spawnParticleRain('🪙',50); } }catch{} return { msg:`🪙 Gave ${a||'50'} tokens to ALL players.`, type:'ok', toast:'🪙 Tokens to all!' }; },
+  ':removetokens':      (p,a)=>{ try{ const u=JSON.parse(localStorage.getItem('eylox_user')||'null'); if(u){ u.tokens=Math.max(0,(u.tokens||0)-parseInt(a||50)); localStorage.setItem('eylox_user',JSON.stringify(u)); } }catch{} return { msg:`📤 Removed ${a||'50'} tokens from ${p}.`, type:'warn', toast:'📤 Tokens removed' }; },
   ':coins':             (p,a)=>{ try{ const u=JSON.parse(localStorage.getItem('eylox_user')||'null'); if(u){ u.coins=(u.coins||0)+parseInt(a||1000); localStorage.setItem('eylox_user',JSON.stringify(u)); } }catch{} return { msg:`💰 Gave ${a||'1000'} coins to ${p}.`,type:'ok',toast:'💰 Coins given' }; },
   ':removecoins':       (p,a)=>{ try{ const u=JSON.parse(localStorage.getItem('eylox_user')||'null'); if(u){ u.coins=Math.max(0,(u.coins||0)-parseInt(a||500)); localStorage.setItem('eylox_user',JSON.stringify(u)); } }catch{} return { msg:`💸 Removed ${a||'500'} coins from ${p}.`,type:'warn',toast:'💸 Coins removed' }; },
   ':givecash':          (p,a)=>({ msg:`💵 Gave $${a||'200'} cash to ${p}.`,      type:'ok',     toast:'💵 Cash given' }),
@@ -1514,7 +1572,14 @@ function addLog(msg, type, cmd) {
   const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0') + ':' + now.getSeconds().toString().padStart(2,'0');
   const line = document.createElement('div');
   line.className = 'log-line';
-  line.innerHTML = `<span class="log-time">${time}</span><span class="log-text ${type||''}">${msg}</span>`;
+  const timeSpan = document.createElement('span');
+  timeSpan.className = 'log-time';
+  timeSpan.textContent = time;
+  const msgSpan = document.createElement('span');
+  msgSpan.className = 'log-text' + (type ? ' ' + type.replace(/[^a-z_-]/gi, '') : '');
+  msgSpan.textContent = msg;
+  line.appendChild(timeSpan);
+  line.appendChild(msgSpan);
   log.appendChild(line);
   log.scrollTop = log.scrollHeight;
   /* keep max 80 lines */
@@ -1535,7 +1600,14 @@ function toast(msg, color) {
   el.className = 'a-toast';
   el.style.borderLeftColor = color || 'var(--purple)';
   el.style.borderLeftWidth = '3px';
-  el.innerHTML = `<span class="a-toast-icon">${msg.split(' ')[0]}</span><span>${msg.split(' ').slice(1).join(' ') || msg}</span>`;
+  const words = msg.split(' ');
+  const icon = document.createElement('span');
+  icon.className = 'a-toast-icon';
+  icon.textContent = words[0];
+  const body = document.createElement('span');
+  body.textContent = words.slice(1).join(' ') || msg;
+  el.appendChild(icon);
+  el.appendChild(body);
   wrap.appendChild(el);
   setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 320); }, 2200);
 }
@@ -1549,11 +1621,14 @@ function upd() {
   document.getElementById('st-bans').textContent = (() => { try { return JSON.parse(localStorage.getItem('eylox_banned')||'[]').length; } catch { return banCount; } })();
   const mins = Math.floor((Date.now() - startTime) / 60000);
   document.getElementById('st-uptime').textContent = mins < 60 ? mins + 'm' : Math.floor(mins/60) + 'h ' + (mins%60) + 'm';
-  // Update coins in circulation from user
   try {
     const u = JSON.parse(localStorage.getItem('eylox_user')||'null');
     const coinEl = document.getElementById('st-coins');
-    if (coinEl && u) coinEl.textContent = (u.coins||0).toLocaleString();
+    const winEl  = document.getElementById('st-wins');
+    if (u) {
+      if (coinEl) coinEl.textContent = (u.coins||0).toLocaleString();
+      if (winEl)  winEl.textContent  = (u.wins||0).toString();
+    }
   } catch {}
 }
 setInterval(upd, 10000);
@@ -1566,9 +1641,9 @@ function showAnnounce(text) {
   if (old) old.remove();
   const el = document.createElement('div');
   el.id = 'announceOverlay';
-  el.style.cssText = 'position:fixed;inset:0;z-index:9990;display:flex;align-items:center;justify-content:center;background:rgba(7,1,26,.85);backdrop-filter:blur(14px);cursor:pointer;animation:toastIn .35s cubic-bezier(.34,1.56,.64,1) both';
+  el.style.cssText = 'position:fixed;inset:0;z-index:9990;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.92);backdrop-filter:blur(14px);cursor:pointer;animation:toastIn .35s cubic-bezier(.34,1.56,.64,1) both';
   el.innerHTML = `
-    <div style="background:linear-gradient(135deg,#1e0a48,#2a1560);border:2px solid var(--yellow);border-radius:24px;padding:40px 52px;text-align:center;max-width:560px;box-shadow:0 0 80px rgba(245,158,11,.25)">
+    <div style="background:linear-gradient(135deg,#0d0020,#1a0035);border:2px solid var(--yellow);border-radius:24px;padding:40px 52px;text-align:center;max-width:560px;box-shadow:0 0 80px rgba(245,158,11,.25)">
       <div style="font-size:3rem;margin-bottom:12px">📢</div>
       <div style="font-family:var(--font-h);font-size:clamp(1.3rem,4vw,2rem);color:var(--yellow);margin-bottom:10px">Server Announcement</div>
       <div style="font-size:clamp(.95rem,2.5vw,1.2rem);font-weight:800;color:var(--text);line-height:1.5">${text}</div>
@@ -1612,6 +1687,7 @@ function getCommandViewHTML() {
       <div class="stat-card"><div class="stat-val" style="color:var(--yellow)" id="st-cmds">0</div><div class="stat-lbl">⚡ Commands</div></div>
       <div class="stat-card"><div class="stat-val" style="color:var(--pink)" id="st-bans">0</div><div class="stat-lbl">🚫 Banned</div></div>
       <div class="stat-card"><div class="stat-val" style="color:var(--teal)" id="st-coins">—</div><div class="stat-lbl">🪙 My Coins</div></div>
+      <div class="stat-card"><div class="stat-val" style="color:var(--yellow)" id="st-wins">—</div><div class="stat-lbl">🏆 My Wins</div></div>
       <div class="stat-card"><div class="stat-val" style="color:var(--purple)" id="st-uptime">0m</div><div class="stat-lbl">⏱️ Uptime</div></div>
     </div>
     <div class="players-wrap">
@@ -1635,35 +1711,35 @@ function getCommandViewHTML() {
         <div class="log-empty">No commands run yet.</div>
       </div>
     </div>
-    <div class="cat-section collapsed" id="sec-movement">
+    <div class="cat-section" id="sec-movement">
       <div class="cat-header" onclick="toggleCat(this)">
         <span class="cat-emoji">🎮</span><span class="cat-title">💯 Player &amp; Movement</span>
         <span class="cat-count">100 commands</span><span class="cat-arrow">▾</span>
       </div>
       <div class="cmd-grid" id="grid-movement"></div>
     </div>
-    <div class="cat-section collapsed" id="sec-effects">
+    <div class="cat-section" id="sec-effects">
       <div class="cat-header" onclick="toggleCat(this)">
         <span class="cat-emoji">💥</span><span class="cat-title">🎭 Effects &amp; Fun</span>
         <span class="cat-count">100 commands</span><span class="cat-arrow">▾</span>
       </div>
       <div class="cmd-grid" id="grid-effects"></div>
     </div>
-    <div class="cat-section collapsed" id="sec-mod">
+    <div class="cat-section" id="sec-mod">
       <div class="cat-header" onclick="toggleCat(this)">
         <span class="cat-emoji">🛡️</span><span class="cat-title">⚖️ Moderation &amp; Server</span>
         <span class="cat-count">100 commands</span><span class="cat-arrow">▾</span>
       </div>
       <div class="cmd-grid" id="grid-mod"></div>
     </div>
-    <div class="cat-section collapsed" id="sec-economy">
+    <div class="cat-section" id="sec-economy">
       <div class="cat-header" onclick="toggleCat(this)">
         <span class="cat-emoji">🎁</span><span class="cat-title">💰 Economy &amp; Items</span>
         <span class="cat-count">100 commands</span><span class="cat-arrow">▾</span>
       </div>
       <div class="cmd-grid" id="grid-economy"></div>
     </div>
-    <div class="cat-section collapsed" id="sec-gamemodes">
+    <div class="cat-section" id="sec-gamemodes">
       <div class="cat-header" onclick="toggleCat(this)">
         <span class="cat-emoji">👑</span><span class="cat-title">🎮 Game Modes &amp; Special</span>
         <span class="cat-count">100 commands</span><span class="cat-arrow">▾</span>
@@ -1770,8 +1846,8 @@ async function showPlayerRegistry() {
           <tr style="background:rgba(167,139,250,.06);border-bottom:1px solid var(--border)">
             <th style="padding:10px 16px;text-align:center;font-size:.65rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Rank</th>
             <th style="padding:10px 16px;text-align:left;font-size:.65rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Account</th>
-            <th style="padding:10px 16px;text-align:left;font-size:.65rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Coins</th>
-            <th style="padding:10px 16px;text-align:left;font-size:.65rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Wins</th>
+            <th style="padding:10px 16px;text-align:left;font-size:.65rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Eylux</th>
+            <th style="padding:10px 16px;text-align:left;font-size:.65rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Eyltrophs</th>
             <th style="padding:10px 16px;text-align:left;font-size:.65rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Badges</th>
           </tr>
         </thead>
@@ -1783,6 +1859,123 @@ async function showPlayerRegistry() {
 /* ══════════════════════════════════════════════════
    ACCOUNT HISTORY (LOGIN LOG)
 ══════════════════════════════════════════════════ */
+async function showJoinLogs() {
+  document.querySelectorAll('.as-link').forEach(l => l.classList.remove('active'));
+  try { event?.currentTarget?.classList.add('active'); } catch {}
+
+  const main = document.querySelector('.admin-main');
+  main.innerHTML = `<div style="text-align:center;padding:60px;color:var(--muted);font-size:.9rem;font-weight:700">⏳ Loading join logs…</div>`;
+
+  function fmtTime(ts) {
+    const d = new Date(ts);
+    return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  }
+
+  /* Fetch all registered users from backend — works from any device */
+  let backendUsers = [];
+  try {
+    const res = await fetch('http://localhost:3001/api/users/registry');
+    const data = await res.json();
+    backendUsers = Array.isArray(data) ? data : (data.users || []);
+  } catch {}
+
+  /* Also pull local login history */
+  const localHistory = (() => { try { return JSON.parse(localStorage.getItem('eylox_login_history') || '[]'); } catch { return []; } })();
+
+  /* Merge: backend users keyed by username, enrich with local login times */
+  const localMap = {};
+  localHistory.forEach(h => { localMap[h.username?.toLowerCase()] = h; });
+
+  const rows = backendUsers.length ? backendUsers.map((u, i) => {
+    const lh = localMap[(u.username || u.name || '').toLowerCase()];
+    const joinTs = u.createdAt ? new Date(u.createdAt).getTime() : (lh?.time || null);
+    const lastLogin = lh?.time ? fmtTime(lh.time) : '—';
+    const joinDate = joinTs ? fmtTime(joinTs) : '—';
+    const isOnline = lh?.time && (Date.now() - lh.time < 30 * 60 * 1000);
+    const username = u.username || u.name || '?';
+    return `
+    <tr>
+      <td style="color:var(--muted);padding:10px 14px;font-size:.78rem">${i+1}</td>
+      <td style="padding:10px 14px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#ec4899);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0">${username[0]?.toUpperCase()||'?'}</div>
+          <div>
+            <div style="font-family:'Fredoka One',cursive;font-size:.9rem;color:var(--text)">${username}</div>
+            <div style="font-size:.7rem;color:var(--muted)">@${username.toLowerCase()}_eylox</div>
+          </div>
+        </div>
+      </td>
+      <td style="padding:10px 14px;font-size:.78rem;color:var(--muted)">${joinDate}</td>
+      <td style="padding:10px 14px;font-size:.78rem;color:var(--muted)">${lastLogin}</td>
+      <td style="padding:10px 14px">
+        <span style="padding:2px 10px;border-radius:99px;font-size:.68rem;font-weight:900;${isOnline?'background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.3)':'background:rgba(167,139,250,.1);color:var(--muted);border:1px solid var(--border)'}">
+          ${isOnline ? '🟢 Online' : '⚫ Offline'}
+        </span>
+      </td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--muted);font-size:.88rem;font-weight:700">${backendUsers.length === 0 && localHistory.length === 0 ? 'No join data yet. Users will appear here when they register.' : 'Could not reach server — showing local history only.'}</td></tr>`;
+
+  const localOnlyRows = !backendUsers.length ? localHistory.map((h, i) => {
+    return `
+    <tr>
+      <td style="color:var(--muted);padding:10px 14px;font-size:.78rem">${i+1}</td>
+      <td style="padding:10px 14px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#ec4899);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0">${h.username?.[0]?.toUpperCase()||'?'}</div>
+          <div>
+            <div style="font-family:'Fredoka One',cursive;font-size:.9rem;color:var(--text)">${h.username}</div>
+            <div style="font-size:.7rem;color:var(--muted)">@${h.username?.toLowerCase()}_eylox</div>
+          </div>
+        </div>
+      </td>
+      <td style="padding:10px 14px;font-size:.78rem;color:var(--muted)">—</td>
+      <td style="padding:10px 14px;font-size:.78rem;color:var(--muted)">${fmtTime(h.time)}</td>
+      <td style="padding:10px 14px">
+        <span style="padding:2px 10px;border-radius:99px;font-size:.68rem;font-weight:900;background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.3)">✓ Logged In</span>
+      </td>
+    </tr>`;
+  }).join('') : '';
+
+  const finalRows = backendUsers.length ? rows : (localHistory.length ? localOnlyRows : rows);
+  const count = backendUsers.length || localHistory.length;
+  const sourceLabel = backendUsers.length ? `${backendUsers.length} registered players (all devices)` : `${localHistory.length} local sessions`;
+
+  main.innerHTML = `
+    <div style="margin-bottom:20px">
+      <h2 style="font-family:'Fredoka One',cursive;font-size:1.6rem;color:var(--text);margin-bottom:6px">📜 Join Logs</h2>
+      <p style="color:var(--muted);font-size:.85rem;font-weight:700">All accounts registered on Eylox — ${sourceLabel}</p>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+      <input id="jlSearch" placeholder="🔍 Search username…" style="flex:1;min-width:180px;background:rgba(167,139,250,.07);border:1px solid var(--border2);border-radius:10px;padding:10px 14px;color:var(--text);font-family:'Nunito',sans-serif;font-weight:700;font-size:.85rem;outline:none"/>
+      <button onclick="showAccountHistory()" style="background:rgba(167,139,250,.1);border:1px solid var(--border2);color:var(--muted);padding:10px 18px;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.82rem;cursor:pointer">📋 Login History</button>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border2);border-radius:16px;overflow:hidden">
+      <table id="jlTable" style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="background:rgba(167,139,250,.06);border-bottom:1px solid var(--border)">
+            <th style="padding:10px 14px;text-align:left;font-size:.68rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase">#</th>
+            <th style="padding:10px 14px;text-align:left;font-size:.68rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Player</th>
+            <th style="padding:10px 14px;text-align:left;font-size:.68rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Joined</th>
+            <th style="padding:10px 14px;text-align:left;font-size:.68rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Last Seen</th>
+            <th style="padding:10px 14px;text-align:left;font-size:.68rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Status</th>
+          </tr>
+        </thead>
+        <tbody id="jlBody" style="color:var(--text)">${finalRows}</tbody>
+      </table>
+    </div>
+  `;
+  const searchEl = document.getElementById('jlSearch');
+  if (searchEl) {
+    searchEl.addEventListener('input', function() {
+      const q = this.value.toLowerCase().trim();
+      document.querySelectorAll('#jlBody tr').forEach(row => {
+        row.style.display = (!q || row.textContent.toLowerCase().includes(q)) ? 'table-row' : 'none';
+      });
+    });
+    searchEl.focus();
+  }
+}
+
 function showAccountHistory() {
   document.querySelectorAll('.as-link').forEach(l => l.classList.remove('active'));
   try { event.currentTarget.classList.add('active'); } catch {}
@@ -1885,8 +2078,632 @@ restoreCommandView(null);
 addLog('🟢 Admin panel loaded. Welcome, ' + (document.getElementById('atName').textContent || 'Owner') + '!', 'ok');
 addLog('ℹ️ Click a category in the sidebar to expand it, or type a command above.', 'info');
 
+/* ══════════════════════════════════════════════════
+   ANTI-CHEAT PANEL
+══════════════════════════════════════════════════ */
+
+/* Styles for AC panel */
+(function injectACStyles() {
+  const s = document.createElement('style');
+  s.textContent = `
+    .ac-wrap { margin-bottom: 20px; }
+    .ac-header { font-family: var(--font-h); font-size: 1.1rem; color: var(--red); margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+    .ac-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-bottom: 16px; }
+    .ac-stat { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; text-align: center; }
+    .ac-stat-val { font-family: var(--font-h); font-size: 1.5rem; }
+    .ac-stat-lbl { font-size: .68rem; color: var(--muted); font-weight: 800; text-transform: uppercase; letter-spacing: .5px; margin-top: 3px; }
+    .ac-log-wrap { background: var(--card); border: 1px solid var(--border2); border-radius: 14px; padding: 14px 18px; }
+    .ac-log-title { font-size: .72rem; font-weight: 900; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .ac-log { display: flex; flex-direction: column; gap: 4px; max-height: 260px; overflow-y: auto; font-family: var(--font-mono); font-size: .74rem; }
+    .ac-entry { display: flex; gap: 8px; align-items: flex-start; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,.03); }
+    .ac-entry:last-child { border: none; }
+    .ac-time { color: rgba(196,181,253,.7); flex-shrink: 0; }
+    .ac-badge { font-size: .6rem; font-weight: 900; padding: 1px 6px; border-radius: 99px; flex-shrink: 0; }
+    .ac-badge.critical { background: rgba(248,113,113,.15); color: var(--red); }
+    .ac-badge.warn     { background: rgba(253,230,138,.12); color: var(--yellow); }
+    .ac-badge.info     { background: rgba(96,165,250,.12);  color: var(--blue); }
+    .ac-detail { color: var(--text); flex: 1; }
+    .ac-report-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: rgba(124,58,237,.12); border: 1px solid rgba(167,139,250,.3); border-radius: 10px; font-size: .78rem; margin-bottom: 6px; }
+    .ac-report-row strong { color: var(--pink); }
+    .ac-report-actions { margin-left: auto; display: flex; gap: 6px; }
+    .ac-act-btn { background: rgba(167,139,250,.15); border: 1px solid rgba(167,139,250,.35); color: #d8c8f8; font-size: .65rem; font-weight: 800; padding: 3px 9px; border-radius: 99px; cursor: pointer; transition: all .15s; }
+    .ac-act-btn:hover { background: rgba(248,113,113,.18); color: var(--red); border-color: var(--red); }
+    .ac-act-btn.green:hover { background: rgba(74,222,128,.18); color: var(--green); border-color: var(--green); }
+  `;
+  document.head.appendChild(s);
+})();
+
+function showAntiCheatPanel() {
+  document.querySelectorAll('.as-link').forEach(l => l.classList.remove('active'));
+  try { event.currentTarget.classList.add('active'); } catch {}
+
+  const main  = document.querySelector('.admin-main');
+  const log   = window.EyloxAC?.getLog()   || JSON.parse(localStorage.getItem('eylox_ac_log')   || '[]');
+  const flags = window.EyloxAC?.getFlags() || log.filter(e => e.type === 'FLAG').length;
+  const bans  = window.EyloxAC?.getBanned()  || JSON.parse(localStorage.getItem('eylox_banned')   || '[]');
+  const warns  = window.EyloxAC?.getWarnings() || {};
+  const warnCount = Object.values(warns).flat().length;
+
+  main.innerHTML = `
+    <div style="margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <h2 style="font-family:'Fredoka One',cursive;font-size:1.6rem;color:var(--red);flex:1;margin:0">🛡️ Anti-Cheat Monitor</h2>
+      <span style="font-size:.8rem;color:var(--muted);font-weight:700">Live threat detection</span>
+      <button onclick="restoreCommandView(null)" style="background:rgba(167,139,250,.1);border:1px solid var(--border2);color:var(--muted);font-size:.72rem;font-weight:800;padding:5px 14px;border-radius:99px;cursor:pointer">← Back</button>
+    </div>
+    <div class="ac-grid">
+      <div class="ac-stat"><div class="ac-stat-val" style="color:var(--red)">${flags}</div><div class="ac-stat-lbl">🚩 Active Flags</div></div>
+      <div class="ac-stat"><div class="ac-stat-val" style="color:var(--yellow)">${warnCount}</div><div class="ac-stat-lbl">⚠️ Warnings Issued</div></div>
+      <div class="ac-stat"><div class="ac-stat-val" style="color:var(--pink)">${bans.length}</div><div class="ac-stat-lbl">🚫 Banned Players</div></div>
+      <div class="ac-stat"><div class="ac-stat-val" style="color:var(--green)">${log.length}</div><div class="ac-stat-lbl">📋 Log Entries</div></div>
+    </div>
+    <div class="ac-log-wrap">
+      <div class="ac-log-title"><div class="console-dot"></div> Security Event Log
+        <button style="margin-left:auto;background:none;border:1px solid var(--border);color:var(--muted);font-family:'Nunito',sans-serif;font-size:.7rem;font-weight:800;padding:3px 10px;border-radius:99px;cursor:pointer" onclick="clearACLog()">🧹 Clear</button>
+      </div>
+      <div class="ac-log" id="acLogList">${log.length ? log.slice(0,40).map(e => `
+        <div class="ac-entry">
+          <span class="ac-time">${new Date(e.ts).toLocaleTimeString()}</span>
+          <span class="ac-badge ${e.severity||'info'}">${e.type||'EVENT'}</span>
+          <span class="ac-detail">${e.user?'<strong>'+e.user+'</strong>: ':''}${e.detail||''}</span>
+        </div>`).join('') : '<div style="color:var(--muted);padding:20px 0;text-align:center;font-size:.85rem;font-weight:700">No security events logged yet. The system is watching 🛡️</div>'}</div>
+    </div>`;
+
+  updateACCounts();
+  addLog('🛡️ Anti-Cheat panel opened.', 'info');
+}
+
+function showReports() {
+  document.querySelectorAll('.as-link').forEach(l => l.classList.remove('active'));
+  try { event.currentTarget.classList.add('active'); } catch {}
+
+  const reports = window.EyloxAC?.getReports() || JSON.parse(localStorage.getItem('eylox_reports') || '[]');
+  const main = document.querySelector('.admin-main');
+
+  main.innerHTML = `
+    <div style="margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <h2 style="font-family:'Fredoka One',cursive;font-size:1.6rem;color:var(--red);flex:1;margin:0">🚨 Player Reports</h2>
+      <span style="font-size:.8rem;color:var(--muted);font-weight:700">${reports.length} report${reports.length!==1?'s':''}</span>
+      <button onclick="restoreCommandView(null)" style="background:rgba(167,139,250,.1);border:1px solid var(--border2);color:var(--muted);font-size:.72rem;font-weight:800;padding:5px 14px;border-radius:99px;cursor:pointer">← Back</button>
+    </div>
+    <div id="reportsContainer">
+      ${reports.length ? reports.slice(0,30).map(r => `
+        <div class="ac-report-row">
+          <div>
+            <strong>${r.reporter||'Anonymous'}</strong> reported <strong style="color:var(--pink)">${r.target||'?'}</strong>
+            <div style="font-size:.7rem;color:var(--muted);margin-top:3px">${r.reason||'No reason given'} · ${new Date(r.ts||Date.now()).toLocaleString()}</div>
+          </div>
+          <div class="ac-report-actions">
+            <button class="ac-act-btn" onclick="adminBanFromReport('${(r.target||'').replace(/'/g,"\\'")}','${(r.reason||'').replace(/'/g,"\\'")}')">🚫 Ban</button>
+            <button class="ac-act-btn" onclick="adminWarnFromReport('${(r.target||'').replace(/'/g,"\\'")}','${(r.reason||'').replace(/'/g,"\\'")}')">⚠️ Warn</button>
+            <button class="ac-act-btn green" onclick="dismissReport(this)">✓ Dismiss</button>
+          </div>
+        </div>`).join('') : '<div style="color:var(--muted);text-align:center;padding:40px;font-size:.9rem;font-weight:700;background:var(--card);border:1px solid var(--border2);border-radius:14px">No player reports yet.<br><span style="font-size:.78rem;opacity:.6">Reports from players will appear here.</span></div>'}
+    </div>`;
+
+  updateACCounts();
+  addLog('🚨 Reports panel opened.', 'info');
+}
+
+function showBanList() {
+  document.querySelectorAll('.as-link').forEach(l => l.classList.remove('active'));
+  try { event.currentTarget.classList.add('active'); } catch {}
+
+  const rawBans = window.EyloxAC?.getBanned() || JSON.parse(localStorage.getItem('eylox_banned') || '[]');
+  /* Normalize: support both string entries and {username,reason,ts} objects */
+  const bans = rawBans.map(b => typeof b === 'string' ? { username:b, reason:'Via :ban command', ts:Date.now() } : b);
+  const main = document.querySelector('.admin-main');
+
+  main.innerHTML = `
+    <div style="margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <h2 style="font-family:'Fredoka One',cursive;font-size:1.6rem;color:var(--red);flex:1;margin:0">🚫 Ban List</h2>
+      <span style="font-size:.8rem;color:var(--muted);font-weight:700">${bans.length} banned player${bans.length!==1?'s':''}</span>
+      <button onclick="restoreCommandView(null)" style="background:rgba(167,139,250,.1);border:1px solid var(--border2);color:var(--muted);font-size:.72rem;font-weight:800;padding:5px 14px;border-radius:99px;cursor:pointer">← Back</button>
+    </div>
+    <div id="banListContainer">
+      ${bans.length ? bans.map(b => `
+        <div class="ac-report-row" id="ban-row-${(b.username||'').replace(/[^a-z0-9]/gi,'_')}">
+          <div style="flex:1">
+            <strong style="color:var(--pink)">${b.username||'?'}</strong>
+            <div style="font-size:.72rem;color:var(--muted);margin-top:3px">Reason: ${b.reason||'None'} · ${b.ts ? new Date(b.ts).toLocaleString() : '—'}</div>
+          </div>
+          <div class="ac-report-actions">
+            <button class="ac-act-btn green" onclick="adminUnban('${(b.username||'').replace(/'/g,"\\'")}')">✓ Unban</button>
+          </div>
+        </div>`).join('') : '<div style="color:var(--muted);text-align:center;padding:40px;font-size:.9rem;font-weight:700;background:var(--card);border:1px solid var(--border2);border-radius:14px">No banned players.<br><span style="font-size:.78rem;opacity:.6">Use <code style="color:var(--purple)">:ban username</code> to ban a player.</span></div>'}
+    </div>`;
+
+  updateACCounts();
+  addLog('🚫 Ban list opened.', 'info');
+}
+
+function adminBanFromReport(username, reason) {
+  if (!window.EyloxAC) {
+    const bans = JSON.parse(localStorage.getItem('eylox_banned') || '[]');
+    bans.push({ username, reason, ts: Date.now() });
+    localStorage.setItem('eylox_banned', JSON.stringify(bans));
+  } else {
+    EyloxAC.banPlayer(username, reason);
+  }
+  addLog(`🚫 Banned ${username}: ${reason}`, 'err');
+  toast(`🚫 ${username} has been banned`, 'err');
+  updateACCounts();
+}
+
+function adminWarnFromReport(username, reason) {
+  if (window.EyloxAC) EyloxAC.warnPlayer(username, reason);
+  addLog(`⚠️ Warned ${username}: ${reason}`, 'warn');
+  toast(`⚠️ ${username} warned`, 'warn');
+}
+
+function adminUnban(username) {
+  if (!window.EyloxAC) {
+    const bans = JSON.parse(localStorage.getItem('eylox_banned') || '[]')
+      .filter(b => (typeof b === 'string' ? b : b.username) !== username);
+    localStorage.setItem('eylox_banned', JSON.stringify(bans));
+  } else {
+    EyloxAC.unbanPlayer(username);
+  }
+  addLog(`✅ Unbanned ${username}`, 'ok');
+  toast(`✅ ${username} unbanned`, 'ok');
+  updateACCounts();
+  showBanList();
+}
+
+function dismissReport(btn) {
+  btn.closest('.ac-report-row')?.remove();
+}
+
+function clearACLog() {
+  localStorage.removeItem('eylox_ac_log');
+  if (window.EyloxAC?.clearFlags) EyloxAC.clearFlags();
+  document.getElementById('acLogList').innerHTML = '<div style="color:var(--muted);padding:12px 0;text-align:center">Log cleared.</div>';
+  addLog('🧹 AC log cleared by admin.', 'info');
+  updateACCounts();
+}
+
+function updateACCounts() {
+  const log   = JSON.parse(localStorage.getItem('eylox_ac_log') || '[]');
+  const bans  = JSON.parse(localStorage.getItem('eylox_banned') || '[]');
+  const reps  = JSON.parse(localStorage.getItem('eylox_reports') || '[]');
+  const flags = log.filter(e => e.type === 'FLAG').length;
+  const fc = document.getElementById('acFlagCount');
+  const rc = document.getElementById('acReportCount');
+  const bc = document.getElementById('acBanCount');
+  if (fc) fc.textContent = flags;
+  if (rc) rc.textContent = reps.length;
+  if (bc) bc.textContent = bans.length;
+  /* Update main stats */
+  const stBans = document.getElementById('st-bans');
+  if (stBans) stBans.textContent = bans.length;
+}
+
+/* Live AC event listener */
+window.addEventListener('eylox:anticheat', e => {
+  const entry = e.detail;
+  addLog(`🛡️ [AC] ${entry.type}: ${entry.detail}`, entry.severity === 'critical' ? 'err' : 'warn');
+  updateACCounts();
+  /* Flash the sidebar count */
+  const fc = document.getElementById('acFlagCount');
+  if (fc) {
+    fc.style.background = 'rgba(248,113,113,.35)';
+    fc.style.color = '#f87171';
+    setTimeout(() => { fc.style.background = ''; fc.style.color = ''; }, 2000);
+  }
+});
+
+/* Init AC counts on load */
+updateACCounts();
+
+/* ══════════════════════════════════════════════════
+   AI MODERATION PANEL
+══════════════════════════════════════════════════ */
+(function injectModStyles() {
+  const s = document.createElement('style');
+  s.textContent = `
+    .mod-panel { margin-bottom: 20px; }
+    .mod-header { font-family: var(--font-h); font-size: 1.1rem; color: var(--purple); margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+    .mod-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px; }
+    .mod-stat { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; text-align: center; }
+    .mod-stat-val { font-family: var(--font-h); font-size: 1.5rem; }
+    .mod-stat-lbl { font-size: .66rem; color: var(--muted); font-weight: 800; text-transform: uppercase; letter-spacing: .4px; margin-top: 3px; }
+    .mod-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+    .mod-filter { background: rgba(167,139,250,.12); border: 1px solid rgba(167,139,250,.35); color: #d8c8f8; font-size: .72rem; font-weight: 800; padding: 4px 12px; border-radius: 99px; cursor: pointer; transition: all .15s; }
+    .mod-filter.active { background: linear-gradient(135deg,#7c3aed,#a78bfa); color: #fff; border-color: transparent; }
+    .mod-log-wrap { background: var(--card); border: 1px solid var(--border2); border-radius: 14px; padding: 14px 18px; }
+    .mod-log-title { font-size: .72rem; font-weight: 900; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .mod-log { display: flex; flex-direction: column; gap: 4px; max-height: 300px; overflow-y: auto; }
+    .mod-entry { display: flex; gap: 8px; align-items: flex-start; padding: 7px 10px; border-radius: 8px; background: rgba(124,58,237,.1); border: 1px solid rgba(167,139,250,.2); transition: background .14s; }
+    .mod-entry:hover { background: rgba(167,139,250,.09); }
+    .mod-entry-time { color: rgba(196,181,253,.7); flex-shrink: 0; font-family: var(--font-mono); font-size: .68rem; padding-top: 1px; }
+    .mod-badge { font-size: .58rem; font-weight: 900; padding: 1px 6px; border-radius: 99px; flex-shrink: 0; white-space: nowrap; }
+    .mod-badge.critical { background: rgba(248,113,113,.15); color: var(--red); border: 1px solid rgba(248,113,113,.3); }
+    .mod-badge.warn     { background: rgba(253,230,138,.12); color: var(--yellow); border: 1px solid rgba(253,230,138,.25); }
+    .mod-badge.info     { background: rgba(96,165,250,.12);  color: var(--blue); border: 1px solid rgba(96,165,250,.25); }
+    .mod-detail { color: var(--text); flex: 1; font-size: .76rem; font-weight: 700; line-height: 1.3; }
+    .mod-detail strong { color: var(--pink); }
+    .mod-user-chip { display: inline-flex; align-items: center; gap: 3px; background: rgba(244,114,182,.1); border: 1px solid rgba(244,114,182,.25); color: var(--pink); border-radius: 99px; padding: 0 6px; font-size: .65rem; font-weight: 900; margin-right: 4px; }
+    .mod-actions { display: flex; gap: 5px; flex-shrink: 0; }
+    .mod-act { background: rgba(167,139,250,.15); border: 1px solid rgba(167,139,250,.35); color: #d8c8f8; font-size: .62rem; font-weight: 900; padding: 2px 8px; border-radius: 99px; cursor: pointer; transition: all .14s; }
+    .mod-act:hover { background: rgba(248,113,113,.18); color: var(--red); border-color: var(--red); }
+    .mod-act.green:hover { background: rgba(74,222,128,.18); color: var(--green); border-color: var(--green); }
+    .mod-rule-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 14px; background: rgba(124,58,237,.1); border: 1px solid rgba(167,139,250,.22); border-radius: 10px; margin-bottom: 6px; }
+    .mod-rule-info { flex: 1; }
+    .mod-rule-name { font-size: .82rem; font-weight: 800; color: var(--text); }
+    .mod-rule-desc { font-size: .7rem; color: var(--muted); font-weight: 700; margin-top: 2px; }
+    .mod-toggle { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
+    .mod-toggle input { opacity: 0; width: 0; height: 0; }
+    .mod-toggle-slider { position: absolute; inset: 0; background: rgba(167,139,250,.15); border-radius: 99px; cursor: pointer; transition: .2s; border: 1px solid rgba(167,139,250,.25); }
+    .mod-toggle-slider::before { content: ''; position: absolute; width: 14px; height: 14px; left: 2px; top: 2px; background: rgba(167,139,250,.5); border-radius: 50%; transition: .2s; }
+    .mod-toggle input:checked + .mod-toggle-slider { background: rgba(74,222,128,.25); border-color: rgba(74,222,128,.4); }
+    .mod-toggle input:checked + .mod-toggle-slider::before { transform: translateX(16px); background: var(--green); }
+  `;
+  document.head.appendChild(s);
+})();
+
+function showAIModerationPanel() {
+  document.querySelectorAll('.as-link').forEach(l => l.classList.remove('active'));
+  try { event.currentTarget.classList.add('active'); } catch {}
+
+  const main  = document.querySelector('.admin-main');
+  const log   = window.EyloxMod ? EyloxMod.getLog()   : JSON.parse(localStorage.getItem('eylox_mod_log')   || '[]');
+  const stats = window.EyloxMod ? EyloxMod.getStats()  : { bad:0, spam:0, exploit:0, fake:0, hacker:0 };
+  const totalFlags = log.length;
+
+  /* Rules config stored in localStorage */
+  const rulesKey = 'eylox_mod_rules';
+  let rules;
+  try { rules = JSON.parse(localStorage.getItem(rulesKey) || 'null'); } catch { rules = null; }
+  if (!rules) {
+    rules = { badwords: true, spam: true, repeat: true, exploit: true, fakeaccount: true, hacker: true };
+    localStorage.setItem(rulesKey, JSON.stringify(rules));
+  }
+
+  function renderLog(filter) {
+    const entries = filter ? log.filter(e => {
+      const typeMap = {
+        badwords: ['BAD_WORD'], spam: ['SPAM','REPEAT_SPAM'],
+        exploit: ['EXPLOIT','COIN_EXPLOIT'], fake: ['FAKE_ACCOUNT','BOT_PATTERN'],
+        hacker: ['HACKER','LS_TAMPER']
+      };
+      return (typeMap[filter] || []).includes(e.type);
+    }) : log;
+
+    if (!entries.length) return '<div style="color:var(--muted);text-align:center;padding:24px;font-size:.85rem;font-weight:700">No events detected yet. The AI is watching 👁️</div>';
+    return entries.slice(0, 60).map(e => `
+      <div class="mod-entry">
+        <span class="mod-entry-time">${new Date(e.ts).toLocaleTimeString()}</span>
+        <span class="mod-badge ${e.severity}">${e.type.replace(/_/g,' ')}</span>
+        ${e.user ? `<span class="mod-user-chip">👤 ${e.user}</span>` : ''}
+        <span class="mod-detail">${e.detail}</span>
+        <div class="mod-actions">
+          ${e.user ? `<button class="mod-act" onclick="modBanUser('${e.user}')">🚫 Ban</button>` : ''}
+          ${e.user ? `<button class="mod-act green" onclick="modDismissEntry(this)">✓</button>` : ''}
+        </div>
+      </div>`).join('');
+  }
+
+  main.innerHTML = `
+    <div class="mod-panel">
+      <div class="mod-header">
+        🤖 AI Moderation
+        <span style="font-family:var(--font-b);font-size:.74rem;color:var(--muted);font-weight:700">Auto-detection engine · ${totalFlags} events</span>
+        <button onclick="restoreCommandView(null)" style="margin-left:auto;background:rgba(167,139,250,.1);border:1px solid var(--border2);color:var(--muted);font-size:.72rem;font-weight:800;padding:5px 14px;border-radius:99px;cursor:pointer">← Back</button>
+      </div>
+
+      <!-- Stats -->
+      <div class="mod-stats">
+        <div class="mod-stat"><div class="mod-stat-val" style="color:var(--red)">${stats.bad||0}</div><div class="mod-stat-lbl">🤬 Bad Words</div></div>
+        <div class="mod-stat"><div class="mod-stat-val" style="color:var(--yellow)">${stats.spam||0}</div><div class="mod-stat-lbl">📨 Spam</div></div>
+        <div class="mod-stat"><div class="mod-stat-val" style="color:var(--orange)">${stats.exploit||0}</div><div class="mod-stat-lbl">⚡ Exploits</div></div>
+        <div class="mod-stat"><div class="mod-stat-val" style="color:var(--blue)">${stats.fake||0}</div><div class="mod-stat-lbl">🤖 Fake Accts</div></div>
+        <div class="mod-stat"><div class="mod-stat-val" style="color:var(--pink)">${stats.hacker||0}</div><div class="mod-stat-lbl">💀 Hackers</div></div>
+        <div class="mod-stat"><div class="mod-stat-val" style="color:var(--green)">${totalFlags}</div><div class="mod-stat-lbl">📋 Total Flags</div></div>
+      </div>
+
+      <!-- Detection Rules -->
+      <div style="background:var(--card);border:1px solid var(--border2);border-radius:14px;padding:14px 18px;margin-bottom:16px">
+        <div class="mod-log-title">⚙️ Detection Rules</div>
+        ${[
+          ['badwords', '🤬 Bad Word Filter',     'Blocks messages containing offensive or forbidden words'],
+          ['spam',     '📨 Spam Detection',      'Flags users sending more than 5 messages in 8 seconds'],
+          ['repeat',   '🔁 Repeat Message',      'Detects when a user sends the same message multiple times'],
+          ['exploit',  '⚡ Exploit Detection',   'Alerts when coin / win counts exceed legitimate limits'],
+          ['fakeaccount','🤖 Fake Account',      'Identifies usernames matching bot / fake account patterns'],
+          ['hacker',   '💀 Hacker Detection',    'Detects sudden localStorage jumps and integrity mismatches'],
+        ].map(([key, name, desc]) => `
+          <div class="mod-rule-row">
+            <div class="mod-rule-info">
+              <div class="mod-rule-name">${name}</div>
+              <div class="mod-rule-desc">${desc}</div>
+            </div>
+            <label class="mod-toggle">
+              <input type="checkbox" ${rules[key] ? 'checked' : ''} onchange="modToggleRule('${key}', this.checked)"/>
+              <span class="mod-toggle-slider"></span>
+            </label>
+          </div>`).join('')}
+      </div>
+
+      <!-- Log -->
+      <div class="mod-log-wrap">
+        <div class="mod-log-title">
+          <div class="console-dot"></div>
+          Detection Log
+          <div class="mod-filters" id="modFilters" style="margin-left:10px;margin-bottom:0">
+            <span class="mod-filter active" onclick="modFilter('',this)">All</span>
+            <span class="mod-filter" onclick="modFilter('badwords',this)">🤬 Words</span>
+            <span class="mod-filter" onclick="modFilter('spam',this)">📨 Spam</span>
+            <span class="mod-filter" onclick="modFilter('exploit',this)">⚡ Exploit</span>
+            <span class="mod-filter" onclick="modFilter('fake',this)">🤖 Fake</span>
+            <span class="mod-filter" onclick="modFilter('hacker',this)">💀 Hack</span>
+          </div>
+          <button style="margin-left:auto;background:none;border:1px solid var(--border);color:var(--muted);font-family:var(--font-b);font-size:.7rem;font-weight:800;padding:3px 10px;border-radius:99px;cursor:pointer" onclick="modClearLog()">🧹 Clear</button>
+        </div>
+        <div class="mod-log" id="modLogList">${renderLog('')}</div>
+      </div>
+    </div>`;
+
+  /* store renderLog for re-use by filter buttons */
+  window._modRenderLog = renderLog;
+  addLog('🤖 AI Moderation panel opened.', 'info');
+  updateModCount();
+}
+
+function modFilter(type, btn) {
+  document.querySelectorAll('.mod-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const list = document.getElementById('modLogList');
+  if (list && window._modRenderLog) list.innerHTML = window._modRenderLog(type);
+}
+
+function modToggleRule(key, val) {
+  const rulesKey = 'eylox_mod_rules';
+  let rules; try { rules = JSON.parse(localStorage.getItem(rulesKey) || '{}'); } catch { rules = {}; }
+  rules[key] = val;
+  localStorage.setItem(rulesKey, JSON.stringify(rules));
+  toast(`${val ? '✅' : '❌'} ${key} rule ${val ? 'enabled' : 'disabled'}`, val ? 'var(--green)' : 'var(--red)');
+  addLog(`${val ? '✅' : '❌'} AI Mod rule "${key}" ${val ? 'enabled' : 'disabled'}`, val ? 'ok' : 'warn');
+}
+
+function modBanUser(username) {
+  const bans = JSON.parse(localStorage.getItem('eylox_banned') || '[]');
+  if (!bans.find(b => (b.username || b) === username)) {
+    bans.push({ username, reason: 'AI Moderation flag', ts: Date.now() });
+    localStorage.setItem('eylox_banned', JSON.stringify(bans));
+  }
+  addLog(`🚫 AI Mod banned ${username}`, 'err');
+  toast(`🚫 ${username} banned by AI Mod`, 'var(--red)');
+  updateACCounts();
+}
+
+function modDismissEntry(btn) {
+  btn.closest('.mod-entry')?.remove();
+}
+
+function modClearLog() {
+  if (window.EyloxMod) EyloxMod.clearLog();
+  else { localStorage.removeItem('eylox_mod_log'); localStorage.removeItem('eylox_mod_flags'); localStorage.removeItem('eylox_mod_stats'); }
+  const list = document.getElementById('modLogList');
+  if (list) list.innerHTML = '<div style="color:var(--muted);text-align:center;padding:24px;font-size:.85rem;font-weight:700">Log cleared.</div>';
+  addLog('🧹 Moderation log cleared by admin.', 'info');
+  updateModCount();
+}
+
+function updateModCount() {
+  const log   = JSON.parse(localStorage.getItem('eylox_mod_log') || '[]');
+  const flags = JSON.parse(localStorage.getItem('eylox_mod_flags') || '{}');
+  const el    = document.getElementById('modFlagCount');
+  if (el) el.textContent = Object.keys(flags).length || log.filter(e => e.severity === 'critical').length;
+}
+
+/* Live moderation event listener */
+window.addEventListener('eylox:moderation', e => {
+  addLog(`🤖 [AI Mod] ${e.detail.type}: ${e.detail.detail}`, e.detail.severity === 'critical' ? 'err' : 'warn');
+  updateModCount();
+  const el = document.getElementById('modFlagCount');
+  if (el) { el.style.background = 'rgba(248,113,113,.35)'; el.style.color = '#f87171'; setTimeout(() => { el.style.background=''; el.style.color=''; }, 2000); }
+});
+
+/* ══════════════════════════════════════════════════
+   VERIFICATION PANEL
+══════════════════════════════════════════════════ */
+(function injectVerStyles() {
+  const s = document.createElement('style');
+  s.textContent = `
+    .ver-panel { margin-bottom: 20px; }
+    .ver-header { font-family: var(--font-h); font-size: 1.1rem; color: var(--teal); margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+    .ver-type-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 10px; margin-bottom: 18px; }
+    .ver-type-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; text-align: center; cursor: pointer; transition: border-color .15s, transform .15s; }
+    .ver-type-card:hover { border-color: rgba(167,139,250,.4); transform: translateY(-2px); }
+    .ver-type-card.selected { border-color: var(--purple); background: rgba(167,139,250,.08); }
+    .ver-type-icon { font-size: 1.8rem; margin-bottom: 6px; }
+    .ver-type-name { font-size: .78rem; font-weight: 900; color: var(--text); }
+    .ver-type-count { font-size: .66rem; color: var(--muted); font-weight: 700; margin-top: 3px; }
+    .ver-grant-form { background: var(--card); border: 1px solid var(--border2); border-radius: 14px; padding: 16px 18px; margin-bottom: 16px; }
+    .ver-grant-title { font-size: .72rem; font-weight: 900; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+    .ver-grant-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .ver-input { flex: 1; min-width: 160px; background: rgba(167,139,250,.07); border: 1px solid var(--border2); border-radius: 10px; padding: 10px 14px; color: var(--text); font-family: var(--font-b); font-size: .88rem; font-weight: 700; outline: none; transition: border-color .15s; }
+    .ver-input:focus { border-color: var(--purple); }
+    .ver-type-select { background: rgba(167,139,250,.07); border: 1px solid var(--border2); border-radius: 10px; padding: 10px 12px; color: var(--text); font-family: var(--font-b); font-size: .85rem; font-weight: 700; outline: none; cursor: pointer; }
+    .ver-grant-btn { background: linear-gradient(135deg,#2dd4bf,#0891b2); color: #fff; border: none; border-radius: 10px; padding: 10px 20px; font-family: var(--font-b); font-weight: 900; font-size: .88rem; cursor: pointer; transition: opacity .15s; white-space: nowrap; }
+    .ver-grant-btn:hover { opacity: .88; }
+    .ver-list-wrap { background: var(--card); border: 1px solid var(--border2); border-radius: 14px; overflow: hidden; }
+    .ver-list-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--border); }
+    .ver-list-title { font-size: .72rem; font-weight: 900; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+    .ver-row { display: flex; align-items: center; gap: 12px; padding: 11px 18px; border-bottom: 1px solid rgba(167,139,250,.05); transition: background .14s; }
+    .ver-row:last-child { border-bottom: none; }
+    .ver-row:hover { background: rgba(167,139,250,.05); }
+    .ver-av { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg,#7c3aed,#ec4899); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+    .ver-name { font-family: var(--font-h); font-size: .95rem; flex: 1; }
+    .ver-badge-chip { display: inline-flex; align-items: center; gap: 4px; border-radius: 99px; padding: 3px 10px; font-size: .68rem; font-weight: 900; }
+    .ver-date { font-size: .68rem; color: var(--muted); font-weight: 700; }
+    .ver-revoke-btn { background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.25); color: var(--red); font-size: .66rem; font-weight: 900; padding: 3px 10px; border-radius: 99px; cursor: pointer; transition: all .14s; }
+    .ver-revoke-btn:hover { background: rgba(248,113,113,.25); }
+    .ver-empty { padding: 32px; text-align: center; color: var(--muted); font-size: .88rem; font-weight: 700; }
+  `;
+  document.head.appendChild(s);
+})();
+
+function showVerificationPanel() {
+  document.querySelectorAll('.as-link').forEach(l => l.classList.remove('active'));
+  try { event.currentTarget.classList.add('active'); } catch {}
+
+  const main = document.querySelector('.admin-main');
+  const VER_KEY = 'eylox_verified_users';
+
+  function getVerified() { try { return JSON.parse(localStorage.getItem(VER_KEY) || '{}'); } catch { return {}; } }
+
+  const BADGE_TYPES = {
+    creator:   { label: 'Creator',       icon: '✔️',  color: '#a78bfa', bg: 'rgba(167,139,250,.15)' },
+    youtuber:  { label: 'YouTuber',      icon: '📺',  color: '#f87171', bg: 'rgba(248,113,113,.15)' },
+    developer: { label: 'Developer',     icon: '💻',  color: '#60a5fa', bg: 'rgba(96,165,250,.15)'  },
+    famous:    { label: 'Famous Player', icon: '🌟',  color: '#fbbf24', bg: 'rgba(251,191,36,.15)'  },
+  };
+
+  function renderList() {
+    const all = getVerified();
+    const entries = Object.entries(all);
+    if (!entries.length) return '<div class="ver-empty">No verified users yet.<br><span style="font-size:.78rem;color:rgba(196,181,253,.75)">Use the form above to grant badges</span></div>';
+    return entries.map(([username, data]) => {
+      const bt = BADGE_TYPES[data.type] || BADGE_TYPES.creator;
+      const av = username[0]?.toUpperCase() || '?';
+      const date = new Date(data.grantedAt || Date.now()).toLocaleDateString();
+      return `
+        <div class="ver-row" id="ver-row-${username}">
+          <div class="ver-av">${av}</div>
+          <div class="ver-name">${username}</div>
+          <span class="ver-badge-chip" style="background:${bt.bg};color:${bt.color}">${bt.icon} ${bt.label}</span>
+          <span class="ver-date">Since ${date}</span>
+          <button class="ver-revoke-btn" onclick="verRevoke('${username}')">✕ Revoke</button>
+        </div>`;
+    }).join('');
+  }
+
+  function getTypeCounts() {
+    const all = getVerified();
+    const counts = { creator:0, youtuber:0, developer:0, famous:0 };
+    Object.values(all).forEach(v => { if (counts[v.type] !== undefined) counts[v.type]++; });
+    return counts;
+  }
+
+  const counts = getTypeCounts();
+
+  main.innerHTML = `
+    <div class="ver-panel">
+      <div class="ver-header">
+        ✅ Verification System
+        <span style="font-family:var(--font-b);font-size:.74rem;color:var(--muted);font-weight:700">${Object.keys(getVerified()).length} verified users</span>
+        <button onclick="restoreCommandView(null)" style="margin-left:auto;background:rgba(167,139,250,.1);border:1px solid var(--border2);color:var(--muted);font-size:.72rem;font-weight:800;padding:5px 14px;border-radius:99px;cursor:pointer">← Back</button>
+      </div>
+
+      <!-- Badge type cards -->
+      <div class="ver-type-grid">
+        ${Object.entries(BADGE_TYPES).map(([key, bt]) => `
+          <div class="ver-type-card" onclick="verSelectType('${key}',this)">
+            <div class="ver-type-icon">${bt.icon}</div>
+            <div class="ver-type-name">${bt.label}</div>
+            <div class="ver-type-count">${counts[key] || 0} verified</div>
+          </div>`).join('')}
+      </div>
+
+      <!-- Grant form -->
+      <div class="ver-grant-form">
+        <div class="ver-grant-title">➕ Grant Verification Badge</div>
+        <div class="ver-grant-row">
+          <input class="ver-input" id="verUsername" placeholder="Enter username…" autocomplete="off"/>
+          <select class="ver-type-select" id="verTypeSelect">
+            ${Object.entries(BADGE_TYPES).map(([key, bt]) => `<option value="${key}">${bt.icon} ${bt.label}</option>`).join('')}
+          </select>
+          <button class="ver-grant-btn" onclick="verGrant()">✅ Verify</button>
+        </div>
+      </div>
+
+      <!-- Verified users list -->
+      <div class="ver-list-wrap">
+        <div class="ver-list-header">
+          <span class="ver-list-title">✅ Verified Users</span>
+          <input id="verSearch" placeholder="🔍 Search…" style="background:rgba(167,139,250,.07);border:1px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--text);font-family:var(--font-b);font-size:.78rem;font-weight:700;outline:none;width:160px" oninput="verSearch(this.value)"/>
+        </div>
+        <div id="verList">${renderList()}</div>
+      </div>
+    </div>`;
+
+  /* store helpers for onclick handlers */
+  window._verGetVerified  = getVerified;
+  window._verRenderList   = renderList;
+  window._verBadgeTypes   = BADGE_TYPES;
+  window._verKey          = VER_KEY;
+
+  addLog('✅ Verification panel opened.', 'info');
+  updateVerCount();
+}
+
+function verSelectType(type, card) {
+  document.querySelectorAll('.ver-type-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  const sel = document.getElementById('verTypeSelect');
+  if (sel) sel.value = type;
+}
+
+function verGrant() {
+  const inp  = document.getElementById('verUsername');
+  const sel  = document.getElementById('verTypeSelect');
+  if (!inp || !sel) return;
+  const username = inp.value.trim();
+  const type     = sel.value;
+  if (!username) { toast('⚠️ Enter a username', 'var(--yellow)'); return; }
+
+  const all = window._verGetVerified ? window._verGetVerified() : JSON.parse(localStorage.getItem(window._verKey || 'eylox_verified_users') || '{}');
+  const bt  = (window._verBadgeTypes || {})[type] || { label: type, icon: '✔️' };
+  all[username] = { type, grantedAt: Date.now() };
+  localStorage.setItem(window._verKey || 'eylox_verified_users', JSON.stringify(all));
+
+  inp.value = '';
+  const list = document.getElementById('verList');
+  if (list && window._verRenderList) list.innerHTML = window._verRenderList();
+
+  addLog(`✅ Verified ${username} as ${bt.icon} ${bt.label}`, 'ok');
+  toast(`✅ ${username} is now a Verified ${bt.label}!`, 'var(--teal)');
+  updateVerCount();
+}
+
+function verRevoke(username) {
+  if (!confirm(`Revoke verification for ${username}?`)) return;
+  const all = JSON.parse(localStorage.getItem(window._verKey || 'eylox_verified_users') || '{}');
+  delete all[username];
+  localStorage.setItem(window._verKey || 'eylox_verified_users', JSON.stringify(all));
+  document.getElementById('ver-row-' + username)?.remove();
+  const list = document.getElementById('verList');
+  if (list && window._verRenderList) list.innerHTML = window._verRenderList();
+  addLog(`❌ Revoked verification for ${username}`, 'warn');
+  toast(`❌ ${username} verification revoked`, 'var(--red)');
+  updateVerCount();
+}
+
+function verSearch(q) {
+  const lq = q.toLowerCase().trim();
+  document.querySelectorAll('#verList .ver-row').forEach(row => {
+    row.style.display = (!lq || row.textContent.toLowerCase().includes(lq)) ? 'flex' : 'none';
+  });
+}
+
+function updateVerCount() {
+  const all  = JSON.parse(localStorage.getItem('eylox_verified_users') || '{}');
+  const el   = document.getElementById('verifiedCount');
+  if (el) el.textContent = Object.keys(all).length;
+}
+
+/* Init AI tool counts on load */
+updateModCount();
+updateVerCount();
 
 </script>
 <script src="security.js"></script>
+<script src="anticheat.js"></script>
+<script src="moderation.js"></script>
+<script src="verification.js"></script>
+<script src="floating-actions.js"></script>
+  <script src="tooltip.js"></script>
+<script src="sw-register.js"></script>
+<script src="offline.js" defer></script>
 </body>
 </html>

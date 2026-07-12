@@ -1,9 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>∞ Eylox — Login</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#7c3aed" />
   <link rel="stylesheet" href="style.css" />
   <script>
     /* If already logged in, skip login page */
@@ -12,6 +14,8 @@
       if (hasSession) window.location.replace('index.html');
     } catch {}
   </script>
+<script src="audit-loader.js" defer></script>
+  <script src="debug-dashboard.js" defer></script>
 </head>
 <body>
 <div class="login-page">
@@ -138,11 +142,12 @@ function swapUserShop(newUsername, alwaysClear) {
     localStorage.setItem('eylox_shop_u_' + prev.toLowerCase(), JSON.stringify(d));
   }
   if (alwaysClear) {
-    // New account — always start with a blank shop
+    // New account — always start with a blank shop and no profile picture
     localStorage.removeItem('eylox_owned_items');
     localStorage.removeItem('eylox_equipped');
     localStorage.removeItem('eylox_inventory');
     localStorage.removeItem('eylox_shop_u_' + newUsername.toLowerCase());
+    localStorage.removeItem('eylox_profile_pic');
     return;
   }
   // Returning login — restore their saved shop
@@ -299,16 +304,34 @@ document.getElementById('loginForm').addEventListener('submit', async e => {
       localStorage.setItem('eylox_shop_token', newToken);
       window.location.href = 'index.html';
     } else {
-      /* Server offline — save session with entered username so it persists */
+      /* Server offline — restore saved progress or create fresh user */
       const newToken = 'offline_' + Date.now();
-      const offlineUser = { _id: 'local_' + username, username, avatar: '🎮', coins: 100, wins: 0, badges: [], recentlyPlayed: [], createdAt: Date.now() };
+      const savedStr = localStorage.getItem('eylox_save_' + username.toLowerCase());
+      let offlineUser;
+      if (savedStr) {
+        try {
+          offlineUser = JSON.parse(savedStr);
+          offlineUser.username = offlineUser.username || username; /* ensure username matches */
+        } catch { offlineUser = null; }
+      }
+      if (!offlineUser) {
+        offlineUser = { _id: 'local_' + username, username, avatar: '🎮', coins: 100, wins: 0, badges: [], recentlyPlayed: [], createdAt: Date.now() };
+      }
       localStorage.setItem('eylox_token', newToken);
       localStorage.setItem('eylox_user',  JSON.stringify(offlineUser));
       localStorage.removeItem('eylox_guest');
       swapUserShop(username);
       localStorage.setItem('eylox_shop_token', newToken);
+      /* Restore AI data, friends, and profile picture if saved */
+      const savedAi  = localStorage.getItem('eylox_save_ai_' + username.toLowerCase());
+      const savedFr  = localStorage.getItem('eylox_save_friends_' + username.toLowerCase());
+      const savedPic = localStorage.getItem('eylox_save_pic_' + username.toLowerCase());
+      if (savedAi)  localStorage.setItem('eylox_ai_data', savedAi);
+      if (savedFr)  localStorage.setItem('eylox_friends', savedFr);
+      if (savedPic) localStorage.setItem('eylox_profile_pic', savedPic);
+      else          localStorage.removeItem('eylox_profile_pic');
       if (window.EyloxLoginSuccess) window.EyloxLoginSuccess();
-      btn.textContent = '🎮 Welcome, ' + username + '!';
+      btn.textContent = '🎮 Welcome back, ' + username + '!';
       setTimeout(() => { window.location.href = 'index.html'; }, 700);
     }
   } catch (err) {
@@ -322,5 +345,13 @@ document.getElementById('loginForm').addEventListener('submit', async e => {
   }
 });
 </script>
+<script src="tooltip.js"></script>
+<script src="sw-register.js"></script>
+<script src="offline.js" defer></script>
+
 </body>
 </html>
+
+<script type="module">
+  // Login code here
+</script>

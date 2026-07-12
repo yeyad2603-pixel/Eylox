@@ -1,9 +1,14 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>∞ Eylox — Leaderboard</title>
+  <title>Eylox — Leaderboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#7c3aed"/>
   <link rel="stylesheet" href="style.css"/>
   <script>
     try {
@@ -11,301 +16,493 @@
       if (!s) window.location.replace('landing.html');
     } catch {}
   </script>
+  <style>
+.lb-hero {
+  background: linear-gradient(160deg,#1a0d2e 0%,#0d0115 60%,#1a0a00 100%);
+  border:1px solid rgba(167,139,250,.18); border-radius:20px;
+  padding:36px 32px 32px; margin-bottom:24px;
+  text-align:center; position:relative; overflow:hidden;
+}
+.lb-hero::before {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(167,139,250,.12) 0%,transparent 65%);
+  pointer-events:none;
+}
+.lb-hero-label { font-size:.7rem; font-weight:900; letter-spacing:2px; color:var(--blue); text-transform:uppercase; margin-bottom:8px; }
+.lb-hero-title { font-family:var(--font-head); font-size:2.4rem; margin:0 0 6px; color:#fff; }
+.lb-hero-sub { color:rgba(180,160,220,.5); font-size:.85rem; font-weight:700; margin-bottom:28px; }
+
+.lb-podium { display:flex; justify-content:center; align-items:flex-end; min-height:180px; gap:16px; flex-wrap:wrap; }
+.lb-pod {
+  background:rgba(167,139,250,.08); border:1px solid rgba(167,139,250,.18);
+  border-radius:16px; padding:20px 16px; text-align:center; min-width:130px;
+}
+.lb-pod.rank-1 { border-color:rgba(255,215,0,.35); background:rgba(255,215,0,.06); transform:translateY(-12px); }
+.lb-pod.rank-2 { border-color:rgba(192,192,192,.3); background:rgba(192,192,192,.04); }
+.lb-pod.rank-3 { border-color:rgba(205,127,50,.3); background:rgba(205,127,50,.04); }
+.lb-pod-crown { font-size:1.8rem; margin-bottom:6px; }
+.lb-pod-avatar {
+  width:60px; height:60px; border-radius:12px;
+  margin:0 auto 10px; font-size:1.6rem;
+  display:flex; align-items:center; justify-content:center;
+}
+.lb-pod-name { font-weight:800; font-size:.9rem; color:#f0e8ff; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:120px; }
+.lb-pod-score { font-size:.75rem; color:rgba(180,160,220,.6); font-weight:700; }
+.lb-pod-rank { font-size:.7rem; font-weight:900; text-transform:uppercase; letter-spacing:.5px; margin-top:6px; color:rgba(167,139,250,.5); }
+
+.lb-tabs {
+  display:flex; gap:8px; margin:24px 0; flex-wrap:wrap; justify-content:center;
+}
+.lb-tab {
+  padding:8px 18px; border-radius:20px;
+  background:rgba(167,139,250,.08); border:1px solid rgba(167,139,250,.15);
+  color:rgba(180,160,220,.6); cursor:pointer; font-weight:700; font-size:.85rem; transition:all .2s;
+}
+.lb-tab.active {
+  background:linear-gradient(135deg,#a78bfa,#8b5cf6);
+  border-color:rgba(167,139,250,.5); color:#fff;
+}
+
+.lb-rows { display:flex; flex-direction:column; gap:8px; }
+.lb-row {
+  background:rgba(167,139,250,.05); border:1px solid rgba(167,139,250,.12);
+  border-radius:12px; padding:12px 16px;
+  display:flex; align-items:center; gap:12px; transition:all .2s;
+}
+.lb-row:hover { background:rgba(167,139,250,.09); border-color:rgba(167,139,250,.22); }
+.lb-row.is-me { border-left:3px solid #ffd700; background:rgba(255,215,0,.04); }
+.lb-rank-num { font-size:1rem; font-weight:900; width:32px; text-align:center; color:var(--muted); flex-shrink:0; }
+.lb-rank-num.top1 { color:#ffd700; }
+.lb-rank-num.top2 { color:#c0c0c0; }
+.lb-rank-num.top3 { color:#cd7f32; }
+.lb-avatar-wrap {
+  width:40px; height:40px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.2rem; flex-shrink:0;
+}
+.lb-info { flex:1; min-width:0; }
+.lb-name { color:#f0e8ff; font-weight:800; font-size:.9rem; margin-bottom:2px; }
+.lb-score { color:rgba(180,160,220,.6); font-size:.75rem; font-weight:700; }
+.lb-badge-you {
+  background:#ffd700; color:#000;
+  padding:2px 8px; border-radius:4px; font-size:.65rem; font-weight:900; flex-shrink:0;
+}
+.lb-badge-owner {
+  background:var(--blue); color:#fff;
+  padding:2px 8px; border-radius:4px; font-size:.65rem; font-weight:900; flex-shrink:0;
+}
+.lb-empty { text-align:center; padding:48px; color:rgba(180,160,220,.5); font-size:.95rem; }
+.lb-empty-icon { font-size:3rem; margin-bottom:12px; }
+
+.lb-your-rank-bar {
+  position:fixed; bottom:0; left:240px; right:0;
+  background:linear-gradient(180deg,rgba(13,5,32,.96) 0%,rgba(13,5,32,.99) 100%);
+  border-top:1px solid rgba(167,139,250,.2);
+  padding:12px 28px; display:flex; align-items:center; gap:16px;
+  z-index:200; transition:transform .3s ease;
+}
+.lb-your-rank-bar.hidden { transform:translateY(100%); }
+@media(max-width:900px){ .lb-your-rank-bar { left:0; } }
+.lb-yr-icon { font-size:1.3rem; }
+.lb-yr-info { flex:1; display:flex; align-items:center; gap:12px; }
+.lb-yr-avatar {
+  width:36px; height:36px; border-radius:6px;
+  display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0;
+}
+.lb-yr-text { display:flex; flex-direction:column; min-width:0; }
+.lb-yr-rank { font-size:.7rem; color:rgba(180,160,220,.5); font-weight:700; text-transform:uppercase; }
+.lb-yr-name { color:#f0e8ff; font-weight:800; font-size:.9rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lb-yr-score { color:var(--blue); font-weight:900; font-size:1.1rem; flex-shrink:0; }
+
+.lb-page-wrap { padding:24px; max-width:860px; margin:0 auto; padding-bottom:100px; }
+
+@media(max-width:600px){
+  .lb-hero { padding:24px 16px 20px; }
+  .lb-hero-title { font-size:1.8rem; }
+  .lb-pod { min-width:100px; }
+}
+  </style>
+<script src="audit-loader.js" defer></script>
+  <script src="debug-dashboard.js" defer></script>
 </head>
 <body data-page="leaderboard">
 <div class="app-shell">
 
-  <!-- ── Sidebar ── -->
+  <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <a href="index.html" class="sidebar-logo">
       <span class="sidebar-logo-icon">🎮</span>
       <span class="sidebar-logo-text">Eylox</span>
     </a>
+
     <p class="sidebar-section-label">Menu</p>
-    <nav class="sidebar-nav"><ul>
-      <li><a href="index.html"    class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
-      <li><a href="games.html"    class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
-      <li><a href="friends.html"  class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span><span class="s-badge" style="display:none">0</span></a></li>
-      <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
-      <li><a href="profile.html"  class="sidebar-link"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
-    </ul></nav>
+    <nav class="sidebar-nav" aria-label="Main navigation">
+      <ul>
+        <li><a href="index.html" class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
+        <li><a href="games.html" class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
+        <li><a href="leaderboard.html" class="sidebar-link active" aria-current="page"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
+        <li><a href="achievements.html" class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
+        <li><a href="events.html" class="sidebar-link"><span class="s-icon">🎯</span><span class="s-label">Live Events</span></a></li>
+        <li><a href="communities.html" class="sidebar-link"><span class="s-icon">🌐</span><span class="s-label">Communities</span></a></li>
+        <li><a href="friends.html" class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span><span class="s-badge" id="friendReqBadge" style="display:none">0</span></a></li>
+        <li><a href="profile.html" class="sidebar-link"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
+        <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
+      </ul>
+    </nav>
+
     <div class="sidebar-divider"></div>
+
     <p class="sidebar-section-label">More</p>
-    <nav class="sidebar-nav"><ul>
-      <li><a href="leaderboard.html"  class="sidebar-link active"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
-      <li><a href="achievements.html" class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
-      <li><a href="communities.html"  class="sidebar-link"><span class="s-icon">🌍</span><span class="s-label">Communities</span></a></li>
-      <li><a href="live-events.html"  class="sidebar-link"><span class="s-icon">⚡</span><span class="s-label">Live Events</span></a></li>
-      <li><a href="shop.html"         class="sidebar-link"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
-      <li><a href="#" class="sidebar-link" id="settingsBtn"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></a></li>
-      <li><a href="#" class="sidebar-link" id="logoutBtn"><span class="s-icon">🚪</span><span class="s-label">Logout</span></a></li>
-    </ul></nav>
+    <nav class="sidebar-nav" aria-label="Secondary navigation">
+      <ul>
+        <li><a href="shop.html" class="sidebar-link"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
+        <li><a href="ai.html" class="sidebar-link"><span class="s-icon">🤖</span><span class="s-label">Eylox Studio</span><span class="s-soon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff">AI</span></a></li>
+        <li><a href="subscription.html" class="sidebar-link"><span class="s-icon">💎</span><span class="s-label">Subscription</span></a></li>
+        <li><button class="sidebar-link sb-action" onclick="openSettingsPanel()"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></button></li>
+        <li><button class="sidebar-link sb-action" onclick="eyloxLogout()" style="color:#f87171"><span class="s-icon">🚪</span><span class="s-label">Log Out</span></button></li>
+      </ul>
+    </nav>
+
     <div class="sidebar-coins">
-      <img src="eylux-coin.png" class="coins-icon-img" alt="Eylux" />
-      <div><div class="coins-amount">—</div><div class="coins-label">Eylux</div></div>
+      <span>💰</span>
+      <div>
+        <div class="coins-amount" id="sidebarEylux">0</div>
+        <div class="coins-label">Eylux</div>
+      </div>
     </div>
-    <div class="sidebar-coins sidebar-trophies">
-      <span class="coins-icon">🏆</span>
-      <div><div class="trophies-amount">—</div><div class="coins-label">Trophies</div></div>
+    <div class="sidebar-coins" style="margin-top:8px">
+      <span>🏆</span>
+      <div>
+        <div class="Eyltrophs-amount" id="sidebarEyltrophs">0</div>
+        <div class="coins-label">Eyltrophs</div>
+      </div>
     </div>
   </aside>
-  <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
+  <!-- MAIN AREA -->
   <div class="main-area">
+
+    <!-- TOPBAR -->
     <header class="topbar">
-      <button class="menu-btn" id="menuBtn" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
-      <div class="search-wrap"><span class="search-icon">🏆</span><input type="search" class="search-input" placeholder="Search players…" id="lbSearch" aria-label="Search"/></div>
+      <button class="menu-btn" id="sidebarToggle" aria-label="Toggle sidebar">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="search" class="search-input" placeholder="Search games…" aria-label="Search games"/>
+      </div>
       <div class="topbar-right">
-        <button class="tb-btn" aria-label="Notifications">🔔<span class="notif-dot"></span></button>
-        <div class="tb-coins"><img src="eylux-coin.png" class="tb-coin-img" alt="EC"> <span>—</span></div>
-        <a href="profile.html" class="tb-avatar" aria-label="My Profile">🎮<span class="online-dot"></span></a>
+        <button class="topbar-icon-btn" id="notifBtn" aria-label="Notifications">🔔<span class="notif-dot"></span></button>
+        <div class="tb-Eyltrophs">🏆 <span id="topbarEyltrophs">0</span></div>
+        <div class="tb-coins">💰 <span id="topbarEylux">0</span></div>
+        <a href="profile.html" class="tb-avatar" aria-label="My profile">🎮<span class="online-dot"></span></a>
       </div>
     </header>
 
-    <main class="page-content">
+    <!-- PAGE CONTENT -->
+    <main class="page-content" id="main-content">
+      <div class="lb-page-wrap">
 
-      <!-- Podium Hero -->
-      <div style="background:linear-gradient(135deg,rgba(253,230,138,.12),rgba(167,139,250,.15));border:1px solid rgba(253,230,138,.25);border-radius:var(--r-lg);padding:32px;margin-bottom:28px;text-align:center">
-        <div style="font-size:.72rem;font-weight:900;letter-spacing:1.5px;color:var(--yellow);text-transform:uppercase;margin-bottom:8px">🌍 GLOBAL RANKINGS</div>
-        <h1 style="font-family:var(--font-head);font-size:2.2rem;margin-bottom:6px">Leaderboard</h1>
-        <p style="color:var(--muted);font-size:.88rem;font-weight:700">Top players ranked by Eylox coins earned. Can you reach #1?</p>
-        <!-- Podium -->
-        <div id="podiumRow" style="display:flex;justify-content:center;align-items:flex-end;gap:16px;margin-top:28px;min-height:140px"></div>
-      </div>
-
-      <!-- Filter Tabs -->
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
-        <button class="shop-tab active" data-board="coins" onclick="switchBoard(this,'coins')">🪙 Most Coins</button>
-        <button class="shop-tab" data-board="wins" onclick="switchBoard(this,'wins')">🏆 Most Wins</button>
-        <button class="shop-tab" data-board="games" onclick="switchBoard(this,'games')">🎮 Most Played</button>
-      </div>
-
-      <!-- Full board -->
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)">
-          <span style="font-family:var(--font-head);font-size:1.1rem">All Players</span>
-          <span id="playerCount" style="font-size:.8rem;color:var(--muted);font-weight:800">Loading…</span>
+        <!-- Hero / Podium -->
+        <div class="lb-hero">
+          <div class="lb-hero-label">🏆 Global Rankings</div>
+          <div class="lb-hero-title" id="heroTitle">Leaderboard</div>
+          <div class="lb-hero-sub" id="heroSub">Compete and climb the ranks!</div>
+          <div class="lb-podium" id="podium" style="display:none"></div>
         </div>
-        <div id="lbList" style="padding:0"></div>
-      </div>
 
-      <!-- Your Rank -->
-      <div id="yourRankBox" style="display:none;margin-top:16px;background:rgba(167,139,250,.08);border:2px solid rgba(167,139,250,.35);border-radius:var(--r-md);padding:16px 20px">
-        <div style="font-size:.7rem;font-weight:900;color:var(--purple);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">YOUR RANK</div>
-        <div id="yourRankInner"></div>
-      </div>
+        <!-- Weekly Tournament Banner -->
+        <div style="background:linear-gradient(135deg,rgba(var(--accent-rgb,167,139,250),.12),rgba(var(--accent-rgb,167,139,250),.04));border:1px solid rgba(var(--accent-rgb,167,139,250),.2);border-radius:16px;padding:18px 20px;margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap" onclick="window.location.href='ai.html'" style="cursor:pointer">
+          <div style="font-size:1.8rem;flex-shrink:0">🏆</div>
+          <div style="flex:1;min-width:120px">
+            <div style="font-family:'Fredoka One',cursive;font-size:1rem;color:var(--text,#f0e8ff)">Weekly AI Tournament</div>
+            <div style="font-size:.76rem;color:var(--muted,#9d8ec7);font-weight:700;margin-top:2px">5,000 coin prize pool · Sign up in AI Studio</div>
+          </div>
+          <a href="ai.html" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#1a0f00;border:none;border-radius:10px;padding:9px 18px;font-family:'Fredoka One',cursive;font-size:.88rem;cursor:pointer;text-decoration:none;white-space:nowrap">Join Now →</a>
+        </div>
 
+        <!-- Tabs -->
+        <div class="lb-tabs" id="tabs">
+          <div class="lb-tab active" data-tip="lb-Eyltrophs" onclick="switchTab('Eyltrophs',this)">🏆 Trophies</div>
+          <div class="lb-tab" data-tip="lb-wins"    onclick="switchTab('wins',this)">⚔️ Wins</div>
+          <div class="lb-tab" data-tip="lb-coins"   onclick="switchTab('Eylux',this)">💰 Coins</div>
+          <div class="lb-tab" data-tip="lb-games"   onclick="switchTab('games',this)">🎮 Games Played</div>
+          <div class="lb-tab" data-tip="lb-season"  onclick="switchTab('season',this)">🏅 Season</div>
+          <div class="lb-tab" data-tip="lb-created" onclick="switchTab('created',this)">🛠️ Created</div>
+          <div class="lb-tab" data-tip="lb-social"  onclick="switchTab('social',this)">🤝 Social</div>
+        </div>
+
+        <!-- Rows -->
+        <div class="lb-rows" id="rows">
+          <div class="lb-empty"><div class="lb-empty-icon">🏆</div>Loading rankings…</div>
+        </div>
+
+      </div>
     </main>
+
+    <!-- Mobile Bottom Nav -->
+    <nav class="bottom-nav" aria-label="Mobile navigation">
+      <a href="index.html" class="bn-item"><span class="bn-icon">🏠</span>Home</a>
+      <a href="leaderboard.html" class="bn-item active"><span class="bn-icon">🏆</span>Leaderboard</a>
+      <a href="communities.html" class="bn-item"><span class="bn-icon">🌐</span>Communities</a>
+      <a href="achievements.html" class="bn-item"><span class="bn-icon">🎖️</span>Achievements</a>
+      <a href="profile.html" class="bn-item"><span class="bn-icon">👤</span>Profile</a>
+    </nav>
+
+  </div><!-- /main-area -->
+</div><!-- /app-shell -->
+
+<!-- Your Rank Bar (fixed) -->
+<div class="lb-your-rank-bar hidden" id="yourRankBar">
+  <div class="lb-yr-icon">🎯</div>
+  <div class="lb-yr-info">
+    <div class="lb-yr-avatar" id="yourRankAvatar">🎮</div>
+    <div class="lb-yr-text">
+      <div class="lb-yr-rank" id="yourRankRank">Unranked</div>
+      <div class="lb-yr-name" id="yourRankName">—</div>
+    </div>
   </div>
+  <div class="lb-yr-score" id="yourRankScore">0</div>
 </div>
 
-<div id="toastContainer"></div>
-
-<style>
-.shop-tab {
-  padding: 10px 20px; border-radius: 99px; border: 1px solid var(--border);
-  background: var(--card); color: var(--muted); font-family: var(--font-body);
-  font-weight: 800; font-size: .85rem; cursor: pointer;
-  transition: background .18s, color .18s, border-color .18s;
-}
-.shop-tab.active, .shop-tab:hover {
-  background: rgba(167,139,250,.18); color: var(--purple); border-color: rgba(167,139,250,.4);
-}
-.lb-row-full {
-  display: flex; align-items: center; gap: 14px; padding: 14px 20px;
-  border-bottom: 1px solid var(--border); transition: background .15s;
-}
-.lb-row-full:last-child { border-bottom: none; }
-.lb-row-full:hover { background: rgba(167,139,250,.04); }
-.lb-row-full.is-me { background: rgba(167,139,250,.06); border-left: 3px solid var(--purple); }
-.podium-block {
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-}
-.podium-platform {
-  width: 80px; border-radius: 8px 8px 0 0;
-  display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px;
-  font-family: var(--font-head); font-size: 1.1rem; color: #1a0800;
-}
-</style>
 
 <script src="security.js"></script>
 <script src="api.js"></script>
+<script src="script.js"></script>
 <script src="features.js"></script>
 <script src="notifications.js"></script>
+<script src="platform-enhancements.js"></script>
+<script src="user-persist.js"></script>
 <script src="polish.js"></script>
 <script src="admin-button.js"></script>
 <script src="studio-button.js"></script>
-<script>
-/* ══════════════════════════════════════════════════
-   LEADERBOARD DATA
-══════════════════════════════════════════════════ */
-/* Static seed data — merged with real backend users */
-const SEED_PLAYERS = [
-  { username:'NinjaKing99',   avatar:'🦁', coins:8400,  wins:142, gamesPlayed:389 },
-  { username:'StarBlaster_X', avatar:'🐯', coins:6100,  wins:98,  gamesPlayed:265 },
-  { username:'DragonSlayer',  avatar:'🐼', coins:4800,  wins:76,  gamesPlayed:210 },
-  { username:'PuzzleWizard',  avatar:'🦊', coins:3200,  wins:54,  gamesPlayed:178 },
-  { username:'OceanRunner',   avatar:'🤖', coins:2700,  wins:45,  gamesPlayed:143 },
-  { username:'SpeedDemon44',  avatar:'⚡', coins:2200,  wins:38,  gamesPlayed:121 },
-  { username:'BlastMaster',   avatar:'🔥', coins:1900,  wins:31,  gamesPlayed:98 },
-  { username:'CosmicZap',     avatar:'👾', coins:1500,  wins:26,  gamesPlayed:84 },
-  { username:'ShadowNinja',   avatar:'🥷', coins:1200,  wins:22,  gamesPlayed:67 },
-  { username:'PixelHero',     avatar:'🤖', coins:900,   wins:17,  gamesPlayed:52 },
-];
-
-let currentBoard = 'coins';
-let allPlayers   = [];
-
-function getMe() {
-  try { return JSON.parse(localStorage.getItem('eylox_user')); } catch { return null; }
-}
-
-function sortKey(board) {
-  return board === 'coins' ? 'coins' : board === 'wins' ? 'wins' : 'gamesPlayed';
-}
-
-function switchBoard(btn, board) {
-  document.querySelectorAll('[data-board]').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  currentBoard = board;
-  renderBoard(board);
-}
-
-async function loadPlayers() {
-  /* Try to get real users from backend */
-  let backendUsers = [];
-  try {
-    const d = await fetch('http://localhost:3001/api/users/registry').then(r => r.ok ? r.json() : null).catch(() => null);
-    if (d?.users) {
-      backendUsers = d.users.map(u => ({
-        username:    u.username,
-        avatar:      u.avatar || '🎮',
-        coins:       u.coins  || 0,
-        wins:        u.wins   || 0,
-        gamesPlayed: u.recentlyPlayed?.length || 0,
-        isReal:      true,
-      }));
-    }
-  } catch {}
-
-  /* Add local user if not in backend list */
-  const me = getMe();
-  if (me?.username) {
-    const alreadyIn = backendUsers.some(u => u.username.toLowerCase() === me.username.toLowerCase());
-    if (!alreadyIn) {
-      backendUsers.push({
-        username:    me.username,
-        avatar:      me.avatar || '🎮',
-        coins:       me.coins  || 0,
-        wins:        me.wins   || 0,
-        gamesPlayed: (me.recentlyPlayed || []).length,
-        isReal:      true,
-        isMe:        true,
-      });
-    } else {
-      const idx = backendUsers.findIndex(u => u.username.toLowerCase() === me.username.toLowerCase());
-      if (idx >= 0) backendUsers[idx].isMe = true;
-    }
-  }
-
-  /* Merge seed data — only keep seeds not already in backend */
-  const merged = [...backendUsers];
-  for (const seed of SEED_PLAYERS) {
-    if (!backendUsers.some(u => u.username.toLowerCase() === seed.username.toLowerCase())) {
-      merged.push(seed);
-    }
-  }
-
-  allPlayers = merged;
-  return merged;
-}
-
-function renderBoard(board) {
-  const key = sortKey(board);
-  const sorted = [...allPlayers].sort((a, b) => (b[key] || 0) - (a[key] || 0));
-  const me = getMe();
-
-  /* Podium (top 3) */
-  const podiumOrder = [sorted[1], sorted[0], sorted[2]].filter(Boolean); /* 2nd, 1st, 3rd visual */
-  const heights = ['100px', '130px', '80px'];
-  const medals  = ['🥈', '🥇', '🥉'];
-  const colors  = ['rgba(192,192,192,.3)', 'rgba(253,230,138,.25)', 'rgba(180,120,60,.25)'];
-  const borders = ['rgba(192,192,192,.5)', 'rgba(253,230,138,.6)', 'rgba(180,120,60,.5)'];
-  const ranks   = [sorted.indexOf(podiumOrder[0]), sorted.indexOf(podiumOrder[1]), sorted.indexOf(podiumOrder[2])];
-
-  document.getElementById('podiumRow').innerHTML = podiumOrder.map((p, i) => `
-    <div class="podium-block">
-      <div style="font-size:2rem;margin-bottom:4px">${p?.avatar || '🎮'}</div>
-      <div style="font-family:var(--font-head);font-size:.85rem;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p?.username || '—'}</div>
-      <div style="font-size:.72rem;color:var(--muted);font-weight:800">🪙 ${(p?.[key] || 0).toLocaleString()}</div>
-      <div class="podium-platform" style="height:${heights[i]};background:${colors[i]};border:2px solid ${borders[i]}">
-        ${medals[i]}
-      </div>
-    </div>
-  `).join('');
-
-  /* Full list */
-  document.getElementById('playerCount').textContent = sorted.length + ' players';
-  document.getElementById('lbList').innerHTML = sorted.slice(0, 50).map((p, i) => {
-    const isMe = me && p.username?.toLowerCase() === me.username?.toLowerCase();
-    return `
-    <div class="lb-row-full${isMe ? ' is-me' : ''}">
-      <div style="width:36px;text-align:center;flex-shrink:0">
-        ${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `<span style="color:var(--muted);font-weight:900;font-size:.85rem">#${i+1}</span>`}
-      </div>
-      <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#ec4899);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">${p.avatar || '🎮'}</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-family:var(--font-head);font-size:.95rem;color:var(--text)">
-          ${p.username}
-          ${isMe ? '<span style="font-size:.62rem;font-weight:900;color:var(--purple);background:rgba(167,139,250,.15);padding:2px 7px;border-radius:99px;margin-left:6px;font-family:var(--font-body)">YOU</span>' : ''}
-          ${p.username?.toLowerCase() === 'eylox' ? '<span style="font-size:.62rem;font-weight:900;color:#fde68a;background:rgba(245,158,11,.15);padding:2px 7px;border-radius:99px;margin-left:4px;font-family:var(--font-body)">👑 OWNER</span>' : ''}
-        </div>
-        <div style="font-size:.72rem;color:var(--muted);font-weight:700">${p.wins || 0} wins · ${p.gamesPlayed || 0} games played</div>
-      </div>
-      <div style="font-weight:900;font-size:.9rem;color:var(--yellow);flex-shrink:0">🪙 ${(p[key] || 0).toLocaleString()}</div>
-    </div>`;
-  }).join('');
-
-  /* Your rank box */
-  const meIdx = sorted.findIndex(p => me && p.username?.toLowerCase() === me.username?.toLowerCase());
-  if (meIdx >= 0) {
-    document.getElementById('yourRankBox').style.display = 'block';
-    document.getElementById('yourRankInner').innerHTML = `
-      <div style="display:flex;align-items:center;gap:14px">
-        <span style="font-size:1.4rem">${meIdx === 0 ? '🥇' : meIdx === 1 ? '🥈' : meIdx === 2 ? '🥉' : `#${meIdx + 1}`}</span>
-        <div style="font-family:var(--font-head);font-size:1rem">${me.username}</div>
-        <div style="margin-left:auto;font-weight:900;color:var(--yellow)">🪙 ${((sorted[meIdx])?.[key] || 0).toLocaleString()}</div>
-      </div>`;
-  }
-}
-
-/* ── Search filter ── */
-document.getElementById('lbSearch').addEventListener('input', e => {
-  const q = e.target.value.toLowerCase();
-  document.querySelectorAll('.lb-row-full').forEach(row => {
-    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
-  });
-});
-
-/* ── Menu ── */
-document.getElementById('menuBtn').addEventListener('click', () => {
-  const s = document.getElementById('sidebar');
-  const o = document.getElementById('sidebarOverlay');
-  s.classList.toggle('open'); o.classList.toggle('show');
-});
-document.getElementById('sidebarOverlay').addEventListener('click', () => {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarOverlay').classList.remove('show');
-});
-
-/* ── Boot ── */
-document.addEventListener('DOMContentLoaded', async () => {
-  await loadPlayers();
-  renderBoard('coins');
-});
-</script>
+<script src="extras.js"></script>
 <script src="effects.js"></script>
 <script src="sound.js"></script>
 <script src="settings.js"></script>
+<script src="quick-access.js"></script>
+<script src="friends-local.js"></script>
+<script src="theme-switcher.js"></script>
+<script>
+/* ── Sidebar toggle ── */
+const toggle = document.getElementById('sidebarToggle');
+const sidebar = document.getElementById('sidebar');
+if (toggle && sidebar) {
+  toggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+  document.addEventListener('click', e => {
+    if (window.innerWidth <= 900 && !sidebar.contains(e.target) && !toggle.contains(e.target))
+      sidebar.classList.remove('open');
+  });
+}
+
+/* ── Data helpers ── */
+function avatarGradient(username) {
+  let h = 0;
+  for (let i = 0; i < username.length; i++) { h = ((h << 5) - h) + username.charCodeAt(i); h |= 0; }
+  return `hsl(${Math.abs(h) % 360},65%,48%)`;
+}
+
+/* Real board, fetched from the backend (GET /api/leaderboard). No fallback
+   to scanning local device storage — that only ever showed accounts that
+   happened to have logged into this one browser, not real global rankings. */
+let boardCache = [];
+let boardLoaded = false;
+
+async function fetchLeaderboard() {
+  try {
+    const res = await fetch('http://localhost:3001/api/leaderboard');
+    if (res.ok) { boardCache = await res.json(); boardLoaded = true; return true; }
+  } catch { /* server offline */ }
+  return false;
+}
+
+function getYou() {
+  try { return JSON.parse(localStorage.getItem('eylox_user') || 'null'); } catch { return null; }
+}
+
+/* ── Sorting ──
+   Only Eyltrophs/wins/coins are real, tracked-by-the-server categories.
+   games/season/created/social have no backend counterpart yet — rather
+   than fabricate numbers for them, they get an honest "not tracked" state. */
+let currentSort = 'Eyltrophs';
+const REAL_TABS = new Set(['Eyltrophs', 'wins', 'coins']);
+const sortKeys = {
+  Eyltrophs: u => u.trophies || 0,
+  wins:      u => u.wins || 0,
+  coins:     u => u.coins || 0,
+};
+const tabLabels = {
+  Eyltrophs: ['🏆 Global Rankings', 'Compete and climb the ranks!'],
+  wins:     ['⚔️ Win Leaders', 'Most victories across all games!'],
+  coins:    ['💰 Richest Players', 'Who has the most Eylux?'],
+  games:    ['🎮 Most Active', "Not tracked by the server yet"],
+  season:   ['🏅 Season Leaders', "Not tracked by the server yet"],
+  created:  ['🛠️ Top Creators', "Not tracked by the server yet"],
+  social:   ['🤝 Social Stars', "Not tracked by the server yet"],
+};
+const rowSubs = {
+  Eyltrophs: p => `${p.wins||0} wins · ${(p.coins||0).toLocaleString()} coins`,
+  wins:      p => `${(p.trophies||0).toLocaleString()} Eyltrophs · ${(p.coins||0).toLocaleString()} coins`,
+  coins:     p => `${p.wins||0} wins · ${(p.trophies||0).toLocaleString()} Eyltrophs`,
+};
+
+function switchTab(sort, el) {
+  currentSort = sort;
+  document.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderBoard();
+}
+
+/* ── Render ── */
+function renderBoard() {
+  const you = getYou();
+  const podium = document.getElementById('podium');
+  const heroTitle = document.getElementById('heroTitle');
+  const heroSub = document.getElementById('heroSub');
+
+  if (!REAL_TABS.has(currentSort)) {
+    document.querySelector('.lb-hero-label').textContent = tabLabels[currentSort][0];
+    heroTitle.textContent = 'Not Tracked Yet';
+    heroSub.textContent = tabLabels[currentSort][1];
+    podium.style.display = 'none';
+    document.getElementById('rows').innerHTML = '<div class="lb-empty"><div class="lb-empty-icon">🚧</div>This category isn\'t tracked by the server yet — check back soon!</div>';
+    document.getElementById('yourRankBar').classList.add('hidden');
+    return;
+  }
+
+  if (!boardLoaded) {
+    heroTitle.textContent = 'Loading…';
+    heroSub.textContent = 'Fetching real rankings from the server…';
+    podium.style.display = 'none';
+    document.getElementById('rows').innerHTML = '';
+    document.getElementById('yourRankBar').classList.add('hidden');
+    return;
+  }
+
+  const ranked = [...boardCache].sort((a, b) => sortKeys[currentSort](b) - sortKeys[currentSort](a));
+
+  if (ranked.length === 0) {
+    heroTitle.textContent = 'No Rankings Yet';
+    heroSub.textContent = 'Be the first to play and earn Eyltrophs!';
+    podium.style.display = 'none';
+    document.getElementById('rows').innerHTML = '<div class="lb-empty"><div class="lb-empty-icon">🏆</div>Start playing to appear on the leaderboard!</div>';
+    document.getElementById('yourRankBar').classList.add('hidden');
+    return;
+  }
+
+  const top3 = ranked.slice(0, 3);
+  const podiumOrder = top3.length >= 3 ? [top3[1], top3[0], top3[2]] : top3;
+  const crowns = ['🥈','🥇','🥉'];
+  const rankNums = [2, 1, 3];
+
+  podium.innerHTML = podiumOrder.map((p, i) => {
+    const rank = top3.length >= 3 ? rankNums[i] : (i + 1);
+    const crown = top3.length >= 3 ? crowns[i] : ['🥇','🥈','🥉'][i];
+    const score = sortKeys[currentSort](p);
+    return `
+      <div class="lb-pod rank-${rank}">
+        <div class="lb-pod-crown">${crown}</div>
+        <div class="lb-pod-avatar" style="background:${avatarGradient(p.username)}">${p.avatar}</div>
+        <div class="lb-pod-name">${p.username}</div>
+        <div class="lb-pod-score">${score.toLocaleString()} pts</div>
+        <div class="lb-pod-rank">Rank #${rank}</div>
+      </div>`;
+  }).join('');
+  podium.style.display = 'flex';
+
+  const [lbTitle, lbSub] = tabLabels[currentSort] || tabLabels.Eyltrophs;
+  document.querySelector('.lb-hero-label').textContent = lbTitle;
+  if (ranked[0]) {
+    heroTitle.textContent = ranked[0].username;
+    heroSub.textContent = rowSubs[currentSort](ranked[0]);
+  } else {
+    heroSub.textContent = lbSub;
+  }
+
+  /* Rows */
+  const rows = document.getElementById('rows');
+  rows.innerHTML = ranked.map((p, i) => {
+    const rank = i + 1;
+    const isYou = you && p.username.toLowerCase() === you.username.toLowerCase();
+    const isOwner = p.username === 'Eylox';
+    const numClass = rank === 1 ? 'top1' : rank === 2 ? 'top2' : rank === 3 ? 'top3' : '';
+    const rankIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+    const score = sortKeys[currentSort](p);
+    return `
+      <div class="lb-row ${isYou ? 'is-me' : ''}">
+        <div class="lb-rank-num ${numClass}">${rankIcon}</div>
+        <div class="lb-avatar-wrap" style="background:${avatarGradient(p.username)}">${p.avatar}</div>
+        <div class="lb-info">
+          <div class="lb-name">${p.username}${isOwner ? ' 👑' : ''}</div>
+          <div class="lb-score">${rowSubs[currentSort](p)}</div>
+        </div>
+        ${isOwner ? '<div class="lb-badge-owner">OWNER</div>' : ''}
+        ${isYou && !isOwner ? '<div class="lb-badge-you">YOU</div>' : ''}
+        <div style="font-weight:900;color:var(--blue);font-size:.95rem;flex-shrink:0">${score.toLocaleString()}</div>
+      </div>`;
+  }).join('');
+
+  /* Your rank bar */
+  if (you && you.username) {
+    const yourIdx = ranked.findIndex(p => p.username.toLowerCase() === you.username.toLowerCase());
+    if (yourIdx !== -1) {
+      const yourScore = sortKeys[currentSort](ranked[yourIdx]);
+      document.getElementById('yourRankRank').textContent = `#${yourIdx + 1}`;
+      document.getElementById('yourRankAvatar').style.background = avatarGradient(you.username);
+      document.getElementById('yourRankAvatar').textContent = you.avatar || '🎮';
+      document.getElementById('yourRankName').textContent = you.username;
+      document.getElementById('yourRankScore').textContent = yourScore.toLocaleString() + ' pts';
+      document.getElementById('yourRankBar').classList.remove('hidden');
+    } else {
+      document.getElementById('yourRankBar').classList.add('hidden');
+    }
+  } else {
+    document.getElementById('yourRankBar').classList.add('hidden');
+  }
+
+  /* Update sidebar coins/Eyltrophs */
+  try {
+    const u = JSON.parse(localStorage.getItem('eylox_user') || 'null');
+    if (u) {
+      const sc = document.getElementById('sidebarEylux');
+      const st = document.getElementById('sidebarEyltrophs');
+      const tc = document.getElementById('topbarEylux');
+      const tt = document.getElementById('topbarEyltrophs');
+      if (sc) sc.textContent = (u.coins || 0).toLocaleString();
+      if (st) st.textContent = (u.Eyltrophs || 0).toLocaleString();
+      if (tc) tc.textContent = (u.coins || 0).toLocaleString();
+      if (tt) tt.textContent = (u.Eyltrophs || 0).toLocaleString();
+    }
+  } catch {}
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  renderBoard(); // instant "Loading…" state
+  await fetchLeaderboard();
+  renderBoard(); // real data (or stays honestly empty if the server is unreachable)
+  /* Mark leaderboard visited for achievement */
+  try {
+    const u = getYou();
+    if (u && u.username && !u.visitedLeaderboard) {
+      u.visitedLeaderboard = true;
+      localStorage.setItem('eylox_user', JSON.stringify(u));
+    }
+  } catch {}
+});
+</script>
+<script>
+function eyloxLogout() {
+  if (!confirm('Log out of Eylox?')) return;
+  ['eylox_token','eylox_user','eylox_guest'].forEach(k => localStorage.removeItem(k));
+  window.location.href = 'landing.html';
+}
+function openSettingsPanel() { window.location.href = 'settings.html'; }
+</script>
+<script src="premium.js"></script>
+<script src="creator-pass.js"></script>
+<script src="floating-actions.js"></script>
+  <script src="tooltip.js"></script>
+<script src="sw-register.js"></script>
+<script src="offline.js" defer></script>
 </body>
 </html>

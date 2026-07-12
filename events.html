@@ -1,0 +1,2659 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Live Events — Eylox</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#7c3aed"/>
+<link rel="stylesheet" href="style.css"/>
+<link rel="stylesheet" href="ads.css"/>
+<script>
+  try {
+    const s = localStorage.getItem('eylox_token')||localStorage.getItem('eylox_guest')||localStorage.getItem('eylox_user');
+    if (!s) window.location.replace('landing.html');
+  } catch {}
+</script>
+<style>
+/* ──────────────────────────────────────
+   EVENTS PAGE — Premium gaming styles
+────────────────────────────────────── */
+
+/* ── Hero ── */
+.ev-hero {
+  background: linear-gradient(135deg, #1a0a40 0%, #0f0530 40%, #1d0a50 70%, #130840 100%);
+  border: 1px solid rgba(167,139,250,.4);
+  border-radius: 24px;
+  padding: 40px 48px;
+  margin-bottom: 36px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  box-shadow: 0 0 80px rgba(124,58,237,.2), 0 20px 60px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06);
+  animation: heroIn .55s cubic-bezier(.22,.61,.36,1) both;
+}
+@keyframes heroIn { from { opacity:0; transform: translateY(-16px); } }
+
+/* Animated orb backgrounds */
+.ev-hero .orb1 {
+  position: absolute; top: -60px; right: -60px;
+  width: 280px; height: 280px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(251,191,36,.18) 0%, transparent 65%);
+  pointer-events: none;
+  animation: orb-drift 7s ease-in-out infinite;
+}
+.ev-hero .orb2 {
+  position: absolute; bottom: -50px; left: 80px;
+  width: 220px; height: 220px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(167,139,250,.14) 0%, transparent 70%);
+  pointer-events: none;
+  animation: orb-drift 9s 2s ease-in-out infinite;
+}
+.ev-hero .orb3 {
+  position: absolute; top: 20px; left: -40px;
+  width: 160px; height: 160px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(79,195,247,.1) 0%, transparent 70%);
+  pointer-events: none;
+  animation: orb-drift 11s 4s ease-in-out infinite;
+}
+
+/* Animated scan line */
+.ev-hero::before {
+  content: '';
+  position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(167,139,250,.04), transparent);
+  animation: hero-scan 5s ease-in-out 1s infinite;
+  pointer-events: none;
+}
+@keyframes hero-scan {
+  0%,100% { left: -100%; }
+  50%      { left: 140%; }
+}
+
+/* Neon top-border line */
+.ev-hero::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(167,139,250,.6), rgba(79,195,247,.4), transparent);
+  animation: border-scan 3s ease-in-out infinite;
+}
+@keyframes border-scan {
+  0%,100% { opacity: .4; }
+  50%      { opacity: 1; }
+}
+
+.ev-hero-icon {
+  font-size: 5.5rem;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 28px rgba(251,191,36,.6)) drop-shadow(0 0 56px rgba(251,191,36,.25));
+  animation: iconFloat 3.2s ease-in-out infinite;
+  position: relative; z-index: 2;
+}
+@keyframes iconFloat {
+  0%,100% { transform: translateY(0) scale(1);   filter: drop-shadow(0 0 20px rgba(251,191,36,.5)); }
+  50%      { transform: translateY(-10px) scale(1.05); filter: drop-shadow(0 0 36px rgba(251,191,36,.8)); }
+}
+.ev-hero-text { position: relative; z-index: 2; }
+.ev-hero-title {
+  font-family: var(--font-head, 'Fredoka One', cursive);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  background: linear-gradient(90deg, #fff 40%, #c4b5fd);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 8px;
+  line-height: 1.05;
+  letter-spacing: .5px;
+}
+.ev-hero-sub {
+  color: rgba(210,190,255,.75); font-size: .9rem; font-weight: 700; margin-bottom: 20px;
+  display: flex; align-items: center; gap: 8px;
+}
+.ev-hero-stats { display: flex; gap: 10px; flex-wrap: wrap; }
+.ev-hero-stat {
+  display: flex; align-items: center; gap: 7px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 99px;
+  padding: 7px 18px;
+  font-size: .78rem;
+  font-weight: 900;
+  color: #fff;
+  backdrop-filter: blur(12px);
+  transition: background .2s, border-color .2s, transform .2s;
+}
+.ev-hero-stat:hover {
+  background: rgba(167,139,250,.15);
+  border-color: rgba(167,139,250,.4);
+  transform: translateY(-2px);
+}
+
+/* ── Section header ── */
+.ev-section-hd {
+  display: flex; align-items: center; gap: 12px;
+  margin: 36px 0 20px;
+}
+.ev-section-title {
+  font-family: var(--font-head, 'Fredoka One', cursive);
+  font-size: 1.35rem;
+  color: #fff;
+  white-space: nowrap;
+}
+.ev-live-badge {
+  font-size: .65rem; font-weight: 900; letter-spacing: .8px;
+  text-transform: uppercase;
+  padding: 4px 12px; border-radius: 99px;
+  background: rgba(248,113,113,.12);
+  color: #f87171;
+  border: 1px solid rgba(248,113,113,.35);
+  display: flex; align-items: center; gap: 5px;
+  box-shadow: 0 0 14px rgba(248,113,113,.15);
+}
+.ev-live-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #f87171;
+  box-shadow: 0 0 6px rgba(248,113,113,.8);
+}
+
+/* ── Event Grid ── */
+.ev-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  gap: 22px;
+}
+
+/* ── Event Card ── */
+.ev-card {
+  background: linear-gradient(160deg, #130b32 0%, #0d0625 100%);
+  border: 1px solid rgba(167,139,250,.22);
+  border-radius: 22px;
+  overflow: hidden;
+  transition: border-color .25s, transform .25s cubic-bezier(.34,1.4,.64,1), box-shadow .25s;
+  position: relative;
+  animation: card-rise .42s cubic-bezier(.22,.61,.36,1) both;
+}
+.ev-card:nth-child(1) { animation-delay: .04s; }
+.ev-card:nth-child(2) { animation-delay: .08s; }
+.ev-card:nth-child(3) { animation-delay: .12s; }
+.ev-card:nth-child(4) { animation-delay: .16s; }
+.ev-card:nth-child(5) { animation-delay: .20s; }
+.ev-card:nth-child(6) { animation-delay: .24s; }
+
+.ev-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(167,139,250,.55);
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.6),
+    0 0 0 1px rgba(167,139,250,.18),
+    0 0 50px rgba(124,58,237,.12);
+}
+
+/* Neon top accent line on hover */
+.ev-card::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--ev-accent, #a78bfa), transparent);
+  opacity: 0;
+  transition: opacity .25s;
+  z-index: 3;
+}
+.ev-card:hover::after { opacity: 1; }
+
+.ev-card-banner {
+  height: 130px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.ev-card-banner-emoji {
+  font-size: 4.2rem;
+  position: relative; z-index: 2;
+  filter: drop-shadow(0 6px 20px rgba(0,0,0,.6));
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1), filter .3s;
+}
+.ev-card:hover .ev-card-banner-emoji {
+  transform: scale(1.12) translateY(-4px);
+  filter: drop-shadow(0 8px 28px rgba(0,0,0,.7));
+}
+.ev-card-banner::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, transparent 25%, rgba(4,0,14,.96) 100%);
+  z-index: 1;
+}
+/* Pattern overlay on banners */
+.ev-card-banner::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 1;
+  background-image: repeating-linear-gradient(
+    0deg, rgba(0,0,0,.1) 0px, rgba(0,0,0,.1) 1px, transparent 1px, transparent 4px
+  );
+  pointer-events: none;
+}
+.ev-card-status {
+  position: absolute; top: 12px; left: 12px;
+  font-size: .6rem; font-weight: 900;
+  padding: 4px 12px; border-radius: 99px;
+  letter-spacing: 1px; text-transform: uppercase;
+  z-index: 4; backdrop-filter: blur(6px);
+}
+.status-live {
+  background: rgba(248,113,113,.2); color: #f87171;
+  border: 1px solid rgba(248,113,113,.45);
+  box-shadow: 0 0 12px rgba(248,113,113,.25);
+}
+.status-upcoming {
+  background: rgba(251,191,36,.15); color: #fbbf24;
+  border: 1px solid rgba(251,191,36,.35);
+  box-shadow: 0 0 12px rgba(251,191,36,.15);
+}
+.ev-card-timer {
+  position: absolute; top: 12px; right: 12px;
+  font-size: .65rem; font-weight: 900;
+  padding: 4px 11px; border-radius: 99px;
+  background: rgba(0,0,0,.72); color: rgba(210,200,255,.9);
+  border: 1px solid rgba(167,139,250,.18);
+  display: flex; align-items: center; gap: 4px;
+  z-index: 4; backdrop-filter: blur(6px);
+}
+
+.ev-card-body { padding: 18px 20px 22px; }
+.ev-card-name {
+  font-family: var(--font-head, 'Fredoka One', cursive);
+  font-size: 1.3rem; color: #fff;
+  margin-bottom: 6px;
+}
+.ev-card-desc {
+  font-size: .78rem; color: rgba(180,160,220,.6);
+  font-weight: 700; margin-bottom: 16px; line-height: 1.5;
+}
+
+.ev-prize-box {
+  display: flex; align-items: center; gap: 14px;
+  background: linear-gradient(135deg, rgba(251,191,36,.1), rgba(245,158,11,.05));
+  border: 1px solid rgba(251,191,36,.28);
+  border-radius: 14px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.ev-card:hover .ev-prize-box {
+  border-color: rgba(251,191,36,.5);
+  box-shadow: 0 0 20px rgba(251,191,36,.1);
+}
+.ev-prize-icon { font-size: 1.8rem; filter: drop-shadow(0 0 8px rgba(251,191,36,.6)); }
+.ev-prize-label {
+  font-size: .6rem; font-weight: 900;
+  color: rgba(251,191,36,.65); letter-spacing: 1px;
+  text-transform: uppercase; margin-bottom: 4px;
+}
+.ev-prize-val {
+  font-family: var(--font-head, 'Fredoka One', cursive);
+  font-size: 1.45rem; color: #fbbf24; line-height: 1.1;
+}
+.ev-prize-badge {
+  font-size: .7rem; font-weight: 800;
+  color: rgba(251,191,36,.7); margin-top: 3px;
+}
+
+.ev-meta-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+.ev-meta-chip {
+  display: flex; align-items: center; gap: 5px;
+  font-size: .7rem; font-weight: 800;
+  color: rgba(167,139,250,.9);
+  background: rgba(167,139,250,.08);
+  border: 1px solid rgba(167,139,250,.2);
+  border-radius: 99px;
+  padding: 4px 12px;
+  transition: background .15s, border-color .15s;
+}
+.ev-meta-chip:hover { background: rgba(167,139,250,.15); border-color: rgba(167,139,250,.4); }
+
+.ev-players-row { margin-bottom: 16px; }
+.ev-players-label {
+  display: flex; justify-content: space-between;
+  font-size: .68rem; font-weight: 800;
+  color: rgba(167,139,250,.6); margin-bottom: 7px;
+}
+.ev-players-bar {
+  height: 5px; background: rgba(167,139,250,.1);
+  border-radius: 99px; overflow: hidden;
+}
+.ev-players-fill { height: 100%; border-radius: 99px; transition: width .8s ease; }
+
+.ev-join-btn {
+  width: 100%;
+  padding: 14px;
+  border: none; border-radius: 14px;
+  font-family: var(--font-head, 'Fredoka One', cursive);
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: filter .15s, transform .15s cubic-bezier(.34,1.56,.64,1), box-shadow .15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  color: #fff;
+  letter-spacing: .5px;
+  position: relative; overflow: hidden;
+}
+.ev-join-btn:hover:not(:disabled) {
+  filter: brightness(1.18);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0,0,0,.35), 0 0 20px rgba(124,58,237,.25);
+}
+.ev-join-btn:active:not(:disabled) { transform: scale(.97); }
+.ev-join-btn:disabled { opacity: .38; cursor: not-allowed; }
+.ev-entry-note {
+  font-size: .67rem; font-weight: 800;
+  color: rgba(167,139,250,.48);
+  text-align: center; margin-top: 9px;
+}
+
+/* ── Spin Wheel Modal ── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(0,0,0,.93);
+  backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  opacity: 0; pointer-events: none;
+  transition: opacity .28s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+
+.spin-modal {
+  background: #111111;
+  border: 1px solid rgba(167,139,250,.45);
+  border-radius: 30px;
+  padding: 36px 40px 40px;
+  width: 100%; max-width: 560px;
+  position: relative;
+  text-align: center;
+  box-shadow: 0 40px 100px rgba(0,0,0,.85), 0 0 0 1px rgba(167,139,250,.08), 0 0 80px rgba(124,58,237,.1);
+  animation: modalIn .3s cubic-bezier(.34,1.56,.64,1) both;
+  overflow: hidden;
+}
+/* Glowing top border on modal */
+.spin-modal::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, #a78bfa, #4fc3f7, transparent);
+  animation: border-scan 3s ease-in-out infinite;
+}
+@keyframes modalIn { from { opacity:0; transform: scale(.88) translateY(28px); } }
+
+.spin-close-btn {
+  position: absolute; top: 18px; right: 20px;
+  background: rgba(167,139,250,.1);
+  border: 1px solid rgba(167,139,250,.22);
+  color: rgba(167,139,250,.7);
+  font-size: .95rem; width: 34px; height: 34px;
+  border-radius: 50%; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s, color .15s, transform .15s;
+  z-index: 10;
+}
+.spin-close-btn:hover { background: rgba(167,139,250,.22); color: #fff; transform: rotate(90deg); }
+
+.spin-modal-title {
+  font-family: var(--font-head, 'Fredoka One', cursive);
+  font-size: 1.75rem; color: #fff;
+  margin-bottom: 5px;
+}
+.spin-modal-sub {
+  font-size: .82rem; font-weight: 700;
+  color: rgba(180,160,220,.6); margin-bottom: 30px;
+}
+
+/* Wheel */
+.wheel-wrap {
+  position: relative;
+  width: 300px; height: 300px;
+  margin: 0 auto 26px;
+}
+/* Outer glow ring */
+.wheel-ring {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(124,58,237,.6) 0deg,
+    rgba(79,195,247,.6) 90deg,
+    rgba(244,114,182,.6) 180deg,
+    rgba(251,191,36,.6) 270deg,
+    rgba(124,58,237,.6) 360deg
+  );
+  filter: blur(6px);
+  animation: ring-spin 4s linear infinite;
+  z-index: 0;
+}
+@keyframes ring-spin { to { transform: rotate(360deg); } }
+.wheel-wrap > * { position: relative; z-index: 1; }
+
+.wheel-pointer {
+  position: absolute;
+  top: -18px; left: 50%; transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-top: 30px solid #fbbf24;
+  filter: drop-shadow(0 4px 12px rgba(251,191,36,.8));
+  z-index: 10;
+}
+.wheel-circle {
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  position: relative; overflow: hidden;
+  border: 5px solid rgba(167,139,250,.5);
+  transition: transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+}
+.wheel-center {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 66px; height: 66px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  border: 4px solid rgba(255,255,255,.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.75rem; z-index: 10;
+  box-shadow: 0 0 30px rgba(124,58,237,.7), inset 0 2px 0 rgba(255,255,255,.15);
+}
+
+/* Spin btn */
+.spin-btn {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  color: #fff; border: none;
+  border-radius: 16px; padding: 15px 48px;
+  font-family: var(--font-head, 'Fredoka One', cursive);
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: filter .15s, transform .15s;
+  display: flex; align-items: center; gap: 10px;
+  margin: 0 auto;
+  position: relative; overflow: hidden;
+}
+.spin-btn::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
+  transform: translateX(-100%);
+  transition: transform .4s;
+}
+.spin-btn:hover:not(:disabled)::after { transform: translateX(100%); }
+.spin-btn:hover:not(:disabled) { filter: brightness(1.15); transform: translateY(-2px); }
+.spin-btn:active:not(:disabled) { transform: scale(.96); }
+.spin-btn:disabled { opacity: .38; cursor: not-allowed; }
+
+/* Game reveal */
+.game-reveal { display: none; }
+.game-reveal.show { display: block; animation: revealIn .5s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes revealIn { from { opacity:0; transform: scale(.78) translateY(18px); } }
+
+.game-reveal-card {
+  background: linear-gradient(135deg, rgba(124,58,237,.18), rgba(124,58,237,.06));
+  border: 2px solid rgba(124,58,237,.5);
+  border-radius: 18px;
+  padding: 20px 22px;
+  margin-bottom: 18px;
+  display: flex; align-items: center; gap: 16px;
+  text-align: left;
+  box-shadow: 0 0 30px rgba(124,58,237,.15);
+}
+.game-reveal-icon {
+  font-size: 3.4rem; flex-shrink: 0;
+  filter: drop-shadow(0 0 12px rgba(124,58,237,.6));
+  animation: iconFloat 2.5s ease-in-out infinite;
+}
+.game-reveal-name { font-family: var(--font-head, 'Fredoka One', cursive); font-size: 1.35rem; color: #fff; }
+.game-reveal-desc { font-size: .78rem; color: rgba(180,160,220,.75); font-weight: 700; margin-top: 4px; }
+.game-reveal-genre {
+  font-size: .6rem; font-weight: 900;
+  padding: 3px 10px; border-radius: 99px;
+  background: rgba(167,139,250,.2); color: #c4b5fd;
+  border: 1px solid rgba(167,139,250,.3);
+  display: inline-block; margin-top: 6px;
+  letter-spacing: .6px; text-transform: uppercase;
+}
+
+.enter-arena-btn {
+  width: 100%; padding: 16px;
+  background: linear-gradient(135deg, #f59e0b, #fbbf24, #fde68a);
+  color: #1a0800; border: none;
+  border-radius: 16px;
+  font-family: var(--font-head, 'Fredoka One', cursive);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: filter .15s, transform .15s, box-shadow .15s;
+  box-shadow: 0 8px 28px rgba(245,158,11,.45), 0 0 40px rgba(245,158,11,.15);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  position: relative; overflow: hidden;
+}
+.enter-arena-btn::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent);
+  transform: translateX(-100%); transition: transform .4s;
+}
+.enter-arena-btn:hover::before { transform: translateX(100%); }
+.enter-arena-btn:hover { filter: brightness(1.08); transform: translateY(-2px); box-shadow: 0 12px 36px rgba(245,158,11,.6); }
+.enter-arena-btn:active { transform: scale(.97); }
+
+/* Opponents */
+.opponents-grid { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 16px; }
+.opp-chip {
+  display: flex; align-items: center; gap: 5px;
+  background: rgba(167,139,250,.08);
+  border: 1px solid rgba(167,139,250,.2);
+  border-radius: 99px; padding: 4px 11px;
+  font-size: .7rem; font-weight: 800;
+  color: rgba(200,180,255,.85);
+  transition: background .15s;
+}
+.opp-chip:hover { background: rgba(167,139,250,.15); }
+.opp-dead { opacity: .38; text-decoration: line-through; border-color: rgba(248,113,113,.3) !important; color: rgba(248,113,113,.7) !important; }
+
+/* ── Result Modal ── */
+.result-modal {
+  background: #111111;
+  border: 1px solid rgba(167,139,250,.4);
+  border-radius: 30px;
+  padding: 44px 40px 40px;
+  width: 100%; max-width: 500px;
+  position: relative; text-align: center;
+  box-shadow: 0 40px 100px rgba(0,0,0,.85), 0 0 80px rgba(124,58,237,.1);
+  animation: modalIn .3s cubic-bezier(.34,1.56,.64,1) both;
+  overflow: hidden;
+}
+.result-modal::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, #fbbf24, #a78bfa, transparent);
+  animation: border-scan 3s ease-in-out infinite;
+}
+
+.result-icon {
+  font-size: 5.8rem; margin-bottom: 16px;
+  display: block;
+  animation: bounceIn .65s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes bounceIn { from { opacity:0; transform: scale(.25) rotate(-15deg); } }
+
+.result-title {
+  font-family: var(--font-head, 'Fredoka One', cursive);
+  font-size: 2.6rem; margin-bottom: 8px;
+  letter-spacing: .5px;
+}
+.result-title.win { text-shadow: 0 0 30px rgba(251,191,36,.5), 0 0 60px rgba(251,191,36,.2); }
+.result-title.loss { text-shadow: 0 0 30px rgba(248,113,113,.4); }
+
+.result-sub {
+  font-size: .88rem; font-weight: 700;
+  color: rgba(180,160,220,.72);
+  margin-bottom: 24px; line-height: 1.55;
+}
+.result-prize-box {
+  background: linear-gradient(135deg, rgba(251,191,36,.12), rgba(245,158,11,.05));
+  border: 2px solid rgba(251,191,36,.38);
+  border-radius: 18px; padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 30px rgba(251,191,36,.08);
+}
+.result-prize-label {
+  font-size: .66rem; font-weight: 900;
+  color: rgba(251,191,36,.7); letter-spacing: 1px;
+  text-transform: uppercase; margin-bottom: 8px;
+}
+.result-prize-coins {
+  font-family: var(--font-head, 'Fredoka One', cursive);
+  font-size: 2.6rem; color: #fbbf24;
+  text-shadow: 0 0 20px rgba(251,191,36,.5);
+}
+.result-prize-badge {
+  font-size: .8rem; font-weight: 800;
+  color: rgba(251,191,36,.8); margin-top: 6px;
+}
+.result-claim-btn {
+  width: 100%; padding: 15px;
+  background: linear-gradient(135deg, #f59e0b, #fbbf24, #fde68a);
+  color: #1a0800; border: none; border-radius: 14px;
+  font-family: var(--font-head, 'Fredoka One', cursive);
+  font-size: 1.15rem; cursor: pointer;
+  transition: filter .14s, transform .14s, box-shadow .14s; margin-bottom: 12px;
+  box-shadow: 0 6px 24px rgba(245,158,11,.4);
+  position: relative; overflow: hidden;
+}
+.result-claim-btn::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent);
+  transform: translateX(-100%); transition: transform .4s;
+}
+.result-claim-btn:hover::before { transform: translateX(100%); }
+.result-claim-btn:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 10px 32px rgba(245,158,11,.55); }
+.result-close-btn {
+  width: 100%; padding: 12px;
+  background: rgba(167,139,250,.1);
+  border: 1px solid rgba(167,139,250,.28);
+  color: #c4b5fd; border-radius: 14px;
+  font-family: var(--font-head, 'Fredoka One', cursive);
+  font-size: 1rem; cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.result-close-btn:hover { background: rgba(167,139,250,.2); border-color: rgba(167,139,250,.5); }
+
+.confetti-canvas { position: fixed; inset: 0; z-index: 3000; pointer-events: none; }
+
+/* History */
+.ev-hist-wrap {
+  background: linear-gradient(160deg, #130b32 0%, #0d0625 100%);
+  border: 1px solid rgba(167,139,250,.18);
+  border-radius: 20px; padding: 20px 24px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 8px 32px rgba(0,0,0,.35);
+}
+.ev-hist-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 13px 0;
+  border-bottom: 1px solid rgba(167,139,250,.07);
+  transition: background .15s, transform .15s;
+  border-radius: 8px;
+  padding-left: 8px;
+}
+.ev-hist-row:hover { background: rgba(167,139,250,.05); transform: translateX(4px); }
+.ev-hist-row:last-child { border-bottom: none; }
+.ev-hist-icon { font-size: 1.8rem; flex-shrink: 0; width: 40px; text-align: center; }
+.ev-hist-body { flex: 1; }
+.ev-hist-name { font-size: .85rem; font-weight: 800; color: #fff; }
+.ev-hist-meta { font-size: .7rem; color: rgba(167,139,250,.6); font-weight: 700; margin-top: 3px; }
+.ev-hist-result {
+  font-size: .7rem; font-weight: 900;
+  padding: 4px 13px; border-radius: 99px;
+  white-space: nowrap;
+}
+.hist-win  { background: rgba(74,222,128,.15); color: #4ade80; border: 1px solid rgba(74,222,128,.3); box-shadow: 0 0 10px rgba(74,222,128,.1); }
+.hist-loss { background: rgba(248,113,113,.1);  color: #f87171; border: 1px solid rgba(248,113,113,.25); }
+
+.ev-empty {
+  text-align: center; padding: 40px;
+  color: rgba(167,139,250,.42); font-size: .88rem; font-weight: 700;
+}
+.ev-empty-icon { font-size: 3rem; margin-bottom: 12px; opacity: .6; }
+
+@media (max-width: 768px) {
+  .ev-hero { flex-direction: column; text-align: center; padding: 26px 22px; gap: 20px; }
+  .ev-hero-stats { justify-content: center; }
+  .ev-grid { grid-template-columns: 1fr; }
+  .spin-modal, .result-modal { padding: 28px 20px; border-radius: 22px; }
+  .wheel-wrap { width: 250px; height: 250px; }
+  .wheel-circle { width: 250px; height: 250px; }
+  .wheel-center { width: 54px; height: 54px; font-size: 1.4rem; }
+  .wheel-ring { inset: -6px; }
+  .ev-hero-title { font-size: 1.8rem; }
+  .ev-chat-spectator-row { flex-direction: column; }
+  .spec-panel { width: 96vw; max-height: 88vh; }
+}
+
+/* ─────────────────────────────────────
+   WATCH / SPECTATE BUTTON ON CARDS
+───────────────────────────────────── */
+.ev-watch-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  margin-top: 8px; padding: 7px 16px;
+  background: rgba(79,195,247,.08);
+  border: 1px solid rgba(79,195,247,.28);
+  color: #4fc3f7; border-radius: 99px;
+  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: .76rem;
+  cursor: pointer; transition: all .16s; width: 100%;
+  justify-content: center;
+}
+.ev-watch-btn:hover {
+  background: rgba(79,195,247,.18); border-color: rgba(79,195,247,.5);
+  transform: translateY(-1px);
+}
+.ev-watch-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: #f87171;
+  animation: livePulse 1.4s ease-in-out infinite; flex-shrink: 0;
+}
+@keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+
+/* ─────────────────────────────────────
+   LIVE CHAT PANEL
+───────────────────────────────────── */
+.ev-chat-spectator-row {
+  display: flex; gap: 20px; align-items: flex-start; margin-top: 0;
+}
+.ev-chat-wrap {
+  flex: 1; background: linear-gradient(160deg, #130b32 0%, #0d0625 100%);
+  border: 1px solid rgba(167,139,250,.2);
+  border-radius: 20px; overflow: hidden;
+  display: flex; flex-direction: column;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 8px 32px rgba(0,0,0,.35);
+}
+.ev-chat-topbar {
+  display: flex; align-items: center; gap: 10px; padding: 14px 18px;
+  border-bottom: 1px solid rgba(167,139,250,.1);
+  background: rgba(167,139,250,.04);
+}
+.ev-chat-topbar-title {
+  font-family: 'Fredoka One', cursive; font-size: 1rem; color: #e0d4ff; flex: 1;
+}
+.ev-chat-viewer-pill {
+  display: flex; align-items: center; gap: 5px;
+  background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.25);
+  border-radius: 99px; padding: 3px 10px;
+  font-size: .7rem; font-weight: 900; color: #f87171;
+}
+.ev-chat-messages {
+  flex: 1; overflow-y: auto; padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 10px;
+  height: 340px; max-height: 340px;
+  scrollbar-width: thin; scrollbar-color: rgba(167,139,250,.2) transparent;
+}
+.ev-chat-messages::-webkit-scrollbar { width: 4px; }
+.ev-chat-messages::-webkit-scrollbar-thumb { background: rgba(167,139,250,.2); border-radius: 4px; }
+.ev-chat-msg {
+  display: flex; align-items: flex-start; gap: 9px;
+  animation: msgIn .22s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes msgIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+.ev-chat-msg.own { flex-direction: row-reverse; }
+.ev-chat-avatar {
+  width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+  background: rgba(124,58,237,.3); border: 1px solid rgba(167,139,250,.3);
+  display: flex; align-items: center; justify-content: center; font-size: .95rem;
+}
+.ev-chat-bubble-wrap { display: flex; flex-direction: column; max-width: 75%; }
+.ev-chat-msg.own .ev-chat-bubble-wrap { align-items: flex-end; }
+.ev-chat-name {
+  font-size: .62rem; font-weight: 900; color: rgba(167,139,250,.55);
+  margin-bottom: 3px; padding: 0 4px;
+}
+.ev-chat-bubble {
+  background: rgba(167,139,250,.1); border: 1px solid rgba(167,139,250,.18);
+  border-radius: 14px 14px 14px 2px;
+  padding: 7px 12px; font-size: .8rem; font-weight: 700;
+  color: #e0d4ff; line-height: 1.45; word-break: break-word;
+}
+.ev-chat-msg.own .ev-chat-bubble {
+  background: rgba(124,58,237,.25); border-color: rgba(167,139,250,.35);
+  border-radius: 14px 14px 2px 14px;
+  color: #f0e8ff;
+}
+.ev-chat-system {
+  text-align: center; font-size: .68rem; color: rgba(167,139,250,.4);
+  font-weight: 800; padding: 2px 0;
+}
+.ev-chat-input-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 14px; border-top: 1px solid rgba(167,139,250,.1);
+  background: rgba(167,139,250,.03);
+}
+.ev-chat-input {
+  flex: 1; background: rgba(167,139,250,.06); border: 1px solid rgba(167,139,250,.2);
+  border-radius: 99px; padding: 9px 16px;
+  color: #f0e8ff; font-family: 'Nunito', sans-serif; font-size: .82rem; font-weight: 700;
+  outline: none; transition: border-color .15s;
+}
+.ev-chat-input::placeholder { color: rgba(167,139,250,.35); }
+.ev-chat-input:focus { border-color: rgba(167,139,250,.5); }
+.ev-chat-send {
+  background: linear-gradient(135deg,#7c3aed,#a855f7);
+  border: none; border-radius: 99px;
+  color: #fff; font-family: 'Fredoka One', cursive;
+  font-size: .82rem; padding: 9px 18px; cursor: pointer;
+  transition: filter .14s, transform .14s; white-space: nowrap;
+}
+.ev-chat-send:hover { filter: brightness(1.12); transform: translateY(-1px); }
+
+/* ─────────────────────────────────────
+   SPECTATOR PANEL (right sidebar next to chat)
+───────────────────────────────────── */
+.ev-spec-sidebar {
+  width: 280px; flex-shrink: 0;
+  background: linear-gradient(160deg, #0a1535 0%, #060d24 100%);
+  border: 1px solid rgba(79,195,247,.2);
+  border-radius: 20px; overflow: hidden;
+  display: flex; flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0,0,0,.35);
+}
+.ev-spec-sidebar-hd {
+  display: flex; align-items: center; gap: 8px; padding: 14px 16px;
+  border-bottom: 1px solid rgba(79,195,247,.1);
+  background: rgba(79,195,247,.04);
+}
+.ev-spec-sidebar-title {
+  font-family: 'Fredoka One', cursive; font-size: .95rem; color: #4fc3f7; flex: 1;
+}
+.ev-spec-tab-row {
+  display: flex; border-bottom: 1px solid rgba(167,139,250,.1);
+}
+.ev-spec-tab {
+  flex: 1; padding: 10px 4px; text-align: center;
+  font-size: .7rem; font-weight: 900; color: rgba(167,139,250,.5);
+  background: none; border: none; cursor: pointer;
+  border-bottom: 2px solid transparent; transition: all .15s;
+}
+.ev-spec-tab.active { color: #4fc3f7; border-bottom-color: #4fc3f7; }
+.ev-spec-body { flex: 1; overflow-y: auto; height: 340px; max-height: 340px; }
+/* Leaderboard */
+.ev-spec-lb-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-bottom: 1px solid rgba(167,139,250,.06);
+  transition: background .12s;
+}
+.ev-spec-lb-row:hover { background: rgba(167,139,250,.04); }
+.ev-spec-rank {
+  width: 22px; text-align: center;
+  font-size: .7rem; font-weight: 900;
+  color: rgba(167,139,250,.5);
+}
+.ev-spec-lb-av {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  background: rgba(124,58,237,.25); border: 1px solid rgba(167,139,250,.25);
+  display: flex; align-items: center; justify-content: center; font-size: .82rem;
+}
+.ev-spec-lb-name {
+  flex: 1; font-size: .75rem; font-weight: 800; color: #e0d4ff;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ev-spec-lb-score {
+  font-family: 'Fredoka One', cursive; font-size: .82rem; color: #fbbf24;
+}
+/* Feed */
+.ev-spec-feed-item {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 9px 14px; border-bottom: 1px solid rgba(167,139,250,.05);
+  animation: msgIn .2s ease both;
+  font-size: .73rem; color: rgba(210,195,240,.75); font-weight: 700; line-height: 1.4;
+}
+.ev-spec-feed-icon { flex-shrink: 0; font-size: .9rem; margin-top: 1px; }
+.ev-spec-feed-time { font-size: .6rem; color: rgba(167,139,250,.35); margin-left: auto; flex-shrink: 0; }
+
+/* ─────────────────────────────────────
+   MATCHMAKING MODAL
+───────────────────────────────────── */
+.mm-modal {
+  background: #111111;
+  border: 1px solid rgba(167,139,250,.45);
+  border-radius: 30px;
+  padding: 36px 36px 40px;
+  width: 100%; max-width: 520px;
+  position: relative; text-align: center;
+  box-shadow: 0 40px 100px rgba(0,0,0,.85), 0 0 0 1px rgba(167,139,250,.06), 0 0 80px rgba(124,58,237,.1);
+  animation: modalIn .35s cubic-bezier(.34,1.56,.64,1) both;
+  overflow: hidden;
+}
+.mm-modal::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, #4fc3f7, #a78bfa, #f472b6, transparent);
+  animation: border-scan 2.5s ease-in-out infinite;
+}
+
+/* Spinning rings */
+.mm-ring-wrap {
+  position: relative; width: 100px; height: 100px;
+  margin: 0 auto 22px;
+  display: flex; align-items: center; justify-content: center;
+}
+.mm-ring, .mm-ring-inner {
+  position: absolute; border-radius: 50%;
+}
+.mm-ring {
+  inset: 0;
+  border: 3px solid rgba(167,139,250,.15);
+  border-top-color: #a78bfa;
+  border-right-color: #4fc3f7;
+  animation: mm-spin 1s linear infinite;
+}
+.mm-ring-inner {
+  inset: 10px;
+  border: 2.5px solid rgba(167,139,250,.08);
+  border-bottom-color: rgba(244,114,182,.6);
+  border-left-color: rgba(251,191,36,.4);
+  animation: mm-spin 1.6s linear infinite reverse;
+}
+.mm-ring-icon {
+  font-size: 1.8rem; z-index: 2; position: relative;
+  animation: mm-pulse 1.5s ease-in-out infinite;
+}
+@keyframes mm-spin    { to { transform: rotate(360deg); } }
+@keyframes mm-pulse   { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+
+.mm-title {
+  font-family: var(--font-head,'Fredoka One',cursive);
+  font-size: 1.5rem; color: #fff; margin-bottom: 6px;
+}
+.mm-sub {
+  font-size: .82rem; font-weight: 700;
+  color: rgba(167,139,250,.6); margin-bottom: 20px;
+}
+
+/* Pulse dots */
+.mm-pulse-dots { display: flex; justify-content: center; gap: 8px; margin-top: 4px; }
+.mm-pulse-dots span {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(167,139,250,.5);
+  animation: dot-pulse 1.4s ease-in-out infinite;
+}
+.mm-pulse-dots span:nth-child(2) { animation-delay: .2s; }
+.mm-pulse-dots span:nth-child(3) { animation-delay: .4s; }
+@keyframes dot-pulse {
+  0%,80%,100% { transform: scale(.7); opacity: .4; }
+  40%          { transform: scale(1.1); opacity: 1; }
+}
+
+/* Lobby */
+.mm-lobby-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.mm-lobby-title {
+  font-family: var(--font-head,'Fredoka One',cursive);
+  font-size: 1.35rem; color: #4ade80;
+  text-shadow: 0 0 16px rgba(74,222,128,.5);
+}
+.mm-lobby-count {
+  font-size: .75rem; font-weight: 900;
+  color: rgba(167,139,250,.65);
+  background: rgba(167,139,250,.08);
+  border: 1px solid rgba(167,139,250,.2);
+  border-radius: 99px; padding: 3px 12px;
+}
+
+/* Player card in lobby */
+.mm-player-card {
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(167,139,250,.06);
+  border: 1px solid rgba(167,139,250,.18);
+  border-radius: 14px; padding: 10px 14px;
+  margin-bottom: 7px;
+  animation: card-rise .35s cubic-bezier(.34,1.56,.64,1) both;
+  text-align: left;
+  transition: background .18s, border-color .18s;
+}
+.mm-player-card:hover { background: rgba(167,139,250,.1); border-color: rgba(167,139,250,.3); }
+.mm-player-card.me-card {
+  background: rgba(74,222,128,.06);
+  border-color: rgba(74,222,128,.3);
+}
+.mm-player-avatar {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; flex-shrink: 0;
+  border: 2px solid rgba(167,139,250,.3);
+  box-shadow: 0 0 14px rgba(124,58,237,.3);
+}
+.mm-player-info { flex: 1; min-width: 0; }
+.mm-player-name { font-weight: 900; font-size: .9rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mm-player-meta { font-size: .72rem; color: rgba(167,139,250,.6); font-weight: 700; margin-top: 2px; }
+
+/* Rank badges */
+.rank-badge {
+  font-size: .6rem; font-weight: 900;
+  padding: 3px 10px; border-radius: 99px;
+  letter-spacing: .6px; text-transform: uppercase;
+  white-space: nowrap; flex-shrink: 0;
+}
+.rank-bronze   { background: rgba(205,127,50,.18); color: #cd7f32; border: 1px solid rgba(205,127,50,.35); }
+.rank-silver   { background: rgba(192,192,192,.15); color: #d0d0d0; border: 1px solid rgba(192,192,192,.3); }
+.rank-gold     { background: rgba(255,215,0,.16);   color: #ffd700; border: 1px solid rgba(255,215,0,.35); box-shadow: 0 0 8px rgba(255,215,0,.1); }
+.rank-platinum { background: rgba(229,228,226,.14); color: #e5e4e2; border: 1px solid rgba(229,228,226,.3); }
+.rank-diamond  { background: rgba(79,195,247,.14);  color: #4fc3f7; border: 1px solid rgba(79,195,247,.3); box-shadow: 0 0 8px rgba(79,195,247,.12); }
+
+/* Countdown */
+.mm-countdown-wrap { margin-top: 16px; }
+.mm-cd-num {
+  font-family: var(--font-head,'Fredoka One',cursive);
+  font-size: 4.5rem; color: #a78bfa;
+  text-shadow: 0 0 30px rgba(167,139,250,.8), 0 0 60px rgba(167,139,250,.3);
+  animation: cd-pop .55s cubic-bezier(.34,1.56,.64,1) both;
+  display: inline-block;
+}
+@keyframes cd-pop {
+  from { opacity:0; transform: scale(1.6) rotate(-5deg); }
+  to   { opacity:1; transform: scale(1) rotate(0deg); }
+}
+
+/* Level up keyframe */
+@keyframes levelUpPop {
+  0%   { opacity:0; transform: translate(-50%,-50%) scale(.5); }
+  60%  { opacity:1; transform: translate(-50%,-50%) scale(1.06); }
+  100% {            transform: translate(-50%,-50%) scale(1); }
+}
+</style>
+<script src="audit-loader.js" defer></script>
+  <script src="debug-dashboard.js" defer></script>
+</head>
+<body data-page="events">
+<!-- Trick polish.js into skipping the starfield (we want plain purple bg) -->
+<div id="eylox-space-bg" style="display:none"></div>
+
+<div class="app-wrapper">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <span class="sidebar-logo-icon">🎮</span>
+      <span class="sidebar-logo-text">Eylox</span>
+    </a>
+
+    <p class="sidebar-section-label">Menu</p>
+    <nav class="sidebar-nav" aria-label="Main navigation">
+      <ul>
+        <li><a href="index.html" class="sidebar-link"><span class="s-icon">🏠</span><span class="s-label">Home</span></a></li>
+        <li><a href="games.html" class="sidebar-link"><span class="s-icon">🔭</span><span class="s-label">Discover</span></a></li>
+        <li><a href="leaderboard.html" class="sidebar-link"><span class="s-icon">🏆</span><span class="s-label">Leaderboard</span></a></li>
+        <li><a href="achievements.html" class="sidebar-link"><span class="s-icon">🎖️</span><span class="s-label">Achievements</span></a></li>
+        <li><a href="events.html" class="sidebar-link active" aria-current="page"><span class="s-icon">🎯</span><span class="s-label">Live Events</span></a></li>
+        <li><a href="communities.html" class="sidebar-link"><span class="s-icon">🌐</span><span class="s-label">Communities</span></a></li>
+        <li><a href="friends.html" class="sidebar-link"><span class="s-icon">🤝</span><span class="s-label">Friends</span></a></li>
+        <li><a href="profile.html" class="sidebar-link"><span class="s-icon">👤</span><span class="s-label">Profile</span></a></li>
+        <li><a href="messages.html" class="sidebar-link"><span class="s-icon">💬</span><span class="s-label">Messages</span></a></li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-divider"></div>
+
+    <p class="sidebar-section-label">More</p>
+    <nav class="sidebar-nav" aria-label="Secondary navigation">
+      <ul>
+        <li><a href="shop.html" class="sidebar-link"><span class="s-icon">🛒</span><span class="s-label">Shop</span></a></li>
+        <li><a href="ai.html" class="sidebar-link"><span class="s-icon">🤖</span><span class="s-label">Eylox Studio</span><span class="s-soon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff">AI</span></a></li>
+        <li><a href="subscription.html" class="sidebar-link"><span class="s-icon">💎</span><span class="s-label">Subscription</span></a></li>
+        <li><button class="sidebar-link sb-action" onclick="openSettingsPanel()"><span class="s-icon">⚙️</span><span class="s-label">Settings</span></button></li>
+        <li><button class="sidebar-link sb-action" onclick="eyloxLogout()" style="color:#f87171"><span class="s-icon">🚪</span><span class="s-label">Log Out</span></button></li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-coins">
+      <span>💰</span>
+      <div>
+        <div class="coins-amount" id="sidebarEylux">0</div>
+        <div class="coins-label">Eylux</div>
+      </div>
+    </div>
+    <div class="sidebar-coins" style="margin-top:8px">
+      <span>🏆</span>
+      <div>
+        <div class="Eyltrophs-amount" id="sidebarEyltrophs">0</div>
+        <div class="coins-label">Eyltrophs</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN AREA ── -->
+  <div class="main-area">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="menu-btn" id="sidebarToggle" aria-label="Toggle sidebar">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="topbar-brand" style="font-family:'Fredoka One',cursive;font-size:1.1rem;color:#a78bfa;letter-spacing:.5px">🎯 Live Events</div>
+      <div class="topbar-right">
+        <div class="tb-Eyltrophs">🏆 <span id="topbarEyltrophs">0</span></div>
+        <div class="tb-coins">💰 <span id="topbarEylux">0</span></div>
+        <a href="profile.html" class="tb-avatar" aria-label="My profile">🎮<span class="online-dot"></span></a>
+      </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <main class="page-content">
+      <div style="max-width:1100px;margin:0 auto;padding:20px 24px">
+
+        <!-- Hero -->
+        <div class="ev-hero">
+          <div class="orb1"></div>
+          <div class="orb2"></div>
+          <div class="orb3"></div>
+          <div class="ev-hero-icon">🎯</div>
+          <div class="ev-hero-text">
+            <div class="ev-hero-title">Live Events Arena</div>
+            <div class="ev-hero-sub">
+              <span style="opacity:.55">⚡</span>
+              Spin the wheel · Conquer the arena · Claim your prize
+            </div>
+            <div class="ev-hero-stats">
+              <span class="ev-hero-stat">🔴 <span id="heroLiveCount">3</span>&nbsp;LIVE NOW</span>
+              <span class="ev-hero-stat">👥 <span id="heroPlayerCount">142</span>&nbsp;COMPETING</span>
+              <span class="ev-hero-stat">💰 <span id="heroTotalPrize">12,500</span>&nbsp;IN PRIZES</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Events -->
+        <div class="ev-section-hd">
+          <div class="ev-live-dot"></div>
+          <div class="ev-section-title">Live Now</div>
+          <span class="ev-live-badge">🔴 3 ACTIVE</span>
+        </div>
+        <div class="ev-grid" id="liveEventsGrid"></div>
+
+        <!-- Upcoming Events -->
+        <div class="ev-section-hd" style="margin-top:40px">
+          <div class="ev-section-title">⏳ Upcoming Events</div>
+        </div>
+        <div class="ev-grid" id="upcomingEventsGrid"></div>
+
+        <!-- Live Chat + Spectator Sidebar -->
+        <div class="ev-section-hd" style="margin-top:40px">
+          <div class="ev-live-dot"></div>
+          <div class="ev-section-title">💬 Event Chat</div>
+          <span class="ev-live-badge" id="chatViewerBadge">👁 <span id="chatViewerCount">47</span> watching</span>
+        </div>
+        <div class="ev-chat-spectator-row">
+
+          <!-- Chat -->
+          <div class="ev-chat-wrap">
+            <div class="ev-chat-topbar">
+              <span style="font-size:1rem">💬</span>
+              <div class="ev-chat-topbar-title">Global Event Chat</div>
+              <div class="ev-chat-viewer-pill">
+                <span class="ev-watch-dot"></span>
+                <span id="chatViewerPill">47 LIVE</span>
+              </div>
+            </div>
+            <div class="ev-chat-messages" id="chatMessages"></div>
+            <div class="ev-chat-input-row">
+              <input type="text" class="ev-chat-input" id="chatInput"
+                     placeholder="Chat with spectators..." maxlength="120"
+                     onkeydown="if(event.key==='Enter')sendChat()"/>
+              <button class="ev-chat-send" onclick="sendChat()">Send ↵</button>
+            </div>
+          </div>
+
+          <!-- Spectator sidebar -->
+          <div class="ev-spec-sidebar">
+            <div class="ev-spec-sidebar-hd">
+              <span class="ev-watch-dot"></span>
+              <div class="ev-spec-sidebar-title">Live Scoreboard</div>
+              <span style="font-size:.65rem;color:rgba(79,195,247,.55);font-weight:900" id="specEventName">Grand Prix Rush</span>
+            </div>
+            <div class="ev-spec-tab-row">
+              <button class="ev-spec-tab active" id="stab-lb"   onclick="switchSpecTab('lb')">🏆 Scores</button>
+              <button class="ev-spec-tab"         id="stab-feed" onclick="switchSpecTab('feed')">⚡ Feed</button>
+            </div>
+            <div class="ev-spec-body">
+              <div id="specLeaderboard"></div>
+              <div id="specFeed" style="display:none"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- History -->
+        <div class="ev-section-hd" style="margin-top:40px">
+          <div class="ev-section-title">📜 My Event History</div>
+        </div>
+        <div class="ev-hist-wrap" id="historyWrap">
+          <div class="ev-empty" id="historyEmpty">
+            <div class="ev-empty-icon">🎮</div>
+            No events played yet. Join one above to get started!
+          </div>
+          <div id="historyList"></div>
+        </div>
+
+      </div>
+    </main>
+  </div><!-- /main-area -->
+</div><!-- /app-wrapper -->
+
+<!-- ══════════════════════════════════════
+     SPIN WHEEL MODAL
+══════════════════════════════════════ -->
+<div class="modal-overlay" id="spinModal">
+  <div class="spin-modal">
+    <button class="spin-close-btn" onclick="closeSpinModal()">✕</button>
+    <div class="spin-modal-title" id="spinModalTitle">🎰 Spin the Wheel!</div>
+    <div class="spin-modal-sub" id="spinModalSub">Your fate is one spin away.</div>
+
+    <div class="wheel-wrap" id="wheelWrap">
+      <div class="wheel-ring" data-tip="wheel-ring"></div>
+      <div class="wheel-pointer"></div>
+      <div class="wheel-circle" id="wheel" data-tip="spin-wheel"></div>
+      <div class="wheel-center">🎯</div>
+    </div>
+
+    <div id="opponentsPreview"></div>
+
+    <div id="spinBtnWrap">
+      <button class="spin-btn" id="spinBtn" onclick="doSpin()" data-tip="spin-btn">
+        🎰 SPIN THE WHEEL
+      </button>
+    </div>
+
+    <div class="game-reveal" id="gameReveal">
+      <div class="game-reveal-card" id="gameRevealCard"></div>
+      <button class="enter-arena-btn" onclick="launchEvent()">
+        ⚔️ Enter the Arena
+      </button>
+      <div style="font-size:.68rem;font-weight:700;color:rgba(167,139,250,.45);margin-top:10px">
+        Last survivor wins the prize · All opponents are fighting for their life too
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     RESULT MODAL
+══════════════════════════════════════ -->
+<div class="modal-overlay" id="resultModal">
+  <div class="result-modal">
+    <span class="result-icon" id="resultIcon">🏆</span>
+    <div class="result-title" id="resultTitle">Victory!</div>
+    <div class="result-sub" id="resultSub"></div>
+    <div id="resultPrizeBox"></div>
+    <div id="resultOpponents" style="margin-bottom:18px"></div>
+    <button class="result-claim-btn" id="resultClaimBtn" onclick="claimPrize()" data-tip="claim-btn">🎁 Claim Prize</button>
+    <button class="result-close-btn" onclick="closeResult()">Continue Playing</button>
+  </div>
+</div>
+
+<canvas class="confetti-canvas" id="confettiCanvas" style="display:none"></canvas>
+
+<!-- ══════════════════════════════════════
+     SPECTATOR FULL-SCREEN OVERLAY
+══════════════════════════════════════ -->
+<div class="modal-overlay" id="spectatorOverlay" style="display:none" onclick="if(event.target===this)closeSpectator()">
+  <div class="spec-panel" style="
+    background:#0f0a1e;border:1px solid rgba(79,195,247,.35);border-radius:28px;
+    padding:0;width:min(680px,96vw);max-height:88vh;overflow:hidden;
+    display:flex;flex-direction:column;
+    box-shadow:0 40px 100px rgba(0,0,0,.85),0 0 60px rgba(79,195,247,.08);
+    animation:modalIn .32s cubic-bezier(.34,1.56,.64,1) both;
+  ">
+    <!-- Header -->
+    <div style="
+      display:flex;align-items:center;gap:14px;padding:20px 24px;
+      border-bottom:1px solid rgba(79,195,247,.15);
+      background:linear-gradient(135deg,rgba(79,195,247,.06),rgba(124,58,237,.06));
+      position:relative;
+    ">
+      <div style="width:10px;height:10px;border-radius:50%;background:#f87171;animation:livePulse 1.4s ease-in-out infinite;flex-shrink:0"></div>
+      <div style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:#4fc3f7;flex:1" id="specOvTitle">Grand Prix Rush</div>
+      <div style="font-size:.72rem;font-weight:900;color:rgba(79,195,247,.6);margin-right:8px">
+        👁 <span id="specOvViewers">47</span> watching
+      </div>
+      <button onclick="closeSpectator()" style="
+        background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);
+        color:rgba(200,190,230,.6);border-radius:50%;width:32px;height:32px;
+        cursor:pointer;font-size:.9rem;flex-shrink:0;
+      ">✕</button>
+    </div>
+    <!-- Tabs -->
+    <div style="display:flex;border-bottom:1px solid rgba(167,139,250,.1)">
+      <button class="ev-spec-tab active" id="sovtab-lb"   onclick="switchSpecOvTab('lb')"   style="flex:1;padding:12px">🏆 Live Scoreboard</button>
+      <button class="ev-spec-tab"        id="sovtab-feed" onclick="switchSpecOvTab('feed')" style="flex:1;padding:12px">⚡ Action Feed</button>
+      <button class="ev-spec-tab"        id="sovtab-info" onclick="switchSpecOvTab('info')" style="flex:1;padding:12px">📋 Event Info</button>
+    </div>
+    <!-- Body -->
+    <div style="flex:1;overflow-y:auto;padding:0">
+      <div id="specOvLb"></div>
+      <div id="specOvFeed" style="display:none"></div>
+      <div id="specOvInfo" style="display:none;padding:24px"></div>
+    </div>
+    <!-- Footer -->
+    <div style="
+      padding:14px 20px;border-top:1px solid rgba(167,139,250,.1);
+      display:flex;align-items:center;gap:10px;background:rgba(167,139,250,.03);
+    ">
+      <input id="specOvChatInput" type="text" placeholder="Chat while spectating..." maxlength="120"
+        onkeydown="if(event.key==='Enter')sendChatFromSpec()"
+        style="
+          flex:1;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.2);
+          border-radius:99px;padding:9px 16px;color:#f0e8ff;
+          font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;outline:none;
+        "/>
+      <button onclick="sendChatFromSpec()" style="
+        background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:99px;
+        color:#fff;font-family:'Fredoka One',cursive;font-size:.82rem;
+        padding:9px 18px;cursor:pointer;white-space:nowrap;
+      ">Send ↵</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MATCHMAKING MODAL
+══════════════════════════════════════ -->
+<div class="modal-overlay" id="matchmakingModal">
+  <div class="mm-modal">
+    <!-- Phase 1: Searching -->
+    <div id="mmSearching">
+      <div class="mm-ring-wrap">
+        <div class="mm-ring"></div>
+        <div class="mm-ring-inner"></div>
+        <div class="mm-ring-icon">🔍</div>
+      </div>
+      <div class="mm-title">Finding Players...</div>
+      <div class="mm-sub">Searching for opponents near your skill level</div>
+      <div class="mm-pulse-dots"><span></span><span></span><span></span></div>
+    </div>
+    <!-- Phase 2: Lobby -->
+    <div id="mmLobby" style="display:none">
+      <div class="mm-lobby-header">
+        <span class="mm-lobby-title">⚔️ Match Found!</span>
+        <span class="mm-lobby-count" id="mmLobbyCount">0 players</span>
+      </div>
+      <div class="mm-players-list" id="mmPlayersList"></div>
+      <div class="mm-countdown-wrap" id="mmCountdown"></div>
+    </div>
+    <button class="spin-close-btn" onclick="closeMatchmaking()" style="top:14px;right:16px">✕</button>
+  </div>
+</div>
+
+<script src="polish.js" defer></script>
+<script src="floating-actions.js"></script>
+  <script src="tooltip.js" defer></script>
+<script src="ads.js" defer></script>
+<script src="sw-register.js"></script>
+<!-- v2.0 Improvements -->
+<script src="currencies.js"></script>
+  <script src="platform-improvements.js"></script>
+<script src="clan-system.js"></script>
+<script src="season-pass.js"></script>
+<script src="video-call.js"></script>
+<script src="offline.js" defer></script>
+<script>
+'use strict';
+
+/* ═══════════════════════════════════════
+   SIDEBAR TOGGLE
+═══════════════════════════════════════ */
+document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+  document.getElementById('sidebar')?.classList.toggle('open');
+});
+
+/* ═══════════════════════════════════════
+   AUTH HELPERS
+═══════════════════════════════════════ */
+function eyloxLogout() {
+  if (!confirm('Log out of Eylox?')) return;
+  ['eylox_token','eylox_user','eylox_guest'].forEach(k => localStorage.removeItem(k));
+  window.location.href = 'landing.html';
+}
+function openSettingsPanel() { window.location.href = 'settings.html'; }
+
+/* ═══════════════════════════════════════
+   EVENTS DATA
+═══════════════════════════════════════ */
+const EVENTS = [
+  {
+    id: 'grand-prix',
+    name: 'Grand Prix Rush',
+    desc: 'Race to the finish. Last player standing wins the gold trophy.',
+    icon: '🏆',
+    banner: 'linear-gradient(135deg,#4c1d95 0%,#7c3aed 50%,#f59e0b 100%)',
+    status: 'live',
+    prize: { coins: 1500, tokens: 50, badge: '🏁 Racing Champion' },
+    entry: 100,
+    players: { current: 47, max: 64 },
+    timeLeft: 8 * 60,
+    accent: '#f59e0b',
+  },
+  {
+    id: 'survival-challenge',
+    name: 'Survival Challenge',
+    desc: 'Outlast every opponent in the harshest arena. Only the strongest survive.',
+    icon: '⚔️',
+    banner: 'linear-gradient(135deg,#7f1d1d 0%,#b91c1c 50%,#ef4444 100%)',
+    status: 'live',
+    prize: { coins: 3000, tokens: 100, badge: '⚔️ Arena Survivor' },
+    entry: 250,
+    players: { current: 28, max: 32 },
+    timeLeft: 23 * 60,
+    accent: '#ef4444',
+  },
+  {
+    id: 'midnight-cup',
+    name: 'Midnight Mystery Cup',
+    desc: 'The game is unknown. The prize is massive. Do you dare?',
+    icon: '🌙',
+    banner: 'linear-gradient(135deg,#1e1b4b 0%,#3730a3 50%,#818cf8 100%)',
+    status: 'live',
+    prize: { coins: 8000, tokens: 250, badge: '🌙 Midnight Legend' },
+    entry: 500,
+    players: { current: 12, max: 16 },
+    timeLeft: 4 * 60,
+    accent: '#818cf8',
+  },
+  {
+    id: 'beginner-cup',
+    name: "Beginner's Cup",
+    desc: 'No entry fee. Perfect for new players to earn their first event win.',
+    icon: '🌟',
+    banner: 'linear-gradient(135deg,#064e3b 0%,#059669 50%,#34d399 100%)',
+    status: 'upcoming',
+    prize: { coins: 500, tokens: 20, badge: '🌟 First Winner' },
+    entry: 0,
+    players: { current: 0, max: 100 },
+    timeLeft: 35 * 60,
+    accent: '#10b981',
+  },
+  {
+    id: 'elite-tournament',
+    name: 'Elite Tournament',
+    desc: 'The ultimate showdown. Top 3 all receive prizes. Winner takes the crown.',
+    icon: '👑',
+    banner: 'linear-gradient(135deg,#451a03 0%,#b45309 50%,#fbbf24 100%)',
+    status: 'upcoming',
+    prize: { coins: 15000, tokens: 500, badge: '👑 Tournament Champion' },
+    entry: 1000,
+    players: { current: 0, max: 32 },
+    timeLeft: 2 * 60 * 60,
+    accent: '#d97706',
+  },
+  {
+    id: 'speed-blitz',
+    name: 'Speed Blitz',
+    desc: 'Fastest fingers wins. Reaction time is everything in this event.',
+    icon: '⚡',
+    banner: 'linear-gradient(135deg,#0c4a6e 0%,#0284c7 50%,#38bdf8 100%)',
+    status: 'upcoming',
+    prize: { coins: 2000, tokens: 75, badge: '⚡ Speed Demon' },
+    entry: 150,
+    players: { current: 0, max: 50 },
+    timeLeft: 90 * 60,
+    accent: '#38bdf8',
+  },
+];
+
+/* ═══════════════════════════════════════
+   WHEEL GAMES
+═══════════════════════════════════════ */
+const WHEEL_GAMES = [
+  { title:'Ninja Dash',      icon:'🥷', genre:'action',   desc:'Sprint through obstacles at breakneck speed.',       color:'#7c3aed', url:'game.html' },
+  { title:'Block Stacker',   icon:'🧱', genre:'puzzle',   desc:'Stack blocks, clear rows, survive the pressure.',    color:'#10b981', url:'game3d-obby.html' },
+  { title:'Ocean Cleanup',   icon:'🌊', genre:'simulator',desc:'Sail the seas and catch everything in your path.',   color:'#0ea5e9', url:'game3d-pirate.html' },
+  { title:'Logic Lab',       icon:'🎯', genre:'puzzle',   desc:'Solve puzzles faster than your opponents.',          color:'#f59e0b', url:'game.html' },
+  { title:'Neon Racer',      icon:'🚗', genre:'racing',   desc:'Burn rubber on neon-lit tracks at hyperspeed.',      color:'#ec4899', url:'game3d-city.html' },
+  { title:'Alien Blaster',   icon:'👾', genre:'shooter',  desc:'Eliminate waves of alien invaders to survive.',      color:'#ef4444', url:'game.html' },
+  { title:'Candy Chaos',     icon:'🍬', genre:'adventure',desc:'Navigate a sugary world full of surprises.',         color:'#f472b6', url:'game3d-obby.html' },
+  { title:'Crystal Catcher', icon:'💎', genre:'adventure',desc:'Catch falling crystals and dodge dark shards.',      color:'#a78bfa', url:'game3d-treasure.html' },
+];
+
+/* ═══════════════════════════════════════
+   STATE
+═══════════════════════════════════════ */
+let activeEvent  = null;
+let selectedGame = null;
+let hasSpun      = false;
+let timers       = {};
+
+/* ═══════════════════════════════════════
+   BUILD WHEEL
+═══════════════════════════════════════ */
+function buildWheel() {
+  const n   = WHEEL_GAMES.length;
+  const deg = 360 / n;
+  const wheel = document.getElementById('wheel');
+
+  // Conic gradient background
+  const gradient = WHEEL_GAMES.map((g, i) => {
+    const start = i * deg, end = start + deg;
+    return `${g.color} ${start}deg ${end}deg`;
+  }).join(', ');
+  wheel.style.background = `conic-gradient(${gradient})`;
+
+  // Labels
+  wheel.innerHTML = '';
+  const R = 150; // wheel radius px
+  WHEEL_GAMES.forEach((g, i) => {
+    const mid = (i + 0.5) * deg;
+    const rad = (mid - 90) * Math.PI / 180;
+    const r   = 90;
+    const cx  = R + r * Math.cos(rad);
+    const cy  = R + r * Math.sin(rad);
+    const lbl = document.createElement('div');
+    lbl.style.cssText = `
+      position:absolute;
+      left:${cx}px;top:${cy}px;
+      transform:translate(-50%,-50%) rotate(${mid}deg);
+      font-size:.56rem;font-weight:900;
+      color:rgba(255,255,255,.95);
+      text-shadow:0 1px 4px rgba(0,0,0,.95);
+      white-space:nowrap;pointer-events:none;
+      line-height:1.3;text-align:center;
+    `;
+    lbl.textContent = g.icon + ' ' + g.title;
+    wheel.appendChild(lbl);
+  });
+}
+
+/* ═══════════════════════════════════════
+   RENDER
+═══════════════════════════════════════ */
+function renderEvents() {
+  const live     = EVENTS.filter(e => e.status === 'live');
+  const upcoming = EVENTS.filter(e => e.status === 'upcoming');
+  document.getElementById('liveEventsGrid').innerHTML     = live.map(buildCard).join('');
+  document.getElementById('upcomingEventsGrid').innerHTML = upcoming.map(buildCard).join('');
+  startTimers();
+  renderHistory();
+}
+
+function buildCard(ev) {
+  const pct    = Math.round((ev.players.current / ev.players.max) * 100);
+  const isLive = ev.status === 'live';
+  const isFull = ev.players.current >= ev.players.max;
+  const user   = getUser();
+  const coins  = user ? (user.coins || 0) : 0;
+  const noMoney = ev.entry > 0 && coins < ev.entry;
+
+  const btnText = isFull
+    ? '🔒 Full'
+    : !isLive
+      ? '⏳ Opens Soon'
+      : ev.entry === 0
+        ? '🎯 Join Free'
+        : `⚔️ Join — ${ev.entry} 🪙`;
+  const btnStyle = isFull || !isLive
+    ? 'background:rgba(107,114,128,.2);color:#6b7280;border:1px solid rgba(107,114,128,.2)'
+    : `background:linear-gradient(135deg,${ev.accent},${ev.accent}bb)`;
+  const fillStyle = isLive
+    ? `background:linear-gradient(90deg,${ev.accent},${ev.accent}88)`
+    : 'background:rgba(251,191,36,.4)';
+
+  return `
+  <div class="ev-card">
+    <div class="ev-card-banner" style="background:${ev.banner}">
+      <div class="ev-card-banner-emoji">${ev.icon}</div>
+      <span class="ev-card-status status-${ev.status}">${isLive ? '🔴 LIVE' : '⏳ SOON'}</span>
+      <span class="ev-card-timer" id="timer-${ev.id}">⏱ ${fmtTime(ev.timeLeft)}</span>
+    </div>
+    <div class="ev-card-body">
+      <div class="ev-card-name">${ev.name}</div>
+      <div class="ev-card-desc">${ev.desc}</div>
+
+      <div class="ev-prize-box">
+        <div class="ev-prize-icon">🏆</div>
+        <div>
+          <div class="ev-prize-label">Prize Pool</div>
+          <div class="ev-prize-val">💰 ${ev.prize.coins.toLocaleString()} coins</div>
+          <div class="ev-prize-badge">🪙 ${ev.prize.tokens} tokens · ${ev.prize.badge}</div>
+        </div>
+      </div>
+
+      <div class="ev-meta-row">
+        <span class="ev-meta-chip">👥 ${ev.players.current}/${ev.players.max}</span>
+        ${ev.entry > 0
+          ? `<span class="ev-meta-chip">🎟 ${ev.entry} coin entry</span>`
+          : `<span class="ev-meta-chip" style="color:#4ade80;border-color:rgba(74,222,128,.3)">🆓 Free entry</span>`}
+      </div>
+
+      <div class="ev-players-row">
+        <div class="ev-players-label">
+          <span>Players in lobby</span>
+          <span>${pct}% full</span>
+        </div>
+        <div class="ev-players-bar">
+          <div class="ev-players-fill" style="width:${pct}%;${fillStyle}"></div>
+        </div>
+      </div>
+
+      <button class="ev-join-btn" style="${btnStyle}" ${isFull || !isLive ? 'disabled' : ''}
+        onclick="openSpinModal('${ev.id}')">
+        ${btnText}
+      </button>
+      ${isLive ? `
+      <button class="ev-watch-btn" onclick="openSpectator('${ev.id}')">
+        <span class="ev-watch-dot"></span>
+        👁 Spectate — Watch Live
+      </button>` : ''}
+      <div class="ev-entry-note">
+        ${noMoney && isLive
+          ? `<span style="color:#f87171">⚠️ Not enough coins (need ${ev.entry})</span>`
+          : isLive
+            ? 'Spin the wheel to discover your game'
+            : 'Opens in ' + fmtTime(ev.timeLeft)}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════
+   TIMERS
+═══════════════════════════════════════ */
+function startTimers() {
+  Object.values(timers).forEach(clearInterval);
+  timers = {};
+  EVENTS.forEach(ev => {
+    timers[ev.id] = setInterval(() => {
+      if (ev.timeLeft > 0) {
+        ev.timeLeft--;
+        const el = document.getElementById('timer-' + ev.id);
+        if (el) el.textContent = '⏱ ' + fmtTime(ev.timeLeft);
+      } else {
+        clearInterval(timers[ev.id]);
+      }
+    }, 1000);
+  });
+}
+
+function fmtTime(s) {
+  if (s >= 3600) {
+    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
+    return `${h}h ${m}m`;
+  }
+  const m = Math.floor(s / 60), sec = s % 60;
+  return `${m}:${sec.toString().padStart(2, '0')}`;
+}
+
+/* ═══════════════════════════════════════
+   OPEN SPIN MODAL (via matchmaking first)
+═══════════════════════════════════════ */
+async function openSpinModal(eventId) {
+  const ev = EVENTS.find(e => e.id === eventId);
+  if (!ev) return;
+
+  const user  = getUser();
+  const coins = user ? (user.coins || 0) : 0;
+  if (ev.entry > 0 && coins < ev.entry) {
+    showToast(`⚠️ Need ${ev.entry} coins to join — you have ${coins}`, '#f87171');
+    return;
+  }
+
+  activeEvent  = ev;
+  hasSpun      = false;
+  selectedGame = null;
+  mmPlayers    = [];
+
+  /* Run matchmaking first */
+  showToast('🔍 Finding opponents…', '#4fc3f7');
+  await openMatchmaking(ev);
+
+  /* Now show the spin modal with matched players */
+  document.getElementById('spinModalTitle').textContent = `🎰 ${ev.name}`;
+  document.getElementById('spinModalSub').textContent   =
+    `Prize: 💰 ${ev.prize.coins.toLocaleString()} coins · Spin to discover your game`;
+
+  const opponents = generateOpponents(ev);
+  document.getElementById('opponentsPreview').innerHTML = `
+    <div style="font-size:.68rem;font-weight:900;color:rgba(167,139,250,.55);letter-spacing:.9px;text-transform:uppercase;margin-bottom:8px">
+      👥 ${opponents.length} Opponents Matched
+    </div>
+    <div class="opponents-grid">
+      ${opponents.map(o => `<span class="opp-chip">${o.avatar} ${o.name}</span>`).join('')}
+    </div>`;
+
+  document.getElementById('gameReveal').classList.remove('show');
+  document.getElementById('spinBtnWrap').style.display = 'block';
+  const btn = document.getElementById('spinBtn');
+  btn.disabled = false;
+  btn.innerHTML = '🎰 SPIN THE WHEEL';
+
+  const wheel = document.getElementById('wheel');
+  wheel.style.transition = 'none';
+  wheel.style.transform  = 'rotate(0deg)';
+
+  document.getElementById('spinModal').classList.add('open');
+}
+
+function closeSpinModal() {
+  document.getElementById('spinModal').classList.remove('open');
+  activeEvent = null; hasSpun = false; selectedGame = null;
+}
+
+/* ═══════════════════════════════════════
+   SPIN
+═══════════════════════════════════════ */
+function doSpin() {
+  if (hasSpun) return;
+  hasSpun = true;
+
+  const btn = document.getElementById('spinBtn');
+  btn.disabled = true;
+  btn.innerHTML = '🌀 Spinning…';
+
+  const n         = WHEEL_GAMES.length;
+  const winIdx    = Math.floor(Math.random() * n);
+  const segDeg    = 360 / n;
+  const targetDeg = 360 - (winIdx * segDeg + segDeg / 2);
+  const total     = 5 * 360 + targetDeg;
+
+  const wheel = document.getElementById('wheel');
+  wheel.classList.add('spinning');
+  setTimeout(() => {
+    wheel.style.transition = 'transform 5s cubic-bezier(0.17,0.67,0.12,0.99)';
+    wheel.style.transform  = `rotate(${total}deg)`;
+  }, 50);
+
+  setTimeout(() => {
+    wheel.classList.remove('spinning');
+    selectedGame = WHEEL_GAMES[winIdx];
+    showGameReveal(selectedGame);
+  }, 5400);
+}
+
+function showGameReveal(game) {
+  document.getElementById('spinBtnWrap').style.display = 'none';
+  document.getElementById('gameRevealCard').innerHTML = `
+    <div class="game-reveal-icon">${game.icon}</div>
+    <div>
+      <div class="game-reveal-name">${game.title}</div>
+      <div class="game-reveal-desc">${game.desc}</div>
+      <span class="game-reveal-genre">${game.genre.toUpperCase()}</span>
+    </div>`;
+  document.getElementById('gameReveal').classList.add('show');
+}
+
+/* ═══════════════════════════════════════
+   LAUNCH GAME (deduct entry, save context)
+═══════════════════════════════════════ */
+function launchEvent() {
+  if (!activeEvent || !selectedGame) return;
+
+  const user = getUser();
+
+  if (activeEvent.entry > 0 && user) {
+    user.coins = Math.max(0, (user.coins || 0) - activeEvent.entry);
+    localStorage.setItem('eylox_user', JSON.stringify(user));
+  }
+
+  const opponents = generateOpponents(activeEvent);
+  localStorage.setItem('eylox_event_active', JSON.stringify({
+    eventId:   activeEvent.id,
+    eventName: activeEvent.name,
+    gameTitle: selectedGame.title,
+    gameIcon:  selectedGame.icon,
+    prize:     activeEvent.prize,
+    entry:     activeEvent.entry,
+    opponents,
+    timestamp: Date.now(),
+  }));
+
+  activeEvent.players.current = Math.min(activeEvent.players.current + 1, activeEvent.players.max);
+  localStorage.setItem('eylox_launch_game', selectedGame.title);
+
+  closeSpinModal();
+  const dest = selectedGame.url || 'game.html';
+  showToast(`⚔️ Loading ${selectedGame.title}…`, '#a78bfa');
+  setTimeout(() => { window.location.href = dest; }, 700);
+}
+
+/* ═══════════════════════════════════════
+   CHECK RESULT (called on page load if returning from game)
+   WIN condition: ALL opponents died before you
+   LOSE condition: you died before eliminating everyone
+═══════════════════════════════════════ */
+function checkEventResult() {
+  try {
+    const raw = localStorage.getItem('eylox_event_active');
+    if (!raw) return;
+    const ctx = JSON.parse(raw);
+
+    const elapsed = (Date.now() - ctx.timestamp) / 1000;
+    if (elapsed < 8) return; // came back too fast — didn't actually play
+
+    /*
+      Simulate arena logic:
+      - Opponents die over time as the game progresses
+      - The longer you played, the more opponents you defeated
+      - Win = all opponents eliminated (last survivor)
+      - Lose = you were eliminated before clearing all opponents
+      Chance increases with engagement time:
+      < 20s  → 20% (barely played)
+      20-45s → 40%
+      45-90s → 60%
+      > 90s  → 70%
+    */
+    const winChance = elapsed > 90 ? 0.70 : elapsed > 45 ? 0.60 : elapsed > 20 ? 0.40 : 0.20;
+    const won = Math.random() < winChance;
+
+    localStorage.removeItem('eylox_event_active');
+    saveHistoryEntry(ctx, won);
+    showResultModal(ctx, won);
+  } catch {
+    localStorage.removeItem('eylox_event_active');
+  }
+}
+
+/* ═══════════════════════════════════════
+   RESULT MODAL
+═══════════════════════════════════════ */
+function showResultModal(ctx, won) {
+  const opp = ctx.opponents || [];
+
+  const iconEl  = document.getElementById('resultIcon');
+  const titleEl = document.getElementById('resultTitle');
+  iconEl.textContent  = won ? '🏆' : '💀';
+  titleEl.textContent = won ? 'VICTORY!' : 'Eliminated!';
+  titleEl.style.color = won ? '#fbbf24' : '#f87171';
+  titleEl.className   = 'result-title ' + (won ? 'win' : 'loss');
+  document.getElementById('resultSub').textContent = won
+    ? `You outlasted all ${opp.length} opponents in ${ctx.gameTitle}! The arena is yours.`
+    : `You fought hard in ${ctx.gameTitle}, but the last opponent took you down. No prize this time.`;
+
+  const xpReward = won ? Math.ceil(ctx.prize.coins / 10) : 0;
+
+  if (won) {
+    document.getElementById('resultPrizeBox').innerHTML = `
+      <div class="result-prize-box">
+        <div class="result-prize-label">🎁 Your Prize</div>
+        <div class="result-prize-coins">💰 +${ctx.prize.coins.toLocaleString()}</div>
+        <div class="result-prize-badge">🪙 +${ctx.prize.tokens} tokens · ${ctx.prize.badge}</div>
+        <div style="margin-top:8px;font-size:.75rem;font-weight:800;color:rgba(167,139,250,.75)">
+          ⬆️ +${xpReward} XP · 🏆 +${Math.ceil(xpReward/50)} Eyltrophs
+        </div>
+      </div>`;
+    const claimBtn = document.getElementById('resultClaimBtn');
+    claimBtn.style.display = 'block';
+    claimBtn.disabled = false;
+    claimBtn.innerHTML = '🎁 Claim Prize';
+    claimBtn.dataset.coins  = ctx.prize.coins;
+    claimBtn.dataset.tokens = ctx.prize.tokens;
+    claimBtn.dataset.xp     = xpReward;
+  } else {
+    /* Track loss on user profile */
+    const u = getUser();
+    if (u) { u.losses = (u.losses || 0) + 1; localStorage.setItem('eylox_user', JSON.stringify(u)); }
+    document.getElementById('resultPrizeBox').innerHTML = `
+      <div style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.22);border-radius:16px;padding:20px;margin-bottom:18px">
+        <div style="font-size:2.2rem;margin-bottom:8px">💀</div>
+        <div style="color:rgba(248,113,113,.9);font-size:.9rem;font-weight:800">Eliminated — No Prize</div>
+        <div style="color:rgba(248,113,113,.55);font-size:.75rem;font-weight:700;margin-top:6px;line-height:1.5">
+          Only the last survivor wins the prize.<br>Keep fighting — the next arena could be yours!
+        </div>
+      </div>`;
+    document.getElementById('resultClaimBtn').style.display = 'none';
+  }
+
+  // Show opponent status
+  const deadIdxs = won
+    ? opp.map((_, i) => i)
+    : Array.from({length: Math.floor(opp.length * 0.55)}, (_, i) => i);
+
+  document.getElementById('resultOpponents').innerHTML = `
+    <div style="font-size:.68rem;font-weight:900;color:rgba(167,139,250,.55);letter-spacing:.9px;text-transform:uppercase;margin-bottom:8px">
+      ${won ? '💀 All Opponents Eliminated' : '⚔️ Arena Results'}
+    </div>
+    <div class="opponents-grid">
+      ${opp.map((o, i) => {
+        const dead = won || deadIdxs.includes(i);
+        return `<span class="opp-chip ${dead ? 'opp-dead' : ''}">${dead ? '💀' : o.avatar} ${o.name}</span>`;
+      }).join('')}
+      <span class="opp-chip" style="border-color:${won ? 'rgba(74,222,128,.4)' : 'rgba(248,113,113,.4)'};color:${won ? '#4ade80' : '#f87171'}">
+        ${won ? '🏆' : '💀'} You
+      </span>
+    </div>`;
+
+  document.getElementById('resultModal').classList.add('open');
+  if (won) launchConfetti();
+}
+
+function claimPrize() {
+  const btn    = document.getElementById('resultClaimBtn');
+  const coins  = parseInt(btn.dataset.coins  || '0');
+  const tokens = parseInt(btn.dataset.tokens || '0');
+  const xpGain = parseInt(btn.dataset.xp     || '150');
+  const user = getUser();
+  if (user) {
+    user.coins    = (user.coins    || 0) + coins;
+    user.tokens   = (user.tokens   || 0) + tokens;
+    user.wins     = (user.wins     || 0) + 1;
+    localStorage.setItem('eylox_user', JSON.stringify(user));
+    /* Gain XP + Eyltrophs */
+    gainXP(xpGain, Math.ceil(xpGain / 50));
+    /* Update topbar */
+    ['topbarEylux','sidebarEylux'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = user.coins.toLocaleString();
+    });
+    ['topbarEyltrophs','sidebarEyltrophs'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = (getUser()?.Eyltrophs || 0).toLocaleString();
+    });
+  }
+  btn.innerHTML = '✅ Prize Claimed!';
+  btn.disabled = true;
+  showToast(`💰 +${coins.toLocaleString()} coins · +${xpGain} XP earned!`, '#4ade80');
+}
+
+function closeResult() {
+  document.getElementById('resultModal').classList.remove('open');
+  stopConfetti();
+}
+
+/* ═══════════════════════════════════════
+   HISTORY
+═══════════════════════════════════════ */
+function saveHistoryEntry(ctx, won) {
+  try {
+    const hist = JSON.parse(localStorage.getItem('eylox_event_history') || '[]');
+    hist.unshift({
+      eventId: ctx.eventId, eventName: ctx.eventName,
+      gameTitle: ctx.gameTitle, gameIcon: ctx.gameIcon,
+      won, coins: won ? ctx.prize.coins : 0, ts: Date.now(),
+    });
+    if (hist.length > 20) hist.length = 20;
+    localStorage.setItem('eylox_event_history', JSON.stringify(hist));
+  } catch {}
+}
+
+function renderHistory() {
+  try {
+    const hist = JSON.parse(localStorage.getItem('eylox_event_history') || '[]');
+    document.getElementById('historyEmpty').style.display = hist.length ? 'none' : 'block';
+    document.getElementById('historyList').innerHTML = hist.map(h => `
+      <div class="ev-hist-row">
+        <div class="ev-hist-icon">${h.gameIcon || '🎮'}</div>
+        <div class="ev-hist-body">
+          <div class="ev-hist-name">${h.eventName} — ${h.gameTitle}</div>
+          <div class="ev-hist-meta">
+            ${new Date(h.ts).toLocaleDateString()} ·
+            ${h.won ? '+' + h.coins.toLocaleString() + ' coins earned' : 'No prize'}
+          </div>
+        </div>
+        <span class="ev-hist-result ${h.won ? 'hist-win' : 'hist-loss'}">
+          ${h.won ? '🏆 WIN' : '💀 LOSS'}
+        </span>
+      </div>`).join('');
+  } catch {}
+}
+
+/* ═══════════════════════════════════════
+   CONFETTI
+═══════════════════════════════════════ */
+let confettiAnim = null;
+function launchConfetti() {
+  const canvas = document.getElementById('confettiCanvas');
+  canvas.style.display = 'block';
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+  const pieces = Array.from({length: 140}, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * -canvas.height,
+    size: 5 + Math.random() * 9,
+    speed: 1.8 + Math.random() * 3.2,
+    drift: (Math.random() - 0.5) * 2.5,
+    color: ['#fbbf24','#a78bfa','#f472b6','#4ade80','#60a5fa','#f87171','#34d399'][Math.floor(Math.random()*7)],
+    rotation: Math.random() * 360,
+    spin: (Math.random() - 0.5) * 5,
+  }));
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rotation * Math.PI / 180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.5);
+      ctx.restore();
+      p.y += p.speed; p.x += p.drift; p.rotation += p.spin;
+      if (p.y > canvas.height) { p.y = -p.size; p.x = Math.random() * canvas.width; }
+    });
+    confettiAnim = requestAnimationFrame(draw);
+  }
+  draw();
+  setTimeout(stopConfetti, 5500);
+}
+function stopConfetti() {
+  if (confettiAnim) cancelAnimationFrame(confettiAnim);
+  document.getElementById('confettiCanvas').style.display = 'none';
+}
+
+/* ═══════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════ */
+
+/* ════════════════════════════════════════
+   PLAYER POOL — "Real" platform players
+════════════════════════════════════════ */
+const POOL_FIRST  = ['Ace','Nova','Zara','Kai','Vex','Storm','Rix','Luna','Bolt','Sage',
+                     'Flex','Ember','Nyx','Cruz','Haze','Jinx','Rave','Echo','Blaze','Dusk',
+                     'Ryze','Sova','Neon','Glitch','Pixel','Spike','Dash','Zero','Flux','Core',
+                     'Apex','Delta','Void','Cipher','Ghost','Reaper','Titan','Orion','Atlas','Zion'];
+const POOL_SUFFIX = ['GG','Pro','X','99','PvP','FPS','2K','Max','HD','MVP',
+                     'ACE','One','OG','Elite','Rush','Prime','Ultra','Hyper','Real','Live'];
+const POOL_AVATS  = ['🎮','🚀','⚡','🌟','🔥','🎯','💫','🌙','🦊','🐉','🦅','🌈',
+                     '⚔️','🏹','🛡️','💀','👾','🤖','🦁','🐺','🐍','🦄','🐯','🦈'];
+
+function getRank(lvl) {
+  if (lvl >= 40) return 'Diamond';
+  if (lvl >= 25) return 'Platinum';
+  if (lvl >= 15) return 'Gold';
+  if (lvl >= 8)  return 'Silver';
+  return 'Bronze';
+}
+function rankClass(rank) {
+  return 'rank-' + rank.toLowerCase();
+}
+
+function seedPlayerPool() {
+  if (localStorage.getItem('eylox_pool_v2')) return;
+  const pool = Array.from({length: 60}, (_, i) => {
+    const lvl  = Math.floor(Math.random() * 44) + 2;
+    const wins = Math.floor(Math.random() * 280) + 5;
+    const fn   = POOL_FIRST[i % POOL_FIRST.length];
+    const sx   = POOL_SUFFIX[Math.floor(Math.random() * POOL_SUFFIX.length)];
+    return {
+      id:       'pp_' + i,
+      username: fn + sx,
+      avatar:   POOL_AVATS[i % POOL_AVATS.length],
+      level:    lvl,
+      xp:       lvl * 900 + Math.floor(Math.random() * 900),
+      wins,
+      losses:   Math.floor(wins * 0.55 + Math.random() * 40),
+      rank:     getRank(lvl),
+      coins:    Math.floor(Math.random() * 6000) + 200,
+      online:   Math.random() > 0.35,
+    };
+  });
+  localStorage.setItem('eylox_player_pool', JSON.stringify(pool));
+  localStorage.setItem('eylox_pool_v2', '1');
+}
+
+function getPlayerPool() {
+  try { return JSON.parse(localStorage.getItem('eylox_player_pool') || '[]'); } catch { return []; }
+}
+
+function findMatchPlayers(eventId, count) {
+  const pool  = getPlayerPool();
+  const me    = getUser();
+  const myLvl = me?.level || 1;
+  /* Also add current user to pool if registered */
+  if (me && me.username) {
+    const existing = pool.find(p => p.username === me.username);
+    if (!existing) {
+      pool.push({
+        id: 'me', username: me.username, avatar: me.avatar || '🎮',
+        level: me.level || 1, wins: me.wins || 0, rank: getRank(me.level || 1), online: true,
+      });
+    }
+  }
+  /* Prefer online players within 8 levels, shuffle, take count */
+  const online = pool.filter(p => p.online !== false);
+  const near   = online.filter(p => Math.abs((p.level||1) - myLvl) <= 10);
+  const all    = [...near, ...online.filter(p => !near.includes(p))];
+  const shuffled = all.sort(() => Math.random() - 0.5);
+  const result = [];
+  for (const p of shuffled) {
+    if (result.length >= count) break;
+    result.push(p);
+  }
+  while (result.length < count) {
+    result.push(pool[Math.floor(Math.random() * pool.length)]);
+  }
+  return result.slice(0, count);
+}
+
+/* ════════════════════════════════════════
+   XP + LEVEL SYSTEM
+════════════════════════════════════════ */
+function gainXP(xpAmount, trophyAmount) {
+  const user = getUser();
+  if (!user) return;
+  const prevLvl = user.level || 1;
+  user.xp       = (user.xp || 0) + xpAmount;
+  user.Eyltrophs = (user.Eyltrophs || 0) + trophyAmount;
+  const newLvl  = Math.floor(user.xp / 1000) + 1;
+  user.level    = newLvl;
+  user.rank     = getRank(newLvl);
+  localStorage.setItem('eylox_user', JSON.stringify(user));
+  if (newLvl > prevLvl) showLevelUp(newLvl, user.rank);
+  /* Update player pool entry */
+  try {
+    const pool = getPlayerPool();
+    const idx  = pool.findIndex(p => p.username === user.username);
+    if (idx >= 0) { pool[idx].level = newLvl; pool[idx].rank = user.rank; pool[idx].wins = user.wins || 0; }
+    localStorage.setItem('eylox_player_pool', JSON.stringify(pool));
+  } catch {}
+}
+
+function showLevelUp(level, rank) {
+  const el = document.createElement('div');
+  el.style.cssText = `
+    position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+    z-index:9999;text-align:center;pointer-events:none;
+    animation:levelUpPop .7s cubic-bezier(.34,1.56,.64,1) both;
+  `;
+  el.innerHTML = `
+    <div style="background:rgba(17,17,17,.97);border:2px solid #a78bfa;border-radius:24px;padding:28px 40px;
+      box-shadow:0 0 60px rgba(124,58,237,.5),0 20px 60px rgba(0,0,0,.7);">
+      <div style="font-size:3.5rem;margin-bottom:8px">⬆️</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:2rem;color:#a78bfa;
+        text-shadow:0 0 20px rgba(167,139,250,.8)">LEVEL UP!</div>
+      <div style="font-size:1.1rem;font-weight:900;color:#fff;margin-top:4px">Level ${level}</div>
+      <div style="font-size:.85rem;font-weight:700;color:rgba(167,139,250,.7);margin-top:6px">
+        Rank: <span style="color:#fbbf24">${rank}</span>
+      </div>
+    </div>`;
+  document.body.appendChild(el);
+  setTimeout(() => { el.style.transition = 'opacity .4s'; el.style.opacity = '0'; }, 2200);
+  setTimeout(() => el.remove(), 2700);
+}
+
+/* ════════════════════════════════════════
+   MATCHMAKING SYSTEM
+════════════════════════════════════════ */
+let mmPlayers = [];
+let mmResolve = null;
+
+function openMatchmaking(ev) {
+  return new Promise(resolve => {
+    mmResolve  = resolve;
+    mmPlayers  = [];
+    const needed = Math.min((ev.players.current || 5) + 2, 8);
+    const pool   = findMatchPlayers(ev.id, needed);
+    const modal  = document.getElementById('matchmakingModal');
+    const phase1 = document.getElementById('mmSearching');
+    const phase2 = document.getElementById('mmLobby');
+    const list   = document.getElementById('mmPlayersList');
+    const cdEl   = document.getElementById('mmCountdown');
+
+    phase1.style.display = 'block';
+    phase2.style.display = 'none';
+    list.innerHTML = '';
+    cdEl.innerHTML = '';
+    modal.classList.add('open');
+
+    /* Show the current user's card first (immediately) */
+    const me = getUser();
+    if (me) {
+      const myCard = document.createElement('div');
+      myCard.className = 'mm-player-card me-card';
+      const myRank = getRank(me.level || 1);
+      myCard.innerHTML = `
+        <div class="mm-player-avatar" style="background:linear-gradient(135deg,#059669,#10b981)">${me.avatar || '🎮'}</div>
+        <div class="mm-player-info">
+          <div class="mm-player-name">${me.username || 'You'} <span style="color:#4ade80;font-size:.65rem">(YOU)</span></div>
+          <div class="mm-player-meta">Lv.${me.level||1} · ${me.wins||0} wins · ${myRank}</div>
+        </div>
+        <span class="rank-badge rank-${myRank.toLowerCase()}">${myRank}</span>`;
+      list.appendChild(myCard);
+    }
+
+    /* Animate opponents joining over ~2.5s */
+    const delays = pool.map((_, i) => 350 + i * 280 + Math.random() * 80);
+    pool.forEach((p, i) => {
+      setTimeout(() => {
+        mmPlayers.push(p);
+        const total = list.querySelectorAll('.mm-player-card').length;
+        const cntEl = document.getElementById('mmLobbyCount');
+        if (cntEl) cntEl.textContent = total + ' / ' + (needed + 1) + ' players';
+        const card = document.createElement('div');
+        card.className = 'mm-player-card';
+        card.style.animationDelay = '0s';
+        card.innerHTML = `
+          <div class="mm-player-avatar">${p.avatar || '🎮'}</div>
+          <div class="mm-player-info">
+            <div class="mm-player-name">${p.username}</div>
+            <div class="mm-player-meta">Lv.${p.level||1} · ${p.wins||0} wins · ${p.rank||'Bronze'}</div>
+          </div>
+          <span class="rank-badge ${rankClass(p.rank||'Bronze')}">${p.rank||'Bronze'}</span>`;
+        list.appendChild(card);
+        if (i === pool.length - 1) {
+          setTimeout(() => startMatchCountdown(ev, phase1, phase2, cdEl, resolve), 500);
+        }
+      }, delays[i]);
+    });
+    /* Switch to lobby view after a short searching delay */
+    setTimeout(() => {
+      phase1.style.display = 'none';
+      phase2.style.display = 'block';
+    }, 900);
+  });
+}
+
+function startMatchCountdown(ev, phase1, phase2, cdEl, resolve) {
+  let n = 3;
+  cdEl.innerHTML = `<div class="mm-cd-num">${n}</div>`;
+  const tick = setInterval(() => {
+    n--;
+    if (n > 0) {
+      cdEl.innerHTML = `<div class="mm-cd-num">${n}</div>`;
+    } else {
+      clearInterval(tick);
+      cdEl.innerHTML = `<div class="mm-cd-num" style="color:#4ade80;font-size:2.2rem">MATCH FOUND!</div>`;
+      setTimeout(() => {
+        document.getElementById('matchmakingModal').classList.remove('open');
+        resolve(mmPlayers);
+      }, 700);
+    }
+  }, 900);
+}
+
+function closeMatchmaking() {
+  document.getElementById('matchmakingModal').classList.remove('open');
+  if (mmResolve) { mmResolve([]); mmResolve = null; }
+}
+
+const AVATARS = POOL_AVATS;
+const NAMES   = POOL_FIRST.map((f, i) => f + POOL_SUFFIX[i % POOL_SUFFIX.length]);
+
+function generateOpponents(ev) {
+  if (mmPlayers.length > 0) return mmPlayers.map(p => ({ name: p.username, avatar: p.avatar || '🎮' }));
+  const count = Math.min((ev.players.current || 3), 7) + 2;
+  return Array.from({length: count}, () => ({
+    name:   NAMES[Math.floor(Math.random() * NAMES.length)],
+    avatar: AVATARS[Math.floor(Math.random() * AVATARS.length)],
+  }));
+}
+
+function getUser() {
+  try { return JSON.parse(localStorage.getItem('eylox_user') || 'null'); } catch { return null; }
+}
+
+function showToast(msg, color) {
+  const t = document.createElement('div');
+  t.style.cssText = `
+    position:fixed;top:80px;right:20px;z-index:9999;
+    background:rgba(8,0,22,.97);border:1px solid ${color || '#a78bfa'};
+    border-radius:16px;padding:14px 20px;
+    font-family:'Nunito',sans-serif;font-weight:800;font-size:.88rem;
+    color:#fff;box-shadow:0 8px 40px rgba(0,0,0,.6),0 0 20px ${color || '#a78bfa'}33;
+    animation:toastIn .35s cubic-bezier(.34,1.56,.64,1) both;
+    pointer-events:none;max-width:340px;
+    display:flex;align-items:center;gap:10px;
+  `;
+  t.innerHTML = `<span style="font-size:1.1em">${msg.slice(0,2)}</span><span>${msg.slice(2)}</span>`;
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.transition='opacity .3s,transform .3s'; t.style.opacity='0'; t.style.transform='translateX(20px)'; }, 2700);
+  setTimeout(() => t.remove(), 3000);
+}
+
+/* ═══════════════════════════════════════
+   RIPPLE EFFECT
+═══════════════════════════════════════ */
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.ev-join-btn, .spin-btn, .enter-arena-btn, .result-claim-btn');
+  if (!btn || btn.disabled) return;
+  const rect = btn.getBoundingClientRect();
+  const r = document.createElement('span');
+  const d = Math.max(rect.width, rect.height);
+  r.className = 'ripple-fx';
+  r.style.cssText = `width:${d}px;height:${d}px;left:${e.clientX - rect.left - d/2}px;top:${e.clientY - rect.top - d/2}px`;
+  btn.appendChild(r);
+  setTimeout(() => r.remove(), 560);
+});
+
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  seedPlayerPool();
+  buildWheel();
+  renderEvents();
+  checkEventResult();
+
+  /* Register current user into the player pool */
+  const me = getUser();
+  if (me && me.username) {
+    try {
+      const pool = getPlayerPool();
+      if (!pool.find(p => p.username === me.username)) {
+        pool.push({
+          id: 'me_' + Date.now(),
+          username: me.username,
+          avatar:   me.avatar || '🎮',
+          level:    me.level  || 1,
+          xp:       me.xp    || 0,
+          wins:     me.wins  || 0,
+          losses:   me.losses || 0,
+          rank:     getRank(me.level || 1),
+          coins:    me.coins || 0,
+          online:   true,
+        });
+        localStorage.setItem('eylox_player_pool', JSON.stringify(pool));
+      }
+    } catch {}
+  }
+
+  // Populate coins/Eyltrophs in sidebar and topbar
+  const u = getUser();
+  if (u) {
+    ['sidebarEylux','topbarEylux'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = (u.coins || 0).toLocaleString();
+    });
+    ['sidebarEyltrophs','topbarEyltrophs'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = (u.Eyltrophs || 0).toLocaleString();
+    });
+  }
+
+  // Fluctuate live player counts
+  setInterval(() => {
+    EVENTS.filter(e => e.status === 'live').forEach(ev => {
+      const delta = Math.floor(Math.random() * 3) - 1;
+      ev.players.current = Math.max(1, Math.min(ev.players.max - 1, ev.players.current + delta));
+    });
+  }, 9000);
+
+  initChat();
+  initSpecSidebar();
+});
+
+/* ════════════════════════════════════════════════════════════
+   LIVE CHAT SYSTEM
+════════════════════════════════════════════════════════════ */
+const CHAT_POOL = [
+  { name:'NeonStrike',   av:'⚡' }, { name:'GlitchByte',  av:'🎮' },
+  { name:'LunaPlays',    av:'🌙' }, { name:'StormX',       av:'🌩' },
+  { name:'ZeroGravity',  av:'🚀' }, { name:'PixelQueen',   av:'👾' },
+  { name:'ShadowFist',   av:'🥷' }, { name:'CrypticAce',   av:'🃏' },
+  { name:'BlazePro',     av:'🔥' }, { name:'IcyChill',     av:'❄️' },
+  { name:'VortexRanked', av:'🌀' }, { name:'EchoRunner',   av:'🎵' },
+];
+const CHAT_MSGS = [
+  "GG let's gooo 🔥", "who's winning this?? 👀",
+  "LETS GOOO I'm so hyped rn", "that spin was INSANE",
+  "this event is crazy competitive",  "omg the prize pool 😭💰",
+  "I just lost 500 coins rip", "anyone else keeping score?",
+  "this match is so intense fr", "who do you think wins?",
+  "WTF just happened 💀", "top player is on FIRE",
+  "I'm watching from the lobby lol", "chat is poppin rn",
+  "best event this week ngl", "bro that comeback tho 😤",
+  "good luck to everyone still playing!", "almost there 🙏",
+  "500 coins on NeonStrike winning", "spectating is addictive fr",
+  "GG to everyone who joined", "coin economy is real rn 🪙",
+];
+const CHAT_KEY = 'eylox_event_chat';
+let _chatViewers = 47;
+let _chatViewerIv = null;
+let _chatMsgIv = null;
+
+function getChatHistory() {
+  try { return JSON.parse(localStorage.getItem(CHAT_KEY) || '[]'); } catch { return []; }
+}
+function saveChatMsg(msg) {
+  try {
+    const hist = getChatHistory();
+    hist.push(msg);
+    if (hist.length > 120) hist.splice(0, hist.length - 120);
+    localStorage.setItem(CHAT_KEY, JSON.stringify(hist));
+  } catch {}
+}
+
+function renderChatMsg(msg, container) {
+  const me = getUser();
+  const isOwn = msg.own || (me && msg.name === (me.username || me.name));
+  const isSystem = msg.system;
+
+  if (isSystem) {
+    const el = document.createElement('div');
+    el.className = 'ev-chat-system';
+    el.textContent = msg.text;
+    container.appendChild(el);
+  } else {
+    const el = document.createElement('div');
+    el.className = 'ev-chat-msg' + (isOwn ? ' own' : '');
+    el.innerHTML = `
+      <div class="ev-chat-avatar">${msg.av || '🎮'}</div>
+      <div class="ev-chat-bubble-wrap">
+        <div class="ev-chat-name">${isOwn ? 'You' : msg.name}</div>
+        <div class="ev-chat-bubble">${escHtml(msg.text)}</div>
+      </div>`;
+    container.appendChild(el);
+  }
+  container.scrollTop = container.scrollHeight;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function appendChatMsg(msg) {
+  const c1 = document.getElementById('chatMessages');
+  const c2 = document.getElementById('specOvChatMessages'); /* full overlay chat, if open */
+  if (c1) renderChatMsg(msg, c1);
+  if (c2) renderChatMsg(msg, c2);
+}
+
+function sendChat() {
+  const input = document.getElementById('chatInput');
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  const me = getUser();
+  const msg = {
+    name: me?.username || me?.name || 'You',
+    av:   me?.avatar   || '🎮',
+    text, own: true,
+    ts:   Date.now(),
+  };
+  saveChatMsg(msg);
+  appendChatMsg(msg);
+}
+
+function sendChatFromSpec() {
+  const input = document.getElementById('specOvChatInput');
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  const me = getUser();
+  const msg = {
+    name: me?.username || me?.name || 'You',
+    av:   me?.avatar   || '🎮',
+    text, own: true, ts: Date.now(),
+  };
+  saveChatMsg(msg);
+  appendChatMsg(msg);
+}
+
+function initChat() {
+  const container = document.getElementById('chatMessages');
+  if (!container) return;
+
+  /* Load last 20 stored messages */
+  const hist = getChatHistory().slice(-20);
+  if (hist.length === 0) {
+    /* Seed with a few messages so chat isn't empty */
+    const seeds = [
+      { name:'GlitchByte', av:'🎮', text:"chat's open! who's hyped for the events? 🔥", ts: Date.now()-120000 },
+      { name:'LunaPlays',  av:'🌙', text:'Grand Prix Rush is insane rn 👀', ts: Date.now()-60000 },
+      { name:'NeonStrike', av:'⚡', text:'let\'s gooo 🚀🚀🚀', ts: Date.now()-20000 },
+    ];
+    seeds.forEach(m => { saveChatMsg(m); renderChatMsg(m, container); });
+  } else {
+    hist.forEach(m => renderChatMsg(m, container));
+  }
+
+  /* Viewer count fluctuation */
+  _chatViewerIv = setInterval(() => {
+    _chatViewers = Math.max(20, Math.min(120, _chatViewers + Math.floor(Math.random()*7)-3));
+    const els = [
+      document.getElementById('chatViewerCount'),
+      document.getElementById('chatViewerPill'),
+      document.getElementById('specOvViewers'),
+    ];
+    els.forEach(el => { if (el) el.textContent = _chatViewers + (el.id === 'chatViewerPill' ? ' LIVE' : ''); });
+  }, 6000);
+
+  /* Simulate incoming messages every 6-14s */
+  function scheduleSimMsg() {
+    const delay = 6000 + Math.random() * 8000;
+    _chatMsgIv = setTimeout(() => {
+      const sender = CHAT_POOL[Math.floor(Math.random() * CHAT_POOL.length)];
+      const text   = CHAT_MSGS[Math.floor(Math.random() * CHAT_MSGS.length)];
+      const msg    = { name: sender.name, av: sender.av, text, ts: Date.now() };
+      saveChatMsg(msg);
+      appendChatMsg(msg);
+      scheduleSimMsg();
+    }, delay);
+  }
+  scheduleSimMsg();
+}
+
+/* ════════════════════════════════════════════════════════════
+   SPECTATOR SIDEBAR (always-visible panel next to chat)
+════════════════════════════════════════════════════════════ */
+const SPEC_PLAYERS = [
+  { name:'NeonStrike', av:'⚡', score:0, rank:1 },
+  { name:'GlitchByte', av:'🎮', score:0, rank:2 },
+  { name:'LunaPlays',  av:'🌙', score:0, rank:3 },
+  { name:'StormX',     av:'🌩', score:0, rank:4 },
+  { name:'ZeroG',      av:'🚀', score:0, rank:5 },
+  { name:'PixelQ',     av:'👾', score:0, rank:6 },
+  { name:'ShadowFist', av:'🥷', score:0, rank:7 },
+  { name:'BlazePro',   av:'🔥', score:0, rank:8 },
+];
+const FEED_EVENTS_POOL = [
+  { icon:'🏆', tmpl: n => `${n} just took 1st place!` },
+  { icon:'🪙', tmpl: n => `${n} collected 50 coins` },
+  { icon:'⚡', tmpl: n => `${n} triggered a speed boost!` },
+  { icon:'💀', tmpl: n => `${n} got eliminated!` },
+  { icon:'🔥', tmpl: n => `${n} is on a 5-win streak!` },
+  { icon:'🎯', tmpl: n => `${n} hit a perfect score!` },
+  { icon:'🌀', tmpl: n => `${n} used a wildcard!` },
+  { icon:'🏅', tmpl: n => `${n} unlocked an achievement!` },
+];
+let _specTab = 'lb';          /* sidebar tab */
+let _specOvTab = 'lb';        /* overlay tab */
+let _specFeedItems = [];
+let _activeSpecEvent = null;
+let _specLbIv = null, _specFeedIv = null;
+
+function initSpecSidebar() {
+  /* Randomise starting scores */
+  SPEC_PLAYERS.forEach(p => { p.score = Math.floor(Math.random()*2000)+200; });
+  _activeSpecEvent = EVENTS.find(e => e.status === 'live') || EVENTS[0];
+  const nameEl = document.getElementById('specEventName');
+  if (nameEl) nameEl.textContent = _activeSpecEvent?.name || '';
+  renderSpecLb('specLeaderboard');
+
+  /* Score fluctuation every 3s */
+  _specLbIv = setInterval(() => {
+    SPEC_PLAYERS.forEach(p => {
+      p.score = Math.max(0, p.score + Math.floor(Math.random()*120)-20);
+    });
+    SPEC_PLAYERS.sort((a,b) => b.score - a.score);
+    SPEC_PLAYERS.forEach((p,i) => p.rank = i+1);
+    if (_specTab === 'lb') renderSpecLb('specLeaderboard');
+    if (_specOvTab === 'lb') renderSpecLb('specOvLb');
+  }, 3000);
+
+  /* Feed events every 2-5s */
+  function addFeedEvent() {
+    const fe = FEED_EVENTS_POOL[Math.floor(Math.random()*FEED_EVENTS_POOL.length)];
+    const pl = SPEC_PLAYERS[Math.floor(Math.random()*SPEC_PLAYERS.length)];
+    const now = new Date(); const t = now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+    const item = { icon: fe.icon, text: fe.tmpl(pl.name), time: t };
+    _specFeedItems.unshift(item);
+    if (_specFeedItems.length > 50) _specFeedItems.pop();
+    if (_specTab  === 'feed') renderSpecFeed('specFeed');
+    if (_specOvTab === 'feed') renderSpecFeed('specOvFeed');
+    setTimeout(addFeedEvent, 2000 + Math.random()*3000);
+  }
+  addFeedEvent();
+}
+
+function renderSpecLb(containerId) {
+  const c = document.getElementById(containerId);
+  if (!c) return;
+  const me = getUser();
+  const medal = ['🥇','🥈','🥉'];
+  c.innerHTML = SPEC_PLAYERS.map((p,i) => {
+    const isMe = me && p.name === (me.username || me.name);
+    return `<div class="ev-spec-lb-row" style="${isMe?'background:rgba(167,139,250,.1);':''}">
+      <div class="ev-spec-rank">${medal[i] || (i+1)}</div>
+      <div class="ev-spec-lb-av">${p.av}</div>
+      <div class="ev-spec-lb-name">${p.name}${isMe?' (you)':''}</div>
+      <div class="ev-spec-lb-score">${p.score.toLocaleString()}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderSpecFeed(containerId) {
+  const c = document.getElementById(containerId);
+  if (!c) return;
+  c.innerHTML = _specFeedItems.slice(0,20).map(item => `
+    <div class="ev-spec-feed-item">
+      <span class="ev-spec-feed-icon">${item.icon}</span>
+      <span>${item.text}</span>
+      <span class="ev-spec-feed-time">${item.time}</span>
+    </div>`).join('');
+}
+
+function switchSpecTab(tab) {
+  _specTab = tab;
+  ['lb','feed'].forEach(t => {
+    const btn = document.getElementById('stab-'+t);
+    const body = document.getElementById(t === 'lb' ? 'specLeaderboard' : 'specFeed');
+    if (btn)  btn.classList.toggle('active', t === tab);
+    if (body) body.style.display = t === tab ? '' : 'none';
+  });
+  if (tab === 'lb')   renderSpecLb('specLeaderboard');
+  if (tab === 'feed') renderSpecFeed('specFeed');
+}
+
+/* ════════════════════════════════════════════════════════════
+   SPECTATOR FULL OVERLAY
+════════════════════════════════════════════════════════════ */
+function openSpectator(eventId) {
+  const ev = EVENTS.find(e => e.id === eventId) || EVENTS[0];
+  _activeSpecEvent = ev;
+
+  /* Title */
+  const title = document.getElementById('specOvTitle');
+  if (title) title.textContent = ev.icon + ' ' + ev.name;
+
+  /* Info tab */
+  const info = document.getElementById('specOvInfo');
+  if (info) info.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="font-size:3rem;text-align:center">${ev.icon}</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:1.4rem;text-align:center;color:#e0d4ff">${ev.name}</div>
+      <div style="color:rgba(210,190,255,.6);font-size:.85rem;text-align:center;font-weight:700">${ev.desc}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px">
+        <div style="background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.15);border-radius:14px;padding:16px;text-align:center">
+          <div style="font-size:.65rem;font-weight:900;color:rgba(167,139,250,.5);text-transform:uppercase;margin-bottom:6px">Prize Pool</div>
+          <div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#fbbf24">💰 ${ev.prize.coins.toLocaleString()}</div>
+          <div style="font-size:.7rem;color:rgba(251,191,36,.6);margin-top:4px">${ev.prize.badge}</div>
+        </div>
+        <div style="background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.15);border-radius:14px;padding:16px;text-align:center">
+          <div style="font-size:.65rem;font-weight:900;color:rgba(167,139,250,.5);text-transform:uppercase;margin-bottom:6px">Players</div>
+          <div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#4fc3f7">${ev.players.current}/${ev.players.max}</div>
+          <div style="font-size:.7rem;color:rgba(79,195,247,.6);margin-top:4px">${Math.round(ev.players.current/ev.players.max*100)}% full</div>
+        </div>
+        <div style="background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.15);border-radius:14px;padding:16px;text-align:center">
+          <div style="font-size:.65rem;font-weight:900;color:rgba(167,139,250,.5);text-transform:uppercase;margin-bottom:6px">Time Left</div>
+          <div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#f87171">${fmtTime(ev.timeLeft)}</div>
+          <div style="font-size:.7rem;color:rgba(248,113,113,.6);margin-top:4px">🔴 LIVE NOW</div>
+        </div>
+        <div style="background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.15);border-radius:14px;padding:16px;text-align:center">
+          <div style="font-size:.65rem;font-weight:900;color:rgba(167,139,250,.5);text-transform:uppercase;margin-bottom:6px">Entry Fee</div>
+          <div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:${ev.entry===0?'#4ade80':'#fbbf24'}">${ev.entry===0?'FREE':'🪙 '+ev.entry}</div>
+          <div style="font-size:.7rem;color:rgba(167,139,250,.5);margin-top:4px">per player</div>
+        </div>
+      </div>
+      <button onclick="closeSpectator();openSpinModal('${ev.id}')" style="
+        margin-top:8px;padding:14px;width:100%;
+        background:linear-gradient(135deg,${ev.accent},${ev.accent}bb);
+        border:none;border-radius:14px;color:#fff;
+        font-family:'Fredoka One',cursive;font-size:1.05rem;cursor:pointer;
+      ">⚔️ Join This Event</button>
+    </div>`;
+
+  switchSpecOvTab('lb');
+  renderSpecLb('specOvLb');
+  const overlay = document.getElementById('spectatorOverlay');
+  if (overlay) { overlay.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+}
+
+function closeSpectator() {
+  const overlay = document.getElementById('spectatorOverlay');
+  if (overlay) { overlay.style.display = 'none'; document.body.style.overflow = ''; }
+}
+
+function switchSpecOvTab(tab) {
+  _specOvTab = tab;
+  ['lb','feed','info'].forEach(t => {
+    const btn  = document.getElementById('sovtab-'+t);
+    const body = document.getElementById('specOv' + t.charAt(0).toUpperCase() + t.slice(1));
+    if (btn)  btn.classList.toggle('active', t === tab);
+    if (body) body.style.display = t === tab ? '' : 'none';
+  });
+  if (tab === 'lb')   renderSpecLb('specOvLb');
+  if (tab === 'feed') renderSpecFeed('specOvFeed');
+}
+</script>
+</body>
+</html>

@@ -109,6 +109,7 @@ const Notifs = (() => {
 
   /* ── Show pop-up toast for new notification ── */
   function _showPop(title, body, type) {
+    return; /* toasts disabled */
     const s   = _typeStyle(type);
     const pop = document.createElement('div');
     pop.className = 'notif-pop';
@@ -303,6 +304,7 @@ const Notifs = (() => {
     /* Find the existing 🔔 button in topbar and replace/augment it */
     let bellEl = document.getElementById('notifBellBtn')
       || document.getElementById('notifBell')
+      || document.getElementById('notifBtn')
       || (() => {
           let found = null;
           document.querySelectorAll('.tb-btn').forEach(btn => {
@@ -338,11 +340,75 @@ const Notifs = (() => {
     }
   }
 
+  /* ── Notification hooks ── */
+
+  /* 1. Coin gain / game win (cross-tab, via localStorage storage event) */
+  window.addEventListener('storage', e => {
+    if (e.key === 'eylox_user') {
+      try {
+        const prev = JSON.parse(e.oldValue || 'null');
+        const next = JSON.parse(e.newValue || 'null');
+        if (!next) return;
+        const prevCoins = prev?.coins || 0;
+        const nextCoins = next?.coins || 0;
+        const gain = nextCoins - prevCoins;
+        if (gain >= 50) {
+          push('💰 Eylux Earned!', `You earned +${gain} Eylux! Total: ${nextCoins.toLocaleString()}`, 'Eylux');
+        }
+        /* Level up detection */
+        const XP = 500;
+        const prevLvl = Math.floor(prevCoins / XP) + 1;
+        const nextLvl = Math.floor(nextCoins / XP) + 1;
+        if (nextLvl > prevLvl) {
+          push('⬆️ Level Up!', `You reached Level ${nextLvl}! Keep playing to unlock more rewards.`, 'level');
+        }
+      } catch {}
+    }
+
+    /* 2. Daily reward claimed */
+    if (e.key === 'eylox_daily_rewards') {
+      try {
+        const prev = JSON.parse(e.oldValue || '{}');
+        const next = JSON.parse(e.newValue || '{}');
+        if (next.lastClaim && next.lastClaim !== prev.lastClaim) {
+          const streak = next.streak || 1;
+          push('🎁 Daily Reward Claimed!', `Day ${streak} streak! Come back tomorrow for even more Eylux.`, 'reward');
+        }
+      } catch {}
+    }
+
+    /* 3. Shop purchase */
+    if (e.key === 'eylox_inventory') {
+      try {
+        const prev = JSON.parse(e.oldValue || '[]');
+        const next = JSON.parse(e.newValue || '[]');
+        if (next.length > prev.length) {
+          const item = next[next.length - 1];
+          push('🛒 Purchase Complete!', `${item?.name || 'Item'} has been added to your inventory.`, 'shop');
+        }
+      } catch {}
+    }
+  });
+
+  /* 4. Pending game-win notifications written by game pages (same-tab) */
+  function _checkPendingNotif() {
+    try {
+      const raw = localStorage.getItem('eylox_pending_notif');
+      if (!raw) return;
+      localStorage.removeItem('eylox_pending_notif');
+      const n = JSON.parse(raw);
+      if (n && n.title && Date.now() - (n.ts || 0) < 30000) {
+        push(n.title, n.body || '', n.type || 'game');
+      }
+    } catch {}
+  }
+
   /* ── Boot on DOM ready ── */
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', _init);
+    document.addEventListener('DOMContentLoaded', () => { _init(); _checkPendingNotif(); });
   } else {
     _init();
+    _checkPendingNotif();
   }
 
   return { push, markRead, markAllRead, clearAll, unreadCount, togglePanel };

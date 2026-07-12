@@ -1,0 +1,675 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Eylox Studio</title>
+<style>
+:root{
+  --bg:#1e1f2e;--panel:#252636;--toolbar:#222230;--text:#e0e0f0;--muted:#8090a0;
+  --border:#333348;--accent:#a78bfa;--accent-blue:#4d78cc;--accent-green:#4ade80;--accent-red:#f87171;
+  --selected:#1e3a6e;--hover:#2a2b40;--titlebar-h:34px;--ribbon-h:86px;--statusbar-h:22px;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Segoe UI,system-ui,sans-serif;}
+body{background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+
+#loading{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;}
+#loading h1{font-size:2.2rem;background:linear-gradient(135deg,var(--accent),var(--accent-blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+#loading p{color:var(--muted);font-size:.9rem;}
+.prog-bar{width:280px;height:6px;background:var(--panel);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent-blue));border-radius:3px;transition:width .3s ease;}
+
+#login-screen{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 40%,#1a0545 0%,var(--bg) 70%);z-index:8888;display:none;align-items:center;justify-content:center;}
+.login-box{background:rgba(13,6,32,.85);border:1px solid var(--border);border-radius:16px;padding:36px 40px;width:360px;backdrop-filter:blur(20px);box-shadow:0 0 60px rgba(167,139,250,.15);}
+.login-box h2{font-size:1.5rem;margin-bottom:6px;background:linear-gradient(135deg,var(--accent),var(--accent-blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.login-box p{color:var(--muted);font-size:.82rem;margin-bottom:24px;}
+.login-box label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:4px;margin-top:14px;}
+.login-box input{width:100%;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:.9rem;outline:none;transition:border-color .2s;}
+.login-box input:focus{border-color:var(--accent);}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 18px;border:none;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .2s;}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#7c3aed);color:#fff;}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 4px 20px rgba(167,139,250,.35);}
+.login-actions{display:flex;gap:10px;margin-top:20px;}
+.login-error{color:var(--accent-red);font-size:.8rem;margin-top:8px;min-height:18px;}
+
+#studio{display:none;flex-direction:column;height:100vh;}
+#studio.visible{display:flex;}
+
+#titlebar{height:var(--titlebar-h);background:var(--toolbar);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 12px;flex-shrink:0;}
+.tb-left,.tb-right{display:flex;align-items:center;gap:12px;}
+.tb-logo{font-size:.9rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent-blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;}
+.tb-game{display:flex;align-items:center;gap:4px;font-size:.8rem;color:var(--text);cursor:pointer;padding:0 6px;}
+.tb-icon{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.2rem;padding:0;}
+.tb-icon:hover{color:var(--text);}
+.tb-collaborate{background:var(--accent-blue);color:#fff;border:none;border-radius:4px;padding:4px 12px;font-size:.75rem;font-weight:600;cursor:pointer;}
+.tb-avatar{width:24px;height:24px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.7rem;font-weight:700;}
+
+#ribbon-tabs{height:26px;background:var(--toolbar);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 12px;gap:24px;flex-shrink:0;overflow-x:auto;}
+.rtab{background:none;border:none;color:var(--muted);font-size:.72rem;padding:0;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;}
+.rtab:hover{color:var(--text);}
+.rtab.active{color:var(--accent-blue);border-bottom-color:var(--accent-blue);}
+
+#ribbon-toolbar{height:60px;background:var(--toolbar);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:4px 8px;gap:2px;flex-shrink:0;overflow-x:auto;}
+.rtoolbar{display:flex;align-items:center;gap:6px;height:100%;}
+.rtoolbar.hidden{display:none;}
+.rt-group{display:flex;align-items:center;gap:2px;padding:0 6px;border-right:1px solid var(--border);height:100%;}
+.rt-group:last-child{border-right:none;}
+.rt-separator{width:1px;height:40px;background:var(--border);}
+.rt-btn{background:none;border:1px solid transparent;color:var(--muted);padding:3px 6px;border-radius:4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:all .15s;font-size:.65rem;}
+.rt-btn:hover{border-color:var(--border);color:var(--text);background:var(--hover);}
+.rt-btn.active{background:rgba(167,139,250,.15);border-color:var(--accent);color:var(--accent);}
+.rt-icon{font-size:.9rem;line-height:1;}
+.rt-label{font-size:.65rem;white-space:nowrap;}
+.rt-play{background:linear-gradient(135deg,var(--accent-green),#16a34a)!important;color:#000!important;border:none!important;}
+.rt-stop{background:linear-gradient(135deg,var(--accent-red),#dc2626)!important;color:#fff!important;border:none!important;}
+.rt-select{background:var(--panel);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:2px 4px;font-size:.7rem;outline:none;}
+.rt-flat-btn{background:var(--hover);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:2px 8px;font-size:.7rem;cursor:pointer;}
+
+#main{flex:1;display:flex;overflow:hidden;gap:1px;background:var(--border);}
+
+#left-panel{width:240px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;}
+.lp-header{height:24px;background:var(--toolbar);border-bottom:1px solid var(--border);padding:0 6px;display:flex;align-items:center;justify-content:space-between;font-size:.75rem;font-weight:600;color:var(--text);flex-shrink:0;}
+.lp-hbtn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.8rem;padding:0;margin:0;}
+.lp-tabs-row{display:flex;border-bottom:1px solid var(--border);background:var(--toolbar);}
+.lp-tab{flex:1;background:none;border:none;color:var(--muted);font-size:.7rem;padding:4px;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;text-align:center;}
+.lp-tab:hover:not(.active){color:var(--text);}
+.lp-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.lp-content{flex:1;overflow-y:auto;padding:4px;}
+.te-action-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:8px;}
+.te-action-btn{background:var(--hover);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.65rem;transition:all .15s;}
+.te-action-btn:hover{border-color:var(--accent);color:var(--accent);}
+.lp-section{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:4px 4px;margin-top:6px;margin-bottom:2px;border-bottom:1px solid var(--border);}
+.te-setting-row{display:flex;justify-content:space-between;align-items:center;padding:3px 4px;font-size:.7rem;gap:4px;}
+.te-slider-row{display:flex;align-items:center;gap:3px;}
+.te-slider{flex:1;height:3px;border-radius:2px;background:var(--hover);outline:none;cursor:pointer;-webkit-appearance:none;}
+.te-slider::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;border-radius:50%;background:var(--accent);cursor:pointer;}
+.te-material-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;}
+.te-mat-swatch{width:100%;aspect-ratio:1;border-radius:3px;border:1px solid var(--border);cursor:pointer;transition:all .15s;}
+.te-mat-swatch:hover{border-color:var(--accent);}
+
+#viewport-wrap{flex:1;display:flex;flex-direction:column;background:#000;position:relative;}
+#viewport-tabs{height:22px;background:var(--toolbar);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 4px;gap:2px;font-size:.7rem;flex-shrink:0;}
+.vp-tab{background:var(--hover);border:1px solid var(--border);color:var(--text);padding:2px 6px;border-radius:3px;display:flex;align-items:center;gap:3px;cursor:pointer;transition:all .15s;}
+.vp-tab.active{background:var(--selected);border-color:var(--accent-blue);color:var(--accent-blue);}
+.vp-tab-close{cursor:pointer;font-size:.6rem;opacity:.6;}
+#viewport{flex:1;position:relative;overflow:hidden;}
+#viewport canvas{display:block;width:100%!important;height:100%!important;}
+.vp-mode-badge{position:absolute;top:8px;left:50%;transform:translateX(-50%);background:rgba(74,222,128,.2);border:1px solid var(--accent-green);color:var(--accent-green);font-size:.7rem;padding:3px 10px;border-radius:15px;z-index:10;display:none;}
+.vp-info{position:absolute;bottom:4px;left:4px;font-size:.65rem;color:rgba(255,255,255,.3);z-index:10;}
+#autosave-badge{position:absolute;top:6px;right:6px;background:rgba(74,222,128,.15);border:1px solid var(--accent-green);color:var(--accent-green);font-size:.6rem;padding:2px 8px;border-radius:15px;z-index:10;display:none;}
+
+#bottom{height:130px;background:var(--toolbar);border-top:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+.bottom-tabs{display:flex;border-bottom:1px solid var(--border);}
+.bottom-tab{background:none;border:none;color:var(--muted);font-size:.7rem;padding:4px 10px;cursor:pointer;border-bottom:2px solid transparent;}
+.bottom-tab.active{color:var(--accent-blue);border-bottom-color:var(--accent-blue);}
+#console-output{flex:1;overflow-y:auto;padding:3px 6px;font-family:monospace;font-size:.7rem;}
+.con-line{padding:1px 0;border-bottom:1px solid rgba(255,255,255,.03);}
+.con-info{color:var(--accent-blue);}
+.con-warn{color:#fbbf24;}
+.con-error,.con-err{color:var(--accent-red);}
+.con-ok,.con-success{color:var(--accent-green);}
+
+#right-panel{width:260px;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;}
+#explorer-panel{flex:0 0 55%;display:flex;flex-direction:column;border-bottom:1px solid var(--border);overflow:hidden;}
+#properties-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.rp-panel-header{height:24px;background:var(--toolbar);border-bottom:1px solid var(--border);padding:0 6px;display:flex;align-items:center;justify-content:space-between;font-size:.75rem;font-weight:600;color:var(--text);flex-shrink:0;}
+.rp-header-btns{display:flex;gap:4px;}
+.rp-hbtn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.8rem;padding:0;}
+.rp-hbtn:hover{color:var(--text);}
+.rp-filter{padding:2px 4px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.rp-filter-input{width:100%;background:var(--hover);border:1px solid var(--border);color:var(--text);border-radius:3px;padding:3px 4px;font-size:.7rem;outline:none;}
+.rp-filter-input:focus{border-color:var(--accent);}
+#scene-tree{flex:1;overflow-y:auto;padding:2px;}
+#tab-props{flex:1;overflow-y:auto;padding:0;}
+#props-body{padding:2px;}
+
+.tree-item{display:flex;align-items:center;gap:3px;padding:2px 4px;border-radius:3px;cursor:pointer;font-size:.75rem;user-select:none;}
+.tree-item:hover{background:var(--hover);}
+.tree-item.selected{background:var(--selected);color:var(--accent);}
+.tree-icon{font-size:.8rem;flex-shrink:0;}
+.tree-arrow{font-size:.6rem;color:var(--muted);flex-shrink:0;width:10px;}
+.tree-children{padding-left:12px;}
+
+.props-section{margin-bottom:6px;}
+.props-title{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:4px 6px;border-bottom:1px solid var(--border);margin-bottom:3px;}
+.prop-row{display:flex;align-items:center;padding:2px 6px;gap:4px;font-size:.7rem;}
+.prop-label{color:var(--muted);flex:0 0 55px;}
+.prop-input{background:var(--hover);border:1px solid var(--border);border-radius:3px;color:var(--text);font-size:.7rem;padding:2px 4px;outline:none;}
+.prop-input:focus{border-color:var(--accent);}
+.prop-toggle{position:relative;display:inline-block;width:28px;height:14px;}
+.prop-toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:var(--hover);border:1px solid var(--border);border-radius:14px;cursor:pointer;transition:.2s;}
+.toggle-slider:before{content:'';position:absolute;width:8px;height:8px;left:2px;top:2px;background:var(--muted);border-radius:50%;transition:.2s;}
+.prop-toggle input:checked+.toggle-slider{background:rgba(167,139,250,.3);border-color:var(--accent);}
+.prop-toggle input:checked+.toggle-slider:before{transform:translateX(14px);background:var(--accent);}
+.no-select{color:var(--muted);font-size:.75rem;text-align:center;padding:20px 10px;}
+
+#script-editor{display:flex;flex-direction:column;height:100%;}
+.script-header{display:flex;align-items:center;gap:6px;padding:4px 6px;border-bottom:1px solid var(--border);background:var(--toolbar);}
+.script-name{font-size:.75rem;color:var(--accent);}
+.script-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.9rem;margin-left:auto;}
+#script-area{flex:1;display:flex;overflow:hidden;}
+#line-numbers{background:var(--toolbar);color:var(--muted);font-family:monospace;font-size:.7rem;padding:4px 4px;text-align:right;user-select:none;min-width:32px;border-right:1px solid var(--border);}
+#code-input{flex:1;background:#0a0520;color:#c9d1d9;font-family:Cascadia Code,Fira Code,monospace;font-size:.7rem;padding:4px;border:none;outline:none;resize:none;line-height:1.4;}
+
+#statusbar{height:var(--statusbar-h);background:var(--toolbar);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 8px;gap:6px;}
+.sb-icon{font-size:.8rem;color:var(--muted);}
+.cmd-input{flex:1;background:var(--hover);border:1px solid var(--border);border-radius:3px;color:var(--text);font-size:.7rem;padding:2px 6px;outline:none;}
+.cmd-input:focus{border-color:var(--accent);}
+
+.studio-modal{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;display:flex;align-items:center;justify-content:center;}
+.smodal-box{background:var(--panel);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.6);max-height:85vh;display:flex;flex-direction:column;}
+.smodal-head{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--toolbar);border-bottom:1px solid var(--border);font-size:.8rem;font-weight:600;color:var(--text);}
+.smodal-close{background:none;border:none;color:var(--text);font-size:.9rem;cursor:pointer;opacity:.7;}
+.smodal-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--toolbar);}
+.modal-tab{flex:1;padding:6px;background:none;border:none;color:var(--text);font-size:.75rem;cursor:pointer;opacity:.6;border-bottom:2px solid transparent;}
+.modal-tab.active{opacity:1;border-bottom-color:var(--accent);}
+.smodal-body{padding:12px;overflow-y:auto;flex:1;}
+.sfield{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:.75rem;color:var(--text);}
+.sfield label{min-width:100px;color:var(--muted);}
+.sfield input[type=text],.sfield input[type=number],.sfield select{flex:1;background:var(--hover);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-size:.75rem;}
+.sfield input[type=color]{width:36px;height:24px;border:none;border-radius:3px;cursor:pointer;}
+.sfield input[type=checkbox]{width:14px;height:14px;accent-color:var(--accent);}
+.smodal-btn{padding:6px 14px;background:var(--accent);color:#fff;border:none;border-radius:4px;font-size:.75rem;font-weight:600;cursor:pointer;}
+.smodal-btn:hover{filter:brightness(1.15);}
+
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+::-webkit-scrollbar-thumb:hover{background:var(--muted);}
+
+.hidden{display:none!important;}
+</style>
+<script src="audit-loader.js" defer></script>
+  <script src="debug-dashboard.js" defer></script>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loading">
+  <h1>⬡ EYLOX STUDIO</h1>
+  <p>Initializing workspace...</p>
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+  <p id="prog-label" style="font-size:.75rem;color:var(--muted)">Loading engine...</p>
+</div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <h2>⬡ Eylox Studio</h2>
+    <p>Sign in to start building</p>
+    <label>Username</label>
+    <input type="text" id="li-user" placeholder="Username" autocomplete="username"/>
+    <label>Password</label>
+    <input type="password" id="li-pass" placeholder="Password" autocomplete="current-password"/>
+    <div class="login-error" id="li-err"></div>
+    <div class="login-actions">
+      <button class="btn btn-primary" onclick="doLogin()">Sign In</button>
+      <button class="btn btn-primary" onclick="doGuest()">Continue as Guest</button>
+    </div>
+  </div>
+</div>
+
+<!-- STUDIO -->
+<div id="studio">
+  <!-- TITLE BAR -->
+  <div id="titlebar">
+    <div class="tb-left">
+      <span class="tb-logo">⬡ EYLOX STUDIO</span>
+      <div class="tb-game"><span>My Game</span><span>▾</span></div>
+      <button class="tb-icon" title="New">+</button>
+      <button class="tb-icon" title="Help">?</button>
+    </div>
+    <div class="tb-right">
+      <button class="tb-collaborate">Collaborate</button>
+      <div class="tb-avatar" id="menu-user-label">E</div>
+    </div>
+  </div>
+
+  <!-- RIBBON TABS -->
+  <div id="ribbon-tabs">
+    <button class="rtab" onclick="setRibbonTab('file')">FILE</button>
+    <button class="rtab active" onclick="setRibbonTab('home')">HOME</button>
+    <button class="rtab" onclick="setRibbonTab('model')">MODEL</button>
+    <button class="rtab" onclick="setRibbonTab('terrain')">TERRAIN</button>
+    <button class="rtab" onclick="setRibbonTab('test')">TEST</button>
+    <button class="rtab" onclick="setRibbonTab('view')">VIEW</button>
+    <button class="rtab" onclick="setRibbonTab('plugins')">PLUGINS</button>
+    <button class="rtab" onclick="setRibbonTab('script')">SCRIPT</button>
+  </div>
+
+  <!-- RIBBON TOOLBAR -->
+  <div id="ribbon-toolbar">
+    <!-- HOME toolbar (visible by default) -->
+    <div class="rtoolbar" id="rt-home">
+      <div class="rt-group">
+        <button class="rt-btn active" id="tb-select" onclick="setTool('select')" title="Select (Q)">
+          <span class="rt-icon">▶</span><span class="rt-label">Select</span>
+        </button>
+        <button class="rt-btn" id="tb-move" onclick="setTool('move')" title="Move (W)">
+          <span class="rt-icon">✤</span><span class="rt-label">Move</span>
+        </button>
+        <button class="rt-btn" id="tb-scale" onclick="setTool('scale')" title="Scale (E)">
+          <span class="rt-icon">⤡</span><span class="rt-label">Scale</span>
+        </button>
+        <button class="rt-btn" id="tb-rotate" onclick="setTool('rotate')" title="Rotate (R)">
+          <span class="rt-icon">↻</span><span class="rt-label">Rotate</span>
+        </button>
+      </div>
+      <div class="rt-separator"></div>
+      <div class="rt-group">
+        <button class="rt-btn" onclick="switchLeftTab('toolbox',event.target.closest('.lp-tab'))" title="Toolbox">
+          <span class="rt-icon">⊞</span><span class="rt-label">Toolbox</span>
+        </button>
+        <button class="rt-btn" onclick="insertObject('Part')" title="Part">
+          <span class="rt-icon">▬</span><span class="rt-label">Part</span>
+        </button>
+        <button class="rt-btn" onclick="insertObject('PointLight')" title="Light">
+          <span class="rt-icon">☀</span><span class="rt-label">Light</span>
+        </button>
+      </div>
+      <div class="rt-separator"></div>
+      <div class="rt-group" style="align-items:center;gap:4px;padding:4px 6px;">
+        <span style="font-size:.65rem;">🌙</span>
+        <input type="range" id="dn-slider" min="0" max="1" step="0.01" value="0.6" oninput="setDayNight(this.value)" style="width:80px;height:3px;" title="Day/Night Cycle">
+        <span style="font-size:.65rem;">☀️</span>
+      </div>
+      <div class="rt-separator"></div>
+      <div class="rt-group">
+        <span id="fps-label" style="font-size:.65rem;color:var(--accent-green);font-family:monospace;min-width:48px;">-- FPS</span>
+      </div>
+      <div class="rt-separator"></div>
+      <div class="rt-group">
+        <button class="rt-btn rt-play" id="play-btn" onclick="startPlay()" title="Play (F5)">
+          <span class="rt-icon">▶</span><span class="rt-label">Play</span>
+        </button>
+        <button class="rt-btn rt-stop" id="stop-btn" onclick="stopPlay()" style="display:none" title="Stop (F6)">
+          <span class="rt-icon">⬛</span><span class="rt-label">Stop</span>
+        </button>
+      </div>
+      <div class="rt-separator"></div>
+      <div class="rt-group">
+        <button class="rt-btn" onclick="window.location.href='index.html'">
+          <span class="rt-icon">←</span><span class="rt-label">Exit</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- TERRAIN toolbar -->
+    <div class="rtoolbar hidden" id="rt-terrain">
+      <div class="rt-group" style="align-items:center;gap:6px;padding:0 6px;">
+        <span style="font-size:.7rem;">Mode:</span>
+        <select class="rt-select"><option>Geometric</option></select>
+        <label style="display:flex;align-items:center;gap:3px;font-size:.7rem;">
+          <input type="checkbox" checked> Collisions
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN AREA -->
+  <div id="main">
+    <!-- LEFT PANEL: Terrain Editor / Toolbox -->
+    <div id="left-panel">
+      <div class="lp-header">
+        <span>Terrain Editor</span>
+        <div class="lp-hbtn">×</div>
+      </div>
+      <div class="lp-tabs-row">
+        <button class="lp-tab active" onclick="switchTerrainTab('create',this)">Create</button>
+        <button class="lp-tab" onclick="switchTerrainTab('edit',this)">Edit</button>
+        <button class="lp-tab" onclick="switchTerrainTab('paint',this)">Paint</button>
+      </div>
+      <div class="lp-content">
+        <!-- Create Tab -->
+        <div id="te-create">
+          <div class="te-action-grid">
+            <button class="te-action-btn" onclick="openTerrainModal('generate')">
+              <span>🌍</span><span>Generate</span>
+            </button>
+            <button class="te-action-btn">
+              <span>📥</span><span>Import</span>
+            </button>
+            <button class="te-action-btn" onclick="clearTerrain()">
+              <span>🗑</span><span>Clear</span>
+            </button>
+          </div>
+          <div class="lp-section">Terrain Settings</div>
+          <div class="lp-section" style="margin-top:0;border:none;font-weight:600;">Brush Settings</div>
+          <div class="te-setting-row">
+            <span>Brush Size</span>
+            <div class="te-slider-row">
+              <input type="range" min="1" max="128" value="64" class="te-slider">
+              <span>64</span>
+            </div>
+          </div>
+          <div class="te-setting-row">
+            <span>Brush Strength</span>
+            <div class="te-slider-row">
+              <input type="range" min="0" max="1" step="0.01" value="1" class="te-slider">
+              <span>1</span>
+            </div>
+          </div>
+          <div class="te-setting-row">
+            <span>Brush Shape</span>
+            <button class="te-shape-btn" style="width:20px;height:20px;border-radius:50%;background:var(--hover);border:1px solid var(--border);cursor:pointer;">●</button>
+          </div>
+          <div class="lp-section" style="margin-top:8px;font-weight:600;border:none;">Material Settings</div>
+          <div class="te-material-grid">
+            <div class="te-mat-swatch" style="background:#4a7c3f;" title="Grass"></div>
+            <div class="te-mat-swatch" style="background:#5a6a3f;" title="Dirt"></div>
+            <div class="te-mat-swatch" style="background:#888888;" title="Rock"></div>
+            <div class="te-mat-swatch" style="background:#c8a96e;" title="Sand"></div>
+          </div>
+        </div>
+        <!-- Edit Tab -->
+        <div id="te-edit" style="display:none;">
+          <div class="te-action-grid">
+            <button class="te-action-btn" onclick="startTerrainBrush('sculpt')">
+              <span>⛰</span><span>Sculpt</span>
+            </button>
+            <button class="te-action-btn" onclick="startTerrainBrush('flatten')">
+              <span>═</span><span>Flatten</span>
+            </button>
+            <button class="te-action-btn" onclick="addWater()">
+              <span>💧</span><span>Water</span>
+            </button>
+          </div>
+        </div>
+        <!-- Paint Tab -->
+        <div id="te-paint" style="display:none;">
+          <div class="lp-section">Paint Color</div>
+          <div style="padding:4px;"><input type="color" value="#4a7c3f" style="width:100%;height:30px;border-radius:4px;border:1px solid var(--border);cursor:pointer;"></div>
+          <div class="te-action-grid" style="margin-top:8px;">
+            <button class="te-action-btn" onclick="startTerrainBrush('paint')">
+              <span>🖌</span><span>Paint</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toolbox (hidden by default) -->
+      <div id="lp-toolbox" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+        <div style="padding:4px;">
+          <input class="tbx-search" id="tbx-search" type="text" placeholder="🔍 Search..." oninput="filterToolbox(this.value)" style="width:100%;background:var(--hover);border:1px solid var(--border);color:var(--text);border-radius:3px;padding:3px;font-size:.7rem;outline:none;">
+          <div class="tbx-cats" id="tbx-cats" style="display:flex;flex-wrap:wrap;gap:2px;padding:2px 0;"></div>
+        </div>
+        <div style="flex:1;overflow-y:auto;">
+          <div class="toolbox-grid" id="toolbox-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:2px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEWPORT -->
+    <div id="viewport-wrap">
+      <div id="viewport-tabs">
+        <button class="vp-tab active">
+          📋 Baseplate
+          <span class="vp-tab-close">×</span>
+        </button>
+      </div>
+      <div id="viewport">
+        <div id="autosave-badge">✓ Autosaved</div>
+        <div class="vp-mode-badge" id="vp-badge">▶ PLAY MODE</div>
+        <div class="vp-info" id="vp-info">Q/W/E/R · F5 Play · Ctrl+S Save</div>
+      </div>
+      <div id="bottom">
+        <div class="bottom-tabs">
+          <button class="bottom-tab active" onclick="switchBottomTab('console',this)">Output</button>
+          <button class="bottom-tab" onclick="switchBottomTab('errors',this)">Errors</button>
+        </div>
+        <div id="console-output"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: Explorer + Properties -->
+    <div id="right-panel">
+      <div id="explorer-panel">
+        <div class="rp-panel-header">
+          <span>Explorer</span>
+          <div class="rp-header-btns">
+            <button class="rp-hbtn">⤢</button>
+            <button class="rp-hbtn">×</button>
+          </div>
+        </div>
+        <div class="rp-filter">
+          <input type="text" placeholder="Filter workspace (Ctrl+Shift+X)" class="rp-filter-input">
+        </div>
+        <div id="scene-tree"></div>
+      </div>
+
+      <div id="properties-panel">
+        <div class="rp-panel-header">
+          <span>Properties - <span id="props-selected-name">–</span> -</span>
+          <div class="rp-header-btns">
+            <button class="rp-hbtn">⤢</button>
+            <button class="rp-hbtn">×</button>
+          </div>
+        </div>
+        <div class="rp-filter">
+          <input type="text" placeholder="Filter Properties (Ctrl+Shift+P)" class="rp-filter-input">
+        </div>
+        <div id="tab-props">
+          <div id="props-body"><div class="no-select">Select an object to edit its properties.</div></div>
+        </div>
+        <div id="script-editor" style="display:none;">
+          <div class="script-header">
+            <span class="tree-icon">📄</span>
+            <span class="script-name" id="script-editor-name">Script</span>
+            <button class="script-close" onclick="closeScriptEditor()">✕</button>
+          </div>
+          <div id="script-area">
+            <div id="line-numbers">1</div>
+            <textarea id="code-input" spellcheck="false" placeholder="-- Eylox Script"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATUS BAR -->
+  <div id="statusbar">
+    <span class="sb-icon">▶</span>
+    <input type="text" class="cmd-input" placeholder="Run a command" readonly>
+  </div>
+</div>
+
+<!-- CONTEXT MENU -->
+<div id="ctx-menu" style="position:fixed;background:var(--panel);border:1px solid var(--border);border-radius:6px;min-width:150px;padding:3px;z-index:600;display:none;box-shadow:0 4px 16px rgba(0,0,0,.5);backdrop-filter:blur(8px);">
+  <button onclick="insertObject('Part');closeCtx()" style="display:block;width:100%;background:none;border:none;color:var(--text);font-size:.75rem;padding:5px 10px;border-radius:4px;cursor:pointer;text-align:left;">▬ Insert Part</button>
+  <button onclick="duplicateObj();closeCtx()" style="display:block;width:100%;background:none;border:none;color:var(--text);font-size:.75rem;padding:5px 10px;border-radius:4px;cursor:pointer;text-align:left;">+ Duplicate</button>
+  <button onclick="deleteSelected();closeCtx()" style="display:block;width:100%;background:none;border:none;color:var(--accent-red);font-size:.75rem;padding:5px 10px;border-radius:4px;cursor:pointer;text-align:left;">🗑 Delete</button>
+</div>
+
+<!-- THREE.JS -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/TransformControls.js"></script>
+
+<script>
+'use strict';
+
+// INCLUDE ALL EXISTING JAVASCRIPT (from line 588 of original file)
+// The original script will be inserted here...
+
+// For now, we'll load it from the original file
+</script>
+
+<!-- MODALS -->
+<div id="terrain-modal" class="studio-modal" style="display:none">
+  <div class="smodal-box" style="width:420px">
+    <div class="smodal-head">
+      <span>🌍 Generate Terrain</span>
+      <button class="smodal-close" onclick="closeTerrainModal()">✕</button>
+    </div>
+    <div class="smodal-tabs">
+      <button id="mtab-gen" class="modal-tab active" onclick="switchTerrainTab2('gen',this)">Generate</button>
+      <button id="mtab-paint" class="modal-tab" onclick="switchTerrainTab2('paint',this)">Paint</button>
+      <button id="mtab-sculpt" class="modal-tab" onclick="switchTerrainTab2('sculpt',this)">Sculpt</button>
+    </div>
+    <div class="smodal-body">
+      <div id="tab-tgen" style="display:block">
+        <div class="sfield"><label>Biome</label><select id="tgen-biome"><option value="grassland">Grassland</option><option value="mountains">Mountains</option><option value="plains">Plains</option><option value="desert">Desert</option><option value="island" selected>Island</option><option value="forest">Forest</option></select></div>
+        <div class="sfield"><label>Grid Size</label><input id="tgen-size" type="number" value="64" min="16" max="128"></div>
+        <div class="sfield"><label>Height Scale</label><input id="tgen-scale" type="number" value="8" min="1" max="64" step="0.5"></div>
+        <div class="sfield"><label>Seed</label><input id="tgen-seed" type="number" placeholder="random"></div>
+        <button class="smodal-btn" onclick="generateTerrain()">Generate</button>
+      </div>
+      <div id="tab-tpaint" style="display:none">
+        <div class="sfield"><label>Brush Size</label><input id="tpaint-size" type="range" min="1" max="30" value="8"><span style="font-size:.7rem;">8</span></div>
+        <div class="sfield"><label>Strength</label><input id="tpaint-strength" type="range" min="0.1" max="3" step="0.1" value="1"><span style="font-size:.7rem;">1</span></div>
+        <button class="smodal-btn brush-toggle" onclick="startTerrainBrush('paint')">Start Brush</button>
+      </div>
+      <div id="tab-tsculpt" style="display:none">
+        <div class="sfield"><label>Brush Size</label><input id="tsculpt-size" type="range" min="1" max="30" value="8"><span style="font-size:.7rem;">8</span></div>
+        <div class="sfield"><label>Strength</label><input id="tsculpt-strength" type="range" min="0.1" max="3" step="0.1" value="1"><span style="font-size:.7rem;">1</span></div>
+        <button class="smodal-btn brush-toggle" onclick="startTerrainBrush('sculpt')">Start Brush</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="settings-modal" class="studio-modal" style="display:none">
+  <div class="smodal-box" style="width:420px">
+    <div class="smodal-head">
+      <span>⚙️ Studio Settings</span>
+      <button class="smodal-close" onclick="closeSettingsModal()">✕</button>
+    </div>
+    <div class="smodal-body">
+      <div class="sfield"><label>Grid Visible</label><input id="set-grid" type="checkbox" checked></div>
+      <div class="sfield"><label>Shadows</label><input id="set-shadows" type="checkbox" checked></div>
+      <div class="sfield"><label>FOV</label><input id="set-fov" type="number" value="60" min="30" max="120"></div>
+      <div class="sfield"><label>Snap Enable</label><input id="set-snap" type="checkbox"></div>
+      <button class="smodal-btn" onclick="applySettings()">Apply</button>
+    </div>
+  </div>
+</div>
+
+<div id="publish-modal" class="studio-modal" style="display:none">
+  <div class="smodal-box" style="width:420px">
+    <div class="smodal-head">
+      <span>📤 Publish Game</span>
+      <button class="smodal-close" onclick="closePublishModal()">✕</button>
+    </div>
+    <div class="smodal-body">
+      <div class="sfield"><label>Game Name</label><input id="pub-name" type="text" placeholder="My Awesome Game"></div>
+      <div class="sfield"><label>Description</label><input id="pub-desc" type="text" placeholder="..."></div>
+      <div class="sfield"><label>Genre</label><select id="pub-genre"><option>Adventure</option><option>Puzzle</option><option>Racing</option></select></div>
+      <div class="sfield"><label>By: <span id="pub-author">Guest</span></label></div>
+      <button class="smodal-btn" onclick="publishGame()">Publish</button>
+    </div>
+  </div>
+</div>
+
+<div id="npc-modal" class="studio-modal" style="display:none">
+  <div class="smodal-box" style="width:420px">
+    <div class="smodal-head">
+      <span>🤖 NPC Generator</span>
+      <button class="smodal-close" onclick="closeNPCModal()">✕</button>
+    </div>
+    <div class="smodal-body">
+      <div class="sfield"><label>NPC Type</label><div id="npc-type-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;"></div></div>
+      <div class="sfield"><label>Name</label><input id="npc-name-input" type="text" placeholder="NPC Name"></div>
+      <div class="sfield"><label>Behavior</label><select id="npc-behavior"><option>Idle</option><option>Patrol</option><option>Follow</option></select></div>
+      <div class="sfield"><label>Scale</label><input id="npc-scale" type="number" value="1" step="0.1"></div>
+      <button class="smodal-btn" onclick="spawnNPC()">Spawn</button>
+    </div>
+  </div>
+</div>
+
+<div id="anim-modal" class="studio-modal" style="display:none">
+  <div class="smodal-box" style="width:580px">
+    <div class="smodal-head">
+      <span>🎬 Animation Editor - <span id="anim-obj-name">Object</span></span>
+      <button class="smodal-close" onclick="closeAnimEditor()">✕</button>
+    </div>
+    <div class="smodal-body">
+      <div style="display:flex;gap:6px;margin-bottom:8px;">
+        <button class="smodal-btn" id="anim-play-btn" onclick="animPlay()">▶ Play</button>
+        <button class="smodal-btn" onclick="animAddKeyframe()">+ Keyframe</button>
+        <button class="smodal-btn" onclick="animClear()">Clear</button>
+      </div>
+      <div id="anim-timeline-body" style="background:var(--hover);border:1px solid var(--border);border-radius:4px;overflow:auto;"></div>
+    </div>
+  </div>
+</div>
+
+<div id="marketplace-modal" class="studio-modal" style="display:none">
+  <div class="smodal-box" style="width:600px">
+    <div class="smodal-head">
+      <span>🛒 Asset Marketplace</span>
+      <button class="smodal-close" onclick="closeMarketplace()">✕</button>
+    </div>
+    <div class="smodal-body">
+      <div style="display:flex;gap:6px;margin-bottom:8px;">
+        <input type="text" placeholder="Search..." style="flex:1;background:var(--hover);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:4px 8px;font-size:.75rem;outline:none;">
+        <select id="mkt-cat-filter" onchange="renderMarketplace()" style="background:var(--hover);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:4px 8px;font-size:.75rem;">
+          <option value="All">All</option>
+          <option value="Buildings">Buildings</option>
+          <option value="Vehicles">Vehicles</option>
+          <option value="Nature">Nature</option>
+        </select>
+      </div>
+      <div id="mkt-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;"></div>
+    </div>
+  </div>
+</div>
+
+<div id="plugins-modal" class="studio-modal" style="display:none">
+  <div class="smodal-box" style="width:480px">
+    <div class="smodal-head">
+      <span>🧩 Manage Plugins</span>
+      <button class="smodal-close" onclick="closePluginsModal()">✕</button>
+    </div>
+    <div class="smodal-body">
+      <div id="plugins-list"></div>
+    </div>
+  </div>
+</div>
+
+<div id="shortcuts-modal" class="studio-modal" style="display:none">
+  <div class="smodal-box" style="width:480px">
+    <div class="smodal-head">
+      <span>⌨️ Keyboard Shortcuts</span>
+      <button class="smodal-close" onclick="closeShortcutsModal()">✕</button>
+    </div>
+    <div class="smodal-body">
+      <div style="font-size:.7rem;line-height:1.8;">
+        <div><strong>Tools:</strong> Q=Select, W=Move, E=Scale, R=Rotate</div>
+        <div><strong>Edit:</strong> Ctrl+Z=Undo, Ctrl+Y=Redo, Ctrl+C=Copy, Ctrl+V=Paste, Del=Delete</div>
+        <div><strong>View:</strong> F=Focus, G=Toggle Grid, Middle Mouse=Rotate</div>
+        <div><strong>Play:</strong> F5=Play, F6=Stop, Space=Jump, WASD=Move</div>
+        <div><strong>File:</strong> Ctrl+S=Save, Ctrl+N=New</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="theme-modal" class="studio-modal" style="display:none">
+  <div class="smodal-box" style="width:420px">
+    <div class="smodal-head">
+      <span>🎨 Choose Theme</span>
+      <button class="smodal-close" onclick="closeThemeModal()">✕</button>
+    </div>
+    <div class="smodal-body">
+      <button class="smodal-btn" onclick="applyTheme('dark');closeThemeModal()" style="width:100%;margin:4px 0;">Dark</button>
+      <button class="smodal-btn" onclick="applyTheme('midnight');closeThemeModal()" style="width:100%;margin:4px 0;">Midnight</button>
+      <button class="smodal-btn" onclick="applyTheme('forest');closeThemeModal()" style="width:100%;margin:4px 0;">Forest</button>
+      <button class="smodal-btn" onclick="applyTheme('light');closeThemeModal()" style="width:100%;margin:4px 0;">Light</button>
+    </div>
+  </div>
+</div>
+
+<!-- ORIGINAL JAVASCRIPT (extract from original file and paste here) -->
+<script>
+// Load from original eylox-studio.html - copy all JavaScript from line 588 onwards
+// [Full JavaScript content from the original file goes here]
+</script>
+<script src="floating-actions.js"></script>
+  <script src="tooltip.js"></script>
+
+
+<script src="sw-register.js"></script>
+<script src="offline.js" defer></script>
+</body>
+</html>
