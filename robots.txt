@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://yeyad2603-pixel.github.io/Eylox/sitemap.xml

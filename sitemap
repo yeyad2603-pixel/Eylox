@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <url>
+    <loc>https://yeyad2603-pixel.github.io/Eylox/</loc>
+    <priority>1.0</priority>
+  </url>
+
+  <url><loc>https://yeyad2603-pixel.github.io/Eylox/discover.html</loc></url>
+  <url><loc>https://yeyad2603-pixel.github.io/Eylox/leaderboard.html</loc></url>
+  <url><loc>https://yeyad2603-pixel.github.io/Eylox/achievements.html</loc></url>
+  <url><loc>https://yeyad2603-pixel.github.io/Eylox/events.html</loc></url>
+  <url><loc>https://yeyad2603-pixel.github.io/Eylox/communities.html</loc></url>
+  <url><loc>https://yeyad2603-pixel.github.io/Eylox/friends.html</loc></url>
+  <url><loc>https://yeyad2603-pixel.github.io/Eylox/profile.html</loc></url>
+  <url><loc>https://yeyad2603-pixel.github.io/Eylox/messages.html</loc></url>
+
+  <url><loc>https://yeyad2603-pixel.github.io/Eylox/random-game.html</loc></url>
+  <url><loc>https://yeyad2603-pixel.github.io/Eylox/daily-missions.html</loc></url>
+  <url><loc>https://yeyad2603-pixel.github.io/Eylox/season-pass.html</loc></url>
+  <url><loc>https://yeyad2603-pixel.github.io/Eylox/clan-wars.html</loc></url>
+
+  <url><loc>https://yeyad2603-pixel.github.io/Eylox/shop.html</loc></url>
+  <url><loc>https://yeyad2603-pixel.github.io/Eylox/my-games.html</loc></url>
+  <url><loc>https://yeyad2603-pixel.github.io/Eylox/devhub.html</loc></url>
+  <url><loc>https://yeyad2603-pixel.github.io/Eylox/inventory.html</loc></url>
+  <url><loc>https://yeyad2603-pixel.github.io/Eylox/ai.html</loc></url>
+  <url><loc>https://yeyad2603-pixel.github.io/Eylox/subscription.html</loc></url>
+  <url><loc>https://yeyad2603-pixel.github.io/Eylox/settings.html</loc></url>
+  <url><loc>https://yeyad2603-pixel.github.io/Eylox/safety.html</loc></url>
+  <url><loc>https://yeyad2603-pixel.github.io/Eylox/help.html</loc></url>
+
+  <url><loc>https://yeyad2603-pixel.github.io/Eylox/login.html</loc></url>
+  <url><loc>https://yeyad2603-pixel.github.io/Eylox/signup.html</loc></url>
+
+  <url><loc>https://yeyad2603-pixel.github.io/Eylox/admin.html</loc></url>
+
+</urlset>
